@@ -1,0 +1,96 @@
+.logsPanel {
+  width: 350px;
+  background-color: var(--bg-secondary);
+  border-left: 1px solid var(--border-primary);
+  display: flex;
+  flex-direction: column;
+  transition: width 0.2s ease, opacity 0.2s ease;
+  min-height: 0;
+}
+
+.logsPanel.hidden {
+  width: 0;
+  opacity: 0;
+  overflow: hidden;
+  border: none;
+}
+
+.logsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+}
+
+.logsTitle {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.logsContent {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 0 16px 8px;
+  overflow-y: auto;
+}
+
+.logItem {
+  padding: 16px 24px;
+  width: 317px !important;
+  margin-bottom: 8px;
+  background-color: var(--surface-secondary);
+  border-radius: 4px;
+}
+
+.logItem time {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.logItemTime {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.toggleButton {
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  height: 40px;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+  border-radius: var(--border-radius);
+  padding: 0 !important;
+}
+
+.toggleButton:hover {
+  background-color: var(--border-primary);
+}
+
+.toggleButtonCollapsed {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+  height: 40px;
+  width: 40px;
+  padding: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+  z-index: 10;
+}
+
+.toggleButtonCollapsed:hover {
+  background-color: var(--border-primary);
+}

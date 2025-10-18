@@ -1,0 +1,9 @@
+.contenedor {
+  display: flex;
+  position: relative;
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  overflow: hidden;
+  flex: 1 1 auto;
+  min-height: 0; 
+}

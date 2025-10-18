@@ -1,21 +1,144 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  --text-primary: #ffffff;
+  --text-secondary: #606060;
+  --surface-primary: #212121;
+  --surface-secondary: #292929;
+  --border-primary: #393939;
+  --border-radius: 8px;
+  --blue: #417dff;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
 }
 
 html,
 body {
+  background-color: var(--surface-primary);
+  color: var(--text-primary);
   margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
+  height: 100%;
+}
+
+#root {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
+  padding: 24px;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+button {
+  all: unset;
+  box-sizing: border-box;
+  background: var(--surface-secondary);
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+  border-radius: var(--border-radius, 8px);
+  transition: 0.1s ease-in;
+}
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+button:hover:not(:disabled) {
+  background-color: rgb(50, 50, 50);
+}
+
+input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 16px;
+  height: 16px;
+  background-color: var(--surface-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: 3px;
+  cursor: pointer;
+  position: relative;
+  margin: 1px 0 0 0;
+  transition: 0.15s ease-in all;
+}
+input[type="checkbox"]::before {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 2px;
+  width: 4px;
+  height: 8px;
+  border: solid var(--surface-secondary);
+  border-width: 0 1px 1px 0;
+  transition: 0.15s ease-in all;
+  transform: rotate(45deg);
+}
+input[type="checkbox"]:checked {
+  border: 1px solid var(--blue);
+}
+input[type="checkbox"]:checked::before {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 2px;
+  width: 4px;
+  height: 8px;
+  border: solid var(--blue);
+  border-width: 0 1px 1px 0;
+  transform: rotate(45deg);
+}
+
+input[type="checkbox"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-color: var(--border-primary) transparent;
+}
+
+/* Chromium-based scrollbar */
+::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-primary);
+  border-top: 0px solid transparent !important;
+  border-bottom: 0px solid transparent !important;
+  border: 5px solid transparent;
+  background-clip: padding-box;
+  transition: all 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #505050;
+  background-clip: padding-box;
 }

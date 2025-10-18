@@ -1,0 +1,46 @@
+.contenedor {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.contenidoDispositivo {
+  margin-top: 8px;
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-primary);
+}
+.etiqueta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+}
+
+.imagenDispositivo {
+  margin-right: 16px;
+  background-color: var(--border-primary);
+  min-width: 260px;
+  height: 260px !important;
+  width: 260px !important;
+  border-radius: var(--border-radius);
+}
+.descripcion {
+  width: 100%;
+  padding: 0 16px;
+  border-right: 1px solid var(--border-primary);
+  border-left: 1px solid var(--border-primary);
+}
+.configuraciones {
+  margin-left: 16px;
+  min-width: 450px;
+}

@@ -1,0 +1,47 @@
+.header {
+  border-bottom: 1px solid var(--border-primary);
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+
+  user-select: none;
+}
+.titleContainer {
+  display: flex;
+  justify-content: space-between;
+}
+.rightSideSection {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.rightSideSection span {
+  color: var(--text-secondary);
+}
+.rightSideSection button {
+  border: 1px solid var(--border-primary);
+}
+.title {
+  font-size: 24px;
+  line-height: 16px;
+  font-weight: 400;
+  margin: 0;
+}
+.nav {
+  display: flex;
+  gap: 32px;
+}
+.linkWithIcon {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  width: fit-content;
+}
+.nav a {
+  text-decoration: none;
+  color: var(--text-primary);
+}
+.nav a.active {
+  border-bottom: 1px solid var(--blue);
+}
