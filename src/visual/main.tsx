@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import "../src/common/styles/global.css"
+import "./common/styles/global.css"
 import VistaOficina from './features/escenarios-simulados/pages/VistaOficina.tsx'
 import Dispositivos from './features/hardening-de-dispositivos/pages/Dispositivos.tsx'
 import { BrowserRouter, Route, Routes } from 'react-router'
