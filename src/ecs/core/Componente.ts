@@ -26,7 +26,7 @@ export class ComponenteContainer {
         return true;
     }
 
-    public eliminar(claseComponente: Function): void {
+    public eliminar(claseComponente: Function): void{
         this.map.delete(claseComponente);
     }
 }

@@ -17,7 +17,7 @@ export class ECSManager {
         return entidad;
     }
 
-    public removerEntidad(entidad: Entidad): void {
+    public removerEntidad(entidad: Entidad): void{
         this.entidadesADestruir.push(entidad);
     }
 
