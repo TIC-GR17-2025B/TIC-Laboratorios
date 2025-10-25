@@ -3,13 +3,15 @@ import {
   Transform,
   MuebleComponent,
   DispositivoComponent,
-  EspacioComponent, agregarDispositivo,
-  OficinaComponent, agregarEspacio,
+  EspacioComponent,
+  agregarDispositivo,
+  OficinaComponent,
+  agregarEspacio,
   ZonaComponent,
 } from "../components";
-import { Mueble, TipoDispositivo } from "../../visual/types/DeviceEnums";
 import type { Entidad } from "../core/Componente";
-import type { EscenarioMock } from "../../visual/types/EscenarioTypes";
+import { Mueble, TipoDispositivo } from "../../types/DeviceEnums";
+import type { Escenario } from "../../types/EscenarioTypes";
 
 /**
  * Builder para crear escenarios de forma declarativa y simple
@@ -200,7 +202,7 @@ export class ScenarioBuilder {
    * Construye el escenario a partir de un objeto de configuración
    * Recorre las zonas, oficinas, espacios y dispositivos del objeto y crea las entidades correspondientes
    */
-  construirDesdeArchivo(escenario: EscenarioMock): this {
+  construirDesdeArchivo(escenario: Escenario): this {
     // Recorrer las zonas
     if (escenario.zonas) {
       for (const zona of escenario.zonas) {
@@ -231,7 +233,7 @@ export class ScenarioBuilder {
                 // Agregar el espacio (mesa/rack)
                 this.agregarEspacio(
                   espacio.id,
-                  espacio.mueble,
+                  espacio.mueble ?? Mueble.MESA,
                   x,
                   y,
                   z,

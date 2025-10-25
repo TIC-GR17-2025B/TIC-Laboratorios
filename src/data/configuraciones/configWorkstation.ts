@@ -1,0 +1,16 @@
+export enum ConfiguracionWorkstation {
+  ACTUALIZACIONES_AUTOMATICAS_ANTIVIRUS = "Actualizaciones automáticas de antivirus",
+  ANTIVIRUS_GESTIONADO = "Antivirus gestionado",
+  USUARIO_APLICA_PARCHES = "Usuario aplica parches",
+  ACTUALIZACION_AUTOMATICA_PARCHES = "Actualización automática de parches",
+  ACTUALIZAR_PARCHES_AL_PUBLICARSE = "Actualizar parches al publicarse",
+  ACTUALIZACION_REGULAR_PARCHES = "Actualización regular de parches",
+  APLICAR_POLITICA_CONTRASEÑAS = "Aplicar política de contraseñas",
+  USAR_CONTRASEÑA_UNICA = "Usar contraseña única",
+  BLOQUEO_AUTOMATICO_INACTIVIDAD = "Bloqueo automático por inactividad",
+  BLOQUEAR_O_CERRAR_SESION_INACTIVIDAD = "Bloquear o cerrar sesión por inactividad",
+  BLOQUEAR_MEDIOS_EXTRAIBLES = "Bloquear medios extraíbles",
+  BLOQUEAR_ALMACENAMIENTO_LOCAL = "Bloquear almacenamiento local",
+  CUIDADO_ADJUNTOS_EMAIL = "Cuidado con adjuntos de email",
+  SIN_SOFTWARE_EXTERNO = "Sin software externo",
+}

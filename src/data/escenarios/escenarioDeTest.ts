@@ -1,4 +1,4 @@
-import { Mueble, TipoDispositivo } from "../visual/types/DeviceEnums";
+import { Mueble, TipoDispositivo } from "../../types/DeviceEnums";
 
 export const escenarioDeTest: any = {
   id: 1,

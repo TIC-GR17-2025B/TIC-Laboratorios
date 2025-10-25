@@ -1,4 +1,4 @@
-import { Mueble, TipoDispositivo } from "../visual/types/DeviceEnums";
+import { Mueble, TipoDispositivo } from "../../types/DeviceEnums";
 
 export const escenarioBase: any = {
   id: 1,
@@ -20,6 +20,9 @@ export const escenarioBase: any = {
                 {
                   id: 101,
                   tipo: TipoDispositivo.WORKSTATION,
+                  sistemaOperativo: "Windows 10",
+                  hardware: "Intel",
+                  software: "Office Suite",
                   nombre: "PC de Jacob",
                 },
               ],

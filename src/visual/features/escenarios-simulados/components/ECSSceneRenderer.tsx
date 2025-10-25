@@ -7,16 +7,25 @@ import {
     getMuebleHeight,
     getDispositivoHeight,
 } from '../config/modelConfig';
+import { useEscenario } from '../../../common/contexts';
 
 interface ECSSceneRendererProps {
     entities: ECSSceneEntity[];
-    onEntityClick?: (entity: ECSSceneEntity) => void;
 }
 
 /**
  * Componente que renderiza todas las entidades del ECS como modelos 3D
  */
-const ECSSceneRenderer: React.FC<ECSSceneRendererProps> = ({ entities, onEntityClick }) => {
+const ECSSceneRenderer: React.FC<ECSSceneRendererProps> = ({ entities }) => {
+
+    const { setDispositivoSeleccionado, dispositivoSeleccionado } = useEscenario();
+
+    const handleEntityClick = (entity: any) => {
+        console.log('Entidad clickeada:', entity);
+        setDispositivoSeleccionado(entity);
+        console.log('Dispositivo seleccionado actualizado:', dispositivoSeleccionado);
+    };
+
     return (
         <>
             {entities.map((entity) => {
@@ -44,8 +53,8 @@ const ECSSceneRenderer: React.FC<ECSSceneRendererProps> = ({ entities, onEntityC
                         position={adjustedPosition}
                         rotation={[0, entity.rotation, 0]}
                         scale={1}
-                    //showHoverButton={showButton}
-                    //onButtonClick={() => onEntityClick?.(entity)}
+                        showHoverButton={showButton}
+                        onClick={() => handleEntityClick(entity)}
                     />
                 );
             })}

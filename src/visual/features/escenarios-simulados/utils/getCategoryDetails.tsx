@@ -1,5 +1,5 @@
 import type { JSX } from 'react';
-import { LogCategory } from '../../../types/LogCategory';
+import { LogCategory } from '../../../../types/LogCategory';
 
 import CarritoIcon from '../../../common/icons/CarritoIcon';
 import AdvertenciaIcon from '../../../common/icons/AdvertenciaIcon';

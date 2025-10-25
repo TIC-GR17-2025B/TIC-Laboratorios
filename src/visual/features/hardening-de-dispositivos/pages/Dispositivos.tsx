@@ -7,9 +7,10 @@ import styles from "../styles/Dispositivos.module.css"
 import { dispositivosMock } from "../../../mocks/DispositivoMock";
 import ComboBox from "../../../common/components/ComboBox";
 import PanelConfiguraciones from "../components/PanelConfiguraciones";
+import { useEscenario } from "../../../common/contexts";
 
 function Dispositivos() {
-    const [dispositivoSeleccionado, setDispositivoSeleccionado] = useState(dispositivosMock[0]);
+    const { setDispositivoSeleccionado, dispositivoSeleccionado } = useEscenario();
 
     const opciones = useMemo(() => dispositivosMock, []);
 

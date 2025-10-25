@@ -1,14 +1,14 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import styles from '../styles/PanelConfiguraciones.module.css';
-import { configuracionesMock } from '../../../mocks/ConfiguracionesMock';
 import CheckableItem from '../../../common/components/CheckableItem';
-import Toggle from '../../../common/components/Toggle';
+import obtenerConfiguraciones from '../utils/obtenerConfiguraciones';
 
 export default function PanelConfiguraciones() {
+    const configuraciones = useMemo(() => obtenerConfiguraciones(), []);
+
     const [checkedItems, setCheckedItems] = useState<boolean[]>(
-        new Array(configuracionesMock.procedimiento.length).fill(false)
+        new Array(configuraciones.length).fill(false)
     );
-    const [vistaSeleccionada, setVistaSeleccionada] = useState<string>("procedimiento");
 
     const handleCheckChange = (index: number, checked: boolean) => {
         const newCheckedItems = [...checkedItems];
@@ -19,17 +19,9 @@ export default function PanelConfiguraciones() {
     return <div className={styles.contenedor}>
         <div className={styles.header}>
             <h2> Configuraciones</h2>
-            <Toggle
-                options={[
-                    { value: "procedimiento", label: "Procedimiento" },
-                    { value: "ajustes", label: "Ajustes" },
-                ]}
-                value={vistaSeleccionada}
-                onChange={(value) => setVistaSeleccionada(value)}
-            />
         </div>
         <div className={styles.listaConfiguraciones}>
-            {configuracionesMock[vistaSeleccionada as keyof typeof configuracionesMock].map((configuracion, index) => (
+            {configuraciones.map((configuracion, index) => (
                 <CheckableItem
                     key={index}
                     label={configuracion.configuracion}

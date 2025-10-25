@@ -8,7 +8,7 @@ interface Model3DProps {
     rotation?: [number, number, number];
     scale?: number | [number, number, number];
     showHoverButton?: boolean;
-    onButtonClick?: () => void;
+    onClick?: () => void;
     hoverPadding?: number;
 }
 
@@ -23,7 +23,7 @@ const Model3D: React.FC<Model3DProps> = ({
     rotation = [0, 0, 0],
     scale = 1,
     showHoverButton = true,
-    onButtonClick,
+    onClick,
     hoverPadding = 1.5
 }) => {
     const groupRef = useRef<Group>(null);
@@ -50,12 +50,13 @@ const Model3D: React.FC<Model3DProps> = ({
 
     const handleButtonClick = (e: React.MouseEvent) => {
         e.stopPropagation();
-        if (onButtonClick) {
-            onButtonClick();
+        if (onClick) {
+            onClick();
         }
     };
 
     const handleSelect = () => {
+        console.log("Modelo seleccionado:", modelPath);
         setHovered(!hovered);
     };
 
@@ -68,7 +69,7 @@ const Model3D: React.FC<Model3DProps> = ({
         >
             {/* Necesito este mesh invisible para detectar un hover con padding */}
             <mesh
-            //onClick={handleSelect}
+                onClick={onClick}
             >
                 <boxGeometry args={boundingBoxSize} />
                 <meshBasicMaterial visible={false} />
@@ -76,7 +77,7 @@ const Model3D: React.FC<Model3DProps> = ({
 
             <primitive object={clonedScene} />
 
-            {showHoverButton && hovered && (
+            {/* {showHoverButton && hovered && (
                 <Html
                     position={[0, boundingBoxSize[1] / 2, 0]}
                     center
@@ -86,11 +87,11 @@ const Model3D: React.FC<Model3DProps> = ({
                     style={{
                         transition: 'all 0.2s',
                         opacity: hovered ? 1 : 0,
-                        pointerEvents: 'auto'
+                        pointerEvents: 'handleButtonClickauto'
                     }}
                 >
                     <button
-                        onClick={handleButtonClick}
+                        onClick={}
                         style={{
                             padding: '8px 16px',
                             backgroundColor: 'var(--border-primary)',
@@ -113,7 +114,7 @@ const Model3D: React.FC<Model3DProps> = ({
                         Configurar
                     </button>
                 </Html>
-            )}
+            )} */}
         </group>
     );
 };

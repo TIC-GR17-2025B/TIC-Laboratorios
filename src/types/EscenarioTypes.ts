@@ -1,36 +1,37 @@
 import { Mueble, TipoDispositivo } from "./DeviceEnums";
 
-export interface DispositivoMock {
+export interface Dispositivo {
   id: number;
   tipo: TipoDispositivo;
   nombre?: string;
   sistemaOperativo?: string;
-  hardware?: string;
+  hardware: string;
+  software?: string;
   posicion?: { x: number; y: number; z: number };
 }
 
-export interface EspacioMock {
+export interface Espacio {
   id: number;
-  mueble: Mueble;
+  mueble: Mueble | null;
   posicion?: { x: number; y: number; z: number; rotacionY?: number };
-  dispositivos: DispositivoMock[];
+  dispositivos: Dispositivo[];
 }
 
-export interface OficinaMock {
+export interface Oficina {
   id: number;
   nombre?: string;
   posicion?: { x: number; y: number; z: number };
-  espacios: EspacioMock[];
+  espacios: Espacio[];
 }
 
-export interface ZonaMock {
+export interface Zona {
   nombre: string;
   id?: number;
-  oficinas: OficinaMock[];
+  oficinas: Oficina[];
 }
 
-export interface EscenarioMock {
+export interface Escenario {
   id: number;
   titulo: string;
-  zonas: ZonaMock[];
+  zonas: Zona[];
 }

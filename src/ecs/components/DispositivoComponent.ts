@@ -1,5 +1,5 @@
+import type { TipoDispositivo } from "../../types/DeviceEnums";
 import { Componente } from "../core/Componente";
-import { TipoDispositivo } from "../../visual/types/DeviceEnums";
 
 export class DispositivoComponent extends Componente {
   constructor(

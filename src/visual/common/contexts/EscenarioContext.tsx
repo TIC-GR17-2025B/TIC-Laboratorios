@@ -1,11 +1,13 @@
 import { createContext, useContext, useState } from 'react';
 import type { ReactNode } from 'react';
-import type { EscenarioMock } from '../../types/EscenarioTypes';
-import { escenarioBase } from '../../../escenarios/escenarioBase';
+import type { Dispositivo, Escenario } from '../../../types/EscenarioTypes';
+import { escenarioBase } from '../../../data/escenarios/escenarioBase';
 
 interface EscenarioContextType {
-    escenario: EscenarioMock;
-    setEscenario: (escenario: EscenarioMock) => void;
+    escenario: Escenario;
+    setEscenario: (escenario: Escenario) => void;
+    dispositivoSeleccionado: Dispositivo | null;
+    setDispositivoSeleccionado: (dispositivo: Dispositivo | null) => void;
 }
 
 /**
@@ -15,17 +17,17 @@ const EscenarioContext = createContext<EscenarioContextType | undefined>(undefin
 
 interface EscenarioProviderProps {
     children: ReactNode;
-    initialEscenario?: EscenarioMock;
+    initialEscenario?: Escenario;
 }
 
 /**
  * Envuelve la aplicación y proporciona el estado del escenario
  */
 export function EscenarioProvider({ children, initialEscenario = escenarioBase }: EscenarioProviderProps) {
-    const [escenario, setEscenario] = useState<EscenarioMock>(initialEscenario);
-
+    const [escenario, setEscenario] = useState<Escenario>(initialEscenario);
+    const [dispositivoSeleccionado, setDispositivoSeleccionado] = useState<Dispositivo | null>(null);
     return (
-        <EscenarioContext.Provider value={{ escenario, setEscenario }}>
+        <EscenarioContext.Provider value={{ escenario, setEscenario, dispositivoSeleccionado, setDispositivoSeleccionado }}>
             {children}
         </EscenarioContext.Provider>
     );
@@ -61,7 +63,7 @@ export function useEscenario(): EscenarioContextType {
  * const escenario = useEscenarioActual();
  */
 
-export function useEscenarioActual(): EscenarioMock {
+export function useEscenarioActual(): Escenario {
     const { escenario } = useEscenario();
     return escenario;
 }

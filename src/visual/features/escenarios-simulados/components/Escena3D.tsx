@@ -19,10 +19,6 @@ import ECSSceneRenderer from './ECSSceneRenderer';
 const Escena3D: React.FC = () => {
     const { entities } = useECSScene();
 
-    const handleEntityClick = (entity: any) => {
-        console.log('Entidad clickeada:', entity);
-    };
-
     return (
         <section className={styles.vista3D} aria-label="Vista 3D de la escena">
             <Scene3DCanvas className={styles.canvas}>
@@ -34,7 +30,6 @@ const Escena3D: React.FC = () => {
                 />
                 <ECSSceneRenderer
                     entities={entities}
-                    onEntityClick={handleEntityClick}
                 />
                 <CameraControls
                     enableZoom={DEFAULT_CONTROLS_CONFIG.enableZoom}

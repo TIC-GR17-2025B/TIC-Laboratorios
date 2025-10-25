@@ -1,4 +1,4 @@
-import { Mueble, TipoDispositivo } from "../../../types/DeviceEnums";
+import { Mueble, TipoDispositivo } from "../../../../types/DeviceEnums";
 
 /**
  * Configuración centralizada de modelos 3D y sus propiedades
