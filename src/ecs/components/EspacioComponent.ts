@@ -5,17 +5,20 @@ import { Componente, type Entidad } from "../core/Componente";
  * Mantiene referencias a las entidades de dispositivos que contiene
  */
 export class EspacioComponent extends Componente {
-  public dispositivos: Entidad[] = [];
-
-  constructor(public id: number, public oficinaId: number) {
+  constructor(
+        public id: number,
+        public oficinaId: number,
+        public dispositivos: Entidad[] = [] 
+  ) {
     super();
   }
+}
 
-  agregarDispositivo(entidadDispositivo: Entidad): boolean {
-    if (!this.dispositivos.includes(entidadDispositivo)) {
-      this.dispositivos.push(entidadDispositivo);
+export function agregarDispositivo(espacioComponent: EspacioComponent,
+                                   entidadDispositivo: Entidad): boolean {
+    if (!espacioComponent.dispositivos.includes(entidadDispositivo)) {
+      espacioComponent.dispositivos.push(entidadDispositivo);
       return true;
     }
     return false;
   }
-}

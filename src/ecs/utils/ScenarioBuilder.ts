@@ -3,8 +3,8 @@ import {
   Transform,
   MuebleComponent,
   DispositivoComponent,
-  EspacioComponent,
-  OficinaComponent,
+  EspacioComponent, agregarDispositivo,
+  OficinaComponent, agregarEspacio,
   ZonaComponent,
 } from "../components";
 import { Mueble, TipoDispositivo } from "../../visual/types/DeviceEnums";
@@ -96,7 +96,7 @@ export class ScenarioBuilder {
       new MuebleComponent(mueble, capacidad)
     );
 
-    oficinaComp.agregarEspacio(entidad);
+    agregarEspacio(oficinaComp, entidad);
 
     const key = `${oficinaComp.id}-${espacioId}`;
     this.espacios.set(key, entidad);
@@ -147,7 +147,7 @@ export class ScenarioBuilder {
       new DispositivoComponent(tipo, nombre)
     );
 
-    espacioComp.agregarDispositivo(entidad);
+    agregarDispositivo(espacioComp, entidad);
     this.dispositivos.set(dispositivoId, entidad);
 
     return this;
@@ -156,9 +156,9 @@ export class ScenarioBuilder {
   /**
    * Obtiene una oficina por ID para modificarla
    */
-  obtenerOficina(oficinaId: number): Entidad | undefined {
-    return this.oficinas.get(oficinaId);
-  }
+  // obtenerOficina(oficinaId: number): Entidad | undefined {
+  //   return this.oficinas.get(oficinaId);
+  // }
 
   /**
    * Obtiene un espacio por oficina y espacio ID
@@ -170,31 +170,31 @@ export class ScenarioBuilder {
   /**
    * Obtiene un dispositivo por ID
    */
-  obtenerDispositivo(dispositivoId: number): Entidad | undefined {
-    return this.dispositivos.get(dispositivoId);
-  }
+  // obtenerDispositivo(dispositivoId: number): Entidad | undefined {
+  //   return this.dispositivos.get(dispositivoId);
+  // }
 
   /**
    * Modifica la posición de un espacio
    */
-  moverEspacio(
-    oficinaId: number,
-    espacioId: number,
-    x: number,
-    y: number,
-    z: number
-  ): this {
-    const espacio = this.obtenerEspacio(oficinaId, espacioId);
-    if (espacio) {
-      const transform = this.ecsManager.getComponentes(espacio)?.get(Transform);
-      if (transform) {
-        transform.x = x;
-        transform.y = y;
-        transform.z = z;
-      }
-    }
-    return this;
-  }
+  // moverEspacio(
+  //   oficinaId: number,
+  //   espacioId: number,
+  //   x: number,
+  //   y: number,
+  //   z: number
+  // ): this {
+  //   const espacio = this.obtenerEspacio(oficinaId, espacioId);
+  //   if (espacio) {
+  //     const transform = this.ecsManager.getComponentes(espacio)?.get(Transform);
+  //     if (transform) {
+  //       transform.x = x;
+  //       transform.y = y;
+  //       transform.z = z;
+  //     }
+  //   }
+  //   return this;
+  // }
 
   /**
    * Construye el escenario a partir de un objeto de configuración
