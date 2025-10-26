@@ -23,12 +23,12 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
             {message.context.imageUrl && (
               <img 
                 src={message.context.imageUrl} 
-                alt={message.context.ariaLabel}
+                alt={message.context.displayText || message.context.contextId}
                 className={styles.messageContextImage}
               />
             )}
             <div className={styles.messageContextInfo}>
-              <strong> {message.context.ariaLabel}</strong>
+              <strong>{message.context.contextId}</strong>
             </div>
           </div>
         )}

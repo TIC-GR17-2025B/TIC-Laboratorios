@@ -20,6 +20,7 @@ const ChatToggleButton: React.FC<ChatToggleButtonProps> = ({
         <button 
             onClick={onToggle}
             aria-label={isOpen ? 'Cerrar chat' : 'Abrir chat'}
+            data-chat-toggle="true"
             className={isActive ? styles.buttonActive : ''}
         >
             Chatbot <EstrellasIcon />

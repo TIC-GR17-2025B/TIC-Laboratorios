@@ -6,13 +6,12 @@ const CONTEXT_SELECTOR = '[data-context]' as const;
 
 const CONTEXT_MODE_CLASS = 'context-mode-active' as const;
 
+// Tipos de eventos a bloquear cuando el modo contexto está activo
 const BLOCKED_EVENT_TYPES = [
   'mousedown',
   'mouseup', 
   'dblclick',
   'contextmenu',
-  'keydown',
-  'keyup',
   'submit'
 ] as const;
 
@@ -23,7 +22,10 @@ export const useContextMode = (onContextSelected?: OnContextSelectedCallback) =>
   const [isContextMode, setIsContextMode] = useState(false);
   const [selectedContext, setSelectedContext] = useState<GameContext | null>(null);
 
-
+  /**
+   * Extrae el contexto de un elemento HTML.
+   * Responsabilidad única: Transformar elemento DOM a GameContext.
+   */
   const extractContextFromElement = useCallback((element: HTMLElement): GameContext => {
     const contextId = element.getAttribute('data-context') || '';
     const displayText = element.textContent?.trim() || contextId;
@@ -40,20 +42,35 @@ export const useContextMode = (onContextSelected?: OnContextSelectedCallback) =>
     };
   }, []);
 
+  /**
+   * Verifica si un elemento es o está dentro de un elemento con data-context.
+   * Responsabilidad única: Identificar elementos contextuales.
+   */
+  const isContextElement = useCallback((element: HTMLElement): boolean => {
+    return element.closest(CONTEXT_SELECTOR) !== null;
+  }, []);
 
+  /**
+   * Previene la propagación de eventos.
+   * Responsabilidad única: Bloquear eventos.
+   */
   const preventEventPropagation = useCallback((event: Event) => {
     event.preventDefault();
     event.stopPropagation();
     event.stopImmediatePropagation();
   }, []);
 
-
+  /**
+   * Maneja clics en elementos contextuales.
+   * Responsabilidad única: Capturar contexto cuando se hace clic.
+   */
   const handleObjectClick = useCallback((event: MouseEvent) => {
     const target = event.target as HTMLElement;
-    const elementWithContext = target.closest(CONTEXT_SELECTOR) as HTMLElement;
     
-    if (!elementWithContext?.hasAttribute('data-context')) return;
+    // Solo procesar si es un elemento contextual
+    if (!isContextElement(target)) return;
 
+    const elementWithContext = target.closest(CONTEXT_SELECTOR) as HTMLElement;
     preventEventPropagation(event);
 
     const context = extractContextFromElement(elementWithContext);
@@ -64,19 +81,26 @@ export const useContextMode = (onContextSelected?: OnContextSelectedCallback) =>
     
     // Notificar al componente padre que se seleccionó un contexto
     onContextSelected?.(context);
-  }, [extractContextFromElement, preventEventPropagation, onContextSelected]);
+  }, [isContextElement, extractContextFromElement, preventEventPropagation, onContextSelected]);
 
-
+  /**
+   * Bloquea acciones SOLO en elementos con data-context.
+   * Responsabilidad única: Prevenir acciones no deseadas en elementos contextuales.
+   */
   const blockElementActions = useCallback((event: Event) => {
     const target = event.target as HTMLElement;
-    const elementWithContext = target.closest(CONTEXT_SELECTOR);
     
-    if (elementWithContext) {
+    // SOLO bloquear si el elemento tiene data-context
+    if (isContextElement(target)) {
       preventEventPropagation(event);
     }
-  }, [preventEventPropagation]);
+  }, [isContextElement, preventEventPropagation]);
 
 
+  /**
+   * Agrega event listeners cuando el modo contexto está activo.
+   * Responsabilidad única: Configurar escucha de eventos.
+   */
   const addEventListeners = useCallback(() => {
     document.addEventListener('click', handleObjectClick, true);
      
@@ -87,6 +111,10 @@ export const useContextMode = (onContextSelected?: OnContextSelectedCallback) =>
     document.body.classList.add(CONTEXT_MODE_CLASS);
   }, [handleObjectClick, blockElementActions]);
 
+  /**
+   * Remueve event listeners cuando el modo contexto se desactiva.
+   * Responsabilidad única: Limpiar escucha de eventos.
+   */
   const removeEventListeners = useCallback(() => {
     document.removeEventListener('click', handleObjectClick, true);
     
@@ -98,11 +126,14 @@ export const useContextMode = (onContextSelected?: OnContextSelectedCallback) =>
   }, [handleObjectClick, blockElementActions]);
 
 
+  /**
+   * Alterna el estado del modo contexto.
+   * Responsabilidad única: Controlar activación/desactivación.
+   */
   const toggleContextMode = useCallback(() => {
     setIsContextMode((prev) => {
       const newValue = !prev;
       
-      // Limpiar contexto cuando se desactiva
       if (!newValue) {
         setSelectedContext(null);
       }
@@ -111,12 +142,17 @@ export const useContextMode = (onContextSelected?: OnContextSelectedCallback) =>
     });
   }, []);
 
+  /**
+   * Limpia el contexto seleccionado.
+   * Responsabilidad única: Resetear estado de contexto.
+   */
   const clearContext = useCallback(() => {
     setSelectedContext(null);
   }, []);
 
   /**
-   * Desactiva el modo contexto manualmente
+   * Desactiva el modo contexto manualmente.
+   * Responsabilidad única: Desactivación explícita.
    */
   const deactivateContextMode = useCallback(() => {
     setIsContextMode(false);
@@ -124,7 +160,8 @@ export const useContextMode = (onContextSelected?: OnContextSelectedCallback) =>
   }, []);
 
   /**
-   * Efecto para gestionar event listeners según el estado del modo contexto
+   * Gestiona event listeners según el estado del modo contexto.
+   * Responsabilidad única: Sincronizar listeners con estado.
    */
   useEffect(() => {
     if (isContextMode) {
@@ -133,7 +170,6 @@ export const useContextMode = (onContextSelected?: OnContextSelectedCallback) =>
       removeEventListeners();
     }
 
-    // Cleanup al desmontar o cambiar el modo
     return removeEventListeners;
   }, [isContextMode, addEventListeners, removeEventListeners]);
 

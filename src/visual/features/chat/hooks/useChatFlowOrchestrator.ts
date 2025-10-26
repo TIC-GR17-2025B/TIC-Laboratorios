@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useChatContext } from '../context/ChatContext';
 import { useContextMode } from './useContextMode';
 import type { GameContext } from '../types/chat.types';
@@ -18,7 +18,7 @@ import type { GameContext } from '../types/chat.types';
 export const useChatFlowOrchestrator = (
   onContextSelected: (context: GameContext) => void
 ) => {
-  const { isChatOpen, closeChat, openChat, setContextModeActive } = useChatContext();
+  const { closeChat, openChat, setContextModeActive } = useChatContext();
 
   /**
    * Callback ejecutado cuando se selecciona un contexto.
@@ -38,21 +38,25 @@ export const useChatFlowOrchestrator = (
     toggleContextMode
   } = useContextMode(handleContextSelection);
 
+  // Ref para trackear el valor anterior de isContextMode
+  const prevIsContextModeRef = useRef(isContextMode);
+
   /**
    * Efecto: Sincronizar estado del modo contexto con el contexto global.
+   * SOLO cierra el chat cuando el modo contexto CAMBIA de false a true.
    */
   useEffect(() => {
     setContextModeActive(isContextMode);
-  }, [isContextMode, setContextModeActive]);
-
-  /**
-   * Efecto: Cerrar chat cuando se activa el modo contexto.
-   */
-  useEffect(() => {
-    if (isContextMode && isChatOpen) {
+    
+    // Cerrar chat SOLO cuando se ACTIVA el modo contexto (transición de false a true)
+    const wasActivated = !prevIsContextModeRef.current && isContextMode;
+    if (wasActivated) {
       closeChat();
     }
-  }, [isContextMode, isChatOpen, closeChat]);
+    
+    // Actualizar el ref con el valor actual para la próxima ejecución
+    prevIsContextModeRef.current = isContextMode;
+  }, [isContextMode, setContextModeActive, closeChat]);
 
   return {
     isContextMode,

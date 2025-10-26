@@ -3,7 +3,8 @@ import styles from '../styles/Header.module.css';
 import NavigationLink from './Navigation';
 import DevicesIcon from '../icons/DevicesIcon';
 import OfficeIcon from '../icons/OfficeIcon';
-import EstrellasIcon from '../icons/EstrellasIcon';
+import ChatToggleButton from '../../features/chat/components/ChatToggleButton/ChatToggleButton';
+import { useChatContext } from '../../features/chat/context/ChatContext';
 import { useEscenarioActual } from '../contexts/EscenarioContext';
 import {useECSScene} from "../../features/escenarios-simulados/hooks/useECSScene";
 import { useEffect } from 'react';
@@ -11,6 +12,7 @@ import { useEffect } from 'react';
 const Header: React.FC = () => {
     const escenario = useEscenarioActual();
     const {pause, resume, iniciar, isPaused} = useECSScene();
+    const { isChatOpen, isContextModeActive, toggleChat } = useChatContext();
     useEffect(() => {
         // iniciar la simulación una sola vez al montar
         iniciar && iniciar();
@@ -25,9 +27,11 @@ const Header: React.FC = () => {
                     </span>
                     <button onClick={()=>{pause && pause()}}>Pausar</button>
                     <button onClick={()=>{resume && resume()}}>Reanudar</button>
-                    <button>
-                        Chatbot <EstrellasIcon />
-                    </button>
+                    <ChatToggleButton 
+                        isOpen={isChatOpen}
+                        isContextModeActive={isContextModeActive}
+                        onToggle={toggleChat}
+                    />
                 </div>
             </div>
             <nav className={styles.nav}>

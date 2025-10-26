@@ -6,10 +6,13 @@ import Dispositivos from './features/hardening-de-dispositivos/pages/Dispositivo
 import { BrowserRouter, Route, Routes } from 'react-router'
 import Header from './common/components/Header.tsx'
 import { EscenarioProvider } from './common/contexts/EscenarioContext.tsx'
+import { ChatProvider } from './features/chat/context/ChatContext.tsx'
+import FloatingChat from './features/chat/components/FloatingChat/FloatingChat.tsx'
 
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
+    <ChatProvider>
     <EscenarioProvider>
       <BrowserRouter>
         <Header />
@@ -19,7 +22,9 @@ createRoot(document.getElementById('root')!).render(
             <Route path='/dispositivos' element={<Dispositivos />} />
           </Routes>
         </div>
+        <FloatingChat />
       </BrowserRouter>
     </EscenarioProvider>
+    </ChatProvider>
   </StrictMode>,
 )
