@@ -5,16 +5,11 @@ import { Componente, type Entidad } from "../core/Componente";
  */
 export class ZonaComponent extends Componente {
   constructor(
-        public id: number,
-        public nombre: string,
-        public oficinas: Entidad[] = []
+    public id: number,
+    public nombre: string,
+    public oficinas: Entidad[] = [],
+    public tipo: string = "zona"
   ) {
     super();
   }
-
-  // agregarOficina(entidadOficina: Entidad): void {
-  //   if (!this.oficinas.includes(entidadOficina)) {
-  //     this.oficinas.push(entidadOficina);
-  //   }
-  // }
 }

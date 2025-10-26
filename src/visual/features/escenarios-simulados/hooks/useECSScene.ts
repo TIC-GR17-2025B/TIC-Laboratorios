@@ -1,14 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { ECSManager } from "../../../../ecs/core/ECSManager";
 import type { Entidad } from "../../../../ecs/core/Componente";
-import {
-  Transform,
-  MuebleComponent,
-  DispositivoComponent,
-  EspacioComponent,
-} from "../../../../ecs/components";
 import { ScenarioBuilder } from "../../../../ecs/utils/ScenarioBuilder";
 import { useEscenarioActual } from "../../../common/contexts/EscenarioContext";
+import { getDispositivoHeight } from "../config/modelConfig";
 
 export interface ECSSceneEntity {
   id: Entidad;
@@ -20,99 +15,101 @@ export interface ECSSceneEntity {
   nombre?: string;
 }
 
+interface Transform {
+  x: number;
+  y: number;
+  z: number;
+  rotacionY: number;
+}
+
+interface ObjetoConTipo {
+  tipo: string;
+  [key: string]: any;
+}
+
+interface ProcessedEntity {
+  objetoConTipo: ObjetoConTipo;
+  position: [number, number, number];
+  rotacionY: number;
+  entityIndex: number;
+}
+
 export function useECSScene() {
   const escenario = useEscenarioActual();
-  const [entities, setEntities] = useState<ECSSceneEntity[]>([]);
+  const [entities, setEntities] = useState<any>([]);
   const ecsManagerRef = useRef<ECSManager | null>(null);
   const builderRef = useRef<ScenarioBuilder | null>(null);
   const inicializadoRef = useRef(false);
 
   useEffect(() => {
-    // Prevenir doble inicialización en React StrictMode
     if (inicializadoRef.current) {
       return;
     }
     inicializadoRef.current = true;
+
     const ecsManager = new ECSManager();
-
     ecsManagerRef.current = ecsManager;
+
     const builder = new ScenarioBuilder(ecsManager);
-
-    // Construir el escenario desde el context
     builder.construirDesdeArchivo(escenario);
-
     builderRef.current = builder;
 
-    console.log("Builder:", builder);
-    console.log("Escenario usado:", escenario);
+    setEntities(builder.getEntidades());
+  }, [escenario]);
 
-    const result = builder.construir();
-    const extractedEntities = extractEntitiesFromBuilder(result, ecsManager);
-    setEntities(extractedEntities);
+  // procesar entidades desde los maps
+  const processEntities = (): ProcessedEntity[] => {
+    if (!entities) return [];
 
-    console.log("Entidades extraídas:", extractedEntities);
-  }, [escenario]); // Re-ejecutar cuando cambie el escenario
+    const processedEntities: ProcessedEntity[] = [];
+
+    Array.from(entities.values()).forEach((value: any, entityIndex: number) => {
+      const componentes = Array.from(value.map.values()) as any[];
+
+      const objetoConTipo = componentes.find(
+        (obj: any): obj is ObjetoConTipo =>
+          "tipo" in obj && typeof obj.tipo === "string"
+      );
+
+      const transform = componentes.find(
+        (obj: any): obj is Transform =>
+          "x" in obj &&
+          "y" in obj &&
+          "z" in obj &&
+          "rotacionY" in obj &&
+          typeof obj.x === "number" &&
+          typeof obj.y === "number" &&
+          typeof obj.z === "number" &&
+          typeof obj.rotacionY === "number"
+      );
+
+      if (!objetoConTipo) return;
+
+      // el offsetY es para poner el dispositivo a
+      // la altura correcta sobre una mesa
+      const offsetY = getDispositivoHeight(objetoConTipo.tipo);
+
+      const position: [number, number, number] = transform
+        ? [transform.x, transform.y + offsetY, transform.z]
+        : [0, offsetY, 0];
+
+      const rotacionY: number = transform?.rotacionY ?? 0;
+
+      processedEntities.push({
+        objetoConTipo,
+        position,
+        rotacionY,
+        entityIndex,
+      });
+    });
+
+    return processedEntities;
+  };
 
   return {
     entities,
     ecsManager: ecsManagerRef.current,
     builder: builderRef.current,
+    processEntities,
   };
-}
-
-/**
- * Extrae las entidades del builder y las convierte al formato ECSSceneEntity
- */
-function extractEntitiesFromBuilder(
-  builderResult: {
-    oficinas: Map<number, Entidad>;
-    espacios: Map<string, Entidad>;
-    dispositivos: Map<number, Entidad>;
-    ecsManager: ECSManager;
-  },
-  ecsManager: ECSManager
-): ECSSceneEntity[] {
-  const sceneEntities: ECSSceneEntity[] = [];
-
-  // Extraer espacios (mesas/racks)
-  for (const [, entityId] of builderResult.espacios) {
-    const components = ecsManager.getComponentes(entityId);
-    if (!components) continue;
-
-    const transform = components.get(Transform);
-    const muebleComp = components.get(MuebleComponent);
-    const espacioComp = components.get(EspacioComponent);
-
-    if (transform && muebleComp && espacioComp) {
-      sceneEntities.push({
-        id: entityId,
-        position: [transform.x, transform.y, transform.z],
-        rotation: transform.rotacionY,
-        type: "espacio",
-        muebleTipo: muebleComp.tipo,
-      });
-    }
-  }
-
-  // Extraer dispositivos
-  for (const [, entityId] of builderResult.dispositivos) {
-    const components = ecsManager.getComponentes(entityId);
-    if (!components) continue;
-
-    const transform = components.get(Transform);
-    const dispositivoComp = components.get(DispositivoComponent);
-
-    if (transform && dispositivoComp) {
-      sceneEntities.push({
-        id: entityId,
-        position: [transform.x, transform.y, transform.z],
-        rotation: transform.rotacionY,
-        type: "dispositivo",
-        dispositivoTipo: dispositivoComp.tipo,
-        nombre: dispositivoComp.nombre,
-      });
-    }
-  }
-
-  return sceneEntities;
 }

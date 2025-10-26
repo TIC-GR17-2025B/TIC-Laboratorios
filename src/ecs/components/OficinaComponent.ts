@@ -5,17 +5,12 @@ import { Componente, type Entidad } from "../core/Componente";
  */
 export class OficinaComponent extends Componente {
   constructor(
-        public id: number,
-        public nombre: string,
-        public zonaId: number, 
-        public espacios: Entidad[] = []
+    public id: number,
+    public nombre: string,
+    public zonaId: number,
+    public espacios: Entidad[] = [],
+    public tipo: string = "oficina"
   ) {
     super();
-  } 
-}
-
-export function agregarEspacio(oficinaComponent: OficinaComponent, entidadEspacio: Entidad): void {
-    if (!oficinaComponent.espacios.includes(entidadEspacio)) {
-      oficinaComponent.espacios.push(entidadEspacio);
-    }
   }
+}

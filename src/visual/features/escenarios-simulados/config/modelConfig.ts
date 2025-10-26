@@ -43,6 +43,17 @@ export const getMuebleModel = (tipo: string): string => {
   return MUEBLE_MODELS[tipo] || "";
 };
 
+export const getModelo = (objeto: any): string => {
+  if (objeto.tipo in DISPOSITIVO_MODELS) {
+    return getDispositivoModel(objeto.tipo);
+  } else if (objeto.tipo == "espacio") {
+    const mueble = objeto.mueble;
+    return getMuebleModel(mueble);
+  } else {
+    return "";
+  }
+};
+
 /**
  * Obtiene el modelo 3D para un tipo de dispositivo
  */
@@ -54,7 +65,7 @@ export const getDispositivoModel = (tipo: string): string => {
  * Obtiene la altura (Y) para un tipo de dispositivo
  */
 export const getDispositivoHeight = (tipo: string): number => {
-  return DISPOSITIVO_HEIGHTS[tipo] ?? 0.5;
+  return DISPOSITIVO_HEIGHTS[tipo] ?? 0;
 };
 
 /**

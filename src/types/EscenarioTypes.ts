@@ -1,4 +1,17 @@
+import type { Entidad } from "../ecs/core";
 import { Mueble, TipoDispositivo } from "./DeviceEnums";
+
+export interface Escenario {
+  id: number;
+  titulo: string;
+  descripcion: string;
+  zonas: Entidad[];
+}
+
+export interface Zona {
+  id: number;
+  nombre: string;
+}
 
 export interface Dispositivo {
   id: number;
@@ -22,16 +35,4 @@ export interface Oficina {
   nombre?: string;
   posicion?: { x: number; y: number; z: number };
   espacios: Espacio[];
-}
-
-export interface Zona {
-  nombre: string;
-  id?: number;
-  oficinas: Oficina[];
-}
-
-export interface Escenario {
-  id: number;
-  titulo: string;
-  zonas: Zona[];
 }

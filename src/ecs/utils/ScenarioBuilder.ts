@@ -1,17 +1,15 @@
 import { ECSManager } from "../core/ECSManager";
 import {
   Transform,
-  MuebleComponent,
   DispositivoComponent,
   EspacioComponent,
-  agregarDispositivo,
   OficinaComponent,
-  agregarEspacio,
   ZonaComponent,
+  EscenarioComponent,
 } from "../components";
-import type { Entidad } from "../core/Componente";
-import { Mueble, TipoDispositivo } from "../../types/DeviceEnums";
+import type { ComponenteContainer, Entidad } from "../core/Componente";
 import type { Escenario } from "../../types/EscenarioTypes";
+import { SistemaRelaciones } from "../systems/SistemaRelaciones";
 
 /**
  * Builder para crear escenarios de forma declarativa y simple
@@ -19,253 +17,147 @@ import type { Escenario } from "../../types/EscenarioTypes";
  */
 export class ScenarioBuilder {
   private ecsManager: ECSManager;
-  private oficinaActual: Entidad | null = null;
-  private espacioActual: Entidad | null = null;
-
-  // Mapas para buscar entidades fácilmente
-  private zonas = new Map<number, Entidad>();
-  private oficinas = new Map<number, Entidad>();
-  private espacios = new Map<string, Entidad>(); // key: "oficinaId-espacioId"
-  private dispositivos = new Map<number, Entidad>();
 
   constructor(ecsManager: ECSManager) {
     this.ecsManager = ecsManager;
   }
 
   /**
-   * Crea una nueva zona en el escenario
-   */
-  crearZona(id: number, nombre: string): this {
-    const entidad = this.ecsManager.agregarEntidad();
-    this.ecsManager.agregarComponente(entidad, new ZonaComponent(id, nombre));
-    this.zonas.set(id, entidad);
-    return this;
-  }
-
-  /**
-   * Crea una nueva oficina dentro de una zona en el escenario
-   */
-  crearOficina(id: number, nombre: string, zonaId: number = 1): this {
-    const entidad = this.ecsManager.agregarEntidad();
-    this.ecsManager.agregarComponente(
-      entidad,
-      new OficinaComponent(id, nombre, zonaId)
-    );
-    this.ecsManager.agregarComponente(entidad, new Transform(0, 0, 0, 0));
-
-    this.oficinas.set(id, entidad);
-    this.oficinaActual = entidad;
-
-    return this;
-  }
-
-  /**
-   * Agrega un espacio (mesa/rack) a la oficina actual
-   */
-  agregarEspacio(
-    espacioId: number,
-    mueble: Mueble,
-    x: number,
-    y: number,
-    z: number,
-    rotacionY: number = 0
-  ): this {
-    if (!this.oficinaActual) {
-      throw new Error("Debes crear una oficina primero con crearOficina()");
-    }
-
-    const oficinaComp = this.ecsManager
-      .getComponentes(this.oficinaActual)
-      ?.get(OficinaComponent);
-    if (!oficinaComp) {
-      throw new Error("La oficina actual no tiene OficinaComponent");
-    }
-
-    const entidad = this.ecsManager.agregarEntidad();
-    this.ecsManager.agregarComponente(
-      entidad,
-      new Transform(x, y, z, rotacionY)
-    );
-    this.ecsManager.agregarComponente(
-      entidad,
-      new EspacioComponent(espacioId, oficinaComp.id)
-    );
-
-    const capacidad =
-      mueble === Mueble.MESA ? 2 : mueble === Mueble.RACK ? 1 : 0;
-    this.ecsManager.agregarComponente(
-      entidad,
-      new MuebleComponent(mueble, capacidad)
-    );
-
-    agregarEspacio(oficinaComp, entidad);
-
-    const key = `${oficinaComp.id}-${espacioId}`;
-    this.espacios.set(key, entidad);
-    this.espacioActual = entidad;
-
-    return this;
-  }
-
-  /**
-   * Agrega un dispositivo al espacio actual
-   */
-  agregarDispositivo(
-    dispositivoId: number,
-    tipo: TipoDispositivo,
-    nombre: string = "",
-    offsetX: number = 0,
-    offsetY: number = 0.5,
-    offsetZ: number = 0
-  ): this {
-    if (!this.espacioActual) {
-      throw new Error("Debes agregar un espacio primero con agregarEspacio()");
-    }
-
-    const espacioComp = this.ecsManager
-      .getComponentes(this.espacioActual)
-      ?.get(EspacioComponent);
-    const espacioTransform = this.ecsManager
-      .getComponentes(this.espacioActual)
-      ?.get(Transform);
-
-    if (!espacioComp || !espacioTransform) {
-      throw new Error("El espacio actual no tiene los componentes necesarios");
-    }
-
-    const entidad = this.ecsManager.agregarEntidad();
-
-    // Posición relativa al espacio
-    const x = espacioTransform.x + offsetX;
-    const y = espacioTransform.y + offsetY;
-    const z = espacioTransform.z + offsetZ;
-
-    this.ecsManager.agregarComponente(
-      entidad,
-      new Transform(x, y, z, espacioTransform.rotacionY)
-    );
-    this.ecsManager.agregarComponente(
-      entidad,
-      new DispositivoComponent(tipo, nombre)
-    );
-
-    agregarDispositivo(espacioComp, entidad);
-    this.dispositivos.set(dispositivoId, entidad);
-
-    return this;
-  }
-
-  /**
-   * Obtiene una oficina por ID para modificarla
-   */
-  // obtenerOficina(oficinaId: number): Entidad | undefined {
-  //   return this.oficinas.get(oficinaId);
-  // }
-
-  /**
-   * Obtiene un espacio por oficina y espacio ID
-   */
-  obtenerEspacio(oficinaId: number, espacioId: number): Entidad | undefined {
-    return this.espacios.get(`${oficinaId}-${espacioId}`);
-  }
-
-  /**
-   * Obtiene un dispositivo por ID
-   */
-  // obtenerDispositivo(dispositivoId: number): Entidad | undefined {
-  //   return this.dispositivos.get(dispositivoId);
-  // }
-
-  /**
-   * Modifica la posición de un espacio
-   */
-  // moverEspacio(
-  //   oficinaId: number,
-  //   espacioId: number,
-  //   x: number,
-  //   y: number,
-  //   z: number
-  // ): this {
-  //   const espacio = this.obtenerEspacio(oficinaId, espacioId);
-  //   if (espacio) {
-  //     const transform = this.ecsManager.getComponentes(espacio)?.get(Transform);
-  //     if (transform) {
-  //       transform.x = x;
-  //       transform.y = y;
-  //       transform.z = z;
-  //     }
-  //   }
-  //   return this;
-  // }
-
-  /**
    * Construye el escenario a partir de un objeto de configuración
    * Recorre las zonas, oficinas, espacios y dispositivos del objeto y crea las entidades correspondientes
    */
   construirDesdeArchivo(escenario: Escenario): this {
-    // Recorrer las zonas
-    if (escenario.zonas) {
-      for (const zona of escenario.zonas) {
-        const zonaId = zona.id ?? 1;
-        this.crearZona(zonaId, zona.nombre);
-
-        // Recorrer las oficinas de cada zona
-        if (zona.oficinas) {
-          for (const oficina of zona.oficinas) {
-            const nombreOficina = oficina.nombre ?? `Oficina ${oficina.id}`;
-            this.crearOficina(oficina.id, nombreOficina, zonaId);
-
-            // Recorrer los espacios de cada oficina
-            if (oficina.espacios) {
-              for (const espacio of oficina.espacios) {
-                // Valores por defecto para posición
-                const posicion = espacio.posicion ?? {
-                  x: 0,
-                  y: 0,
-                  z: 0,
-                  rotacionY: 0,
-                };
-                const x = posicion.x ?? 0;
-                const y = posicion.y ?? 0;
-                const z = posicion.z ?? 0;
-                const rotacionY = posicion.rotacionY ?? 0;
-
-                // Agregar el espacio (mesa/rack)
-                this.agregarEspacio(
-                  espacio.id,
-                  espacio.mueble ?? Mueble.MESA,
-                  x,
-                  y,
-                  z,
-                  rotacionY
-                );
-
-                // Agregar los dispositivos del espacio
-                if (espacio.dispositivos) {
-                  for (const dispositivo of espacio.dispositivos) {
-                    this.agregarDispositivo(
-                      dispositivo.id,
-                      dispositivo.tipo,
-                      dispositivo.nombre ?? `Dispositivo ${dispositivo.id}`
-                    );
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
+    const escenarioPadre = this.crearEscenario(escenario);
+    escenario.zonas.forEach((zona: any) => {
+      const zonaEntidad = this.crearZona(zona, escenarioPadre);
+      zona.oficinas.forEach((oficina: any) => {
+        const oficinaEntidad = this.crearOficina(oficina, zonaEntidad);
+        oficina.espacios.forEach((espacio: any) => {
+          const espacioEntidad = this.crearEspacio(espacio, oficinaEntidad);
+          espacio.dispositivos.forEach((dispositivo: any) => {
+            this.crearDispositivo(dispositivo, espacioEntidad);
+          });
+        });
+      });
+    });
 
     return this;
   }
 
-  construir() {
-    return {
-      oficinas: this.oficinas,
-      espacios: this.espacios,
-      dispositivos: this.dispositivos,
-      ecsManager: this.ecsManager,
-    };
+  crearEscenario(escenario: Escenario): Entidad {
+    const entidadEscenario = this.ecsManager.agregarEntidad();
+    this.ecsManager.agregarComponente(
+      entidadEscenario,
+      new EscenarioComponent(
+        escenario.id,
+        escenario.titulo,
+        escenario.descripcion
+      )
+    );
+    return entidadEscenario;
+  }
+
+  crearZona(zona: any, escenarioEntidad?: Entidad): Entidad {
+    const entidadZona = this.ecsManager.agregarEntidad();
+    this.ecsManager.agregarComponente(
+      entidadZona,
+      new ZonaComponent(zona.id, zona.nombre)
+    );
+    const escEntidad = escenarioEntidad;
+    if (escEntidad != null) {
+      const relacion = new SistemaRelaciones(
+        EscenarioComponent,
+        ZonaComponent,
+        "zonas"
+      );
+      relacion.ecsManager = this.ecsManager;
+      relacion.agregar(escEntidad, entidadZona);
+    }
+    return entidadZona;
+  }
+
+  crearOficina(oficina: any, zonaId: number): Entidad {
+    const entidadOficina = this.ecsManager.agregarEntidad();
+    this.ecsManager.agregarComponente(
+      entidadOficina,
+      new OficinaComponent(oficina.id, oficina.nombre, zonaId)
+    );
+
+    const ofiEntidad = entidadOficina;
+    if (ofiEntidad != null) {
+      const relacion = new SistemaRelaciones(
+        ZonaComponent,
+        OficinaComponent,
+        "oficinas"
+      );
+      relacion.ecsManager = this.ecsManager;
+      relacion.agregar(zonaId, ofiEntidad);
+    }
+    return entidadOficina;
+  }
+
+  crearEspacio(espacio: any, oficinaId: number): Entidad {
+    const entidadEspacio = this.ecsManager.agregarEntidad();
+    this.ecsManager.agregarComponente(
+      entidadEspacio,
+      new EspacioComponent(espacio.id, oficinaId, espacio.mueble)
+    );
+    this.ecsManager.agregarComponente(
+      entidadEspacio,
+      new Transform(
+        espacio.posicion.x,
+        espacio.posicion.y,
+        espacio.posicion.z,
+        espacio.posicion.rotacionY
+      )
+    );
+    const espEntidad = entidadEspacio;
+    if (espEntidad != null) {
+      const relacion = new SistemaRelaciones(
+        OficinaComponent,
+        EspacioComponent,
+        "espacios"
+      );
+      relacion.ecsManager = this.ecsManager;
+      relacion.agregar(oficinaId, espEntidad);
+    }
+    return entidadEspacio;
+  }
+
+  crearDispositivo(dispositivo: any, espacioId: number): Entidad {
+    const entidadDispositivo = this.ecsManager.agregarEntidad();
+    this.ecsManager.agregarComponente(
+      entidadDispositivo,
+      new DispositivoComponent(
+        dispositivo.nombre,
+        dispositivo.sistemaOperativo,
+        dispositivo.hardware,
+        dispositivo.tipo
+      )
+    );
+    this.ecsManager.agregarComponente(
+      entidadDispositivo,
+      new Transform(
+        dispositivo.posicion.x,
+        dispositivo.posicion.y,
+        dispositivo.posicion.z,
+        dispositivo.posicion.rotacionY
+      )
+    );
+    const disEntidad = entidadDispositivo;
+    if (disEntidad != null) {
+      const relacion = new SistemaRelaciones(
+        EspacioComponent,
+        DispositivoComponent,
+        "dispositivos"
+      );
+      relacion.ecsManager = this.ecsManager;
+      relacion.agregar(espacioId, disEntidad);
+    }
+    return entidadDispositivo;
+  }
+
+  public getEntidades(): Map<Entidad, ComponenteContainer> {
+    return this.ecsManager.getEntidades();
   }
 }

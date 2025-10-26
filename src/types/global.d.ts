@@ -2,13 +2,13 @@ import type { TipoDispositivo } from "./DeviceEnums";
 import { LogCategory } from "./LogCategory";
 
 declare global {
-  type Log = {
-    time: string;
-    content: string;
-    category: LogCategory;
-  };
+  interface Transform {
+    x: number;
+    y: number;
+    z: number;
+    rotacionY: number;
+  }
 
-  // Estas entidades son para el 3D
   interface BaseEntity {
     id: Entidad;
     position: [number, number, number];
@@ -23,6 +23,12 @@ declare global {
     dispositivo: Dispositivo;
   }
   type ECSSceneEntity = EspacioEntity | DispositivoEntity;
+
+  type Log = {
+    time: string;
+    content: string;
+    category: LogCategory;
+  };
 }
 
 export {};

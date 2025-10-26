@@ -9,5 +9,8 @@ export enum TipoDispositivo {
   SERVER = "server",
   ROUTER = "router",
   SWITCH = "switch",
+  FIREWALL = "firewall",
+  PORTATIL = "portatil",
+  NAS = "nas",
   OTRO = "otro",
 }

@@ -1,24 +1,18 @@
 import React from 'react';
 import Model3D from './Model3D';
-import type { ECSSceneEntity } from '../hooks/useECSScene';
-import {
-    getMuebleModel,
-    getDispositivoModel,
-    getMuebleHeight,
-    getDispositivoHeight,
-} from '../config/modelConfig';
+import { getModelo } from '../config/modelConfig';
 import { useEscenario } from '../../../common/contexts';
+import { useECSScene } from '../hooks/useECSScene';
 
 interface ECSSceneRendererProps {
-    entities: ECSSceneEntity[];
+    entities: any;
 }
-
 /**
  * Componente que renderiza todas las entidades del ECS como modelos 3D
  */
 const ECSSceneRenderer: React.FC<ECSSceneRendererProps> = ({ entities }) => {
-
     const { setDispositivoSeleccionado, dispositivoSeleccionado } = useEscenario();
+    const { processEntities } = useECSScene();
 
     const handleEntityClick = (entity: any) => {
         console.log('Entidad clickeada:', entity);
@@ -26,35 +20,23 @@ const ECSSceneRenderer: React.FC<ECSSceneRendererProps> = ({ entities }) => {
         console.log('Dispositivo seleccionado actualizado:', dispositivoSeleccionado);
     };
 
+    const processedEntities = processEntities();
+
     return (
         <>
-            {entities.map((entity) => {
-                let modelPath = '';
-                let showButton = false;
-                let adjustedPosition: [number, number, number] = [...entity.position];
+            {processedEntities.map(({ objetoConTipo, position, rotacionY, entityIndex }) => {
+                const modelPath = getModelo(objetoConTipo);
 
-                if (entity.type === 'espacio' && entity.muebleTipo) {
-                    modelPath = getMuebleModel(entity.muebleTipo);
-                    const muebleHeight = getMuebleHeight(entity.muebleTipo);
-                    adjustedPosition = [entity.position[0], muebleHeight, entity.position[2]];
-                } else if (entity.type === 'dispositivo' && entity.dispositivoTipo) {
-                    modelPath = getDispositivoModel(entity.dispositivoTipo);
-                    showButton = true;
-                    const deviceHeight = getDispositivoHeight(entity.dispositivoTipo);
-                    adjustedPosition = [entity.position[0], deviceHeight, entity.position[2]];
-                }
-
-                if (!modelPath) return null;
+                if (modelPath === "") return null;
 
                 return (
                     <Model3D
-                        key={`entity-${entity.id}`}
+                        key={`entity-${entityIndex}`}
                         modelPath={modelPath}
-                        position={adjustedPosition}
-                        rotation={[0, entity.rotation, 0]}
+                        position={position}
+                        rotation={[0, rotacionY, 0]}
                         scale={1}
-                        showHoverButton={showButton}
-                        onClick={() => handleEntityClick(entity)}
+                        onClick={() => handleEntityClick(objetoConTipo)}
                     />
                 );
             })}
