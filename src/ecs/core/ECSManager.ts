@@ -63,7 +63,6 @@ export class ECSManager {
     this.sistemas.delete(sistema);
   }
 
-  /*
     public actualizar(): void {
         for (let [sistema, entidades] of this.sistemas.entries()) {
             sistema.actualizar(entidades)
@@ -75,7 +74,6 @@ export class ECSManager {
             }
         }
     }
-    */
 
   // Para verificaciones internas
 

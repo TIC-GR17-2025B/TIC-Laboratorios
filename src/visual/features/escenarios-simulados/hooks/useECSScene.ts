@@ -1,12 +1,13 @@
-import { useState, useEffect, useRef } from "react";
-import { ECSManager } from "../../../../ecs/core/ECSManager";
+import { useState, useEffect, /*useRef*/ } from "react";
+// import { ECSManager } from "../../../../ecs/core/ECSManager";
 import type { Entidad } from "../../../../ecs/core/Componente";
 
 import { getDispositivoHeight } from "../config/modelConfig";
-import { ScenarioBuilder } from "../../../../ecs/utils/ScenarioBuilder";
+// import { ScenarioBuilder } from "../../../../ecs/utils/ScenarioBuilder";
 import { useEscenarioActual } from "../../../common/contexts/EscenarioContext";
-import { SistemaTiempo } from "../../../../ecs/systems";
-import { TiempoComponent } from "../../../../ecs/components";
+import { EscenarioController } from "../../../../ecs/controllers/EscenarioController";
+// import { SistemaTiempo } from "../../../../ecs/systems";
+// import { TiempoComponent } from "../../../../ecs/components";
 
 export interface ECSSceneEntity {
   id: Entidad;
@@ -39,52 +40,16 @@ interface ProcessedEntity {
 
 export function useECSScene() {
   const escenario = useEscenarioActual();
-  const [entities, setEntities] = useState<any>([]);
-  const ecsManagerRef = useRef<ECSManager | null>(null);
-  const builderRef = useRef<ScenarioBuilder | null>(null);
-  const inicializadoRef = useRef(false);
+  const [entities, setEntities] = useState<any>([]); 
 
-  // Usar un singleton a nivel de módulo para que múltiples hooks/componentes compartan el mismo ECS
-  // (Header y la escena deben controlar la misma simulación)
-  // Inicializamos perezosamente si no existe
-  if (!(globalThis as any).__simECS) {
-    const ecs = new ECSManager();
-    const timeEntity = ecs.agregarEntidad();
-    ecs.agregarComponente(timeEntity, new TiempoComponent());
-    const sistemaTiempo = new SistemaTiempo();
-    ecs.agregarSistema(sistemaTiempo);
-
-    // Almacenar en globalThis para accesibilidad entre componentes/hook invocaciones
-    (globalThis as any).__simECS = {
-      ecsManager: ecs,
-      timeEntity,
-      sistemaTiempo,
-      builder: null as ScenarioBuilder | null,
-    };
-  }
-
-  // Referencias al singleton
-  ecsManagerRef.current = (globalThis as any).__simECS.ecsManager as ECSManager;
-  const timeEntity = (globalThis as any).__simECS.timeEntity as Entidad;
-  const sistemaTiempo = (globalThis as any).__simECS
-    .sistemaTiempo as SistemaTiempo;
-  builderRef.current = (globalThis as any).__simECS
-    .builder as ScenarioBuilder | null;
+  const escenarioController = new EscenarioController(escenario);
+  const { iniciarTiempo, pausarTiempo, reanudarTiempo, estaTiempoPausado } = escenarioController.ejecutarTiempo();
 
   useEffect(() => {
-    if (inicializadoRef.current) {
-      return;
-    }
-    inicializadoRef.current = true;
 
-    const ecsManager = ecsManagerRef.current!;
-    const builder = new ScenarioBuilder(ecsManager);
-    builder.construirDesdeArchivo(escenario);
-    builderRef.current = builder;
-    // Guardar builder en singleton para posibles futuras referencias
-    (globalThis as any).__simECS.builder = builder;
+    escenarioController.iniciarEscenario()
+    setEntities(escenarioController.builder.getEntidades());
 
-    setEntities(builder.getEntidades());
   }, [escenario]);
 
   // procesar entidades desde los maps
@@ -135,30 +100,25 @@ export function useECSScene() {
 
     return processedEntities;
   };
-
+ 
   return {
     entities,
-    ecsManager: ecsManagerRef.current,
-    builder: builderRef.current,
+    ecsManager: escenarioController.escManager,
+    builder: escenarioController.builder,
     processEntities,
     iniciar: () => {
-      sistemaTiempo.iniciar(timeEntity);
+      iniciarTiempo();
     },
     pause: () => {
       console.log("useECSScene: pausar");
-      sistemaTiempo.pausar(timeEntity);
+      pausarTiempo();
     },
     resume: () => {
       console.log("useECSScene: reanudar");
-      sistemaTiempo.reanudar(timeEntity);
+      reanudarTiempo();
     },
     isPaused: () => {
-      const ecs = ecsManagerRef.current;
-      if (!ecs) return false;
-      const cont = ecs.getComponentes(timeEntity);
-      if (!cont) return false;
-      const tiempo = cont.get(TiempoComponent);
-      return !!tiempo.pausado;
+      estaTiempoPausado();
     },
   };
 }
