@@ -38,7 +38,7 @@ export class SistemaPresupuesto extends Sistema {
 
           this.ecsManager.registrarAccion("Click",
                                           "Configuracion Workstation",
-                                          undefined,
+                                          -1,
                                           { nombreConfig: listaConfigsWorkstation[i].nombreConfig,
                                             activado: listaConfigsWorkstation[i].activado
                                           });
@@ -51,7 +51,7 @@ export class SistemaPresupuesto extends Sistema {
 
           this.ecsManager.registrarAccion("Click",
                                           "Configuracion Workstation",
-                                          undefined,
+                                          -1,
                                           { nombreConfig: listaConfigsWorkstation[i].nombreConfig,
                                             activado: listaConfigsWorkstation[i].activado
                                           });

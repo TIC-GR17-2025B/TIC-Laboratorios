@@ -14,7 +14,7 @@ export class ECSManager {
   private eventListeners = new Map<string, Set<EventCallback>>();
 
   // Sistema de registro de acciones realizadas durante la simulacion
-  private accionesSimulacion: Set<[string, string, number?, any?]>[] = [];
+  private accionesSimulacion = new Array<[string, string, number, any?]>();
                               /* Set<nombre de acción,
                                      objeto sobre el cual se hizo la acción (no necesariamente es un objeto de la escena 3D),
                                      tiempo actual (total) en segundos justo cuando se realizó la acción,
@@ -154,28 +154,20 @@ export class ECSManager {
 
   ///// Sistema de acciones
 
-  public registrarAccion(accion: string, objeto: string, tiempo?: number, val?: any): void{
-    this.accionesSimulacion.push(new Set([accion, objeto, tiempo, val]));
+  public registrarAccion(accion: string, objeto: string, tiempo: number, val?: any): void{
+    this.accionesSimulacion.push([accion, objeto, tiempo, val]);
   }
 
-  public consultarAccion(accion: string, objeto: string, tiempo?: number, val?: any)
-                        : [string, string, number?, any?] | undefined {
-    for (const setAcciones of this.accionesSimulacion) {
-      for (const [a, o, t, v] of setAcciones) {
-        const coincide = 
-          a === accion &&
-          o === objeto &&
-          (tiempo === undefined || t === tiempo) &&
-          (val === undefined || v === val);
-
-        if (coincide) {
-          return [a, o, t, v];
-        }
-      }
-    }
-
-    // Si no se encontró ninguna coincidencia
-    return undefined;
+  public consultarAccion(accion: string, objeto: string, tiempo: number, val?: any)
+                        : [string, string, number, any?] | undefined {
+    console.log(this.accionesSimulacion.at(0));
+    console.log(accion, objeto, tiempo, val);
+                          return this.accionesSimulacion.find(([a, o, t, v]) =>
+      a == accion &&
+      o == objeto &&
+      t == tiempo &&
+      (val == undefined || v == val)
+    );
   }
 
 }

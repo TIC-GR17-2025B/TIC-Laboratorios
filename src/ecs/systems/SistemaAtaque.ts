@@ -18,11 +18,11 @@ export class SistemaAtaque extends Sistema {
         if(!container3) return;
         const dispositivoAAtacar = container3.get(DispositivoComponent);
 
-        if(this.ecsManager.consultarAccion(ataque.condicionMitigacion.accion,
+        if(!this.ecsManager.consultarAccion(ataque.condicionMitigacion.accion,
                                          ataque.condicionMitigacion.objeto,
-                                         ataque.condicionMitigacion.tiempo,
+                                         ataque.condicionMitigacion.tiempo!,
                                          ataque.condicionMitigacion.val
-                                        ) == undefined){ 
+                                        )){ 
             dispositivoAAtacar.estadoAtaque = EstadoAtaqueDispositivo.COMPROMETIDO;
             this.ecsManager.emit("ataque:ataqueRealizado", { ataque });
         }else{

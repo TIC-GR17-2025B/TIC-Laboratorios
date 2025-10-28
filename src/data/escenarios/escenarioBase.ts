@@ -23,7 +23,7 @@ export const escenarioBase: any = {
       condicionMitigacion: {
         accion: "Click",
         objeto: "Configuracion Workstation",
-        tiempo: undefined,
+        tiempo: -1,
         val: {
           nombreConfig: "Actualizaciones automáticas de antivirus",
           activado: true,
