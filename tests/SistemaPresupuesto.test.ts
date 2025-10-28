@@ -5,7 +5,7 @@ import { PresupuestoComponent, WorkstationComponent } from "../src/ecs/component
 import { ConfiguracionWorkstation } from "../src/data/configuraciones/configWorkstation";
 
 describe('PresupuestoComponent y SistemaPresupuesto', () => {
-    test('el monto del presupuesto aumenta y disminuye al activar y desactivar configuraciones', () => {
+    test('activación y desactivación de configuraciones con presupuesto suficiente', () => {
         const em = new ECSManager();
         const entidadPresupuesto = em.agregarEntidad();
         const presupuestoInicial = 1000;
@@ -34,6 +34,38 @@ describe('PresupuestoComponent y SistemaPresupuesto', () => {
         sistema.toggleConfiguracionWorkstation(entidadPresupuesto, entidadWorkstation, configuracion)
         expect(presupuesto.monto).toBeLessThan(montoDespuesDeActivacion);
         console.log("Se desactivó la configuración:", configuracion)
+        console.log("Presupuesto actual:", presupuesto.monto)
+    });
+
+    test('activación y desactivación de configuraciones con presupuesto insuficiente', () => {
+        const em = new ECSManager();
+        const entidadPresupuesto = em.agregarEntidad();
+        const presupuestoInicial = 15;
+        em.agregarComponente(entidadPresupuesto, new PresupuestoComponent(presupuestoInicial));
+        const sistema = new SistemaPresupuesto();
+        em.agregarSistema(sistema);
+
+        const c = em.getComponentes(entidadPresupuesto);
+        expect(c).toBeDefined();
+        const presupuesto = c!.get(PresupuestoComponent);
+        expect(presupuesto.monto).toBe(presupuestoInicial);
+
+        const configuracion = ConfiguracionWorkstation.values().next().value!.nombreConfig;
+
+        // Simular activación de una configuración con presupuesto insuficiente
+        const entidadWorkstation = em.agregarEntidad();
+        em.agregarComponente(entidadWorkstation, new WorkstationComponent(ConfiguracionWorkstation));
+        sistema.toggleConfiguracionWorkstation(entidadPresupuesto, entidadWorkstation, configuracion)
+        expect(presupuesto.monto).toEqual(presupuestoInicial);
+        console.log("No se activó la configuración:", configuracion)
+        console.log("Presupuesto actual:", presupuesto.monto)
+
+        presupuesto.monto = presupuestoInicial;
+
+        // Simular desactivación de una configuración con presupuesto insuficiente
+        sistema.toggleConfiguracionWorkstation(entidadPresupuesto, entidadWorkstation, configuracion)
+        expect(presupuesto.monto).toEqual(presupuesto.monto);
+        console.log("No se desactivó la configuración:", configuracion)
         console.log("Presupuesto actual:", presupuesto.monto)
     });
 });

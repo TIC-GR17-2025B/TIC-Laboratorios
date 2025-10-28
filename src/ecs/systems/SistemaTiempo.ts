@@ -7,11 +7,6 @@ export class SistemaTiempo extends Sistema {
   public intervalo: ReturnType<typeof setInterval> | null = null;
   public ataquesEscenario: any[] = [];
 
-  public actualizar(entidades: Set<Entidad>): void {
-    console.log("SistemaTiempo llamado. Entidades: ", entidades.size);
-    // Aquí capaz van futuras funciones dependientes del tiempo
-  }
-
   public on(eventName: string, callback: (data: any) => void): () => void {
     return this.ecsManager.on(eventName, callback);
   }

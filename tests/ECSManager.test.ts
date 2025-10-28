@@ -50,7 +50,7 @@ describe('ECSManager', () => {
             expect(componentes?.tiene(Velocidad)).toBe(true);
         });
 
-        it('debe actualizar automáticamente los sistemas relevantes', () => {
+        /*it('debe actualizar automáticamente los sistemas relevantes', () => {
             const sistema = new SistemaMovimiento();
             em.agregarSistema(sistema);
           
@@ -68,7 +68,7 @@ describe('ECSManager', () => {
             const componentes = em.getComponentes(entidad);
             const pos = componentes?.get(Transform);
             expect(pos?.x).toBe(1); // Se movió
-        });
+        });*/
     });
 
     describe('getComponentes', () => {
@@ -102,7 +102,7 @@ describe('ECSManager', () => {
             expect(componentes?.tiene(Transform)).toBe(false);
         });
 
-        it('debe actualizar sistemas al remover componente', () => {
+        /*it('debe actualizar sistemas al remover componente', () => {
             const sistema = new SistemaMovimiento();
             em.agregarSistema(sistema);
           
@@ -121,7 +121,7 @@ describe('ECSManager', () => {
           
             const pos2 = em.getComponentes(entidad)?.get(Transform);
             expect(pos2?.x).toBe(1); // No cambió porque ya no cumple requisitos
-        });
+        });*/
 
         it('no debe causar error al remover componente de entidad inexistente', () => {
             expect(() => {
@@ -138,7 +138,7 @@ describe('ECSManager', () => {
             expect(sistema.ecsManager).toBe(em);
         });
 
-        it('debe procesar entidades existentes al agregar sistema', () => {
+        /*it('debe procesar entidades existentes al agregar sistema', () => {
             const entidad = em.agregarEntidad();
             em.agregarComponente(entidad, new Transform(0, 0, 0, 0));
             em.agregarComponente(entidad, new Velocidad(1, 1));
@@ -150,9 +150,9 @@ describe('ECSManager', () => {
           
             const pos = em.getComponentes(entidad)?.get(Transform);
             expect(pos?.x).toBe(1);
-        }); 
+        });*/
 
-        it('debe permitir múltiples sistemas', () => {
+        /*it('debe permitir múltiples sistemas', () => {
             const sistema1 = new SistemaMovimiento();
             const sistema2 = new SistemaAtaque();
           
@@ -167,11 +167,11 @@ describe('ECSManager', () => {
             em.actualizar();
           
             expect(sistema1.actualizacionesRealizadas).toBe(1);
-        });
+        });*/
     });
 
-    describe('removerSistema', () => {
-        it('debe remover un sistema del ECS', () => {
+    //describe('removerSistema', () => {
+        /*it('debe remover un sistema del ECS', () => {
             const sistema = new SistemaMovimiento();
             em.agregarSistema(sistema);
             em.removerSistema(sistema);
@@ -184,11 +184,11 @@ describe('ECSManager', () => {
 
             // El sistema no debe haber actualizado
             expect(sistema.actualizacionesRealizadas).toBe(0);
-        });
-    });
+        });*/
+    //});
 
-    describe('actualizar', () => {
-        it('debe llamar a actualizar en todos los sistemas', () => {
+    //describe('actualizar', () => {
+        /*it('debe llamar a actualizar en todos los sistemas', () => {
             const sistema1 = new SistemaMovimiento();
             const sistema2 = new SistemaAtaque();
 
@@ -198,9 +198,9 @@ describe('ECSManager', () => {
             em.actualizar();
 
             expect(sistema1.actualizacionesRealizadas).toBe(1);
-        });
+        });*/
 
-        it('debe pasar las entidades correctas a cada sistema', () => {
+        /*it('debe pasar las entidades correctas a cada sistema', () => {
             const sistema1 = new SistemaMovimiento();
             const sistema2 = new SistemaAtaque();
 
@@ -219,9 +219,9 @@ describe('ECSManager', () => {
             // sistema1 solo debe procesar entidad1
             const pos = em.getComponentes(entidad1)?.get(Transform);
             expect(pos?.x).toBe(1);
-        });
+        });*/
 
-        it('debe actualizar múltiples veces correctamente', () => {
+        /*it('debe actualizar múltiples veces correctamente', () => {
             const sistema = new SistemaMovimiento();
             em.agregarSistema(sistema);
 
@@ -237,11 +237,11 @@ describe('ECSManager', () => {
             expect(pos?.x).toBe(6); // 2 * 3
             expect(pos?.z).toBe(9); // 3 * 3
             expect(sistema.actualizacionesRealizadas).toBe(3);
-        });
-    });
+        });*/
+    //});
 
-    describe('removerEntidad', () => {
-        it('debe marcar entidad para destrucción', () => {
+    /*describe('removerEntidad', () => {
+        /*it('debe marcar entidad para destrucción', () => {
             const entidad = em.agregarEntidad();
             em.agregarComponente(entidad, new Transform(0, 0, 0, 0));
 
@@ -250,9 +250,9 @@ describe('ECSManager', () => {
 
             const componentes = em.getComponentes(entidad);
             expect(componentes).toBeUndefined();
-        });
+        });*/
 
-        it('debe remover entidad de todos los sistemas', () => {
+        /*it('debe remover entidad de todos los sistemas', () => {
             const sistema = new SistemaMovimiento();
             em.agregarSistema(sistema);
 
@@ -268,9 +268,9 @@ describe('ECSManager', () => {
 
             // El sistema ya no debe procesar la entidad
             expect(sistema.actualizacionesRealizadas).toBe(2); // Se llamó pero sin entidades
-        });
+        });*/
 
-        it('debe procesar múltiples entidades a destruir en un frame', () => {
+        /*it('debe procesar múltiples entidades a destruir en un frame', () => {
             const entidad1 = em.agregarEntidad();
             const entidad2 = em.agregarEntidad();
             const entidad3 = em.agregarEntidad();
@@ -284,13 +284,13 @@ describe('ECSManager', () => {
             expect(em.getComponentes(entidad1)).toBeUndefined();
             expect(em.getComponentes(entidad2)).toBeUndefined();
             expect(em.getComponentes(entidad3)).toBeUndefined();
-        });
+        });*/
 
-        it('no debe causar error al remover entidad inexistente', () => {
+       /* it('no debe causar error al remover entidad inexistente', () => {
             expect(() => {
                 em.removerEntidad(999);
                 em.actualizar();
             }).not.toThrow();
-        });
-    });
+        });*/
+    //});
 });

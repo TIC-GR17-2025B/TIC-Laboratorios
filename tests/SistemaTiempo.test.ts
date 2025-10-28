@@ -43,6 +43,29 @@ describe('SistemaTiempo y TimeComponent', () => {
         // intentar avanzar estando pausado
         if(!t.pausado) t.transcurrido += 1;
         expect(t.transcurrido).toBe(1);
+    });
+
+    test("reanudar continua el tiempo desde donde se quedó", () =>{
+        const em = new ECSManager();
+        const entidad = em.agregarEntidad();
+        em.agregarComponente(entidad, new TiempoComponent());
+        const sistema = new SistemaTiempo();
+        em.agregarSistema(sistema);
+        
+        const c = em.getComponentes(entidad)!;
+        const t = c.get(TiempoComponent);
+        
+        // avanzar un poco
+        t.transcurrido += 1;
+        expect(t.transcurrido).toBe(1);
+        
+        // pausar
+        sistema.pausar(entidad);
+        expect(t.pausado).toBe(true);
+        
+        // intentar avanzar estando pausado
+        if(!t.pausado) t.transcurrido += 1;
+        expect(t.transcurrido).toBe(1);
         
         // reanudar
         sistema.reanudar(entidad);

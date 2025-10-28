@@ -5,10 +5,6 @@ import { Sistema, type Entidad } from "../core";
 export class SistemaAtaque extends Sistema {
     public componentesRequeridos: Set<Function> = new Set([AtaqueComponent]);
 
-    public actualizar(entidades: Set<Entidad>): void {
-        //
-    }
-
     public on(eventName: string, callback: (data: any) => void): () => void {
         return this.ecsManager.on(eventName, callback);
     }

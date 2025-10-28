@@ -75,7 +75,7 @@ export class ECSManager {
     this.sistemas.delete(sistema);
   }
 
-  public actualizar(): void {
+  /*public actualizar(): void {
     for (let [sistema, entidades] of this.sistemas.entries()) {
       sistema.actualizar(entidades);
     }
@@ -85,16 +85,16 @@ export class ECSManager {
         this.destruirEntidad(entidad);
       }
     }
-  }
+  }*/
 
   // Para verificaciones internas
 
-  private destruirEntidad(entidad: Entidad): void {
+  /*private destruirEntidad(entidad: Entidad): void {
     this.entidades.delete(entidad);
     for (let entidades of this.sistemas.values()) {
       entidades.delete(entidad);
     }
-  }
+  }*/
 
   private verificarEntidad(entidad: Entidad): void {
     for (let sistema of this.sistemas.keys()) {

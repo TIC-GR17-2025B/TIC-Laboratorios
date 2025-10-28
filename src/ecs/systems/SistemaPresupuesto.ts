@@ -4,10 +4,6 @@ import { WorkstationComponent, PresupuestoComponent } from "../components";
 export class SistemaPresupuesto extends Sistema {
   public componentesRequeridos = new Set([PresupuestoComponent]);
 
-  public actualizar(entidades: Set<Entidad>): void {
-    console.log("SistemaPresupuesto: actualizar. Entidades", entidades.size);
-  }
-
   public toggleConfiguracionWorkstation(
     entidadPresupuesto: Entidad,
     entidadWorkstation: Entidad,
@@ -31,30 +27,34 @@ export class SistemaPresupuesto extends Sistema {
 
       // Si al hacer toggle se pone en activado
       if (listaConfigsWorkstation[i].activado){
-        this.ecsManager
-          .getComponentes(entidadPresupuesto)!
-          .get(PresupuestoComponent).monto -=
-          listaConfigsWorkstation[i].costoActivacion;
-
-          this.ecsManager.registrarAccion("Click",
-                                          "Configuracion Workstation",
-                                          -1,
-                                          { nombreConfig: listaConfigsWorkstation[i].nombreConfig,
-                                            activado: listaConfigsWorkstation[i].activado
-                                          });
+        if(this.verificarPresupuestoSuficiente(entidadPresupuesto,
+                                    listaConfigsWorkstation[i].costoActivacion)){
+          this.ecsManager
+            .getComponentes(entidadPresupuesto)!
+            .get(PresupuestoComponent).monto -=
+            listaConfigsWorkstation[i].costoActivacion;
+        }
+        this.ecsManager.registrarAccion("Click",
+                                        "Configuracion Workstation",
+                                        -1,
+                                        { nombreConfig: listaConfigsWorkstation[i].nombreConfig,
+                                          activado: listaConfigsWorkstation[i].activado
+                                        });
       // Caso contrario significa que se desactivó
       }else{
-        this.ecsManager
-          .getComponentes(entidadPresupuesto)!
-          .get(PresupuestoComponent).monto -=
-          listaConfigsWorkstation[i].costoActivacion * 0.5;
-
-          this.ecsManager.registrarAccion("Click",
-                                          "Configuracion Workstation",
-                                          -1,
-                                          { nombreConfig: listaConfigsWorkstation[i].nombreConfig,
-                                            activado: listaConfigsWorkstation[i].activado
-                                          });
+        if(this.verificarPresupuestoSuficiente(entidadPresupuesto,
+                                    listaConfigsWorkstation[i].costoActivacion*0.5)){
+          this.ecsManager
+            .getComponentes(entidadPresupuesto)!
+            .get(PresupuestoComponent).monto -=
+            listaConfigsWorkstation[i].costoActivacion * 0.5;
+        }
+        this.ecsManager.registrarAccion("Click",
+                                        "Configuracion Workstation",
+                                        -1,
+                                        { nombreConfig: listaConfigsWorkstation[i].nombreConfig,
+                                          activado: listaConfigsWorkstation[i].activado
+                                        });
       }
     }
     this.ecsManager.emit("presupuesto:actualizado", {
@@ -62,5 +62,22 @@ export class SistemaPresupuesto extends Sistema {
         .getComponentes(entidadPresupuesto)!
         .get(PresupuestoComponent).monto,
     });
+    this.notificarPresupuestoAgotado(entidadPresupuesto);
+  }
+
+  private verificarPresupuestoSuficiente(entidadPresupuesto: Entidad, montoAProcesar: number): boolean{
+    const presupuestoActual = this.ecsManager.getComponentes(entidadPresupuesto)!
+                                             .get(PresupuestoComponent).monto;
+    
+    if(montoAProcesar > presupuestoActual) return false;
+    
+    return true;    
+  }
+
+  private notificarPresupuestoAgotado(entidadPresupuesto: Entidad): void {
+    if (this.ecsManager
+        .getComponentes(entidadPresupuesto)!
+        .get(PresupuestoComponent).monto == 0)
+      this.ecsManager.emit("presupuesto:agotado");
   }
 }

@@ -1,6 +1,7 @@
 import type { Escenario } from "../../types/EscenarioTypes";
 import { Componente, type Entidad } from "../core/Componente";
 import type { AtaqueComponent } from "./AtaqueComponent";
+import type { FaseComponent } from "./FaseComponent";
 
 export class EscenarioComponent extends Componente implements Escenario {
   constructor(
@@ -10,6 +11,7 @@ export class EscenarioComponent extends Componente implements Escenario {
     public presupuestoInicial: number,
     public zonas: Entidad[] = [],
     public ataques: AtaqueComponent[] = [],
+    public fases: FaseComponent[] = [],
     public tipo: string = "escenario"
   ) {
     super();

@@ -1,7 +1,6 @@
 import {
   AtaqueComponent,
   DispositivoComponent,
-  EscenarioComponent,
   PresupuestoComponent,
   TiempoComponent,
 } from "../components";
@@ -70,6 +69,10 @@ export class EscenarioController {
       console.log(
         `Se mitigó el ataque a: ${data.ataque.dispositivoAAtacar}. Ataque mitigado: ${data.ataque.tipoAtaque}`
       );
+    });
+    this.escManager.on("presupuesto:agotado", () => {
+      this.sistemaTiempo?.pausar(this.entidadTiempo!);
+      console.log("Se agotó el presupuesto, fin de la partida.");      
     });
   }
 
