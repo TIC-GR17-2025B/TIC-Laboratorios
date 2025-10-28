@@ -2,8 +2,8 @@ import { useState, useMemo } from 'react';
 import styles from '../styles/PanelConfiguraciones.module.css';
 import CheckableItem from '../../../common/components/CheckableItem';
 import obtenerConfiguraciones from '../utils/obtenerConfiguraciones';
-import { useECSScene } from '../../escenarios-simulados/hooks/useECSScene';
 import { useEscenario } from '../../../common/contexts';
+import { useECSSceneContext } from '../../escenarios-simulados/context/ECSSceneContext';
 
 export default function PanelConfiguraciones() {
     const configuraciones = useMemo(() => obtenerConfiguraciones(), []);
@@ -11,7 +11,7 @@ export default function PanelConfiguraciones() {
         new Array(configuraciones.length).fill(false)
     );
 
-    const { toggleConfigWorkstation } = useECSScene();
+    const { toggleConfigWorkstation } = useECSSceneContext();
     const { dispositivoSeleccionado } = useEscenario();
 
     const handleCheckChange = (index: number, checked: boolean, configuracion: string) => {

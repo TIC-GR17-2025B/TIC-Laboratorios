@@ -5,13 +5,13 @@ import DevicesIcon from '../icons/DevicesIcon';
 import OfficeIcon from '../icons/OfficeIcon';
 import EstrellasIcon from '../icons/EstrellasIcon';
 import { useEscenarioActual } from '../contexts/EscenarioContext';
-import { useECSScene } from "../../features/escenarios-simulados/hooks/useECSScene";
 import { useEffect } from 'react';
 import { formatearTiempo } from '../utils/formatearTiempo';
+import { useECSSceneContext } from '../../features/escenarios-simulados/context/ECSSceneContext';
 
 const Header: React.FC = () => {
     const escenario = useEscenarioActual();
-    const { pause, resume, iniciar, isPaused, tiempoTranscurrido, presupuesto } = useECSScene();
+    const { pause, resume, iniciar, isPaused, tiempoTranscurrido, presupuesto } = useECSSceneContext();
     useEffect(() => {
         iniciar && iniciar();
     }, [iniciar]);

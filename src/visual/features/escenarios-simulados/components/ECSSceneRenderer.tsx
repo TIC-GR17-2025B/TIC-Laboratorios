@@ -1,15 +1,14 @@
 import Model3D from './Model3D';
 import { getModelo } from '../config/modelConfig';
 import { useEscenario } from '../../../common/contexts';
-import { useECSScene } from '../hooks/useECSScene';
+import { useECSSceneContext } from '../context/ECSSceneContext';
 
 /**
  * Componente que renderiza todas las entidades del ECS como modelos 3D
  */
 const ECSSceneRenderer = () => {
     const { setDispositivoSeleccionado, dispositivoSeleccionado } = useEscenario();
-    const { processEntities, entities } = useECSScene();
-
+    const { processEntities, entities } = useECSSceneContext();
     const handleEntityClick = (entity: any) => {
         console.log('Entidad clickeada:', entity);
         setDispositivoSeleccionado(entity);

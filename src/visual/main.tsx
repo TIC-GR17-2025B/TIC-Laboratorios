@@ -1,4 +1,3 @@
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import "./common/styles/global.css"
 import VistaOficina from './features/escenarios-simulados/pages/VistaOficina.tsx'
@@ -6,11 +5,12 @@ import Dispositivos from './features/hardening-de-dispositivos/pages/Dispositivo
 import { BrowserRouter, Route, Routes } from 'react-router'
 import Header from './common/components/Header.tsx'
 import { EscenarioProvider } from './common/contexts/EscenarioContext.tsx'
+import { ECSSceneProvider } from './features/escenarios-simulados/context/ECSSceneContext.tsx'
 
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <EscenarioProvider>
+  <EscenarioProvider>
+    <ECSSceneProvider>
       <BrowserRouter>
         <Header />
         <div className="content">
@@ -20,6 +20,7 @@ createRoot(document.getElementById('root')!).render(
           </Routes>
         </div>
       </BrowserRouter>
-    </EscenarioProvider>
-  </StrictMode>,
+    </ECSSceneProvider>
+  </EscenarioProvider>
+  ,
 )

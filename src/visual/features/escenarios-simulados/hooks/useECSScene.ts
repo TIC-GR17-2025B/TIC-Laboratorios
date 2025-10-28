@@ -83,7 +83,7 @@ export function useECSScene() {
       unsubscribePausado();
       unsubscribeReanudado();
     };
-  }, [escenarioController]);
+  }, []);
 
   /**
    * Devuelve un array de entidades listo para render 3D
@@ -141,10 +141,12 @@ export function useECSScene() {
       setIsPaused(escenarioController.estaTiempoPausado());
     },
     pause: () => {
+      console.log("efectuando pausa");
       pausarTiempo();
       setIsPaused(true);
     },
     resume: () => {
+      console.log("efectuando reanudación");
       reanudarTiempo();
       setIsPaused(false);
     },

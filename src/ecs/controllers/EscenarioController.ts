@@ -1,4 +1,10 @@
-import { AtaqueComponent, DispositivoComponent, EscenarioComponent, PresupuestoComponent, TiempoComponent } from "../components";
+import {
+  AtaqueComponent,
+  DispositivoComponent,
+  EscenarioComponent,
+  PresupuestoComponent,
+  TiempoComponent,
+} from "../components";
 import { ECSManager, type Entidad } from "../core";
 import { SistemaAtaque, SistemaPresupuesto, SistemaTiempo } from "../systems";
 import { ScenarioBuilder } from "../utils/ScenarioBuilder";
@@ -39,20 +45,31 @@ export class EscenarioController {
   public iniciarEscenario(): void {
     this.builder = new ScenarioBuilder(this.escManager);
     this.builder.construirDesdeArchivo(this.escenario);
-    if(!this.sistemaAtaque){
-        this.sistemaAtaque = new SistemaAtaque();
-        this.escManager.agregarSistema(this.sistemaAtaque);
+    if (!this.sistemaAtaque) {
+      this.sistemaAtaque = new SistemaAtaque();
+      this.escManager.agregarSistema(this.sistemaAtaque);
     }
     this.escManager.emit("escenarioController:escenarioIniciado", {
-      ataques: this.getAtaques()
+      ataques: this.getAtaques(),
     });
-    this.escManager.on("tiempo:notificacionAtaque", (data: {descripcionAtaque: string}) => { console.log(data.descripcionAtaque) });
-    this.escManager.on("tiempo:ejecucionAtaque", (data: {ataque: any}) => this.ejecutarAtaque(data.ataque));
-    this.escManager.on("ataque:ataqueRealizado", (data: { ataque: any}) => {
-      console.log(`Se comprometió el dispositivo: ${data.ataque.dispositivoAAtacar}. Causa: ${data.ataque.tipoAtaque}`)
+    this.escManager.on(
+      "tiempo:notificacionAtaque",
+      (data: { descripcionAtaque: string }) => {
+        console.log(data.descripcionAtaque);
+      }
+    );
+    this.escManager.on("tiempo:ejecucionAtaque", (data: { ataque: any }) =>
+      this.ejecutarAtaque(data.ataque)
+    );
+    this.escManager.on("ataque:ataqueRealizado", (data: { ataque: any }) => {
+      console.log(
+        `Se comprometió el dispositivo: ${data.ataque.dispositivoAAtacar}. Causa: ${data.ataque.tipoAtaque}`
+      );
     });
-    this.escManager.on("ataque:ataqueMitigado", (data: { ataque: any}) => {
-      console.log(`Se mitigó el ataque a: ${data.ataque.dispositivoAAtacar}. Ataque mitigado: ${data.ataque.tipoAtaque}`)
+    this.escManager.on("ataque:ataqueMitigado", (data: { ataque: any }) => {
+      console.log(
+        `Se mitigó el ataque a: ${data.ataque.dispositivoAAtacar}. Ataque mitigado: ${data.ataque.tipoAtaque}`
+      );
     });
   }
 
@@ -66,10 +83,12 @@ export class EscenarioController {
 
       this.sistemaTiempo = new SistemaTiempo();
       this.escManager.agregarSistema(this.sistemaTiempo);
-      this.sistemaTiempo.on("escenarioController:escenarioIniciado",
-        (data: {ataques: any[]}) => {
+      this.sistemaTiempo.on(
+        "escenarioController:escenarioIniciado",
+        (data: { ataques: any[] }) => {
           this.sistemaTiempo!.ataquesEscenario = data.ataques;
-      });
+        }
+      );
     }
 
     const iniciarTiempo = () =>
@@ -140,23 +159,28 @@ export class EscenarioController {
     return { toggleConfiguracionWorkstation };
   }
 
-  public ejecutarAtaque(ataque: any){
-      const entidadAtaque = this.escManager.agregarEntidad();
-      this.escManager.agregarComponente(entidadAtaque, ataque);
+  public ejecutarAtaque(ataque: any) {
+    const entidadAtaque = this.escManager.agregarEntidad();
+    this.escManager.agregarComponente(entidadAtaque, ataque);
 
-      let dispositivos: any[][] = []; // Info de dispositivo: idEntidad y nombre
+    let dispositivos: any[][] = []; // Info de dispositivo: idEntidad y nombre
 
-      this.builder.getEntidades().forEach((container, entidad) => {
-        if(container.tiene(DispositivoComponent))
-          dispositivos.push([entidad, container.get(DispositivoComponent).nombre]); 
-      });
+    this.builder.getEntidades().forEach((container, entidad) => {
+      if (container.tiene(DispositivoComponent))
+        dispositivos.push([
+          entidad,
+          container.get(DispositivoComponent).nombre,
+        ]);
+    });
 
-      const nombreDispositivoAAtacar = ataque.dispositivoAAtacar;
+    const nombreDispositivoAAtacar = ataque.dispositivoAAtacar;
 
-      const entidadDispConSuNombre = dispositivos.filter(([entidad, nombre]) => nombreDispositivoAAtacar == nombre);
+    const entidadDispConSuNombre = dispositivos.filter(
+      ([entidad, nombre]) => nombreDispositivoAAtacar == nombre
+    );
 
-      // CAMBIAR LUEGO: POR EL STRICT MODE SE MULTIPLICAN LAS ENTRADAS
-      this.sistemaAtaque?.ejecutarAtaque(entidadDispConSuNombre[0][0], ataque);
+    // CAMBIAR LUEGO: POR EL STRICT MODE SE MULTIPLICAN LAS ENTRADAS
+    this.sistemaAtaque?.ejecutarAtaque(entidadDispConSuNombre[0][0], ataque);
   }
 
   public getPresupuestoActual(): number {
@@ -181,7 +205,5 @@ export class EscenarioController {
     }
 
     return ataques;
-
   }
-
 }

@@ -4,20 +4,20 @@ import Scene3DCanvas from './Scene3DCanvas';
 import CameraControls from './CameraControls';
 import Lights from './Lights';
 import Environment from './Environment';
-import { useECSScene } from '../hooks/useECSScene';
 import {
     DEFAULT_LIGHT_CONFIG,
     DEFAULT_CONTROLS_CONFIG,
     DEFAULT_ENVIRONMENT_CONFIG,
 } from '../config/scene3DConfig';
 import ECSSceneRenderer from './ECSSceneRenderer';
+import { useECSSceneContext } from '../context/ECSSceneContext';
 
 /**
  * Componente principal de la escena 3D
  * Orquesta la visualización 3D del escenario usando ECS con luces y controles 
  */
 const Escena3D: React.FC = () => {
-    const { entities } = useECSScene();
+    const { entities } = useECSSceneContext();
 
     return (
         <section className={styles.vista3D} aria-label="Vista 3D de la escena">

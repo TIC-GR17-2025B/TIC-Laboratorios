@@ -57,11 +57,13 @@ export class SistemaTiempo extends Sistema {
         /* Verificar que sea un tiempo de notificacion de ataque 
            y verificar que sea un tiempo de ejecución de ataque
         */
-        for(const ataque of this.ataquesEscenario){
-          if(tiempo.transcurrido == ataque.tiempoNotificacion){
-            this.ecsManager.emit("tiempo:notificacionAtaque", { descripcionAtaque: ataque.descripcion });
+        for (const ataque of this.ataquesEscenario) {
+          if (tiempo.transcurrido == ataque.tiempoNotificacion) {
+            this.ecsManager.emit("tiempo:notificacionAtaque", {
+              descripcionAtaque: ataque.descripcion,
+            });
           }
-          if(tiempo.transcurrido == ataque.tiempoEnOcurrir){
+          if (tiempo.transcurrido == ataque.tiempoEnOcurrir) {
             this.ecsManager.emit("tiempo:ejecucionAtaque", { ataque });
           }
         }
@@ -69,5 +71,4 @@ export class SistemaTiempo extends Sistema {
       console.log(`Tiempo transcurrido: ${tiempo.transcurrido}s`);
     }, 1000);
   }
-
 }
