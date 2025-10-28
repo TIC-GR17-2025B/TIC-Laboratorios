@@ -1,4 +1,4 @@
-import type { AtaqueComponent } from "../ecs/components";
+import type { AtaqueComponent, FaseComponent } from "../ecs/components";
 import type { Entidad } from "../ecs/core";
 import { EstadoAtaqueDispositivo, Mueble, TipoDispositivo } from "./DeviceEnums";
 
@@ -9,6 +9,7 @@ export interface Escenario {
   presupuestoInicial: number,
   zonas: Entidad[];
   ataques: AtaqueComponent[];
+  fases: FaseComponent[];
 }
 
 export interface Zona {

@@ -9,9 +9,28 @@ export const escenarioBase: any = {
   ataques: [
     {
       nombreAtaque: "ataque 1",
-      tiempoEnOcurrir: 10,
+      tiempoNotificacion: 10,
       tipoAtaque: TipoAtaque.INFECCION_TROYANO,
-      dispositivoAAtacar: "Servidor Web Principal"
+      dispositivoAAtacar: "Computadora Jacob",
+      descripcion: "Un dispositivo está por ser infectado con un troyano. Revisa la activación del antivirus para evitarlo.",
+      fase: 1,
+      condicionMitigacion: {
+        accion: "Click",
+        objeto: "Configuracion Workstation",
+        tiempo: undefined,
+        val: {
+          nombreConfig: "Actualizaciones automáticas de antivirus",
+          activado: true
+        }
+      }
+    }
+  ],
+  fases: [
+    {
+      id: 1,
+      nombre: "Fase 1",
+      descripcion: "Mitigar el ataque de un troyano",
+      faseActual: true
     }
   ],
   zonas: [

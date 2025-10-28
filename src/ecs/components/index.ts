@@ -10,3 +10,4 @@ export * from "./TiempoComponent";
 export * from "./PresupuestoComponent";
 export * from "./WorkstationComponent"
 export * from "./AtaqueComponent"
+export * from "./FaseComponent"

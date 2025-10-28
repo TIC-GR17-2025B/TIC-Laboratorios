@@ -30,17 +30,32 @@ export class SistemaPresupuesto extends Sistema {
         !listaConfigsWorkstation[i].activado;
 
       // Si al hacer toggle se pone en activado
-      if (listaConfigsWorkstation[i].activado)
+      if (listaConfigsWorkstation[i].activado){
         this.ecsManager
           .getComponentes(entidadPresupuesto)!
           .get(PresupuestoComponent).monto -=
           listaConfigsWorkstation[i].costoActivacion;
+
+          this.ecsManager.registrarAccion("Click",
+                                          "Configuracion Workstation",
+                                          undefined,
+                                          { nombreConfig: listaConfigsWorkstation[i].nombreConfig,
+                                            activado: listaConfigsWorkstation[i].activado
+                                          });
       // Caso contrario significa que se desactivó
-      else
+      }else{
         this.ecsManager
           .getComponentes(entidadPresupuesto)!
           .get(PresupuestoComponent).monto -=
           listaConfigsWorkstation[i].costoActivacion * 0.5;
+
+          this.ecsManager.registrarAccion("Click",
+                                          "Configuracion Workstation",
+                                          undefined,
+                                          { nombreConfig: listaConfigsWorkstation[i].nombreConfig,
+                                            activado: listaConfigsWorkstation[i].activado
+                                          });
+      }
     }
     this.ecsManager.emit("presupuesto:actualizado", {
       presupuesto: this.ecsManager

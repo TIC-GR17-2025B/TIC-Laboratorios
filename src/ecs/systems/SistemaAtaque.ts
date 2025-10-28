@@ -1,5 +1,5 @@
 import { EstadoAtaqueDispositivo } from "../../types/DeviceEnums";
-import { AtaqueComponent, DispositivoComponent, TiempoComponent } from "../components";
+import { AtaqueComponent, DispositivoComponent } from "../components";
 import { Sistema, type Entidad } from "../core";
 
 export class SistemaAtaque extends Sistema {
@@ -9,26 +9,28 @@ export class SistemaAtaque extends Sistema {
         //
     }
 
-    public ejecutarAtaque(entidadDispositivo: Entidad, ataque: AtaqueComponent, entidadTiempo: Entidad): void {
-        /*const container1 = this.ecsManager.getComponentes(entidadAtaque);
-        if (!container1) return;
-        const ataque = container1.get(AtaqueComponent);*/
-        console.log("Ejecutando ataque para entidad dispositivo:", entidadDispositivo);
-        const container2 = this.ecsManager.getComponentes(entidadTiempo);
-        if (!container2) return;
-        const tiempo = container2.get(TiempoComponent);
+    public on(eventName: string, callback: (data: any) => void): () => void {
+        return this.ecsManager.on(eventName, callback);
+    }
 
+    public ejecutarAtaque(entidadDispositivo: Entidad, ataque: AtaqueComponent): void {
         const container3 = this.ecsManager.getComponentes(entidadDispositivo);
         if(!container3) return;
         const dispositivoAAtacar = container3.get(DispositivoComponent);
 
-        if(tiempo.transcurrido == ataque.tiempoEnOcurrir){
+        if(this.ecsManager.consultarAccion(ataque.condicionMitigacion.accion,
+                                         ataque.condicionMitigacion.objeto,
+                                         ataque.condicionMitigacion.tiempo,
+                                         ataque.condicionMitigacion.val
+                                        ) == undefined){ 
             dispositivoAAtacar.estadoAtaque = EstadoAtaqueDispositivo.COMPROMETIDO;
-            console.log("cambio hecho en estado de dispositivo");
-            console.log("entidad:", entidadDispositivo);
-            console.log(dispositivoAAtacar.estadoAtaque);
-            console.log(this.ecsManager.getEntidades());
-            this.ecsManager.emit("eventoAtaque", ataque);
+            this.ecsManager.emit("ataque:ataqueRealizado", { ataque });
+        }else{
+            this.ecsManager.emit("ataque:ataqueMitigado", { ataque });
         }
+    }
+
+    public verificarMitigacionAtaque(ataque: any) {
+        ataque.condicionMitigacion = true;
     }
 }

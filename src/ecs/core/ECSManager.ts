@@ -13,6 +13,13 @@ export class ECSManager {
   // Sistema de eventos para comunicación con el frontend
   private eventListeners = new Map<string, Set<EventCallback>>();
 
+  // Sistema de registro de acciones realizadas durante la simulacion
+  private accionesSimulacion: Set<[string, string, number?, any?]>[] = [];
+                              /* Set<nombre de acción,
+                                     objeto sobre el cual se hizo la acción (no necesariamente es un objeto de la escena 3D),
+                                     tiempo actual (total) en segundos justo cuando se realizó la acción,
+                                     estado resultante u otro valor relevante (opcional, creo que puede ser útil en algunos casos)> >*/
+
   // Para Entidades
 
   public agregarEntidad(): Entidad {
@@ -144,4 +151,31 @@ export class ECSManager {
   public off(eventName: string): void {
     this.eventListeners.delete(eventName);
   }
+
+  ///// Sistema de acciones
+
+  public registrarAccion(accion: string, objeto: string, tiempo?: number, val?: any): void{
+    this.accionesSimulacion.push(new Set([accion, objeto, tiempo, val]));
+  }
+
+  public consultarAccion(accion: string, objeto: string, tiempo?: number, val?: any)
+                        : [string, string, number?, any?] | undefined {
+    for (const setAcciones of this.accionesSimulacion) {
+      for (const [a, o, t, v] of setAcciones) {
+        const coincide = 
+          a === accion &&
+          o === objeto &&
+          (tiempo === undefined || t === tiempo) &&
+          (val === undefined || v === val);
+
+        if (coincide) {
+          return [a, o, t, v];
+        }
+      }
+    }
+
+    // Si no se encontró ninguna coincidencia
+    return undefined;
+  }
+
 }

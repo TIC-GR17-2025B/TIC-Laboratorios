@@ -7,6 +7,7 @@ import {
   ZonaComponent,
   EscenarioComponent,
   AtaqueComponent,
+  FaseComponent,
   WorkstationComponent,
 } from "../components";
 import type { ComponenteContainer, Entidad } from "../core/Componente";
@@ -33,6 +34,10 @@ export class ScenarioBuilder {
     
     escenario.ataques.forEach((ataque: any) => {
       this.crearAtaque(ataque);
+    });
+
+    escenario.fases.forEach((fase: any) => {
+      this.crearAtaque(fase);
     });
 
     escenario.zonas.forEach((zona: any) => {
@@ -71,9 +76,25 @@ export class ScenarioBuilder {
       entidadAtaque,
       new AtaqueComponent(
         ataque.nombreAtaque,
-        ataque.tiempoEnOcurrir,
+        ataque.tiempoNotificacion,
         ataque.tipoAtaque,
-        ataque.dispositivoAAtacar
+        ataque.dispositivoAAtacar,
+        ataque.descripcion,
+        ataque.fase,
+        ataque.condicionMitigacion
+      )
+    );
+  }
+
+  crearFase(fase: any) {
+    const entidadFase = this.ecsManager.agregarEntidad();
+    this.ecsManager.agregarComponente(
+      entidadFase,
+      new FaseComponent(
+        fase.id,
+        fase.nombre,
+        fase.descripcion,
+        fase.faseActual
       )
     );
   }

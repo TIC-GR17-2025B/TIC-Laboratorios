@@ -5,10 +5,15 @@ import { TiempoComponent } from "../components";
 export class SistemaTiempo extends Sistema {
   public componentesRequeridos = new Set([TiempoComponent]);
   public intervalo: ReturnType<typeof setInterval> | null = null;
+  public ataquesEscenario: any[] = [];
 
   public actualizar(entidades: Set<Entidad>): void {
     console.log("SistemaTiempo llamado. Entidades: ", entidades.size);
     // Aquí capaz van futuras funciones dependientes del tiempo
+  }
+
+  public on(eventName: string, callback: (data: any) => void): () => void {
+    return this.ecsManager.on(eventName, callback);
   }
 
   public pausar(entidad: Entidad) {
@@ -21,8 +26,6 @@ export class SistemaTiempo extends Sistema {
       transcurrido: tiempo.transcurrido,
       pausado: true,
     });
-    //clearInterval(this.intervalo!);
-    //this.intervalo = null;
   }
 
   public reanudar(entidad: Entidad) {
@@ -50,8 +53,21 @@ export class SistemaTiempo extends Sistema {
           transcurrido: tiempo.transcurrido,
           pausado: tiempo.pausado,
         });
+
+        /* Verificar que sea un tiempo de notificacion de ataque 
+           y verificar que sea un tiempo de ejecución de ataque
+        */
+        for(const ataque of this.ataquesEscenario){
+          if(tiempo.transcurrido == ataque.tiempoNotificacion){
+            this.ecsManager.emit("tiempo:notificacionAtaque", { descripcionAtaque: ataque.descripcion });
+          }
+          if(tiempo.transcurrido == ataque.tiempoEnOcurrir){
+            this.ecsManager.emit("tiempo:ejecucionAtaque", { ataque });
+          }
+        }
       }
       console.log(`Tiempo transcurrido: ${tiempo.transcurrido}s`);
     }, 1000);
   }
+
 }
