@@ -1,5 +1,5 @@
 import { Sistema, type Entidad } from "../core";
-import { WorkstationComponent, PresupuestoComponent } from "../components";
+import { WorkstationComponent, PresupuestoComponent, DispositivoComponent } from "../components";
 
 export class SistemaPresupuesto extends Sistema {
   public componentesRequeridos = new Set([PresupuestoComponent]);
@@ -21,7 +21,7 @@ export class SistemaPresupuesto extends Sistema {
       );
     for (let i = 0; i < listaConfigsWorkstation.length; i++) {
       if (listaConfigsWorkstation[i].nombreConfig != config) continue;
-
+      
       listaConfigsWorkstation[i].activado =
         !listaConfigsWorkstation[i].activado;
 
@@ -38,8 +38,10 @@ export class SistemaPresupuesto extends Sistema {
                                         "Configuracion Workstation",
                                         -1,
                                         { nombreConfig: listaConfigsWorkstation[i].nombreConfig,
+                                          dispositivoAAtacar: componentesEntidadWorkstation?.get(DispositivoComponent).nombre,
                                           activado: listaConfigsWorkstation[i].activado
                                         });
+        break;
       // Caso contrario significa que se desactivó
       }else{
         if(this.verificarPresupuestoSuficiente(entidadPresupuesto,
@@ -53,8 +55,10 @@ export class SistemaPresupuesto extends Sistema {
                                         "Configuracion Workstation",
                                         -1,
                                         { nombreConfig: listaConfigsWorkstation[i].nombreConfig,
+                                          dispositivoAAtacar: componentesEntidadWorkstation?.get(DispositivoComponent).nombre,
                                           activado: listaConfigsWorkstation[i].activado
                                         });
+        break;
       }
     }
     this.ecsManager.emit("presupuesto:actualizado", {

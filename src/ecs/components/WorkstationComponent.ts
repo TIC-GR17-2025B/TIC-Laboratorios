@@ -1,11 +1,12 @@
 import { Componente } from "../core";
-import type { ConfiguracionWorkstation } from "../../data/configuraciones/configWorkstation";
+import { ConfiguracionWorkstation, type EsquemaConfigWorkstation } from "../../data/configuraciones/configWorkstation";
 
 // Tiene el conjunto de total de configuraciones de un workstation.
 export class WorkstationComponent extends Componente {
     constructor(
-        public configuraciones: typeof ConfiguracionWorkstation,
+        public configuraciones: Array<EsquemaConfigWorkstation> = []
     ){
         super();
+        this.configuraciones = ConfiguracionWorkstation.map(c => ({ ...c }));
     }
 }

@@ -13,7 +13,6 @@ import {
 import type { ComponenteContainer, Entidad } from "../core/Componente";
 import type { Escenario } from "../../types/EscenarioTypes";
 import { SistemaRelaciones } from "../systems/SistemaRelaciones";
-import { ConfiguracionWorkstation } from "../../data/configuraciones/configWorkstation";
 /**
  * Builder para crear escenarios de forma declarativa y simple
  * Facilita la construcción inicial y modificaciones posteriores
@@ -190,7 +189,7 @@ export class ScenarioBuilder {
     // TO-DO: agregar condicional para cada tipo de dispositivo segun dispositivo.tipo (IMPORTANTE)
     this.ecsManager.agregarComponente(
       entidadDispositivo,
-      new WorkstationComponent(ConfiguracionWorkstation)
+      new WorkstationComponent()
     );
 
     const disEntidad = entidadDispositivo;

@@ -26,6 +26,7 @@ export const escenarioBase: any = {
         tiempo: -1,
         val: {
           nombreConfig: "Actualizaciones automáticas de antivirus",
+          dispositivoAAtacar: "Computadora Jacob",
           activado: true,
         },
       },

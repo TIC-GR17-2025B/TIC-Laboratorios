@@ -75,7 +75,7 @@ export function useECSScene() {
       "ataque:ataqueRealizado",
       (data: { ataque: any }) => {
         setMostrarNuevoLog(true);
-        setMensajeLog(`Ataque ejecutado: ${data.ataque.descripcion}`);
+        setMensajeLog(`Ataque ejecutado: ${data.ataque.tipoAtaque}`);
       }
     );
 
@@ -83,7 +83,7 @@ export function useECSScene() {
       "ataque:ataqueMitigado",
       (data: { ataque: any }) => {
         setMostrarNuevoLog(true);
-        setMensajeLog(`Ataque mitigado: ${data.ataque.descripcion}`);
+        setMensajeLog(`Ataque mitigado: ${data.ataque.tipoAtaque}`);
       }
     );
 

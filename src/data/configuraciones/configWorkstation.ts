@@ -1,10 +1,10 @@
-interface EsquemaConfigWorkstation {
+export interface EsquemaConfigWorkstation {
     nombreConfig: string,
     costoActivacion: number,
     activado: boolean
 }
 
-export const ConfiguracionWorkstation: Array<EsquemaConfigWorkstation> = [
+export const ConfiguracionWorkstation: ReadonlyArray<EsquemaConfigWorkstation> = Object.freeze([
     { "nombreConfig": "Actualizaciones automáticas de antivirus", "costoActivacion": 40, "activado": false},
     { "nombreConfig": "Antivirus gestionado", "costoActivacion": 40, "activado": false},
     { "nombreConfig": "Usuario aplica parches", "costoActivacion": 35, "activado": false},
@@ -19,4 +19,4 @@ export const ConfiguracionWorkstation: Array<EsquemaConfigWorkstation> = [
     { "nombreConfig": "Bloquear almacenamiento local", "costoActivacion": 25, "activado": false},
     { "nombreConfig": "Cuidado con adjuntos de email", "costoActivacion": 30, "activado": false},
     { "nombreConfig": "Sin software externo", "costoActivacion": 25, "activado": true}
-]
+]);

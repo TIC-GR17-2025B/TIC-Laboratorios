@@ -25,8 +25,4 @@ export class SistemaAtaque extends Sistema {
             this.ecsManager.emit("ataque:ataqueMitigado", { ataque });
         }
     }
-
-    public verificarMitigacionAtaque(ataque: any) {
-        ataque.condicionMitigacion = true;
-    }
 }
