@@ -1,12 +1,16 @@
 import type { AtaqueComponent, FaseComponent } from "../ecs/components";
 import type { Entidad } from "../ecs/core";
-import { EstadoAtaqueDispositivo, Mueble, TipoDispositivo } from "./DeviceEnums";
+import {
+  EstadoAtaqueDispositivo,
+  Mueble,
+  TipoDispositivo,
+} from "./DeviceEnums";
 
 export interface Escenario {
   id: number;
   titulo: string;
   descripcion: string;
-  presupuestoInicial: number,
+  presupuestoInicial: number;
   zonas: Entidad[];
   ataques: AtaqueComponent[];
   fases: FaseComponent[];
@@ -26,6 +30,10 @@ export interface Dispositivo {
   software?: string;
   posicion?: { x: number; y: number; z: number };
   estadoAtaque?: EstadoAtaqueDispositivo;
+  // Id de la entidad ECS asociada (útil para acciones sobre la entidad)
+  entidadId?: number;
+  // Configuraciones del Workstation si aplica (las provee WorkstationComponent)
+  configuraciones?: any;
 }
 
 export interface Espacio {

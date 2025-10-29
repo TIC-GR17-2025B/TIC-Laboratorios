@@ -28,7 +28,8 @@ export function useECSScene() {
   const escenario = useEscenarioActual();
   const [entities, setEntities] = useState<Map<Entidad, any>>(new Map());
   const [tiempoTranscurrido, setTiempoTranscurrido] = useState(0);
-
+  const [mostrarNuevoLog, setMostrarNuevoLog] = useState(false);
+  const [mensajeLog, setMensajeLog] = useState("");
   const escenarioController = useMemo(
     () => EscenarioController.getInstance(escenario),
     [escenario]
@@ -70,6 +71,22 @@ export function useECSScene() {
       }
     );
 
+    const unsubscribeAtaqueRealizado = escenarioController.on(
+      "ataque:ataqueRealizado",
+      (data: { ataque: any }) => {
+        setMostrarNuevoLog(true);
+        setMensajeLog(`Ataque ejecutado: ${data.ataque.descripcion}`);
+      }
+    );
+
+    const unsubscribeAtaqueMitigado = escenarioController.on(
+      "ataque:ataqueMitigado",
+      (data: { ataque: any }) => {
+        setMostrarNuevoLog(true);
+        setMensajeLog(`Ataque mitigado: ${data.ataque.descripcion}`);
+      }
+    );
+
     const unsubscribeReanudado = escenarioController.on(
       "tiempo:reanudado",
       (data: { transcurrido: number; pausado: boolean }) => {
@@ -82,6 +99,8 @@ export function useECSScene() {
       unsubscribeActualizado();
       unsubscribePausado();
       unsubscribeReanudado();
+      unsubscribeAtaqueRealizado();
+      unsubscribeAtaqueMitigado();
     };
   }, []);
 
@@ -132,6 +151,10 @@ export function useECSScene() {
 
   return {
     entities,
+    mostrarNuevoLog,
+    mensajeLog,
+    setMostrarNuevoLog,
+    setMensajeLog,
     ecsManager: escenarioController.escManager,
     builder: escenarioController.builder,
     processEntities,

@@ -17,6 +17,7 @@ export class SistemaTiempo extends Sistema {
     const tiempo = container.get(TiempoComponent);
     tiempo.pausado = true;
     // Emitir evento de pausa
+    console.log("Pausando tiempo en SistemaTiempo", tiempo);
     this.ecsManager.emit("tiempo:pausado", {
       transcurrido: tiempo.transcurrido,
       pausado: true,

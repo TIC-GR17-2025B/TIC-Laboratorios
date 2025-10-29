@@ -96,7 +96,10 @@ export class EscenarioController {
 
     const iniciarTiempo = () =>
       this.sistemaTiempo!.iniciar(this.entidadTiempo!);
-    const pausarTiempo = () => this.sistemaTiempo!.pausar(this.entidadTiempo!);
+    const pausarTiempo = () => {
+      this.sistemaTiempo!.pausar(this.entidadTiempo!);
+      console.log("Tiempo pausado");
+    };
     const reanudarTiempo = () =>
       this.sistemaTiempo!.reanudar(this.entidadTiempo!);
 

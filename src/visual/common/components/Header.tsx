@@ -14,7 +14,7 @@ const Header: React.FC = () => {
     const { pause, resume, iniciar, isPaused, tiempoTranscurrido, presupuesto } = useECSSceneContext();
     useEffect(() => {
         iniciar && iniciar();
-    }, [iniciar]);
+    }, []);
     useEffect(() => { }, [presupuesto])
     return (
         <header className={styles.header}>
