@@ -21,19 +21,20 @@ export class SistemaPresupuesto extends Sistema {
       );
     for (let i = 0; i < listaConfigsWorkstation.length; i++) {
       if (listaConfigsWorkstation[i].nombreConfig != config) continue;
-      
-      listaConfigsWorkstation[i].activado =
-        !listaConfigsWorkstation[i].activado;
-
-      // Si al hacer toggle se pone en activado
-      if (listaConfigsWorkstation[i].activado){
+     
+      // Al hacer click, primero se verifica si la config está desactivada
+      if (!listaConfigsWorkstation[i].activado){
         if(this.verificarPresupuestoSuficiente(entidadPresupuesto,
                                     listaConfigsWorkstation[i].costoActivacion)){
+          // Aquí recién se hace el toggle
+          listaConfigsWorkstation[i].activado = !listaConfigsWorkstation[i].activado;
+          
           this.ecsManager
             .getComponentes(entidadPresupuesto)!
             .get(PresupuestoComponent).monto -=
             listaConfigsWorkstation[i].costoActivacion;
-        }
+        }else break;
+        
         this.ecsManager.registrarAccion("Click",
                                         "Configuracion Workstation",
                                         -1,
@@ -42,15 +43,19 @@ export class SistemaPresupuesto extends Sistema {
                                           activado: listaConfigsWorkstation[i].activado
                                         });
         break;
-      // Caso contrario significa que se desactivó
+      // Caso contrario significa que está activada
       }else{
         if(this.verificarPresupuestoSuficiente(entidadPresupuesto,
                                     listaConfigsWorkstation[i].costoActivacion*0.5)){
+          
+          listaConfigsWorkstation[i].activado = !listaConfigsWorkstation[i].activado; 
+          
           this.ecsManager
             .getComponentes(entidadPresupuesto)!
             .get(PresupuestoComponent).monto -=
             listaConfigsWorkstation[i].costoActivacion * 0.5;
-        }
+        }else break;
+
         this.ecsManager.registrarAccion("Click",
                                         "Configuracion Workstation",
                                         -1,
