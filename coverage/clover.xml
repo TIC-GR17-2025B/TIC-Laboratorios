@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1761286690911" clover="3.2.0">
+  <project timestamp="1761286690912" name="All files">
+    <metrics statements="68" coveredstatements="66" conditionals="10" coveredconditionals="7" methods="21" coveredmethods="21" elements="99" coveredelements="94" complexity="0" loc="68" ncloc="68" packages="3" files="10" classes="10"/>
+    <package name="components">
+      <metrics statements="8" coveredstatements="8" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="2"/>
+      <file name="Transform.ts" path="/home/kenny/dev/TIC/TIC-Laboratorios/src/ecs/components/Transform.ts">
+        <metrics statements="5" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="5" count="26" type="stmt"/>
+        <line num="6" count="26" type="stmt"/>
+        <line num="7" count="26" type="stmt"/>
+        <line num="8" count="26" type="stmt"/>
+        <line num="10" count="26" type="stmt"/>
+      </file>
+      <file name="Velocidad.ts" path="/home/kenny/dev/TIC/TIC-Laboratorios/src/ecs/components/Velocidad.ts">
+        <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="5" count="14" type="stmt"/>
+        <line num="6" count="14" type="stmt"/>
+        <line num="8" count="14" type="stmt"/>
+      </file>
+      <file name="index.ts" path="/home/kenny/dev/TIC/TIC-Laboratorios/src/ecs/components/index.ts">
+        <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      </file>
+    </package>
+    <package name="core">
+      <metrics statements="46" coveredstatements="44" conditionals="8" coveredconditionals="6" methods="16" coveredmethods="16"/>
+      <file name="Componente.ts" path="/home/kenny/dev/TIC/TIC-Laboratorios/src/ecs/core/Componente.ts">
+        <metrics statements="8" coveredstatements="8" conditionals="2" coveredconditionals="2" methods="5" coveredmethods="5"/>
+        <line num="8" count="37" type="stmt"/>
+        <line num="11" count="42" type="stmt"/>
+        <line num="15" count="33" type="stmt"/>
+        <line num="19" count="12" type="stmt"/>
+        <line num="23" count="26" type="stmt"/>
+        <line num="24" count="42" type="cond" truecount="2" falsecount="0"/>
+        <line num="26" count="13" type="stmt"/>
+        <line num="30" count="6" type="stmt"/>
+      </file>
+      <file name="ECSManager.ts" path="/home/kenny/dev/TIC/TIC-Laboratorios/src/ecs/core/ECSManager.ts">
+        <metrics statements="38" coveredstatements="36" conditionals="6" coveredconditionals="4" methods="11" coveredmethods="11"/>
+        <line num="5" count="21" type="stmt"/>
+        <line num="6" count="21" type="stmt"/>
+        <line num="8" count="21" type="stmt"/>
+        <line num="9" count="21" type="stmt"/>
+        <line num="14" count="21" type="stmt"/>
+        <line num="15" count="21" type="stmt"/>
+        <line num="16" count="21" type="stmt"/>
+        <line num="17" count="21" type="stmt"/>
+        <line num="21" count="6" type="stmt"/>
+        <line num="27" count="24" type="stmt"/>
+        <line num="28" count="24" type="stmt"/>
+        <line num="32" count="25" type="stmt"/>
+        <line num="36" count="3" type="stmt"/>
+        <line num="37" count="3" type="stmt"/>
+        <line num="43" count="13" type="cond" truecount="1" falsecount="1"/>
+        <line num="44" count="0" type="stmt"/>
+        <line num="45" count="0" type="stmt"/>
+        <line num="48" count="13" type="stmt"/>
+        <line num="50" count="13" type="stmt"/>
+        <line num="51" count="13" type="stmt"/>
+        <line num="52" count="1" type="stmt"/>
+        <line num="57" count="1" type="stmt"/>
+        <line num="61" count="17" type="stmt"/>
+        <line num="62" count="16" type="stmt"/>
+        <line num="64" count="17" type="stmt"/>
+        <line num="65" count="6" type="stmt"/>
+        <line num="66" count="6" type="cond" truecount="1" falsecount="1"/>
+        <line num="67" count="6" type="stmt"/>
+        <line num="75" count="6" type="stmt"/>
+        <line num="76" count="6" type="stmt"/>
+        <line num="77" count="1" type="stmt"/>
+        <line num="82" count="27" type="stmt"/>
+        <line num="83" count="21" type="stmt"/>
+        <line num="88" count="22" type="stmt"/>
+        <line num="89" count="22" type="stmt"/>
+        <line num="90" count="22" type="cond" truecount="2" falsecount="0"/>
+        <line num="91" count="10" type="stmt"/>
+        <line num="93" count="12" type="stmt"/>
+      </file>
+      <file name="Sistema.ts" path="/home/kenny/dev/TIC/TIC-Laboratorios/src/ecs/core/Sistema.ts">
+        <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      </file>
+      <file name="index.ts" path="/home/kenny/dev/TIC/TIC-Laboratorios/src/ecs/core/index.ts">
+        <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      </file>
+    </package>
+    <package name="systems">
+      <metrics statements="14" coveredstatements="14" conditionals="2" coveredconditionals="1" methods="3" coveredmethods="3"/>
+      <file name="SistemaAtaque.ts" path="/home/kenny/dev/TIC/TIC-Laboratorios/src/ecs/systems/SistemaAtaque.ts">
+        <metrics statements="4" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="2"/>
+        <line num="4" count="2" type="stmt"/>
+        <line num="9" count="3" type="stmt"/>
+        <line num="10" count="3" type="stmt"/>
+        <line num="13" count="3" type="stmt"/>
+      </file>
+      <file name="SistemaMovimiento.ts" path="/home/kenny/dev/TIC/TIC-Laboratorios/src/ecs/systems/SistemaMovimiento.ts">
+        <metrics statements="10" coveredstatements="10" conditionals="2" coveredconditionals="1" methods="1" coveredmethods="1"/>
+        <line num="5" count="10" type="stmt"/>
+        <line num="6" count="10" type="stmt"/>
+        <line num="9" count="13" type="stmt"/>
+        <line num="11" count="13" type="stmt"/>
+        <line num="12" count="10" type="stmt"/>
+        <line num="13" count="10" type="cond" truecount="1" falsecount="1"/>
+        <line num="15" count="10" type="stmt"/>
+        <line num="16" count="10" type="stmt"/>
+        <line num="18" count="10" type="stmt"/>
+        <line num="19" count="10" type="stmt"/>
+      </file>
+      <file name="index.ts" path="/home/kenny/dev/TIC/TIC-Laboratorios/src/ecs/systems/index.ts">
+        <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      </file>
+    </package>
+  </project>
+</coverage>

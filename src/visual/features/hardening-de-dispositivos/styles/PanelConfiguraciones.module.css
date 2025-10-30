@@ -1,0 +1,28 @@
+.contenedor {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+  margin-bottom: 16px;
+}
+.header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: normal;
+}
+.listaConfiguraciones {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding-top: 5px;
+}
+
+.listaConfiguraciones > * {
+  box-sizing: border-box;
+}

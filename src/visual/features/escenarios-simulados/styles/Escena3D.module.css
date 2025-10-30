@@ -1,0 +1,25 @@
+.vista3D {
+    flex: 1;
+    background-color: var(--border-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 500px;
+    position: relative;
+}
+.controles3D{
+    width: fit-content;
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    right: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 4px;
+    z-index: 10;
+}
+.controles3D button{
+    height: 40px;
+    width: 40px;
+}

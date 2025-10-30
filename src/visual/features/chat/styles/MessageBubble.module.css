@@ -1,0 +1,126 @@
+.messageBubble {
+  display: flex;
+  margin: 6px 0;
+  animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.messageBubble.user {
+  justify-content: flex-end;
+}
+
+.messageBubble.bot {
+  justify-content: flex-start;
+}
+
+.messageContent {
+  max-width: 80%;
+  padding: 12px;
+  border-radius: 12px;
+  word-wrap: break-word;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.messageBubble.user .messageContent {
+  background: var(--blue-transparent);
+  color: var(--text-primary);
+}
+.messageBubble.user .messageContent .messageTime {
+  color: var(--blue-lighter);
+}
+
+.messageBubble.bot .messageContent {
+  background: var(--surface-secondary) 100%;
+  color: var(--text-primary);
+}
+
+.messageContent p {
+  margin: 0 0 4px 0;
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+
+.messageTime {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  display: block;
+  text-align: right;
+  margin-top: 4px;
+}
+
+/* Contexto del mensaje */
+.messageContext {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: var(--border-radius);
+  padding: 8px;
+  margin-bottom: 8px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid var(--border-primary);
+}
+
+.messageContextImage {
+  width: 36px;
+  height: 36px;
+  border-radius: calc(var(--border-radius) / 2);
+  object-fit: cover;
+  border: 1px solid var(--border-primary);
+}
+
+.messageContextInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.messageContextInfo strong {
+  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.messageContextInfo span {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .messageContent {
+    max-width: 85%;
+    padding: 8px 12px;
+  }
+
+  .messageContent p {
+    font-size: 0.9rem;
+  }
+
+  .messageContextImage {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .messageContent {
+    max-width: 90%;
+  }
+}
