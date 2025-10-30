@@ -18,6 +18,7 @@ export class EscenarioController {
   private sistemaPresupuesto?: SistemaPresupuesto;
   private entidadPresupuesto?: Entidad;
   private sistemaAtaque?: SistemaAtaque;
+  private escenarioIniciado: boolean = false; // FLAG PARA EVITAR MÚLTIPLES INICIALIZACIONES
 
   private static instance: EscenarioController | null = null;
 
@@ -42,41 +43,61 @@ export class EscenarioController {
   }
 
   public iniciarEscenario(): void {
+    // EVITAR MÚLTIPLES INICIALIZACIONES
+    if (this.escenarioIniciado) {
+      return;
+    }
+
     this.builder = new ScenarioBuilder(this.escManager);
     this.builder.construirDesdeArchivo(this.escenario);
+
     if (!this.sistemaAtaque) {
       this.sistemaAtaque = new SistemaAtaque();
       this.escManager.agregarSistema(this.sistemaAtaque);
     }
-    this.escManager.emit("escenarioController:escenarioIniciado", {
-      ataques: this.getAtaques(),
-    });
+
+    // NO emitir el evento aquí - lo haremos después de que los sistemas se suscriban
     this.escManager.on(
       "tiempo:notificacionAtaque",
       (data: { descripcionAtaque: string }) => {
         console.log(data.descripcionAtaque);
       }
     );
+
     this.escManager.on("tiempo:ejecucionAtaque", (data: { ataque: any }) =>
       this.ejecutarAtaque(data.ataque)
     );
+
     this.escManager.on("ataque:ataqueRealizado", (data: { ataque: any }) => {
       console.log(
         `Se comprometió el dispositivo: ${data.ataque.dispositivoAAtacar}. Causa: ${data.ataque.tipoAtaque}`
       );
     });
+
     this.escManager.on("ataque:ataqueMitigado", (data: { ataque: any }) => {
       console.log(
         `Se mitigó el ataque a: ${data.ataque.dispositivoAAtacar}. Ataque mitigado: ${data.ataque.tipoAtaque}`
       );
     });
+
     this.escManager.on("presupuesto:agotado", () => {
       this.sistemaTiempo?.pausar(this.entidadTiempo!);
-      console.log("Se agotó el presupuesto, fin de la partida.");      
+      console.log("Se agotó el presupuesto, fin de la partida.");
     });
+
+    this.escenarioIniciado = true;
   }
 
-  public ejecutarTiempo(): any {
+  public cargarAtaquesEnSistema(): void {
+    if (!this.sistemaTiempo) {
+      console.error("SistemaTiempo no existe aún");
+      return;
+    }
+    const ataques = this.getAtaques();
+    this.sistemaTiempo.ataquesEscenario = ataques;
+  }
+
+  public ejecutarTiempo(): void {
     if (!this.entidadTiempo) {
       this.entidadTiempo = this.escManager.agregarEntidad();
       this.escManager.agregarComponente(
@@ -86,24 +107,31 @@ export class EscenarioController {
 
       this.sistemaTiempo = new SistemaTiempo();
       this.escManager.agregarSistema(this.sistemaTiempo);
-      this.sistemaTiempo.on(
-        "escenarioController:escenarioIniciado",
-        (data: { ataques: any[] }) => {
-          this.sistemaTiempo!.ataquesEscenario = data.ataques;
-        }
-      );
+    }
+  }
+  public iniciarTiempo(): void {
+    if (!this.sistemaTiempo || !this.entidadTiempo) {
+      console.error("Sistema de tiempo no inicializado");
+      return;
+    }
+    this.sistemaTiempo.iniciar(this.entidadTiempo);
+  }
+
+  public pausarTiempo(): void {
+    if (!this.sistemaTiempo || !this.entidadTiempo) {
+      console.error("Sistema de tiempo no inicializado");
+      return;
+    }
+    this.sistemaTiempo.pausar(this.entidadTiempo);
+  }
+
+  public reanudarTiempo(): void {
+    if (!this.sistemaTiempo || !this.entidadTiempo) {
+      console.error("Sistema de tiempo no inicializado");
+      return;
     }
 
-    const iniciarTiempo = () =>
-      this.sistemaTiempo!.iniciar(this.entidadTiempo!);
-    const pausarTiempo = () => {
-      this.sistemaTiempo!.pausar(this.entidadTiempo!);
-      console.log("Tiempo pausado");
-    };
-    const reanudarTiempo = () =>
-      this.sistemaTiempo!.reanudar(this.entidadTiempo!);
-
-    return { iniciarTiempo, pausarTiempo, reanudarTiempo };
+    this.sistemaTiempo.reanudar(this.entidadTiempo);
   }
 
   public estaTiempoPausado(): boolean {
@@ -140,7 +168,7 @@ export class EscenarioController {
     return this.escManager.on(eventName, callback);
   }
 
-  public efectuarPresupuesto(montoInicial: number): any {
+  public efectuarPresupuesto(montoInicial: number): void {
     if (!this.entidadPresupuesto) {
       this.entidadPresupuesto = this.escManager.agregarEntidad();
       this.escManager.agregarComponente(
@@ -150,19 +178,21 @@ export class EscenarioController {
       this.sistemaPresupuesto = new SistemaPresupuesto();
       this.escManager.agregarSistema(this.sistemaPresupuesto);
     }
+  }
 
-    const toggleConfiguracionWorkstation = (
-      entidadWorkstation: Entidad,
-      nombreConfig: string
-    ) => {
-      this.sistemaPresupuesto!.toggleConfiguracionWorkstation(
-        this.entidadPresupuesto!,
-        entidadWorkstation,
-        nombreConfig
-      );
-    };
-
-    return { toggleConfiguracionWorkstation };
+  public toggleConfiguracionWorkstation(
+    entidadWorkstation: Entidad,
+    nombreConfig: string
+  ): void {
+    if (!this.sistemaPresupuesto || !this.entidadPresupuesto) {
+      console.error("Sistema de presupuesto no inicializado");
+      return;
+    }
+    this.sistemaPresupuesto.toggleConfiguracionWorkstation(
+      this.entidadPresupuesto,
+      entidadWorkstation,
+      nombreConfig
+    );
   }
 
   public ejecutarAtaque(ataque: any) {
@@ -209,5 +239,13 @@ export class EscenarioController {
     }
 
     return ataques;
+  }
+
+  // MÉTODO PARA RESETEAR EL SINGLETON (útil para desarrollo/testing)
+  public static reset(): void {
+    if (EscenarioController.instance?.sistemaTiempo) {
+      EscenarioController.instance.sistemaTiempo.destruir();
+    }
+    EscenarioController.instance = null;
   }
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import type { Entidad } from "../../../../ecs/core/Componente";
 import { getDispositivoHeight } from "../config/modelConfig";
 import { useEscenarioActual } from "../../../common/contexts/EscenarioContext";
@@ -30,25 +30,45 @@ export function useECSScene() {
   const [tiempoTranscurrido, setTiempoTranscurrido] = useState(0);
   const [mostrarNuevoLog, setMostrarNuevoLog] = useState(false);
   const [mensajeLog, setMensajeLog] = useState("");
+  const [isPaused, setIsPaused] = useState(false);
+  const [presupuesto, setPresupuesto] = useState(0);
+
+  // useRef para evitar múltiples inicializaciones
+  const inicializado = useRef(false);
+  const tiempoIniciadoRef = useRef(false);
+
   const escenarioController = useMemo(
     () => EscenarioController.getInstance(escenario),
     [escenario]
   );
 
-  const { iniciarTiempo, pausarTiempo, reanudarTiempo } =
-    escenarioController.ejecutarTiempo();
+  // NO llamar ejecutarTiempo() ni efectuarPresupuesto() aquí
+  // Se llamarán después de iniciarEscenario()
 
-  const { toggleConfiguracionWorkstation } =
-    escenarioController.efectuarPresupuesto(escenario.presupuestoInicial);
-
-  const [isPaused, setIsPaused] = useState(false);
-  const [presupuesto, setPresupuesto] = useState(0);
   useEffect(() => {
+    // Evitar múltiples inicializaciones
+    if (inicializado.current) {
+      console.log("Hook ya inicializado, omitiendo");
+      return;
+    }
+
+    inicializado.current = true;
+
+    // PRIMERO: Inicializar el escenario
     escenarioController.iniciarEscenario();
+    // SEGUNDO: Configurar tiempo
+    escenarioController.ejecutarTiempo();
+    // TERCERO: Cargar ataques DIRECTAMENTE en el sistema de tiempo
+    escenarioController.cargarAtaquesEnSistema();
+    // CUARTO: Configurar presupuesto
+    escenarioController.efectuarPresupuesto(escenario.presupuestoInicial);
+    // QUINTO: Obtener estado inicial
     setEntities(escenarioController.builder.getEntidades());
     setIsPaused(escenarioController.estaTiempoPausado());
-
     setPresupuesto(escenarioController.getPresupuestoActual());
+    // SEXTO: Iniciar el tiempo automáticamente desde useEffect
+    escenarioController.iniciarTiempo();
+    tiempoIniciadoRef.current = true;
 
     const unsubscribePresupuesto = escenarioController.on(
       "presupuesto:actualizado",
@@ -68,6 +88,7 @@ export function useECSScene() {
       "tiempo:pausado",
       (data: { transcurrido: number; pausado: boolean }) => {
         setTiempoTranscurrido(data.transcurrido);
+        setIsPaused(true);
       }
     );
 
@@ -91,10 +112,12 @@ export function useECSScene() {
       "tiempo:reanudado",
       (data: { transcurrido: number; pausado: boolean }) => {
         setTiempoTranscurrido(data.transcurrido);
+        setIsPaused(false);
       }
     );
 
     return () => {
+      console.log("Limpiando suscripciones");
       unsubscribePresupuesto();
       unsubscribeActualizado();
       unsubscribePausado();
@@ -102,7 +125,7 @@ export function useECSScene() {
       unsubscribeAtaqueRealizado();
       unsubscribeAtaqueMitigado();
     };
-  }, []);
+  }, []); // Sin dependencias - solo se ejecuta una vez
 
   /**
    * Devuelve un array de entidades listo para render 3D
@@ -149,6 +172,40 @@ export function useECSScene() {
     );
   };
 
+  // Memoizar las funciones para que no cambien en cada render
+  const iniciar = useCallback(() => {
+    if (tiempoIniciadoRef.current) {
+      console.log("Tiempo ya iniciado, omitiendo");
+      return;
+    }
+    console.log("Llamando iniciar manualmente desde useECSScene");
+    escenarioController.iniciarTiempo();
+    tiempoIniciadoRef.current = true;
+    setIsPaused(escenarioController.estaTiempoPausado());
+  }, [escenarioController]);
+
+  const pause = useCallback(() => {
+    console.log("efectuando pausa");
+    escenarioController.pausarTiempo();
+    setIsPaused(true);
+  }, [escenarioController]);
+
+  const resume = useCallback(() => {
+    console.log("efectuando reanudación");
+    escenarioController.reanudarTiempo();
+    setIsPaused(false);
+  }, [escenarioController]);
+
+  const toggleConfigWorkstation = useCallback(
+    (entidadWorkstation: Entidad, nombreConfig: string) => {
+      escenarioController.toggleConfiguracionWorkstation(
+        entidadWorkstation,
+        nombreConfig
+      );
+    },
+    [escenarioController]
+  );
+
   return {
     entities,
     mostrarNuevoLog,
@@ -159,27 +216,11 @@ export function useECSScene() {
     builder: escenarioController.builder,
     processEntities,
     tiempoTranscurrido,
-    iniciar: () => {
-      iniciarTiempo();
-      setIsPaused(escenarioController.estaTiempoPausado());
-    },
-    pause: () => {
-      console.log("efectuando pausa");
-      pausarTiempo();
-      setIsPaused(true);
-    },
-    resume: () => {
-      console.log("efectuando reanudación");
-      reanudarTiempo();
-      setIsPaused(false);
-    },
+    iniciar,
+    pause,
+    resume,
     isPaused,
     presupuesto,
-    toggleConfigWorkstation: (
-      entidadWorkstation: Entidad,
-      nombreConfig: string
-    ) => {
-      toggleConfiguracionWorkstation(entidadWorkstation, nombreConfig);
-    },
+    toggleConfigWorkstation,
   };
 }

@@ -14,9 +14,16 @@ export class SistemaTiempo extends Sistema {
   public pausar(entidad: Entidad) {
     const container = this.ecsManager.getComponentes(entidad);
     if (!container) return;
+
     const tiempo = container.get(TiempoComponent);
     tiempo.pausado = true;
-    // Emitir evento de pausa
+
+    // IMPORTANTE: Detener el intervalo cuando se pausa
+    if (this.intervalo) {
+      clearInterval(this.intervalo);
+      this.intervalo = null;
+    }
+
     console.log("Pausando tiempo en SistemaTiempo", tiempo);
     this.ecsManager.emit("tiempo:pausado", {
       transcurrido: tiempo.transcurrido,
@@ -27,9 +34,13 @@ export class SistemaTiempo extends Sistema {
   public reanudar(entidad: Entidad) {
     const container = this.ecsManager.getComponentes(entidad);
     if (!container) return;
+
     const tiempo = container.get(TiempoComponent);
     tiempo.pausado = false;
-    // Emitir evento de reanudación
+
+    // Reiniciar el intervalo cuando se reanuda
+    this.iniciarIntervalo(tiempo);
+
     this.ecsManager.emit("tiempo:reanudado", {
       transcurrido: tiempo.transcurrido,
       pausado: false,
@@ -39,32 +50,48 @@ export class SistemaTiempo extends Sistema {
   public iniciar(entidad: Entidad) {
     const container = this.ecsManager.getComponentes(entidad);
     if (!container) return;
-    const tiempo = container.get(TiempoComponent);
-    if (this.intervalo) return; // evitar múltiples intervalos
-    this.intervalo = setInterval(() => {
-      if (!tiempo.pausado) {
-        tiempo.transcurrido += 1;
-        // Emitir evento cuando el tiempo cambia
-        this.ecsManager.emit("tiempo:actualizado", {
-          transcurrido: tiempo.transcurrido,
-          pausado: tiempo.pausado,
-        });
 
-        /* Verificar que sea un tiempo de notificacion de ataque 
-           y verificar que sea un tiempo de ejecución de ataque
-        */
-        for (const ataque of this.ataquesEscenario) {
-          if (tiempo.transcurrido == ataque.tiempoNotificacion) {
-            this.ecsManager.emit("tiempo:notificacionAtaque", {
-              descripcionAtaque: ataque.descripcion,
-            });
-          }
-          if (tiempo.transcurrido == ataque.tiempoEnOcurrir) {
-            this.ecsManager.emit("tiempo:ejecucionAtaque", { ataque });
-          }
+    const tiempo = container.get(TiempoComponent);
+
+    // Evitar múltiples intervalos
+    if (this.intervalo) return;
+
+    this.iniciarIntervalo(tiempo);
+  }
+
+  private iniciarIntervalo(tiempo: TiempoComponent) {
+    this.intervalo = setInterval(() => {
+      tiempo.transcurrido += 1;
+
+      // Emitir evento cuando el tiempo cambia
+      this.ecsManager.emit("tiempo:actualizado", {
+        transcurrido: tiempo.transcurrido,
+        pausado: tiempo.pausado,
+      });
+
+      /* Verificar que sea un tiempo de notificacion de ataque 
+         y verificar que sea un tiempo de ejecución de ataque
+      */
+      for (const ataque of this.ataquesEscenario) {
+        if (tiempo.transcurrido == ataque.tiempoNotificacion) {
+          this.ecsManager.emit("tiempo:notificacionAtaque", {
+            descripcionAtaque: ataque.descripcion,
+          });
+        }
+        if (tiempo.transcurrido == ataque.tiempoEnOcurrir) {
+          this.ecsManager.emit("tiempo:ejecucionAtaque", { ataque });
         }
       }
-      console.log(`Tiempo transcurrido: ${tiempo.transcurrido}s`);
+
+      //console.log(`Tiempo transcurrido: ${tiempo.transcurrido}s`);
     }, 1000);
+  }
+
+  // Método para limpiar el intervalo cuando se destruye el sistema
+  public destruir() {
+    if (this.intervalo) {
+      clearInterval(this.intervalo);
+      this.intervalo = null;
+    }
   }
 }
