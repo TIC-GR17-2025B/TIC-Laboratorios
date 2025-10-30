@@ -24,7 +24,7 @@ export class SistemaPresupuesto extends Sistema {
      
       // Al hacer click, primero se verifica si la config está desactivada
       if (!listaConfigsWorkstation[i].activado){
-        if(this.verificarPresupuestoSuficiente(entidadPresupuesto,
+        if(this.hayPresupuestoSuficiente(entidadPresupuesto,
                                     listaConfigsWorkstation[i].costoActivacion)){
           // Aquí recién se hace el toggle
           listaConfigsWorkstation[i].activado = !listaConfigsWorkstation[i].activado;
@@ -45,7 +45,7 @@ export class SistemaPresupuesto extends Sistema {
         break;
       // Caso contrario significa que está activada
       }else{
-        if(this.verificarPresupuestoSuficiente(entidadPresupuesto,
+        if(this.hayPresupuestoSuficiente(entidadPresupuesto,
                                     listaConfigsWorkstation[i].costoActivacion*0.5)){
           
           listaConfigsWorkstation[i].activado = !listaConfigsWorkstation[i].activado; 
@@ -74,7 +74,7 @@ export class SistemaPresupuesto extends Sistema {
     this.notificarPresupuestoAgotado(entidadPresupuesto);
   }
 
-  private verificarPresupuestoSuficiente(entidadPresupuesto: Entidad, montoAProcesar: number): boolean{
+  private hayPresupuestoSuficiente(entidadPresupuesto: Entidad, montoAProcesar: number): boolean{
     const presupuestoActual = this.ecsManager.getComponentes(entidadPresupuesto)!
                                              .get(PresupuestoComponent).monto;
     

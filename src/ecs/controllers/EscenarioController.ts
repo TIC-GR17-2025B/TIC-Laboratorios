@@ -3,6 +3,7 @@ import {
   DispositivoComponent,
   PresupuestoComponent,
   TiempoComponent,
+  WorkstationComponent,
 } from "../components";
 import { ECSManager, type Entidad } from "../core";
 import { SistemaAtaque, SistemaPresupuesto, SistemaTiempo } from "../systems";
@@ -10,7 +11,7 @@ import { ScenarioBuilder } from "../utils/ScenarioBuilder";
 
 export class EscenarioController {
   public escenario: any;
-  public escManager: ECSManager;
+  public ecsManager: ECSManager;
   public builder!: ScenarioBuilder;
 
   private entidadTiempo?: Entidad;
@@ -24,7 +25,7 @@ export class EscenarioController {
 
   private constructor(escenario: any) {
     this.escenario = escenario;
-    this.escManager = new ECSManager();
+    this.ecsManager = new ECSManager();
   }
 
   // SINGLETON
@@ -48,39 +49,39 @@ export class EscenarioController {
       return;
     }
 
-    this.builder = new ScenarioBuilder(this.escManager);
+    this.builder = new ScenarioBuilder(this.ecsManager);
     this.builder.construirDesdeArchivo(this.escenario);
 
     if (!this.sistemaAtaque) {
       this.sistemaAtaque = new SistemaAtaque();
-      this.escManager.agregarSistema(this.sistemaAtaque);
+      this.ecsManager.agregarSistema(this.sistemaAtaque);
     }
 
     // NO emitir el evento aquí - lo haremos después de que los sistemas se suscriban
-    this.escManager.on(
+    this.ecsManager.on(
       "tiempo:notificacionAtaque",
       (data: { descripcionAtaque: string }) => {
         console.log(data.descripcionAtaque);
       }
     );
 
-    this.escManager.on("tiempo:ejecucionAtaque", (data: { ataque: any }) =>
+    this.ecsManager.on("tiempo:ejecucionAtaque", (data: { ataque: any }) =>
       this.ejecutarAtaque(data.ataque)
     );
 
-    this.escManager.on("ataque:ataqueRealizado", (data: { ataque: any }) => {
+    this.ecsManager.on("ataque:ataqueRealizado", (data: { ataque: any }) => {
       console.log(
         `Se comprometió el dispositivo: ${data.ataque.dispositivoAAtacar}. Causa: ${data.ataque.tipoAtaque}`
       );
     });
 
-    this.escManager.on("ataque:ataqueMitigado", (data: { ataque: any }) => {
+    this.ecsManager.on("ataque:ataqueMitigado", (data: { ataque: any }) => {
       console.log(
         `Se mitigó el ataque a: ${data.ataque.dispositivoAAtacar}. Ataque mitigado: ${data.ataque.tipoAtaque}`
       );
     });
 
-    this.escManager.on("presupuesto:agotado", () => {
+    this.ecsManager.on("presupuesto:agotado", () => {
       this.sistemaTiempo?.pausar(this.entidadTiempo!);
       console.log("Se agotó el presupuesto, fin de la partida.");
     });
@@ -99,14 +100,14 @@ export class EscenarioController {
 
   public ejecutarTiempo(): void {
     if (!this.entidadTiempo) {
-      this.entidadTiempo = this.escManager.agregarEntidad();
-      this.escManager.agregarComponente(
+      this.entidadTiempo = this.ecsManager.agregarEntidad();
+      this.ecsManager.agregarComponente(
         this.entidadTiempo,
         new TiempoComponent()
       );
 
       this.sistemaTiempo = new SistemaTiempo();
-      this.escManager.agregarSistema(this.sistemaTiempo);
+      this.ecsManager.agregarSistema(this.sistemaTiempo);
     }
   }
   public iniciarTiempo(): void {
@@ -135,11 +136,11 @@ export class EscenarioController {
   }
 
   public estaTiempoPausado(): boolean {
-    if (!this.escManager || !this.entidadTiempo) {
+    if (!this.ecsManager || !this.entidadTiempo) {
       return false;
     }
 
-    const cont = this.escManager.getComponentes(this.entidadTiempo);
+    const cont = this.ecsManager.getComponentes(this.entidadTiempo);
     if (!cont) return false;
 
     const tiempo = cont.get(TiempoComponent);
@@ -147,11 +148,11 @@ export class EscenarioController {
   }
 
   public get tiempoTranscurrido(): number {
-    if (!this.escManager || !this.entidadTiempo) {
+    if (!this.ecsManager || !this.entidadTiempo) {
       return 0;
     }
 
-    const cont = this.escManager.getComponentes(this.entidadTiempo);
+    const cont = this.ecsManager.getComponentes(this.entidadTiempo);
     if (!cont) return 0;
 
     const tiempo = cont.get(TiempoComponent);
@@ -165,18 +166,18 @@ export class EscenarioController {
    * @returns Función para desuscribirse del evento
    */
   public on(eventName: string, callback: (data: any) => void): () => void {
-    return this.escManager.on(eventName, callback);
+    return this.ecsManager.on(eventName, callback);
   }
 
   public efectuarPresupuesto(montoInicial: number): void {
     if (!this.entidadPresupuesto) {
-      this.entidadPresupuesto = this.escManager.agregarEntidad();
-      this.escManager.agregarComponente(
+      this.entidadPresupuesto = this.ecsManager.agregarEntidad();
+      this.ecsManager.agregarComponente(
         this.entidadPresupuesto,
         new PresupuestoComponent(montoInicial)
       );
       this.sistemaPresupuesto = new SistemaPresupuesto();
-      this.escManager.agregarSistema(this.sistemaPresupuesto);
+      this.ecsManager.agregarSistema(this.sistemaPresupuesto);
     }
   }
 
@@ -196,8 +197,8 @@ export class EscenarioController {
   }
 
   public ejecutarAtaque(ataque: any) {
-    const entidadAtaque = this.escManager.agregarEntidad();
-    this.escManager.agregarComponente(entidadAtaque, ataque);
+    const entidadAtaque = this.ecsManager.agregarEntidad();
+    this.ecsManager.agregarComponente(entidadAtaque, ataque);
 
     let dispositivos: any[][] = []; // Info de dispositivo: idEntidad y nombre
 
@@ -219,10 +220,10 @@ export class EscenarioController {
   }
 
   public getPresupuestoActual(): number {
-    if (!this.escManager || !this.entidadPresupuesto) {
+    if (!this.ecsManager || !this.entidadPresupuesto) {
       return 0;
     }
-    const cont = this.escManager.getComponentes(this.entidadPresupuesto);
+    const cont = this.ecsManager.getComponentes(this.entidadPresupuesto);
     if (!cont) return 0;
 
     const presupuesto = cont.get(PresupuestoComponent);
@@ -239,6 +240,30 @@ export class EscenarioController {
     }
 
     return ataques;
+  }
+
+  public getWorkstationsYServers(): any[] {
+    let workstationsYServers = [];
+
+    for (const [entidad, container] of this.ecsManager.getEntidades()){
+      if (container.tiene(WorkstationComponent) /* || container.tiene(ServidorComponent)*/) {
+        workstationsYServers.push(entidad);
+      }
+    }
+
+    return workstationsYServers;
+  }
+
+  public getAllDispositivos(): any[] {
+    let dispositivosTodos = [];
+
+    for (const [entidad, container] of this.ecsManager.getEntidades()){
+      if(container.tiene(DispositivoComponent)) {
+        dispositivosTodos.push(entidad);
+      }
+    }
+    
+    return dispositivosTodos;
   }
 
   // MÉTODO PARA RESETEAR EL SINGLETON (útil para desarrollo/testing)

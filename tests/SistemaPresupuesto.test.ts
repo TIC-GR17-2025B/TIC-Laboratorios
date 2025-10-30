@@ -1,8 +1,9 @@
 import { describe, expect, test } from "vitest";
 import { ECSManager } from "../src/ecs/core";
 import { SistemaPresupuesto } from "../src/ecs/systems";
-import { PresupuestoComponent, WorkstationComponent } from "../src/ecs/components";
+import { DispositivoComponent, PresupuestoComponent, WorkstationComponent } from "../src/ecs/components";
 import { ConfiguracionWorkstation } from "../src/data/configuraciones/configWorkstation";
+import { EstadoAtaqueDispositivo, TipoDispositivo } from "../src/types/DeviceEnums";
 
 describe('PresupuestoComponent y SistemaPresupuesto', () => {
     test('activación y desactivación de configuraciones con presupuesto suficiente', () => {
@@ -22,7 +23,8 @@ describe('PresupuestoComponent y SistemaPresupuesto', () => {
 
         // Simular activación de una configuración
         const entidadWorkstation = em.agregarEntidad();
-        em.agregarComponente(entidadWorkstation, new WorkstationComponent(ConfiguracionWorkstation));
+        em.agregarComponente(entidadWorkstation, new DispositivoComponent("dispo", "so", "hw", TipoDispositivo.WORKSTATION, EstadoAtaqueDispositivo.NORMAL));
+        em.agregarComponente(entidadWorkstation, new WorkstationComponent());
         sistema.toggleConfiguracionWorkstation(entidadPresupuesto, entidadWorkstation, configuracion)
         expect(presupuesto.monto).toBeLessThan(presupuestoInicial);
         console.log("Se activó la configuración:", configuracion)
@@ -54,7 +56,8 @@ describe('PresupuestoComponent y SistemaPresupuesto', () => {
 
         // Simular activación de una configuración con presupuesto insuficiente
         const entidadWorkstation = em.agregarEntidad();
-        em.agregarComponente(entidadWorkstation, new WorkstationComponent(ConfiguracionWorkstation));
+        em.agregarComponente(entidadWorkstation, new DispositivoComponent("dispo", "so", "hw", TipoDispositivo.WORKSTATION, EstadoAtaqueDispositivo.NORMAL));
+        em.agregarComponente(entidadWorkstation, new WorkstationComponent());
         sistema.toggleConfiguracionWorkstation(entidadPresupuesto, entidadWorkstation, configuracion)
         expect(presupuesto.monto).toEqual(presupuestoInicial);
         console.log("No se activó la configuración:", configuracion)

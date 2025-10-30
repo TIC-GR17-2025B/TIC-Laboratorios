@@ -212,7 +212,7 @@ export function useECSScene() {
     mensajeLog,
     setMostrarNuevoLog,
     setMensajeLog,
-    ecsManager: escenarioController.escManager,
+    escManager: escenarioController.ecsManager,
     builder: escenarioController.builder,
     processEntities,
     tiempoTranscurrido,
