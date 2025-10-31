@@ -64,6 +64,7 @@ export const escenarioBase: any = {
                   software: "Apache, MySQL, PHP",
                   posicion: { x: 0, y: 0, z: 0, rotacionY: 0 },
                   estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
+                  redes: ["LAN1"],
                   activos: [
                     {
                       nombre: "Activo1",
@@ -87,6 +88,7 @@ export const escenarioBase: any = {
                   software: "IDS/IPS, VPN",
                   posicion: { x: 3, y: 0, z: 0, rotacionY: 180 },
                   estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
+                  redes: ["LAN1"],
                   activos: [], 
                 },
               ],

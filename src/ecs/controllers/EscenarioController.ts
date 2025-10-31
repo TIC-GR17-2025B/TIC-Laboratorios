@@ -86,6 +86,10 @@ export class EscenarioController {
       console.log("Se agotó el presupuesto, fin de la partida.");
     });
 
+    this.ecsManager.on("red:activoEnviado", (data: { d1: string, d2: string, nombreActivo: string }) => {
+      console.log(`Se envió el activo "${data.nombreActivo}" desde ${data.d1} hacia ${data.d2}.`);
+    });
+
     this.escenarioIniciado = true;
   }
 

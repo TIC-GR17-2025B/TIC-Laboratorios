@@ -50,7 +50,7 @@ export class ScenarioBuilder {
           const espacioEntidad = this.crearEspacio(espacio, oficinaEntidad);
           espacio.dispositivos.forEach((dispositivo: any) => {
             const dispositivoEntidad = this.crearDispositivo(dispositivo, espacioEntidad);
-            this.crearActivo(dispositivoEntidad, dispositivo.activos);
+            this.crearActivos(dispositivoEntidad, dispositivo.activos);
           });
         });
       });
@@ -222,7 +222,7 @@ export class ScenarioBuilder {
     return entidadDispositivo;
   }
 
-  crearActivo(entidadDispositivo: number, activos: any) {
+  crearActivos(entidadDispositivo: number, activos: any) {
     const activoComponente = new ActivoComponent();
     activoComponente.activos = activos;
     this.ecsManager.agregarComponente(
