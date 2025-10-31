@@ -3,10 +3,10 @@ import styles from '../styles/Header.module.css';
 import NavigationLink from './Navigation';
 import DevicesIcon from '../icons/DevicesIcon';
 import OfficeIcon from '../icons/OfficeIcon';
-import EstrellasIcon from '../icons/EstrellasIcon';
 import { useEscenarioActual } from '../contexts/EscenarioContext';
 import { formatearTiempo } from '../utils/formatearTiempo';
 import { useECSSceneContext } from '../../features/escenarios-simulados/context/ECSSceneContext';
+import ChatLauncher from '../../features/chat/components/ChatLauncher';
 
 const Header: React.FC = () => {
     const escenario = useEscenarioActual();
@@ -33,9 +33,7 @@ const Header: React.FC = () => {
                             </svg>
                         )}
                     </button>
-                    <button>
-                        Chatbot <EstrellasIcon />
-                    </button>
+                    <ChatLauncher />
                 </div>
             </div>
             <nav className={styles.nav}>

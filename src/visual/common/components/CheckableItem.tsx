@@ -27,6 +27,7 @@ function CheckableItem({
         <div
             className={`${styles.item} ${className ?? ""}`}
             onClick={handleClick}
+            data-context={label.toLowerCase()}
             style={{ cursor: disabled ? 'default' : 'pointer' }}
         >
             <div className={styles.labelContainer}>
