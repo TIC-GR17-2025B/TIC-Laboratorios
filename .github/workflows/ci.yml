@@ -1,53 +1,49 @@
-# -----------------------------------------------------------
-# CD - Despliegue Continuo a Vercel
-# Se ejecuta SOLAMENTE cuando se fusiona a la rama de Producción (main).
-# -----------------------------------------------------------
-name: 🚀 CD - Despliegue a Producción (Vercel)
+---
+name: 🛡️ CI - Guardia de Calidad (Lint, Test, Build)
 
+# ----------------------------------------------------
+# Disparador: Se ejecuta solo en los Pull Requests (PRs)
+# que intentan fusionar a las ramas de control (develop y main).
+# ----------------------------------------------------
 on:
-  # Disparador: Solo en push a la rama 'main' (el commit final después del merge)
-  push:
+  pull_request:
     branches:
+      - develop
       - main
-
-# Otorga permisos de lectura/escritura para gestionar el despliegue
-permissions:
-  contents: read
-  deployments: write
+    types: [opened, synchronize, reopened] # En apertura, push y reapertura
 
 jobs:
-  deploy_to_vercel:
-    name: Despliegue de Producción
+  validate_quality:
+    name: 🧪 Ejecutar Validación
     runs-on: ubuntu-latest
-
-    # ----------------------------------------------------
-    # Dependencia de la calidad: Vercel necesita ejecutar Test y Build
-    # justo antes del despliegue para usar artefactos frescos.
-    # ----------------------------------------------------
+    
     steps:
-      - name: Checkout Code
+      # 1. Checkout del Código
+      - name: Checkout Repository
         uses: actions/checkout@v4
-
+        
+      # 2. Configuración de Node.js y Caché
       - name: Setup Node.js Environment
         uses: actions/setup-node@v4
         with:
-          node-version: "20.x"
-          cache: "npm"
-
-      - name: Install Dependencies
+          node-version: '20.x'
+          cache: 'npm' 
+          
+      # 3. Instalación de Dependencias (npm ci garantiza un build reproducible)
+      - name: Install Dependencies (npm ci)
         run: npm ci
 
-      # Opcional pero recomendado: Re-ejecutar tests en el contexto final
-      - name: Run Final Tests
-        run: npm run test
+      # 4. Ejecutar Linter (ESLint o similar)
+      - name: Run ESLint Check
+        run: npm run lint
+        # Requiere el script "lint" en package.json.
 
-      # 1. Despliegue a Vercel (Requiere Secrets en GitHub)
-      - name: Deploy to Vercel Production
-        uses: vercel/actions-deploy@v1
-        with:
-          # Se deben configurar como Secrets en el repositorio de GitHub
-          token: ${{ secrets.VERCEL_TOKEN }}
-          org-id: ${{ secrets.VERCEL_ORG_ID }}
-          project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          # Bandera 'prod: true' para activar el despliegue de Producción
-          prod: true
+      # 5. Ejecutar Pruebas Automatizadas
+      - name: Run Automated Tests
+        run: npm run test
+        # Requiere el script "test" en package.json.
+
+      # 6. Ejecutar Build (Verificación de Compilación)
+      - name: Run Project Build
+        run: npm run build
+        # Requiere el script "build" en package.json.
