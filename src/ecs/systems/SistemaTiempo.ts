@@ -1,13 +1,13 @@
 import { Sistema } from "../core";
 import { type Entidad } from "../core";
-import { TiempoComponent } from "../components";
+import { TiempoComponent, AtaqueComponent } from "../components";
 
 export class SistemaTiempo extends Sistema {
   public componentesRequeridos = new Set([TiempoComponent]);
   public intervalo: ReturnType<typeof setInterval> | null = null;
-  public ataquesEscenario: any[] = [];
+  public ataquesEscenario: AtaqueComponent[] = [];
 
-  public on(eventName: string, callback: (data: any) => void): () => void {
+  public on(eventName: string, callback: (data: unknown) => void): () => void {
     return this.ecsManager.on(eventName, callback);
   }
 
@@ -16,6 +16,7 @@ export class SistemaTiempo extends Sistema {
     if (!container) return;
 
     const tiempo = container.get(TiempoComponent);
+    if (!tiempo) return;
     tiempo.pausado = true;
 
     // IMPORTANTE: Detener el intervalo cuando se pausa
@@ -36,6 +37,7 @@ export class SistemaTiempo extends Sistema {
     if (!container) return;
 
     const tiempo = container.get(TiempoComponent);
+    if (!tiempo) return;
     tiempo.pausado = false;
 
     // Reiniciar el intervalo cuando se reanuda
@@ -52,6 +54,7 @@ export class SistemaTiempo extends Sistema {
     if (!container) return;
 
     const tiempo = container.get(TiempoComponent);
+    if (!tiempo) return;
 
     // Evitar múltiples intervalos
     if (this.intervalo) return;

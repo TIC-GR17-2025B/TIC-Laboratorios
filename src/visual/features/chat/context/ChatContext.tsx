@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, type ReactNode } from 'react';
 
 interface ChatContextType {
@@ -25,11 +26,11 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
   const setContextModeActive = (active: boolean) => setIsContextModeActive(active);
 
   return (
-    <ChatContext.Provider value={{ 
-      isChatOpen, 
+    <ChatContext.Provider value={{
+      isChatOpen,
       isContextModeActive,
-      toggleChat, 
-      openChat, 
+      toggleChat,
+      openChat,
       closeChat,
       setContextModeActive
     }}>

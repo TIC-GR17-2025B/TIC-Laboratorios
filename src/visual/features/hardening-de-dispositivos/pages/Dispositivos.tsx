@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import DevicesIcon from "../../../common/icons/DevicesIcon";
 import SistemaOpIcon from "../../../common/icons/SistemaOpIcon";
 import SoftwareIcon from "../../../common/icons/SoftwareIcon";
@@ -9,6 +9,8 @@ import ComboBox from "../../../common/components/ComboBox";
 import PanelConfiguraciones from "../components/PanelConfiguraciones";
 import { useEscenario } from "../../../common/contexts";
 
+type DispositivoMock = typeof dispositivosMock[number];
+
 function Dispositivos() {
     const { setDispositivoSeleccionado, dispositivoSeleccionado } = useEscenario();
 
@@ -16,9 +18,9 @@ function Dispositivos() {
 
     return <div className={styles.contenedor}>
         <div className={styles.comboBoxDispositivo}>
-            <ComboBox
+            <ComboBox<DispositivoMock>
                 items={opciones}
-                value={dispositivoSeleccionado}
+                value={dispositivoSeleccionado as unknown as DispositivoMock}
                 onChange={setDispositivoSeleccionado}
                 getKey={(d) => d.id}
                 getLabel={(d) => d.nombre}

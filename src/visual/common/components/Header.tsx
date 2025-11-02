@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import styles from '../styles/Header.module.css';
 import NavigationLink from './Navigation';
 import DevicesIcon from '../icons/DevicesIcon';
@@ -21,7 +21,7 @@ const Header: React.FC = () => {
                     <span aria-label='Estado de la animación'>
                         {formatearTiempo(tiempoTranscurrido)}
                     </span>
-                    <button onClick={() => { isPaused ? resume() : pause() }} aria-label={isPaused ? 'Reanudar animación' : 'Pausar animación'} >
+                    <button onClick={() => { if (isPaused) resume(); else pause(); }} aria-label={isPaused ? 'Reanudar animación' : 'Pausar animación'} >
                         {isPaused ? 'Reanudar' : 'Pausar'}
                         {isPaused ? (
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">

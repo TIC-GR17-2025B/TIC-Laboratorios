@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import type { Entidad } from "../../../../ecs/core/Componente";
 import { getDispositivoHeight } from "../config/modelConfig";
@@ -6,10 +7,10 @@ import { EscenarioController } from "../../../../ecs/controllers/EscenarioContro
 
 export interface ECSSceneEntity {
   entidadId: Entidad;
-  objetoConTipo: { tipo: string; [key: string]: any };
+  objetoConTipo: { tipo: string; [key: string]: unknown };
   position: [number, number, number];
   rotacionY: number;
-  entidadCompleta: any;
+  entidadCompleta: unknown;
 }
 
 interface Transform {
@@ -21,12 +22,12 @@ interface Transform {
 
 interface ObjetoConTipo {
   tipo: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export function useECSScene() {
   const escenario = useEscenarioActual();
-  const [entities, setEntities] = useState<Map<Entidad, any>>(new Map());
+  const [entities, setEntities] = useState<Map<Entidad, unknown>>(new Map());
   const [tiempoTranscurrido, setTiempoTranscurrido] = useState(0);
   const [mostrarNuevoLog, setMostrarNuevoLog] = useState(false);
   const [mensajeLog, setMensajeLog] = useState("");
@@ -72,46 +73,54 @@ export function useECSScene() {
 
     const unsubscribePresupuesto = escenarioController.on(
       "presupuesto:actualizado",
-      (data: { presupuesto: number }) => {
-        setPresupuesto(data.presupuesto);
+      (data: unknown) => {
+        const d = data as { presupuesto: number };
+        setPresupuesto(d.presupuesto);
       }
     );
 
     const unsubscribeActualizado = escenarioController.on(
       "tiempo:actualizado",
-      (data: { transcurrido: number; pausado: boolean }) => {
-        setTiempoTranscurrido(data.transcurrido);
+      (data: unknown) => {
+        const d = data as { transcurrido: number; pausado: boolean };
+        setTiempoTranscurrido(d.transcurrido);
       }
     );
 
     const unsubscribePausado = escenarioController.on(
       "tiempo:pausado",
-      (data: { transcurrido: number; pausado: boolean }) => {
-        setTiempoTranscurrido(data.transcurrido);
+      (data: unknown) => {
+        const d = data as { transcurrido: number; pausado: boolean };
+        setTiempoTranscurrido(d.transcurrido);
         setIsPaused(true);
       }
     );
 
     const unsubscribeAtaqueRealizado = escenarioController.on(
       "ataque:ataqueRealizado",
-      (data: { ataque: any }) => {
+      (data: unknown) => {
+        const ataque = (data as unknown as { ataque?: { tipoAtaque?: string } })
+          .ataque;
         setMostrarNuevoLog(true);
-        setMensajeLog(`Ataque ejecutado: ${data.ataque.tipoAtaque}`);
+        setMensajeLog(`Ataque ejecutado: ${ataque?.tipoAtaque ?? ""}`);
       }
     );
 
     const unsubscribeAtaqueMitigado = escenarioController.on(
       "ataque:ataqueMitigado",
-      (data: { ataque: any }) => {
+      (data: unknown) => {
+        const ataque = (data as unknown as { ataque?: { tipoAtaque?: string } })
+          .ataque;
         setMostrarNuevoLog(true);
-        setMensajeLog(`Ataque mitigado: ${data.ataque.tipoAtaque}`);
+        setMensajeLog(`Ataque mitigado: ${ataque?.tipoAtaque ?? ""}`);
       }
     );
 
     const unsubscribeReanudado = escenarioController.on(
       "tiempo:reanudado",
-      (data: { transcurrido: number; pausado: boolean }) => {
-        setTiempoTranscurrido(data.transcurrido);
+      (data: unknown) => {
+        const d = data as { transcurrido: number; pausado: boolean };
+        setTiempoTranscurrido(d.transcurrido);
         setIsPaused(false);
       }
     );
@@ -136,20 +145,29 @@ export function useECSScene() {
 
     return Array.from(entities.entries()).map(
       ([entidadId, entidadObjeto]): ECSSceneEntity => {
-        const componentes = Array.from(entidadObjeto.map.values());
+        const componentes = Array.from(
+          (
+            entidadObjeto as unknown as { map: Map<unknown, unknown> }
+          ).map.values()
+        ) as unknown[];
 
         const objetoConTipo = componentes.find(
-          (c: any): c is ObjetoConTipo =>
-            "tipo" in c && typeof c.tipo === "string"
+          (c: unknown): c is ObjetoConTipo =>
+            typeof c === "object" &&
+            c !== null &&
+            "tipo" in (c as Record<string, unknown>) &&
+            typeof (c as Record<string, unknown>).tipo === "string"
         );
 
         const transform = componentes.find(
-          (c: any): c is Transform =>
-            "x" in c &&
-            "y" in c &&
-            "z" in c &&
-            "rotacionY" in c &&
-            typeof c.x === "number"
+          (c: unknown): c is Transform =>
+            typeof c === "object" &&
+            c !== null &&
+            "x" in (c as Record<string, unknown>) &&
+            "y" in (c as Record<string, unknown>) &&
+            "z" in (c as Record<string, unknown>) &&
+            "rotacionY" in (c as Record<string, unknown>) &&
+            typeof (c as Record<string, unknown>).x === "number"
         );
 
         const offsetY = objetoConTipo

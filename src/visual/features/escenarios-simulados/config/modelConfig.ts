@@ -43,11 +43,12 @@ export const getMuebleModel = (tipo: string): string => {
   return MUEBLE_MODELS[tipo] || "";
 };
 
-export const getModelo = (objeto: any): string => {
-  if (objeto.tipo in DISPOSITIVO_MODELS) {
-    return getDispositivoModel(objeto.tipo);
-  } else if (objeto.tipo == "espacio") {
-    const mueble = objeto.mueble;
+export const getModelo = (objeto: unknown): string => {
+  const o = objeto as { tipo?: string; mueble?: string };
+  if (o.tipo && o.tipo in DISPOSITIVO_MODELS) {
+    return getDispositivoModel(o.tipo);
+  } else if (o.tipo === "espacio") {
+    const mueble = o.mueble ?? "";
     return getMuebleModel(mueble);
   } else {
     return "";
