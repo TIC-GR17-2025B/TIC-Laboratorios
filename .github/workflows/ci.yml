@@ -1,0 +1,53 @@
+# -----------------------------------------------------------
+# CD - Despliegue Continuo a Vercel
+# Se ejecuta SOLAMENTE cuando se fusiona a la rama de Producción (main).
+# -----------------------------------------------------------
+name: 🚀 CD - Despliegue a Producción (Vercel)
+
+on:
+  # Disparador: Solo en push a la rama 'main' (el commit final después del merge)
+  push:
+    branches:
+      - main
+
+# Otorga permisos de lectura/escritura para gestionar el despliegue
+permissions:
+  contents: read
+  deployments: write
+
+jobs:
+  deploy_to_vercel:
+    name: Despliegue de Producción
+    runs-on: ubuntu-latest
+
+    # ----------------------------------------------------
+    # Dependencia de la calidad: Vercel necesita ejecutar Test y Build
+    # justo antes del despliegue para usar artefactos frescos.
+    # ----------------------------------------------------
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: npm ci
+
+      # Opcional pero recomendado: Re-ejecutar tests en el contexto final
+      - name: Run Final Tests
+        run: npm run test
+
+      # 1. Despliegue a Vercel (Requiere Secrets en GitHub)
+      - name: Deploy to Vercel Production
+        uses: vercel/actions-deploy@v1
+        with:
+          # Se deben configurar como Secrets en el repositorio de GitHub
+          token: ${{ secrets.VERCEL_TOKEN }}
+          org-id: ${{ secrets.VERCEL_ORG_ID }}
+          project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          # Bandera 'prod: true' para activar el despliegue de Producción
+          prod: true
