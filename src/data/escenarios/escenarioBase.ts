@@ -4,8 +4,7 @@ import {
   TipoAtaque,
   TipoDispositivo,
 } from "../../types/DeviceEnums";
-
-export const escenarioBase: any = {
+export const escenarioBase: unknown = {
   id: 2,
   titulo: "Infraestructura Corporativa Completa",
   descripcion:

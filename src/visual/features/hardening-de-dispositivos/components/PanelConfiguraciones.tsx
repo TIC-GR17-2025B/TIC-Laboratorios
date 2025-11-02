@@ -10,9 +10,9 @@ export default function PanelConfiguraciones() {
     const [checkedItems, setCheckedItems] = useState<boolean[]>(
         new Array(baseConfiguraciones.length).fill(false)
     );
-
     const { toggleConfigWorkstation } = useECSSceneContext();
     const { dispositivoSeleccionado } = useEscenario();
+    const { presupuesto } = useECSSceneContext();
 
     // Cuando cambia el dispositivo seleccionado, inicializamos los checks desde sus configuraciones
     useEffect(() => {
@@ -22,24 +22,23 @@ export default function PanelConfiguraciones() {
         }
 
         const newChecked = baseConfiguraciones.map((cfg) => {
-            const found = (dispositivoSeleccionado.configuraciones as any[]).find(
-                (c) => c.nombreConfig === cfg.configuracion || c.nombreConfig === cfg.configuracion
-            );
-            return found ? !!found.activado : false;
+            const confs = dispositivoSeleccionado.configuraciones as unknown;
+            const arr = Array.isArray(confs) ? (confs as unknown[]) : [];
+            const found = arr.find((c) => ((c as unknown as Record<string, unknown>)?.nombreConfig as string | undefined) === cfg.configuracion);
+            return found ? !!((found as unknown as Record<string, unknown>).activado as boolean | undefined) : false;
         });
 
         setCheckedItems(newChecked);
     }, [dispositivoSeleccionado, baseConfiguraciones]);
 
     const handleCheckChange = (index: number, checked: boolean, configuracion: string) => {
-        const entidadId = (dispositivoSeleccionado as any)?.entidadId;
+        const entidadId = (dispositivoSeleccionado as unknown as { entidadId?: number })?.entidadId;
         if (typeof entidadId !== 'number') {
             console.warn('No hay entidad seleccionada para aplicar la configuración:', configuracion);
             return;
         }
 
         toggleConfigWorkstation(entidadId, configuracion);
-        console.log(`Toggle configuración: ${configuracion}, Nuevo estado: ${checked} para entidad: ${entidadId}`);
         const newCheckedItems = [...checkedItems];
         newCheckedItems[index] = checked;
         setCheckedItems(newCheckedItems);
@@ -50,15 +49,21 @@ export default function PanelConfiguraciones() {
             <h2> Configuraciones</h2>
         </div>
         <div className={styles.listaConfiguraciones}>
-            {baseConfiguraciones.map((configuracion, index) => (
-                <CheckableItem
-                    key={index}
-                    label={configuracion.configuracion}
-                    price={configuracion.precio}
-                    checked={checkedItems[index]}
-                    onChange={(checked) => handleCheckChange(index, checked, configuracion.configuracion)}
-                />
-            ))}
+            {baseConfiguraciones.map((configuracion, index) => {
+                const isChecked = checkedItems[index];
+                const price = isChecked ? configuracion.precio / 2 : configuracion.precio;
+
+                return (
+                    <CheckableItem
+                        key={index}
+                        label={configuracion.configuracion}
+                        price={configuracion.precio}
+                        checked={isChecked}
+                        disabled={presupuesto < price}
+                        onChange={(checked) => handleCheckChange(index, checked, configuracion.configuracion)}
+                    />
+                );
+            })}
         </div>
     </div>;
 }

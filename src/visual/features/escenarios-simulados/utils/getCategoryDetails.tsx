@@ -13,6 +13,8 @@ export function obtenerColorCategoria(category: LogCategory): string {
             return "#C084FC";
         case LogCategory.INFO:
             return "#52AB7B";
+        case LogCategory.ADVERTENCIA:
+            return "#F59E0B";
         default:
             return "#787878";
     }
@@ -21,13 +23,15 @@ export function obtenerColorCategoria(category: LogCategory): string {
 export function obtenerIconoCategoria(category: LogCategory): JSX.Element {
     switch (category) {
         case LogCategory.ATAQUE:
-            return (<AdvertenciaIcon />);
+            return (<AdvertenciaIcon size={16} />);
         case LogCategory.COMPRA:
-            return (<CarritoIcon />);
+            return (<CarritoIcon size={16} />);
         case LogCategory.INFO:
-            return (<ConfiguracionVisto />);
+            return (<ConfiguracionVisto size={16} />);
+        case LogCategory.ADVERTENCIA:
+            return (<AdvertenciaIcon size={16} />);
         default:
-            return (<CarritoIcon />);
+            return (<CarritoIcon size={16} />);
     }
 }
 

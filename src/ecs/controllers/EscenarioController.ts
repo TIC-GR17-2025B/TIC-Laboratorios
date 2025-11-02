@@ -8,9 +8,10 @@ import {
 import { ECSManager, type Entidad } from "../core";
 import { SistemaAtaque, SistemaPresupuesto, SistemaTiempo } from "../systems";
 import { ScenarioBuilder } from "../utils/ScenarioBuilder";
+import type { Escenario } from "../../types/EscenarioTypes";
 
 export class EscenarioController {
-  public escenario: any;
+  public escenario: Escenario;
   public ecsManager: ECSManager;
   public builder!: ScenarioBuilder;
 
@@ -23,13 +24,13 @@ export class EscenarioController {
 
   private static instance: EscenarioController | null = null;
 
-  private constructor(escenario: any) {
+  private constructor(escenario: Escenario) {
     this.escenario = escenario;
     this.ecsManager = new ECSManager();
   }
 
   // SINGLETON
-  public static getInstance(escenario?: any): EscenarioController {
+  public static getInstance(escenario?: Escenario): EscenarioController {
     if (!EscenarioController.instance) {
       if (!escenario) {
         throw new Error(
@@ -58,26 +59,27 @@ export class EscenarioController {
     }
 
     // NO emitir el evento aquí - lo haremos después de que los sistemas se suscriban
-    this.ecsManager.on(
-      "tiempo:notificacionAtaque",
-      (data: { descripcionAtaque: string }) => {
-        console.log(data.descripcionAtaque);
-      }
-    );
+    this.ecsManager.on("tiempo:notificacionAtaque", (data: unknown) => {
+      const d = data as { descripcionAtaque: string };
+      console.log(d.descripcionAtaque);
+    });
 
-    this.ecsManager.on("tiempo:ejecucionAtaque", (data: { ataque: any }) =>
-      this.ejecutarAtaque(data.ataque)
-    );
+    this.ecsManager.on("tiempo:ejecucionAtaque", (data: unknown) => {
+      const d = data as { ataque: AtaqueComponent };
+      this.ejecutarAtaque(d.ataque);
+    });
 
-    this.ecsManager.on("ataque:ataqueRealizado", (data: { ataque: any }) => {
+    this.ecsManager.on("ataque:ataqueRealizado", (data: unknown) => {
+      const d = data as { ataque: AtaqueComponent };
       console.log(
-        `Se comprometió el dispositivo: ${data.ataque.dispositivoAAtacar}. Causa: ${data.ataque.tipoAtaque}`
+        `Se comprometió el dispositivo: ${d.ataque.dispositivoAAtacar}. Causa: ${d.ataque.tipoAtaque}`
       );
     });
 
-    this.ecsManager.on("ataque:ataqueMitigado", (data: { ataque: any }) => {
+    this.ecsManager.on("ataque:ataqueMitigado", (data: unknown) => {
+      const d = data as { ataque: AtaqueComponent };
       console.log(
-        `Se mitigó el ataque a: ${data.ataque.dispositivoAAtacar}. Ataque mitigado: ${data.ataque.tipoAtaque}`
+        `Se mitigó el ataque a: ${d.ataque.dispositivoAAtacar}. Ataque mitigado: ${d.ataque.tipoAtaque}`
       );
     });
 
@@ -169,7 +171,7 @@ export class EscenarioController {
    * @param callback Función a ejecutar cuando se emita el evento
    * @returns Función para desuscribirse del evento
    */
-  public on(eventName: string, callback: (data: any) => void): () => void {
+  public on(eventName: string, callback: (data: unknown) => void): () => void {
     return this.ecsManager.on(eventName, callback);
   }
 
@@ -200,27 +202,29 @@ export class EscenarioController {
     );
   }
 
-  public ejecutarAtaque(ataque: any) {
+  public ejecutarAtaque(ataque: AtaqueComponent) {
     const entidadAtaque = this.ecsManager.agregarEntidad();
     this.ecsManager.agregarComponente(entidadAtaque, ataque);
 
-    let dispositivos: any[][] = []; // Info de dispositivo: idEntidad y nombre
+    const dispositivos: [Entidad, string][] = []; // Info de dispositivo: idEntidad y nombre
 
     this.builder.getEntidades().forEach((container, entidad) => {
       if (container.tiene(DispositivoComponent))
         dispositivos.push([
           entidad,
-          container.get(DispositivoComponent).nombre,
+          container.get(DispositivoComponent)?.nombre ?? "",
         ]);
     });
 
     const nombreDispositivoAAtacar = ataque.dispositivoAAtacar;
 
     const entidadDispConSuNombre = dispositivos.filter(
-      ([entidad, nombre]) => nombreDispositivoAAtacar == nombre
+      ([, nombre]) => nombreDispositivoAAtacar == nombre
     );
 
-    this.sistemaAtaque?.ejecutarAtaque(entidadDispConSuNombre[0][0], ataque);
+    if (entidadDispConSuNombre.length > 0) {
+      this.sistemaAtaque?.ejecutarAtaque(entidadDispConSuNombre[0][0], ataque);
+    }
   }
 
   public getPresupuestoActual(): number {
@@ -234,23 +238,28 @@ export class EscenarioController {
     return presupuesto?.monto ?? 0;
   }
 
-  public getAtaques(): any[] {
-    let ataques = [];
+  public getAtaques(): AtaqueComponent[] {
+    const ataques: AtaqueComponent[] = [];
 
     for (const [, container] of this.builder.getEntidades()) {
       if (container.tiene(AtaqueComponent)) {
-        ataques.push(container.get(AtaqueComponent));
+        const a = container.get(AtaqueComponent);
+        if (a) ataques.push(a);
       }
     }
 
     return ataques;
   }
 
-  public getWorkstationsYServers(): any[] {
-    let workstationsYServers = [];
+  public getWorkstationsYServers(): Entidad[] {
+    const workstationsYServers: Entidad[] = [];
 
-    for (const [entidad, container] of this.ecsManager.getEntidades()){
-      if (container.tiene(WorkstationComponent) /* || container.tiene(ServidorComponent)*/) {
+    for (const [entidad, container] of this.ecsManager.getEntidades()) {
+      if (
+        container.tiene(
+          WorkstationComponent
+        ) /* || container.tiene(ServidorComponent)*/
+      ) {
         workstationsYServers.push(entidad);
       }
     }
@@ -258,15 +267,15 @@ export class EscenarioController {
     return workstationsYServers;
   }
 
-  public getAllDispositivos(): any[] {
-    let dispositivosTodos = [];
+  public getAllDispositivos(): Entidad[] {
+    const dispositivosTodos: Entidad[] = [];
 
-    for (const [entidad, container] of this.ecsManager.getEntidades()){
-      if(container.tiene(DispositivoComponent)) {
+    for (const [entidad, container] of this.ecsManager.getEntidades()) {
+      if (container.tiene(DispositivoComponent)) {
         dispositivosTodos.push(entidad);
       }
     }
-    
+
     return dispositivosTodos;
   }
 

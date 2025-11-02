@@ -31,7 +31,9 @@ export const useModel3DLoader = (modelPath: string) => {
 /**
  * Hook para gestionar la configuración de controles de cámara
  */
-export const useCameraControls = (initialConfig?: Partial<any>) => {
+export const useCameraControls = (
+  initialConfig?: Partial<Record<string, unknown>>
+) => {
   const [config, setConfig] = useState({
     enableZoom: true,
     enablePan: true,

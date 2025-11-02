@@ -23,17 +23,25 @@ function CheckableItem({
         }
     };
 
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        e.stopPropagation();
+        if (!disabled) {
+            onChange?.(!checked);
+        }
+    };
+
     return (
         <div
             className={`${styles.item} ${className ?? ""}`}
             onClick={handleClick}
             data-context={label.toLowerCase()}
-            style={{ cursor: disabled ? 'default' : 'pointer' }}
+            style={{ cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.5 : 1 }}
         >
             <div className={styles.labelContainer}>
                 <input
                     type="checkbox"
                     checked={checked}
+                    onChange={handleChange}
                     disabled={disabled}
                     className={styles.checkbox}
                 />

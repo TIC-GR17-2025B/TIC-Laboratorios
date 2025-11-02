@@ -1,12 +1,39 @@
-.tarjeta {
+.logItem {
   position: absolute;
-  right: 24px;
-  bottom: 16px;
+  right: 40px;
+  bottom: 40px;
+  width: 317px;
+  padding: 16px 24px;
   background-color: var(--surface-secondary);
-  border: 1px solid var(--border-primary);
-  border-radius: var(--border-radius);
-  padding: 16px;
-  width: 300px;
-  margin: 8px 0;
-  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  animation: slideIn 0.3s ease-out;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.logItem time {
+  font-size: 12px;
+}
+
+.logItemTime {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.logItem p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
 }

@@ -1,6 +1,7 @@
 export { default as Escena3D } from "./Escena3D";
 export { default as Scene3DCanvas } from "./Scene3DCanvas";
-export { default as Model3D, preloadModel } from "./Model3D";
+export { default as Model3D } from "./Model3D";
+export { preloadModel } from "./Model3DUtils";
 export { default as CameraControls } from "./CameraControls";
 export { default as Lights } from "./Lights";
 export { default as Environment } from "./Environment";

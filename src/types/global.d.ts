@@ -1,4 +1,3 @@
-import type { TipoDispositivo } from "./DeviceEnums";
 import { LogCategory } from "./LogCategory";
 
 declare global {
