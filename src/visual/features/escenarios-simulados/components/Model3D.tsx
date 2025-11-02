@@ -1,5 +1,6 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { useRef, useMemo, useState, useEffect } from 'react';
-import { useGLTF, Html } from '@react-three/drei';
+import { useGLTF } from '@react-three/drei';
 import { Group, Box3, Vector3 } from 'three';
 
 interface Model3DProps {
@@ -22,13 +23,12 @@ const Model3D: React.FC<Model3DProps> = ({
     position = [0, 0, 0],
     rotation = [0, 0, 0],
     scale = 1,
-    showHoverButton = true,
+    //showHoverButton = true,
     onClick,
     hoverPadding = 1
 }) => {
     const groupRef = useRef<Group>(null);
     const { scene } = useGLTF(modelPath);
-    const [hovered, setHovered] = useState(false);
     const [boundingBoxSize, setBoundingBoxSize] = useState<[number, number, number]>([2, 2, 2]);
 
     const clonedScene = useMemo(() => scene.clone(), [scene]);
@@ -48,17 +48,17 @@ const Model3D: React.FC<Model3DProps> = ({
         }
     }, [clonedScene, hoverPadding]);
 
-    const handleButtonClick = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        if (onClick) {
-            onClick();
-        }
-    };
+    // const handleButtonClick = (e: React.MouseEvent) => {
+    //     e.stopPropagation();
+    //     if (onClick) {
+    //         onClick();
+    //     }
+    // };
 
-    const handleSelect = () => {
-        console.log("Modelo seleccionado:", modelPath);
-        setHovered(!hovered);
-    };
+    // const handleSelect = () => {
+    //     console.log("Modelo seleccionado:", modelPath);
+    //     setHovered(!hovered);
+    // };
 
     return (
         <group

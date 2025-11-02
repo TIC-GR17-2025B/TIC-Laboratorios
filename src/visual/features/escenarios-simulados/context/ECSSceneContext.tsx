@@ -1,4 +1,5 @@
 import { createContext, type ReactNode, useContext } from 'react';
+/* eslint-disable react-refresh/only-export-components */
 import { useECSScene } from '../hooks/useECSScene';
 
 const ECSSceneContext = createContext<ReturnType<typeof useECSScene> | null>(null);

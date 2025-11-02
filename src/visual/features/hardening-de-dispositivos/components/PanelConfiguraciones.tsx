@@ -22,17 +22,17 @@ export default function PanelConfiguraciones() {
         }
 
         const newChecked = baseConfiguraciones.map((cfg) => {
-            const found = (dispositivoSeleccionado.configuraciones as any[]).find(
-                (c) => c.nombreConfig === cfg.configuracion || c.nombreConfig === cfg.configuracion
-            );
-            return found ? !!found.activado : false;
+            const confs = dispositivoSeleccionado.configuraciones as unknown;
+            const arr = Array.isArray(confs) ? (confs as unknown[]) : [];
+            const found = arr.find((c) => ((c as unknown as Record<string, unknown>)?.nombreConfig as string | undefined) === cfg.configuracion);
+            return found ? !!((found as unknown as Record<string, unknown>).activado as boolean | undefined) : false;
         });
 
         setCheckedItems(newChecked);
     }, [dispositivoSeleccionado, baseConfiguraciones]);
 
     const handleCheckChange = (index: number, checked: boolean, configuracion: string) => {
-        const entidadId = (dispositivoSeleccionado as any)?.entidadId;
+        const entidadId = (dispositivoSeleccionado as unknown as { entidadId?: number })?.entidadId;
         if (typeof entidadId !== 'number') {
             console.warn('No hay entidad seleccionada para aplicar la configuración:', configuracion);
             return;

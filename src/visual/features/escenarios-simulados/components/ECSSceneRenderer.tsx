@@ -8,8 +8,8 @@ import { useECSSceneContext } from '../context/ECSSceneContext';
  */
 const ECSSceneRenderer = () => {
     const { setDispositivoSeleccionado, dispositivoSeleccionado } = useEscenario();
-    const { processEntities, entities } = useECSSceneContext();
-    const handleEntityClick = (entity: any) => {
+    const { processEntities } = useECSSceneContext();
+    const handleEntityClick = (entity: unknown) => {
         console.log('Entidad clickeada:', entity);
         setDispositivoSeleccionado(entity);
         console.log('Dispositivo seleccionado actualizado:', dispositivoSeleccionado);
@@ -20,7 +20,7 @@ const ECSSceneRenderer = () => {
     return (
         <>
             {/* Asegúrate de desestructurar con el nombre correcto: 'entidadId' */}
-            {processedEntities.map(({ objetoConTipo, position, rotacionY, entityIndex, entidadId, entidadCompleta }) => {
+            {processedEntities.map(({ objetoConTipo, position, rotacionY, entidadId, entidadCompleta }) => {
                 const modelPath = getModelo(objetoConTipo);
 
                 if (modelPath === "") return null;

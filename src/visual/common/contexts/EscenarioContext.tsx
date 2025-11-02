@@ -1,6 +1,8 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { Dispositivo, Escenario } from '../../../types/EscenarioTypes';
+import { EstadoAtaqueDispositivo, TipoDispositivo } from '../../../types/DeviceEnums';
 import { escenarioBase } from '../../../data/escenarios/escenarioBase';
 import {
     DispositivoComponent,
@@ -13,7 +15,7 @@ interface EscenarioContextType {
     setEscenario: (escenario: Escenario) => void;
     dispositivoSeleccionado: Dispositivo | null;
     // Acepta un Dispositivo ya normalizado, null, o una entidad/objeto proveniente del ECS
-    setDispositivoSeleccionado: (dispositivo: Dispositivo | null | any) => void;
+    setDispositivoSeleccionado: (dispositivo: Dispositivo | null | unknown) => void;
 }
 
 /**
@@ -29,76 +31,85 @@ interface EscenarioProviderProps {
 /**
  * Envuelve la aplicación y proporciona el estado del escenario
  */
-export function EscenarioProvider({ children, initialEscenario = escenarioBase }: EscenarioProviderProps) {
+export function EscenarioProvider({ children, initialEscenario = escenarioBase as unknown as Escenario }: EscenarioProviderProps) {
     const [escenario, setEscenario] = useState<Escenario>(initialEscenario);
     // Estado real
     const [dispositivoSeleccionado, setDispositivoSeleccionadoState] = useState<Dispositivo | null>(null);
 
     // Helper: normaliza distintos shapes que pueden venir al seleccionar una entidad 3D
-    const mapEntityToDispositivo = (input: any): Dispositivo | null => {
+    const mapEntityToDispositivo = (input: unknown): Dispositivo | null => {
         if (!input) return null;
 
+        const raw = input as Record<string, unknown>;
+
         // Si ya tiene forma de Dispositivo
-        if (typeof input.id !== 'undefined' && typeof input.tipo !== 'undefined') {
-            return input as Dispositivo;
+        if (typeof raw.id !== 'undefined' && typeof raw.tipo !== 'undefined') {
+            return raw as unknown as Dispositivo;
         }
 
         // Forma que usa ECSSceneRenderer: { objetoConTipo, entidadId, entidadCompleta, position }
-        if (input.entidadCompleta) {
+        if (raw.entidadCompleta) {
             try {
-                const container = input.entidadCompleta;
+                const container = raw.entidadCompleta as unknown;
+
+                type LocalContainer = { tiene?: (c: unknown) => boolean; get?: (c: unknown) => unknown };
+                const cont = container as LocalContainer;
 
                 // Extraer DispositivoComponent si existe
-                let dispComp: any = null;
-                if (typeof container.tiene === 'function' && container.tiene(DispositivoComponent)) {
-                    dispComp = container.get(DispositivoComponent);
+                let dispComp: unknown = null;
+                if (typeof cont.tiene === 'function' && cont.tiene!(DispositivoComponent)) {
+                    dispComp = cont.get!(DispositivoComponent);
                 }
 
                 // Extraer Transform para posicion
-                let transform: any = null;
-                if (typeof container.tiene === 'function' && container.tiene(Transform)) {
-                    transform = container.get(Transform);
+                let transform: unknown = null;
+                if (typeof cont.tiene === 'function' && cont.tiene!(Transform)) {
+                    transform = cont.get!(Transform);
                 }
 
                 if (!dispComp) {
                     // fallback: intentar leer objetoConTipo
-                    if (input.objetoConTipo) {
+                    if (raw.objetoConTipo) {
+                        const oc = raw.objetoConTipo as Record<string, unknown>;
                         return {
-                            id: input.entidadId ?? 0,
-                            tipo: input.objetoConTipo.tipo,
-                            nombre: input.objetoConTipo.nombre,
-                            sistemaOperativo: input.objetoConTipo.sistemaOperativo,
-                            hardware: input.objetoConTipo.hardware,
-                            software: input.objetoConTipo.software,
-                            posicion: input.position ?? undefined,
-                            estadoAtaque: input.objetoConTipo.estadoAtaque,
+                            id: (raw.entidadId as number) ?? 0,
+                            tipo: oc.tipo as unknown as TipoDispositivo,
+                            nombre: oc.nombre as string | undefined,
+                            sistemaOperativo: oc.sistemaOperativo as string | undefined,
+                            hardware: (oc.hardware as string) ?? "",
+                            software: oc.software as string | undefined,
+                            posicion: (raw.position as unknown) as { x: number; y: number; z: number } | undefined,
+                            estadoAtaque: oc.estadoAtaque as unknown as EstadoAtaqueDispositivo,
                         } as Dispositivo;
                     }
                     return null;
                 }
 
-                const posicion = transform
-                    ? { x: transform.x, y: transform.y, z: transform.z, rotacionY: transform.rotacionY }
-                    : input.position ?? undefined;
+                const t = transform as Record<string, unknown> | undefined;
+                const posicion = t
+                    ? { x: t.x as number, y: t.y as number, z: t.z as number, rotacionY: t.rotacionY as number }
+                    : (raw.position as unknown) as { x: number; y: number; z: number } | undefined;
 
+                const dc = dispComp as Record<string, unknown>;
                 const dispositivo: Dispositivo = {
-                    id: input.entidadId ?? 0,
-                    entidadId: input.entidadId ?? 0,
-                    tipo: dispComp.tipo,
-                    nombre: dispComp.nombre,
-                    sistemaOperativo: dispComp.sistemaOperativo,
-                    hardware: dispComp.hardware,
-                    software: dispComp.software,
+                    id: (raw.entidadId as number) ?? 0,
+                    entidadId: (raw.entidadId as number) ?? 0,
+                    tipo: dc.tipo as unknown as TipoDispositivo,
+                    nombre: dc.nombre as string | undefined,
+                    sistemaOperativo: dc.sistemaOperativo as string | undefined,
+                    hardware: (dc.hardware as string) ?? "",
+                    software: dc.software as string | undefined,
                     posicion,
-                    estadoAtaque: dispComp.estadoAtaque,
+                    estadoAtaque: dc.estadoAtaque as unknown as EstadoAtaqueDispositivo,
                 };
 
                 // Añadir configuraciones desde WorkstationComponent si existe
-                if (typeof container.tiene === 'function' && container.tiene(WorkstationComponent)) {
+                if (typeof cont.tiene === 'function' && cont.tiene!(WorkstationComponent)) {
                     try {
-                        const ws = container.get(WorkstationComponent) as any;
-                        if (ws && typeof ws.configuraciones !== 'undefined') {
-                            dispositivo.configuraciones = ws.configuraciones;
+                        const ws = cont.get!(WorkstationComponent) as unknown;
+                        const wsObj = ws as { configuraciones?: unknown };
+                        if (wsObj && typeof wsObj.configuraciones !== 'undefined') {
+                            dispositivo.configuraciones = wsObj.configuraciones;
                         }
                     } catch (e) {
                         console.warn('No se pudo leer WorkstationComponent:', e);
@@ -113,17 +124,18 @@ export function EscenarioProvider({ children, initialEscenario = escenarioBase }
         }
 
         // Forma alternativa: objeto con objetoConTipo y position
-        if (input.objetoConTipo) {
+        if (raw.objetoConTipo) {
+            const oc = raw.objetoConTipo as Record<string, unknown>;
             return {
-                id: input.entidadId ?? 0,
-                entidadId: input.entidadId ?? 0,
-                tipo: input.objetoConTipo.tipo,
-                nombre: input.objetoConTipo.nombre,
-                sistemaOperativo: input.objetoConTipo.sistemaOperativo,
-                hardware: input.objetoConTipo.hardware,
-                software: input.objetoConTipo.software,
-                posicion: input.position ?? undefined,
-                estadoAtaque: input.objetoConTipo.estadoAtaque,
+                id: (raw.entidadId as number) ?? 0,
+                entidadId: (raw.entidadId as number) ?? 0,
+                tipo: oc.tipo as unknown as TipoDispositivo,
+                nombre: oc.nombre as string | undefined,
+                sistemaOperativo: oc.sistemaOperativo as string | undefined,
+                hardware: (oc.hardware as string) ?? "",
+                software: oc.software as string | undefined,
+                posicion: (raw.position as unknown) as { x: number; y: number; z: number } | undefined,
+                estadoAtaque: oc.estadoAtaque as unknown as EstadoAtaqueDispositivo,
             } as Dispositivo;
         }
 
@@ -131,7 +143,7 @@ export function EscenarioProvider({ children, initialEscenario = escenarioBase }
     };
 
     // Setter expuesto: acepta un Dispositivo o una entidad/objeto y mapea a Dispositivo
-    const setDispositivoSeleccionado = (dispositivo: Dispositivo | null | any) => {
+    const setDispositivoSeleccionado = (dispositivo: Dispositivo | null | unknown) => {
         const mapped = mapEntityToDispositivo(dispositivo);
         setDispositivoSeleccionadoState(mapped);
     };

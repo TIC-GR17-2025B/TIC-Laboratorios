@@ -1,4 +1,4 @@
-import type { Entidad } from "../core/Componente";
+import type { Entidad, ClaseComponente } from "../core/Componente";
 import { Sistema } from "../core";
 
 /**
@@ -9,11 +9,11 @@ import { Sistema } from "../core";
  */
 export class SistemaRelaciones extends Sistema {
   // Conjunto de componentes requeridos por este sistema (se completa en el constructor)
-  public componentesRequeridos = new Set<Function>();
+  public componentesRequeridos = new Set<ClaseComponente>();
 
   constructor(
-    private ClasePadre: Function,
-    private ClaseHijo: Function,
+    private ClasePadre: ClaseComponente,
+    private ClaseHijo: ClaseComponente,
     private propiedadPadre: string // nombre de la propiedad en el componente padre que contiene Entidad[]
   ) {
     super();
@@ -26,13 +26,12 @@ export class SistemaRelaciones extends Sistema {
   agregar(padreId: Entidad, hijoId: Entidad): void {
     const padre = this.ecsManager
       ?.getComponentes(padreId)
-      ?.get(this.ClasePadre as any);
-    const hijo = this.ecsManager
-      ?.getComponentes(hijoId)
-      ?.get(this.ClaseHijo as any);
+      ?.get(this.ClasePadre);
+    const hijo = this.ecsManager?.getComponentes(hijoId)?.get(this.ClaseHijo);
     if (!padre || !hijo) return;
-
-    const arr = (padre as any)[this.propiedadPadre] as Entidad[] | undefined;
+    const arr = (padre as unknown as Record<string, unknown>)[
+      this.propiedadPadre
+    ] as Entidad[] | undefined;
     if (!Array.isArray(arr)) return;
     if (!arr.includes(hijoId)) arr.push(hijoId);
   }
@@ -41,9 +40,11 @@ export class SistemaRelaciones extends Sistema {
   obtenerHijos(padreId: Entidad): Entidad[] {
     const padre = this.ecsManager
       ?.getComponentes(padreId)
-      ?.get(this.ClasePadre as any);
+      ?.get(this.ClasePadre);
     const arr = padre
-      ? ((padre as any)[this.propiedadPadre] as Entidad[] | undefined)
+      ? ((padre as unknown as Record<string, unknown>)[this.propiedadPadre] as
+          | Entidad[]
+          | undefined)
       : undefined;
     return arr ? [...arr] : [];
   }

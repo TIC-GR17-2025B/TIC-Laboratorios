@@ -33,7 +33,7 @@ export interface Dispositivo {
   // Id de la entidad ECS asociada (útil para acciones sobre la entidad)
   entidadId?: number;
   // Configuraciones del Workstation si aplica (las provee WorkstationComponent)
-  configuraciones?: any;
+  configuraciones?: unknown;
 }
 
 export interface Espacio {
