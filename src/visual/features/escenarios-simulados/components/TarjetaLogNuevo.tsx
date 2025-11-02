@@ -1,9 +1,11 @@
 import { useECSSceneContext } from "../context/ECSSceneContext";
 import styles from "../styles/TarjetaLogNuevo.module.css";
 import { useEffect } from "react";
+import { obtenerColorCategoria, obtenerIconoCategoria } from '../utils/getCategoryDetails';
+import { LogCategory } from '../../../../types/LogCategory';
 
 export default function TarjetaLogNuevo() {
-    const { mostrarNuevoLog, setMostrarNuevoLog, setMensajeLog, mensajeLog } = useECSSceneContext();
+    const { mostrarNuevoLog, setMostrarNuevoLog, setMensajeLog, mensajeLog, tipoLog, tiempoLog } = useECSSceneContext();
 
     useEffect(() => {
         if (!mostrarNuevoLog) return;
@@ -21,9 +23,31 @@ export default function TarjetaLogNuevo() {
         return null;
     }
 
+    // Formatear el tiempo transcurrido
+    const formatearTiempo = (segundos: number): string => {
+        const minutos = Math.floor(segundos / 60);
+        const segs = Math.floor(segundos % 60);
+        return `${minutos.toString().padStart(2, '0')}:${segs.toString().padStart(2, '0')}`;
+    };
+
+    // Mapear el tipo a categorías de log
+    const tipoToCategory: Record<string, LogCategory> = {
+        ataque: LogCategory.ATAQUE,
+        advertencia: LogCategory.ATAQUE, // Usamos el mismo icono de alerta
+        completado: LogCategory.INFO
+    };
+
+    const category = tipoToCategory[tipoLog];
+    const color = obtenerColorCategoria(category);
+    const icon = obtenerIconoCategoria(category);
+
     return (
-        <div className={styles.tarjeta}>
+        <article className={styles.logItem} style={{ borderLeft: `2px solid ${color}` }}>
+            <div className={styles.logItemTime} style={{ color }}>
+                {icon}
+                <time>{formatearTiempo(tiempoLog)}</time>
+            </div>
             <p>{mensajeLog}</p>
-        </div>
+        </article>
     );
 }

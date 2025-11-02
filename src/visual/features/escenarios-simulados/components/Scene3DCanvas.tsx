@@ -15,13 +15,14 @@ const Scene3DCanvas: React.FC<Scene3DCanvasProps> = ({ children, className }) =>
         <Canvas
             className={className}
             camera={{
-                position: [0, 2, 5],
+                position: [-3, 4, 5],
                 fov: 50,
                 near: 0.1,
                 far: 1000
             }}
             shadows
             dpr={[1, 2]} // Device pixel ratio para mejor calidad
+            style={{ width: '100%', height: '100%', display: 'block' }}
         >
             <Suspense fallback={null}>
                 {children}

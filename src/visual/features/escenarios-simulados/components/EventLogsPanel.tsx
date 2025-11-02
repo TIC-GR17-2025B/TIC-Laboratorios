@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from '../styles/EventLogsPanel.module.css';
-
-import logsMock from "../../../mocks/LogsMock";
 import { obtenerColorCategoria, obtenerIconoCategoria } from '../utils/getCategoryDetails';
+import { useECSSceneContext } from '../context/ECSSceneContext';
+import { LogCategory } from '../../../../types/LogCategory';
 
-const LogItem = (log: Log) => (
-    <article className={styles.logItem} style={{ borderLeft: `2px solid ${obtenerColorCategoria(log.category)}` }}>
-        <div className={styles.logItemTime} style={{ color: obtenerColorCategoria(log.category) }}>
-            {obtenerIconoCategoria(log.category)}
+const LogItem = (log: { time: string; content: string; category: string }) => (
+    <article className={styles.logItem} style={{ borderLeft: `2px solid ${obtenerColorCategoria(log.category as LogCategory)}` }}>
+        <div className={styles.logItemTime} style={{ color: obtenerColorCategoria(log.category as LogCategory) }}>
+            {obtenerIconoCategoria(log.category as LogCategory)}
             <time>{log.time}</time>
         </div>
         <p>{log.content}</p>
@@ -15,10 +15,18 @@ const LogItem = (log: Log) => (
 );
 
 const EventLogsPanel: React.FC = () => {
-    const [isOpen, setIsOpen] = useState(true);
+    const { logs, hasNewLog, logsPanelOpen, toggleLogsPanel } = useECSSceneContext();
+    const [isOpen, setIsOpen] = useState(logsPanelOpen);
 
-    const togglePanel = () => {
-        setIsOpen(!isOpen);
+    // Sincronizar el estado local con el contexto
+    useEffect(() => {
+        setIsOpen(logsPanelOpen);
+    }, [logsPanelOpen]);
+
+    const handleToggle = () => {
+        const newState = !isOpen;
+        setIsOpen(newState);
+        toggleLogsPanel(newState);
     };
 
     return (
@@ -32,7 +40,7 @@ const EventLogsPanel: React.FC = () => {
                     <h2 className={styles.logsTitle}>Logs</h2>
                     <button
                         className={styles.toggleButton}
-                        onClick={togglePanel}
+                        onClick={handleToggle}
                         aria-label="Cerrar panel de registros"
                         type="button"
                     >
@@ -40,20 +48,32 @@ const EventLogsPanel: React.FC = () => {
                     </button>
                 </header>
                 <section className={styles.logsContent} aria-label="Lista de eventos registrados">
-                    {logsMock.map((log: Log, index: number) => (
-                        <LogItem key={index} {...log} />
-                    ))}
+                    {logs.length === 0 ? (
+                        <div className={styles.emptyState}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M8 9h8m-8 4h6m1 5h-2l-5 3v-3H6a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3" />
+                            </svg>
+                            <p className={styles.emptyStateText}>No hay eventos registrados</p>
+                            <span className={styles.emptyStateSubtext}>Los eventos aparecerán aquí cuando ocurran</span>
+                        </div>
+                    ) : (
+                        logs.map((log, index: number) => (
+                            <LogItem key={index} {...log} />
+                        ))
+                    )}
                 </section>
             </aside>
 
             {!isOpen && (
                 <button
                     className={styles.toggleButtonCollapsed}
-                    onClick={togglePanel}
+                    onClick={handleToggle}
                     aria-label="Abrir panel de registros"
                     type="button"
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M8 9h8m-8 4h6m1 5h-2l-5 3v-3H6a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3v5.5M19 16v3m0 3v.01" /></svg> </button>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M8 9h8m-8 4h6m1 5h-2l-5 3v-3H6a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3v5.5M19 16v3m0 3v.01" /></svg>
+                    {hasNewLog && <span className={styles.newLogIndicator} />}
+                </button>
             )}
         </>
     );

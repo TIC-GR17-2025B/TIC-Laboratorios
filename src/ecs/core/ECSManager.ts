@@ -1,7 +1,12 @@
-import { ComponenteContainer, Componente, type Entidad } from "./Componente";
+import {
+  ComponenteContainer,
+  Componente,
+  type Entidad,
+  type ClaseComponente,
+} from "./Componente";
 import type { Sistema } from "./Sistema";
 
-type EventCallback = (data: any) => void;
+type EventCallback = (data: unknown) => void;
 
 export class ECSManager {
   private entidades = new Map<Entidad, ComponenteContainer>();
@@ -14,8 +19,8 @@ export class ECSManager {
   private eventListeners = new Map<string, Set<EventCallback>>();
 
   // Sistema de registro de acciones realizadas durante la simulacion
-  private accionesSimulacion = new Array<[string, string, number, any?]>();
-                              /* Set<nombre de acción,
+  private accionesSimulacion = new Array<[string, string, number, unknown?]>();
+  /* Set<nombre de acción,
                                      objeto sobre el cual se hizo la acción (no necesariamente es un objeto de la escena 3D),
                                      tiempo actual (total) en segundos justo cuando se realizó la acción,
                                      estado resultante u otro valor relevante (opcional, creo que puede ser útil en algunos casos)> >*/
@@ -23,7 +28,7 @@ export class ECSManager {
   // Para Entidades
 
   public agregarEntidad(): Entidad {
-    let entidad = this.idSiguienteEntidad;
+    const entidad = this.idSiguienteEntidad;
     this.idSiguienteEntidad++;
     this.entidades.set(entidad, new ComponenteContainer());
     return entidad;
@@ -48,7 +53,10 @@ export class ECSManager {
     return this.entidades.get(entidad);
   }
 
-  public removerComponente(entidad: Entidad, claseComponente: Function): void {
+  public removerComponente(
+    entidad: Entidad,
+    claseComponente: ClaseComponente
+  ): void {
     this.entidades.get(entidad)?.eliminar(claseComponente);
     this.verificarEntidad(entidad);
   }
@@ -66,7 +74,7 @@ export class ECSManager {
     sistema.ecsManager = this;
 
     this.sistemas.set(sistema, new Set());
-    for (let entidad of this.entidades.keys()) {
+    for (const entidad of this.entidades.keys()) {
       this.verificarEntidadSistema(entidad, sistema);
     }
   }
@@ -97,14 +105,14 @@ export class ECSManager {
   }*/
 
   private verificarEntidad(entidad: Entidad): void {
-    for (let sistema of this.sistemas.keys()) {
+    for (const sistema of this.sistemas.keys()) {
       this.verificarEntidadSistema(entidad, sistema);
     }
   }
 
   private verificarEntidadSistema(entidad: Entidad, sistema: Sistema): void {
-    let componenteContainer = this.entidades.get(entidad);
-    let componentesRequeridos = sistema.componentesRequeridos;
+    const componenteContainer = this.entidades.get(entidad);
+    const componentesRequeridos = sistema.componentesRequeridos;
     if (componenteContainer?.tieneTodos(componentesRequeridos)) {
       this.sistemas.get(sistema)?.add(entidad);
     } else {
@@ -137,7 +145,7 @@ export class ECSManager {
    * @param eventName Nombre del evento
    * @param data Datos a pasar a los callbacks
    */
-  public emit(eventName: string, data?: any): void {
+  public emit(eventName: string, data?: unknown): void {
     const listeners = this.eventListeners.get(eventName);
     if (listeners) {
       listeners.forEach((callback) => callback(data));
@@ -154,15 +162,25 @@ export class ECSManager {
 
   ///// Sistema de acciones
 
-  public registrarAccion(accion: string, objeto: string, tiempo: number, val?: any): void{
+  public registrarAccion(
+    accion: string,
+    objeto: string,
+    tiempo: number,
+    val?: unknown
+  ): void {
     this.accionesSimulacion.push([accion, objeto, tiempo, val]);
   }
 
-  public consultarAccion(accion: string, objeto: string, tiempo: number, val?: any)
-                        : [string, string, number, any?] | undefined {
-    return this.accionesSimulacion.find(([a, o, t, v]) =>
-      JSON.stringify([a, o, t, v]) === JSON.stringify([accion, objeto, tiempo, val])
+  public consultarAccion(
+    accion: string,
+    objeto: string,
+    tiempo: number,
+    val?: unknown
+  ): [string, string, number, unknown?] | undefined {
+    return this.accionesSimulacion.find(
+      ([a, o, t, v]) =>
+        JSON.stringify([a, o, t, v]) ===
+        JSON.stringify([accion, objeto, tiempo, val])
     );
   }
-
 }

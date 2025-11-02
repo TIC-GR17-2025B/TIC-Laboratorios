@@ -1,6 +1,6 @@
 import { Mueble, TipoDispositivo } from "../../types/DeviceEnums";
 
-export const escenarioDeTest: any = {
+export const escenarioDeTest: unknown = {
   id: 1,
   titulo: "Escenario Introductorio",
   presupuestoInicial: 1000,

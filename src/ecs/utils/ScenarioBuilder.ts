@@ -13,6 +13,11 @@ import {
 import type { ComponenteContainer, Entidad } from "../core/Componente";
 import type { Escenario } from "../../types/EscenarioTypes";
 import { SistemaRelaciones } from "../systems/SistemaRelaciones";
+import {
+  TipoAtaque,
+  TipoDispositivo,
+  EstadoAtaqueDispositivo,
+} from "../../types/DeviceEnums";
 /**
  * Builder para crear escenarios de forma declarativa y simple
  * Facilita la construcción inicial y modificaciones posteriores
@@ -30,22 +35,25 @@ export class ScenarioBuilder {
    */
   construirDesdeArchivo(escenario: Escenario): this {
     const escenarioPadre = this.crearEscenario(escenario);
-    
-    escenario.ataques.forEach((ataque: any) => {
+
+    escenario.ataques.forEach((ataque: unknown) => {
       this.crearAtaque(ataque);
     });
 
-    escenario.fases.forEach((fase: any) => {
+    escenario.fases.forEach((fase: unknown) => {
       this.crearFase(fase);
     });
 
-    escenario.zonas.forEach((zona: any) => {
+    escenario.zonas.forEach((zona: unknown) => {
       const zonaEntidad = this.crearZona(zona, escenarioPadre);
-      zona.oficinas.forEach((oficina: any) => {
+      const z = zona as { oficinas?: unknown[] };
+      (z.oficinas ?? []).forEach((oficina: unknown) => {
         const oficinaEntidad = this.crearOficina(oficina, zonaEntidad);
-        oficina.espacios.forEach((espacio: any) => {
+        const ofi = oficina as { espacios?: unknown[] };
+        (ofi.espacios ?? []).forEach((espacio: unknown) => {
           const espacioEntidad = this.crearEspacio(espacio, oficinaEntidad);
-          espacio.dispositivos.forEach((dispositivo: any) => {
+          const esp = espacio as { dispositivos?: unknown[] };
+          (esp.dispositivos ?? []).forEach((dispositivo: unknown) => {
             this.crearDispositivo(dispositivo, espacioEntidad);
           });
         });
@@ -69,40 +77,61 @@ export class ScenarioBuilder {
     return entidadEscenario;
   }
 
-  crearAtaque(ataque: any) {
+  crearAtaque(ataque: unknown) {
+    const a = ataque as {
+      nombreAtaque: string;
+      tiempoNotificacion: number;
+      tipoAtaque: unknown;
+      dispositivoAAtacar: string;
+      descripcion: string;
+      fase: number;
+      condicionMitigacion: {
+        accion: string;
+        objeto: string;
+        tiempo?: number;
+        val?: unknown;
+      };
+    };
     const entidadAtaque = this.ecsManager.agregarEntidad();
     this.ecsManager.agregarComponente(
       entidadAtaque,
       new AtaqueComponent(
-        ataque.nombreAtaque,
-        ataque.tiempoNotificacion,
-        ataque.tipoAtaque,
-        ataque.dispositivoAAtacar,
-        ataque.descripcion,
-        ataque.fase,
-        ataque.condicionMitigacion
+        a.nombreAtaque,
+        a.tiempoNotificacion,
+        a.tipoAtaque as unknown as TipoAtaque,
+        a.dispositivoAAtacar,
+        a.descripcion,
+        a.fase,
+        a.condicionMitigacion
       )
     );
   }
 
-  crearFase(fase: any) {
+  crearFase(fase: unknown) {
+    const f = fase as {
+      id: number;
+      nombre: string;
+      descripcion?: string;
+      faseActual?: boolean;
+    };
     const entidadFase = this.ecsManager.agregarEntidad();
     this.ecsManager.agregarComponente(
       entidadFase,
       new FaseComponent(
-        fase.id,
-        fase.nombre,
-        fase.descripcion,
-        fase.faseActual
+        f.id,
+        f.nombre,
+        f.descripcion ?? "",
+        f.faseActual ?? false
       )
     );
   }
 
-  crearZona(zona: any, escenarioEntidad?: Entidad): Entidad {
+  crearZona(zona: unknown, escenarioEntidad?: Entidad): Entidad {
     const entidadZona = this.ecsManager.agregarEntidad();
+    const z = zona as { id: number; nombre: string };
     this.ecsManager.agregarComponente(
       entidadZona,
-      new ZonaComponent(zona.id, zona.nombre)
+      new ZonaComponent(z.id, z.nombre)
     );
     const escEntidad = escenarioEntidad;
     if (escEntidad != null) {
@@ -117,11 +146,12 @@ export class ScenarioBuilder {
     return entidadZona;
   }
 
-  crearOficina(oficina: any, zonaId: number): Entidad {
+  crearOficina(oficina: unknown, zonaId: number): Entidad {
     const entidadOficina = this.ecsManager.agregarEntidad();
+    const ofi = oficina as { id: number; nombre?: string };
     this.ecsManager.agregarComponente(
       entidadOficina,
-      new OficinaComponent(oficina.id, oficina.nombre, zonaId)
+      new OficinaComponent(ofi.id, ofi.nombre ?? "", zonaId)
     );
 
     const ofiEntidad = entidadOficina;
@@ -137,19 +167,24 @@ export class ScenarioBuilder {
     return entidadOficina;
   }
 
-  crearEspacio(espacio: any, oficinaId: number): Entidad {
+  crearEspacio(espacio: unknown, oficinaId: number): Entidad {
     const entidadEspacio = this.ecsManager.agregarEntidad();
+    const esp = espacio as {
+      id: number;
+      mueble: unknown;
+      posicion?: { x: number; y: number; z: number; rotacionY?: number };
+    };
     this.ecsManager.agregarComponente(
       entidadEspacio,
-      new EspacioComponent(espacio.id, oficinaId, espacio.mueble)
+      new EspacioComponent(esp.id, oficinaId, String(esp.mueble ?? "libre"))
     );
     this.ecsManager.agregarComponente(
       entidadEspacio,
       new Transform(
-        espacio.posicion.x,
-        espacio.posicion.y,
-        espacio.posicion.z,
-        espacio.posicion.rotacionY
+        esp.posicion?.x ?? 0,
+        esp.posicion?.y ?? 0,
+        esp.posicion?.z ?? 0,
+        esp.posicion?.rotacionY ?? 0
       )
     );
     const espEntidad = entidadEspacio;
@@ -165,25 +200,33 @@ export class ScenarioBuilder {
     return entidadEspacio;
   }
 
-  crearDispositivo(dispositivo: any, espacioId: number): Entidad {
+  crearDispositivo(dispositivo: unknown, espacioId: number): Entidad {
     const entidadDispositivo = this.ecsManager.agregarEntidad();
+    const d = dispositivo as {
+      nombre?: string;
+      sistemaOperativo?: string;
+      hardware?: string;
+      tipo?: unknown;
+      estadoAtaque?: unknown;
+      posicion?: { x: number; y: number; z: number; rotacionY?: number };
+    };
     this.ecsManager.agregarComponente(
       entidadDispositivo,
       new DispositivoComponent(
-        dispositivo.nombre,
-        dispositivo.sistemaOperativo,
-        dispositivo.hardware,
-        dispositivo.tipo,
-        dispositivo.estadoAtaque
+        d.nombre ?? "",
+        d.sistemaOperativo ?? "",
+        d.hardware ?? "",
+        d.tipo as unknown as TipoDispositivo,
+        d.estadoAtaque as unknown as EstadoAtaqueDispositivo
       )
     );
     this.ecsManager.agregarComponente(
       entidadDispositivo,
       new Transform(
-        dispositivo.posicion.x,
-        dispositivo.posicion.y,
-        dispositivo.posicion.z,
-        dispositivo.posicion.rotacionY
+        d.posicion?.x ?? 0,
+        d.posicion?.y ?? 0,
+        d.posicion?.z ?? 0,
+        d.posicion?.rotacionY ?? 0
       )
     );
     // TO-DO: agregar condicional para cada tipo de dispositivo segun dispositivo.tipo (IMPORTANTE)

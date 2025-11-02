@@ -1,4 +1,5 @@
 import { Mueble, TipoDispositivo } from "../../../../types/DeviceEnums";
+import { preloadModel } from "../components/Model3DUtils";
 
 /**
  * Configuración centralizada de modelos 3D y sus propiedades
@@ -17,6 +18,22 @@ export const MUEBLE_MODELS: Record<string, string> = {
  */
 export const DISPOSITIVO_MODELS: Record<string, string> = {
   [TipoDispositivo.WORKSTATION]: "/assets/models/computadora.gltf",
+};
+
+/**
+ * Precarga todos los modelos 3D para mejorar el rendimiento
+ * Llamar esta función al inicio de la aplicación
+ */
+export const preloadAllModels = () => {
+  // Precargar modelos de muebles
+  Object.values(MUEBLE_MODELS).forEach((path) => {
+    if (path) preloadModel(path);
+  });
+
+  // Precargar modelos de dispositivos
+  Object.values(DISPOSITIVO_MODELS).forEach((path) => {
+    if (path) preloadModel(path);
+  });
 };
 
 /**
@@ -43,11 +60,12 @@ export const getMuebleModel = (tipo: string): string => {
   return MUEBLE_MODELS[tipo] || "";
 };
 
-export const getModelo = (objeto: any): string => {
-  if (objeto.tipo in DISPOSITIVO_MODELS) {
-    return getDispositivoModel(objeto.tipo);
-  } else if (objeto.tipo == "espacio") {
-    const mueble = objeto.mueble;
+export const getModelo = (objeto: unknown): string => {
+  const o = objeto as { tipo?: string; mueble?: string };
+  if (o.tipo && o.tipo in DISPOSITIVO_MODELS) {
+    return getDispositivoModel(o.tipo);
+  } else if (o.tipo === "espacio") {
+    const mueble = o.mueble ?? "";
     return getMuebleModel(mueble);
   } else {
     return "";

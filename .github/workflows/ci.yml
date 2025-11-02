@@ -1,0 +1,43 @@
+name: CI – Validación de PR
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - main
+    types: [opened, synchronize, reopened]
+
+jobs:
+  validate_quality:
+    name: Ejecutar Validación de Calidad
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout de la rama del PR
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0 
+
+      - name: Merge temporal con la rama base
+        run: |
+          git fetch origin ${{ github.base_ref }}
+          git merge origin/${{ github.base_ref }} --no-commit || echo "Conflictos detectados"
+     
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Ejecutar ESLint
+        run: npm run lint
+
+      - name: Ejecutar Pruebas Automatizadas
+        run: npm run test
+
+      - name: Ejecutar Build
+        run: npm run build
