@@ -4,6 +4,7 @@ import {
   Mueble,
   TipoAtaque,
   TipoDispositivo,
+  TipoEvento,
 } from "../../types/DeviceEnums";
 export const escenarioBase: unknown = {
   id: 2,
@@ -29,6 +30,20 @@ export const escenarioBase: unknown = {
           dispositivoAAtacar: "Computadora Jacob",
           activado: true,
         },
+      },
+    },
+  ],
+  eventos: [
+    {
+      nombreEvento: "Envío de archivo/activo",
+      tipoEvento: TipoEvento.ENVIO_ACTIVO,
+      tiempoNotificacion: 25,
+      descripcion: "Se enviará un archivo entre dispositivos.",
+      fase: 1,
+      infoAdicional: { // Como es de un activo, se indica el nombre del activo a enviar, y los dispositivos involucrados
+        nombreActivo: "Activo1",
+        dispositivoEmisor: "Computadora Administrativa",
+        dispositivoReceptor: "Computadora Jacob",
       },
     },
   ],

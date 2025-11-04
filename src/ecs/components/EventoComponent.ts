@@ -1,3 +1,4 @@
+import type { TipoEvento } from "../../types/DeviceEnums";
 import { Componente } from "../core";
 
 // Componente generalizado para cualquier evento de la simulación.
@@ -10,12 +11,13 @@ import { Componente } from "../core";
 export class EventoComponent extends Componente {
     constructor(
         public nombreEvento: string,
+        public tipoEvento: TipoEvento,
         public tiempoNotificacion: number,
         public descripcion: string,
         public fase: number,
-        public tiempoEnOcurrir: number = tiempoNotificacion + 10,
         // Similar a condicionAMitigar en AtaqueComponent, pero en este caso es para brindar cualquier infor útil adicional
         public infoAdicional?: unknown,
+        public tiempoEnOcurrir: number = tiempoNotificacion + 10
     ) {
         super();
     }

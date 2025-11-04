@@ -1,51 +1,67 @@
-import { ActivoComponent, DispositivoComponent } from "../components";
+import { ActivoComponent, DispositivoComponent, EventoComponent } from "../components";
 import { RedComponent } from "../components";
-import { Sistema } from "../core";
+import { ComponenteContainer, Sistema } from "../core";
 import type { TipoProtocolo, RegistroTrafico } from "../../types/TrafficEnums";
 import { PROTOCOLOS } from "../../types/TrafficEnums";
+import { EventosRed } from "../../types/EventosEnums";
+import type { Activo } from "../../types/EscenarioTypes";
 
 export class SistemaRed extends Sistema {
     public componentesRequeridos = new Set([ActivoComponent, RedComponent]);
-    
-    public enviarActivo(entidadDispEnvio: number, entidadDispReceptor: number, activo: any) {
-        // Obtener dispositivos
-        const dispEnvio = this.getDispositivo(entidadDispEnvio);
-        const dispReceptor = this.getDispositivo(entidadDispReceptor);
 
-        if (!dispEnvio || !dispReceptor) {
-            console.log("Dispositivos no encontrados");
-            return;
-        }
+    public enviarActivo(dispEnvio: string, dispReceptor: string, activo: string) {
+        // Obtener dispositivos
+        // const dispEnvio = this.getDispositivo(entidadDispEnvio);
+        // const dispReceptor = this.getDispositivo(entidadDispReceptor);
+        //
+        // if (!dispEnvio || !dispReceptor) {
+        //     console.log("Dispositivos no encontrados");
+        //     return;
+        // }
 
         // Verificar conectividad
-        if (!this.estanConectados(dispEnvio.nombre, dispReceptor.nombre)) {
+        if (!this.estanConectados(dispEnvio, dispReceptor)) {
             console.log("El dispositivo receptor no está conectado a una red del dispositivo de envío");
             return;
         }
 
         // Obtener lista de activos del receptor
-        const activosDispR = this.ecsManager
-            .getComponentes(entidadDispReceptor)
-            ?.get(ActivoComponent)?.activos;
+        let activosDispR;
+        for (const [,c] of this.ecsManager.getEntidades()) {
+            if (c.get(DispositivoComponent)?.nombre == dispReceptor) {
+                activosDispR = c.get(ActivoComponent)?.activos;
+                break;
+            }
+        }
 
         if (!activosDispR) {
             console.log("El dispositivo receptor no tiene componente de activos");
             return;
         }
 
+        // Obtener el objeto activo del emisor
+        let activoAenviar: Activo;
+        for (const [,c] of this.ecsManager.getEntidades()) {
+            if (c.get(DispositivoComponent)?.nombre == dispEnvio) {
+                activoAenviar = c.get(ActivoComponent)?.activos.find((a) => a.nombre == activo)!;
+                break;
+            }
+        }
+
         // Verificar si el receptor ya tiene el activo
-        if (activosDispR.some(a => a.nombre === activo.nombre && a.contenido === activo.contenido)) {
-            console.log("El dispositivo receptor ya contiene activo:", activo.nombre);
+        if (activosDispR.some(a => a.nombre === activoAenviar.nombre &&
+                                   a.contenido === activoAenviar.contenido)) {
+            console.log("El dispositivo receptor ya contiene activo:", activo);
             return;
         }
-         
+ 
         // Transferir activo
-        activosDispR.push(activo);
+        activosDispR.push(activoAenviar!);
 
-        this.ecsManager.emit("red:activoEnviado", {
-            nombreActivo: activo.nombre,
-            d1: dispEnvio.nombre,
-            d2: dispReceptor.nombre
+        this.ecsManager.emit(EventosRed.RED_ACTIVO_ENVIADO, {
+            nombreActivo: activo,
+            d1: dispEnvio,
+            d2: dispReceptor
         });
     }
 
@@ -108,8 +124,6 @@ export class SistemaRed extends Sistema {
         );
     }
 
-    
-
     private registrarTrafico(
         origen: string,
         destino: string,
@@ -121,6 +135,6 @@ export class SistemaRed extends Sistema {
             protocolo
         };
 
-        this.ecsManager.emit("trafico:enviado", registro);
+        this.ecsManager.emit(EventosRed.TRAFICO_ENVIADO, registro);
     }
 }

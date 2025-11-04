@@ -11,6 +11,7 @@ import {
   WorkstationComponent,
   RouterComponent,
   ActivoComponent,
+  EventoComponent,
 } from "../components";
 import type { ComponenteContainer, Entidad } from "../core/Componente";
 import type { Dispositivo, Escenario } from "../../types/EscenarioTypes";
@@ -19,6 +20,7 @@ import {
   TipoAtaque,
   TipoDispositivo,
   EstadoAtaqueDispositivo,
+  TipoEvento,
 } from "../../types/DeviceEnums";
 import { RedComponent } from "../components/RedComponent";
 /**
@@ -41,6 +43,10 @@ export class ScenarioBuilder {
 
     escenario.ataques.forEach((ataque: unknown) => {
       this.crearAtaque(ataque);
+    });
+
+    escenario.eventos.forEach((evento: unknown) => {
+      this.crearEvento(evento);
     });
 
     escenario.fases.forEach((fase: unknown) => {
@@ -114,6 +120,29 @@ export class ScenarioBuilder {
         a.descripcion,
         a.fase,
         a.condicionMitigacion
+      )
+    );
+  }
+
+  crearEvento(evento: unknown) {
+    const a = evento as {
+      nombreEvento: string;
+      tipoEvento: TipoEvento;
+      tiempoNotificacion: number;
+      descripcion: string;
+      fase: number;
+      infoAdicional?: unknown;
+    };
+    const entidadEvento = this.ecsManager.agregarEntidad();
+    this.ecsManager.agregarComponente(
+      entidadEvento,
+      new EventoComponent(
+        a.nombreEvento,
+        a.tipoEvento,
+        a.tiempoNotificacion,
+        a.descripcion,
+        a.fase,
+        a.infoAdicional
       )
     );
   }

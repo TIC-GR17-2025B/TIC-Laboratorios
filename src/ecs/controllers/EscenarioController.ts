@@ -7,9 +7,10 @@ import {
   WorkstationComponent,
 } from "../components";
 import { ECSManager, type Entidad } from "../core";
-import { SistemaEvento, SistemaPresupuesto, SistemaTiempo } from "../systems";
+import { SistemaEvento, SistemaPresupuesto, SistemaRed, SistemaTiempo } from "../systems";
 import { ScenarioBuilder } from "../utils/ScenarioBuilder";
 import type { Escenario } from "../../types/EscenarioTypes";
+import { EventosAtaque, EventosPresupuesto, EventosRed, EventosTiempo } from "../../types/EventosEnums";
 
 export class EscenarioController {
   public escenario: Escenario;
@@ -21,6 +22,7 @@ export class EscenarioController {
   private sistemaPresupuesto?: SistemaPresupuesto;
   private entidadPresupuesto?: Entidad;
   private sistemaEvento?: SistemaEvento;
+  private sistemaRed?: SistemaRed;
   private escenarioIniciado: boolean = false; // FLAG PARA EVITAR MÚLTIPLES INICIALIZACIONES
 
   private static instance: EscenarioController | null = null;
@@ -59,49 +61,61 @@ export class EscenarioController {
       this.ecsManager.agregarSistema(this.sistemaEvento);
     }
 
+    if (!this.sistemaRed) {
+      this.sistemaRed = new SistemaRed();
+      this.ecsManager.agregarSistema(this.sistemaRed);
+    }
+
     // NO emitir el evento aquí - lo haremos después de que los sistemas se suscriban
-    this.ecsManager.on("tiempo:notificacionAtaque", (data: unknown) => {
+    this.ecsManager.on(EventosTiempo.TIEMPO_NOTIFICACION_ATAQUE, (data: unknown) => {
       const d = data as { descripcionAtaque: string };
       console.log(d.descripcionAtaque);
     });
 
     // Lo mismo que ariba pero para eventos generalizados
-    this.ecsManager.on("tiempo:notificacionEvento", (data: unknown) => {
+    this.ecsManager.on(EventosTiempo.TIEMPO_NOTIFICACION_EVENTO, (data: unknown) => {
       const d = data as { descripcionEvento: string };
       console.log(d.descripcionEvento);
     });
 
-    this.ecsManager.on("tiempo:ejecucionAtaque", (data: unknown) => {
+    this.ecsManager.on(EventosTiempo.TIEMPO_EJECUCION_ATAQUE, (data: unknown) => {
       const d = data as { ataque: AtaqueComponent };
       this.ejecutarAtaque(d.ataque);
     });
 
     // Lo mismo que ariba pero para eventos generalizados
-    this.ecsManager.on("tiempo:ejecucionEvento", (data: unknown) => {
+    this.ecsManager.on(EventosTiempo.TIEMPO_EJECUCION_EVENTO, (data: unknown) => {
       const d = data as { evento: EventoComponent };
-      console.log(`Evento ocurrido: ${d.evento.nombreEvento}`)
+      this.ejecutarEvento(d.evento);
     });
 
-    this.ecsManager.on("ataque:ataqueRealizado", (data: unknown) => {
+    this.ecsManager.on(EventosAtaque.ATAQUE_REALIZADO, (data: unknown) => {
       const d = data as { ataque: AtaqueComponent };
       console.log(
         `Se comprometió el dispositivo: ${d.ataque.dispositivoAAtacar}. Causa: ${d.ataque.tipoAtaque}`
       );
     });
 
-    this.ecsManager.on("ataque:ataqueMitigado", (data: unknown) => {
+    this.ecsManager.on(EventosAtaque.ATAQUE_MITIGADO, (data: unknown) => {
       const d = data as { ataque: AtaqueComponent };
       console.log(
         `Se mitigó el ataque a: ${d.ataque.dispositivoAAtacar}. Ataque mitigado: ${d.ataque.tipoAtaque}`
       );
     });
 
-    this.ecsManager.on("presupuesto:agotado", () => {
+    this.ecsManager.on(EventosPresupuesto.PRESUPUESTO_AGOTADO, () => {
       this.sistemaTiempo?.pausar(this.entidadTiempo!);
       console.log("Se agotó el presupuesto, fin de la partida.");
     });
 
-    this.ecsManager.on("red:activoEnviado", (data: unknown) => {
+    this.ecsManager.on(EventosRed.RED_ENVIAR_ACTIVO, (data: unknown) => {
+      const d = data as { evento: unknown };
+      this.sistemaRed?.enviarActivo(d.evento.infoAdicional.dispositivoEmisor,
+                                    d.evento.infoAdicional.dispositivoReceptor,
+                                    d.evento.infoAdicional.nombreActivo);
+    });
+
+    this.ecsManager.on(EventosRed.RED_ACTIVO_ENVIADO, (data: unknown) => {
       const d = data as { d1: string, d2: string, nombreActivo: string };
       console.log(`Se envió el activo "${d.nombreActivo}" desde ${d.d1} hacia ${d.d2}.`);
     });
@@ -239,6 +253,10 @@ export class EscenarioController {
     if (entidadDispConSuNombre.length > 0) {
       this.sistemaEvento?.ejecutarAtaque(entidadDispConSuNombre[0][0], ataque);
     }
+  }
+
+  public ejecutarEvento(evento: EventoComponent) {
+    this.sistemaEvento?.ejecutarEvento(evento);
   }
 
   public getPresupuestoActual(): number {

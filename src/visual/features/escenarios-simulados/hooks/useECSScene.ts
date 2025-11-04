@@ -4,6 +4,7 @@ import type { Entidad } from "../../../../ecs/core/Componente";
 import { getDispositivoHeight } from "../config/modelConfig";
 import { useEscenarioActual } from "../../../common/contexts/EscenarioContext";
 import { EscenarioController } from "../../../../ecs/controllers/EscenarioController";
+import { EventosAtaque, EventosPresupuesto, EventosTiempo } from "../../../../types/EventosEnums";
 
 export interface ECSSceneEntity {
   entidadId: Entidad;
@@ -121,14 +122,14 @@ export function useECSScene() {
     tiempoIniciadoRef.current = true;
 
     const unsubscribePresupuesto = escenarioController.on(
-      "presupuesto:actualizado",
+      EventosPresupuesto.PRESUPUESTO_ACTUALIZADO,
       (data: unknown) => {
         const d = data as { presupuesto: number };
         setPresupuesto(d.presupuesto);
       }
     );
     const unsubscribeNotificacionAtaque = escenarioController.on(
-      "tiempo:notificacionAtaque",
+      EventosTiempo.TIEMPO_NOTIFICACION_ATAQUE,
       (data: unknown) => {
         const d = data as { descripcionAtaque: string };
         setMostrarNuevoLog(true);
@@ -141,7 +142,7 @@ export function useECSScene() {
     );
 
     const unsubscribeActualizado = escenarioController.on(
-      "tiempo:actualizado",
+      EventosTiempo.TIEMPO_ACTUALIZADO,
       (data: unknown) => {
         const d = data as { transcurrido: number; pausado: boolean };
         setTiempoTranscurrido(d.transcurrido);
@@ -149,7 +150,7 @@ export function useECSScene() {
     );
 
     const unsubscribePausado = escenarioController.on(
-      "tiempo:pausado",
+      EventosTiempo.TIEMPO_PAUSADO,
       (data: unknown) => {
         const d = data as { transcurrido: number; pausado: boolean };
         setTiempoTranscurrido(d.transcurrido);
@@ -158,7 +159,7 @@ export function useECSScene() {
     );
 
     const unsubscribeAtaqueRealizado = escenarioController.on(
-      "ataque:ataqueRealizado",
+      EventosAtaque.ATAQUE_REALIZADO,
       (data: unknown) => {
         const ataque = (data as unknown as { ataque?: { tipoAtaque?: string } })
           .ataque;
@@ -173,7 +174,7 @@ export function useECSScene() {
     );
 
     const unsubscribeAtaqueMitigado = escenarioController.on(
-      "ataque:ataqueMitigado",
+      EventosAtaque.ATAQUE_MITIGADO,
       (data: unknown) => {
         const ataque = (data as unknown as { ataque?: { tipoAtaque?: string } })
           .ataque;
@@ -188,7 +189,7 @@ export function useECSScene() {
     );
 
     const unsubscribeReanudado = escenarioController.on(
-      "tiempo:reanudado",
+      EventosTiempo.TIEMPO_REANUDADO,
       (data: unknown) => {
         const d = data as { transcurrido: number; pausado: boolean };
         setTiempoTranscurrido(d.transcurrido);

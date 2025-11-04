@@ -22,3 +22,7 @@ export enum EstadoAtaqueDispositivo {
 export enum TipoAtaque {
     INFECCION_TROYANO = "Infección de troyano",
 }
+
+export enum TipoEvento {
+    ENVIO_ACTIVO = "Envío de activo",
+}

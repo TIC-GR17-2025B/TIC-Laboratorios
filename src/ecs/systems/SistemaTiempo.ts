@@ -1,6 +1,7 @@
 import { Sistema } from "../core";
 import { type Entidad } from "../core";
 import { TiempoComponent, EventoComponent, AtaqueComponent } from "../components";
+import { EventosTiempo } from "../../types/EventosEnums";
 
 export class SistemaTiempo extends Sistema {
   public componentesRequeridos = new Set([TiempoComponent]);
@@ -26,7 +27,7 @@ export class SistemaTiempo extends Sistema {
     }
 
     console.log("Pausando tiempo en SistemaTiempo", tiempo);
-    this.ecsManager.emit("tiempo:pausado", {
+    this.ecsManager.emit(EventosTiempo.TIEMPO_PAUSADO, {
       transcurrido: tiempo.transcurrido,
       pausado: true,
     });
@@ -43,7 +44,7 @@ export class SistemaTiempo extends Sistema {
     // Reiniciar el intervalo cuando se reanuda
     this.iniciarIntervalo(tiempo);
 
-    this.ecsManager.emit("tiempo:reanudado", {
+    this.ecsManager.emit(EventosTiempo.TIEMPO_REANUDADO, {
       transcurrido: tiempo.transcurrido,
       pausado: false,
     });
@@ -67,31 +68,31 @@ export class SistemaTiempo extends Sistema {
       tiempo.transcurrido += 1;
 
       // Emitir evento cuando el tiempo cambia
-      this.ecsManager.emit("tiempo:actualizado", {
+      this.ecsManager.emit(EventosTiempo.TIEMPO_ACTUALIZADO, {
         transcurrido: tiempo.transcurrido,
         pausado: tiempo.pausado,
       });
 
-      /* Verificar que sea un tiempo de notificacion de ataque 
-         y verificar que sea un tiempo de ejecución de ataque
+      /* Verificar que sea un tiempo de notificacion de ataque o evento
+         y verificar que sea un tiempo de ejecución de ataque o evento
       */
       for (const evento of this.eventosEscenario) {
         if (tiempo.transcurrido == evento.tiempoNotificacion) {
           if (evento instanceof AtaqueComponent){
-            this.ecsManager.emit("tiempo:notificacionAtaque", {
+            this.ecsManager.emit(EventosTiempo.TIEMPO_NOTIFICACION_ATAQUE, {
               descripcionAtaque: evento.descripcion,
             });
           } else {
-            this.ecsManager.emit("tiempo:notificacionEvento", {
+            this.ecsManager.emit(EventosTiempo.TIEMPO_NOTIFICACION_EVENTO, {
               descripcionEvento: evento.descripcion,
             });
           }
         }
         if (tiempo.transcurrido == evento.tiempoEnOcurrir) {
           if (evento instanceof AtaqueComponent) {
-            this.ecsManager.emit("tiempo:ejecucionAtaque", { ataque: evento });
+            this.ecsManager.emit(EventosTiempo.TIEMPO_EJECUCION_ATAQUE, { ataque: evento });
           } else {
-            this.ecsManager.emit("tiempo:ejecucionEvento", { evento });
+            this.ecsManager.emit(EventosTiempo.TIEMPO_EJECUCION_EVENTO, { evento });
           }
         }
       }

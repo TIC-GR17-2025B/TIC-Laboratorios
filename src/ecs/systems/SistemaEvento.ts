@@ -1,6 +1,7 @@
 import { ObjetosManejables } from "../../types/AccionesEnums";
-import { EstadoAtaqueDispositivo } from "../../types/DeviceEnums";
-import { AtaqueComponent, DispositivoComponent, WorkstationComponent } from "../components";
+import { EstadoAtaqueDispositivo, TipoEvento } from "../../types/DeviceEnums";
+import { EventosAtaque, EventosRed } from "../../types/EventosEnums";
+import { AtaqueComponent, DispositivoComponent, EventoComponent, WorkstationComponent } from "../components";
 import { Sistema, type Entidad } from "../core";
 import type { ClaseComponente } from "../core/Componente";
 
@@ -24,9 +25,9 @@ export class SistemaEvento extends Sistema {
 
     if (!this.verificarCondicionMitigacion(entidadDispositivo, ataque.condicionMitigacion)) {
       dispositivoAAtacar.estadoAtaque = EstadoAtaqueDispositivo.COMPROMETIDO;
-      this.ecsManager.emit("ataque:ataqueRealizado", { ataque });
+      this.ecsManager.emit(EventosAtaque.ATAQUE_REALIZADO, { ataque });
     } else {
-      this.ecsManager.emit("ataque:ataqueMitigado", { ataque });
+      this.ecsManager.emit(EventosAtaque.ATAQUE_MITIGADO, { ataque });
     }
   }
 
@@ -53,4 +54,19 @@ export class SistemaEvento extends Sistema {
 
     return false;
   }
+
+  /* A partir del formato general de eventos (1), se verifica qué tipo es, para según eso realizar lo que se tenga que hacer.
+   * Para lo cual, se emiten los eventos (2) correspondientes para que las clases responsables se encarguen.
+   * No confundir entre (1) y (2): (1) son los sucesos (como los ataques) que ocurren en la simulación. (2) son las "señales"
+   * que se emiten para que los oyentes de estas señales hagan lo que se les pide según corresponda (es como el patrón Observador).*/
+  public ejecutarEvento(evento: EventoComponent): void {
+    switch(evento.tipoEvento){
+      case TipoEvento.ENVIO_ACTIVO: {
+        this.ecsManager.emit(EventosRed.RED_ENVIAR_ACTIVO, { evento });
+        break;
+      }
+        // Próximamente para futuros eventos
+    }
+  }
+
 }

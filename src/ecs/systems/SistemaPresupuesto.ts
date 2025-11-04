@@ -5,6 +5,7 @@ import {
   DispositivoComponent,
 } from "../components";
 import { AccionesRealizables, ObjetosManejables } from "../../types/AccionesEnums";
+import { EventosPresupuesto } from "../../types/EventosEnums";
 
 export class SistemaPresupuesto extends Sistema {
   public componentesRequeridos = new Set([PresupuestoComponent]);
@@ -99,7 +100,7 @@ export class SistemaPresupuesto extends Sistema {
       .getComponentes(entidadPresupuesto)
       ?.get(PresupuestoComponent);
 
-    this.ecsManager.emit("presupuesto:actualizado", {
+    this.ecsManager.emit(EventosPresupuesto.PRESUPUESTO_ACTUALIZADO, {
       presupuesto: presupuestoComp?.monto ?? 0,
     });
     this.notificarPresupuestoAgotado(entidadPresupuesto);
@@ -125,6 +126,6 @@ export class SistemaPresupuesto extends Sistema {
       ?.get(PresupuestoComponent);
 
     if (presupuestoComp?.monto === 0)
-      this.ecsManager.emit("presupuesto:agotado");
+      this.ecsManager.emit(EventosPresupuesto.PRESUPUESTO_AGOTADO);
   }
 }
