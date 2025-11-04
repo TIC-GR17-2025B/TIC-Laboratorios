@@ -1,6 +1,6 @@
 // Export de systems
 export * from './SistemaMovimiento'
-export * from './SistemaAtaque'
+export * from './SistemaEvento'
 export * from './SistemaTiempo'
 export * from './SistemaPresupuesto'
 export * from './SistemaFase'

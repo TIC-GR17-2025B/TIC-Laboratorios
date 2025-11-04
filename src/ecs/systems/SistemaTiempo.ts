@@ -1,11 +1,11 @@
 import { Sistema } from "../core";
 import { type Entidad } from "../core";
-import { TiempoComponent, AtaqueComponent } from "../components";
+import { TiempoComponent, EventoComponent, AtaqueComponent } from "../components";
 
 export class SistemaTiempo extends Sistema {
   public componentesRequeridos = new Set([TiempoComponent]);
   public intervalo: ReturnType<typeof setInterval> | null = null;
-  public ataquesEscenario: AtaqueComponent[] = [];
+  public eventosEscenario: EventoComponent[] = [];
 
   public on(eventName: string, callback: (data: unknown) => void): () => void {
     return this.ecsManager.on(eventName, callback);
@@ -75,14 +75,24 @@ export class SistemaTiempo extends Sistema {
       /* Verificar que sea un tiempo de notificacion de ataque 
          y verificar que sea un tiempo de ejecución de ataque
       */
-      for (const ataque of this.ataquesEscenario) {
-        if (tiempo.transcurrido == ataque.tiempoNotificacion) {
-          this.ecsManager.emit("tiempo:notificacionAtaque", {
-            descripcionAtaque: ataque.descripcion,
-          });
+      for (const evento of this.eventosEscenario) {
+        if (tiempo.transcurrido == evento.tiempoNotificacion) {
+          if (evento instanceof AtaqueComponent){
+            this.ecsManager.emit("tiempo:notificacionAtaque", {
+              descripcionAtaque: evento.descripcion,
+            });
+          } else {
+            this.ecsManager.emit("tiempo:notificacionEvento", {
+              descripcionEvento: evento.descripcion,
+            });
+          }
         }
-        if (tiempo.transcurrido == ataque.tiempoEnOcurrir) {
-          this.ecsManager.emit("tiempo:ejecucionAtaque", { ataque });
+        if (tiempo.transcurrido == evento.tiempoEnOcurrir) {
+          if (evento instanceof AtaqueComponent) {
+            this.ecsManager.emit("tiempo:ejecucionAtaque", { ataque: evento });
+          } else {
+            this.ecsManager.emit("tiempo:ejecucionEvento", { evento });
+          }
         }
       }
 

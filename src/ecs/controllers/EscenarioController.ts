@@ -1,12 +1,13 @@
 import {
   AtaqueComponent,
   DispositivoComponent,
+  EventoComponent,
   PresupuestoComponent,
   TiempoComponent,
   WorkstationComponent,
 } from "../components";
 import { ECSManager, type Entidad } from "../core";
-import { SistemaAtaque, SistemaPresupuesto, SistemaTiempo } from "../systems";
+import { SistemaEvento, SistemaPresupuesto, SistemaTiempo } from "../systems";
 import { ScenarioBuilder } from "../utils/ScenarioBuilder";
 import type { Escenario } from "../../types/EscenarioTypes";
 
@@ -19,7 +20,7 @@ export class EscenarioController {
   private sistemaTiempo?: SistemaTiempo;
   private sistemaPresupuesto?: SistemaPresupuesto;
   private entidadPresupuesto?: Entidad;
-  private sistemaAtaque?: SistemaAtaque;
+  private sistemaEvento?: SistemaEvento;
   private escenarioIniciado: boolean = false; // FLAG PARA EVITAR MÚLTIPLES INICIALIZACIONES
 
   private static instance: EscenarioController | null = null;
@@ -53,9 +54,9 @@ export class EscenarioController {
     this.builder = new ScenarioBuilder(this.ecsManager);
     this.builder.construirDesdeArchivo(this.escenario);
 
-    if (!this.sistemaAtaque) {
-      this.sistemaAtaque = new SistemaAtaque();
-      this.ecsManager.agregarSistema(this.sistemaAtaque);
+    if (!this.sistemaEvento) {
+      this.sistemaEvento = new SistemaEvento();
+      this.ecsManager.agregarSistema(this.sistemaEvento);
     }
 
     // NO emitir el evento aquí - lo haremos después de que los sistemas se suscriban
@@ -64,9 +65,21 @@ export class EscenarioController {
       console.log(d.descripcionAtaque);
     });
 
+    // Lo mismo que ariba pero para eventos generalizados
+    this.ecsManager.on("tiempo:notificacionEvento", (data: unknown) => {
+      const d = data as { descripcionEvento: string };
+      console.log(d.descripcionEvento);
+    });
+
     this.ecsManager.on("tiempo:ejecucionAtaque", (data: unknown) => {
       const d = data as { ataque: AtaqueComponent };
       this.ejecutarAtaque(d.ataque);
+    });
+
+    // Lo mismo que ariba pero para eventos generalizados
+    this.ecsManager.on("tiempo:ejecucionEvento", (data: unknown) => {
+      const d = data as { evento: EventoComponent };
+      console.log(`Evento ocurrido: ${d.evento.nombreEvento}`)
     });
 
     this.ecsManager.on("ataque:ataqueRealizado", (data: unknown) => {
@@ -88,20 +101,21 @@ export class EscenarioController {
       console.log("Se agotó el presupuesto, fin de la partida.");
     });
 
-    this.ecsManager.on("red:activoEnviado", (data: { d1: string, d2: string, nombreActivo: string }) => {
-      console.log(`Se envió el activo "${data.nombreActivo}" desde ${data.d1} hacia ${data.d2}.`);
+    this.ecsManager.on("red:activoEnviado", (data: unknown) => {
+      const d = data as { d1: string, d2: string, nombreActivo: string };
+      console.log(`Se envió el activo "${d.nombreActivo}" desde ${d.d1} hacia ${d.d2}.`);
     });
 
     this.escenarioIniciado = true;
   }
 
-  public cargarAtaquesEnSistema(): void {
+  public cargarEventosEnSistema(): void {
     if (!this.sistemaTiempo) {
       console.error("SistemaTiempo no existe aún");
       return;
     }
-    const ataques = this.getAtaques();
-    this.sistemaTiempo.ataquesEscenario = ataques;
+    const eventos = this.getEventos();
+    this.sistemaTiempo.eventosEscenario = eventos;
   }
 
   public ejecutarTiempo(): void {
@@ -223,7 +237,7 @@ export class EscenarioController {
     );
 
     if (entidadDispConSuNombre.length > 0) {
-      this.sistemaAtaque?.ejecutarAtaque(entidadDispConSuNombre[0][0], ataque);
+      this.sistemaEvento?.ejecutarAtaque(entidadDispConSuNombre[0][0], ataque);
     }
   }
 
@@ -238,17 +252,21 @@ export class EscenarioController {
     return presupuesto?.monto ?? 0;
   }
 
-  public getAtaques(): AtaqueComponent[] {
-    const ataques: AtaqueComponent[] = [];
+  public getEventos(): EventoComponent[] {
+    const eventos: EventoComponent[] = [];
 
     for (const [, container] of this.builder.getEntidades()) {
+      if (container.tiene(EventoComponent)) {
+        const a = container.get(EventoComponent);
+        if (a) eventos.push(a);
+      }
       if (container.tiene(AtaqueComponent)) {
         const a = container.get(AtaqueComponent);
-        if (a) ataques.push(a);
+        if (a) eventos.push(a);
       }
     }
 
-    return ataques;
+    return eventos;
   }
 
   public getWorkstationsYServers(): Entidad[] {

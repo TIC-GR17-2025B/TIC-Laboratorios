@@ -108,8 +108,8 @@ export function useECSScene() {
     escenarioController.iniciarEscenario();
     // SEGUNDO: Configurar tiempo
     escenarioController.ejecutarTiempo();
-    // TERCERO: Cargar ataques DIRECTAMENTE en el sistema de tiempo
-    escenarioController.cargarAtaquesEnSistema();
+    // TERCERO: Cargar eventos DIRECTAMENTE en el sistema de tiempo
+    escenarioController.cargarEventosEnSistema();
     // CUARTO: Configurar presupuesto
     escenarioController.efectuarPresupuesto(escenario.presupuestoInicial);
     // QUINTO: Obtener estado inicial

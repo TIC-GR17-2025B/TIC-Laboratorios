@@ -1,9 +1,9 @@
 import type { TipoAtaque } from "../../types/DeviceEnums";
-import { Componente } from "../core";
+import { EventoComponent } from "./EventoComponent";
 
-export class AtaqueComponent extends Componente {
+export class AtaqueComponent extends EventoComponent {
   constructor(
-    public nombreAtaque: string,
+    public nombreEvento: string,
     /* Tiempo en segundos en el que se notificará un futuro ataque desde que sucedió un evento. Ej: inició la simulación,
      * se hizo toggle a una config específica, etc.
      * No debe tomar en cuenta mientras está pausado. Ej: si se define tiempoNotificacion = 10 al inicio de la simulación,
@@ -27,6 +27,6 @@ export class AtaqueComponent extends Componente {
      */
     public tiempoEnOcurrir: number = tiempoNotificacion + 10
   ) {
-    super();
+    super(nombreEvento, tiempoNotificacion, descripcion, fase);
   }
 }

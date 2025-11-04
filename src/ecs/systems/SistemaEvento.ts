@@ -3,7 +3,7 @@ import { AtaqueComponent, DispositivoComponent } from "../components";
 import { Sistema, type Entidad } from "../core";
 import type { ClaseComponente } from "../core/Componente";
 
-export class SistemaAtaque extends Sistema {
+export class SistemaEvento extends Sistema {
   public componentesRequeridos: Set<ClaseComponente> = new Set([
     AtaqueComponent,
   ]);
