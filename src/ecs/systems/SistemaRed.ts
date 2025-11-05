@@ -1,6 +1,6 @@
-import { ActivoComponent, DispositivoComponent, EventoComponent } from "../components";
+import { ActivoComponent, DispositivoComponent } from "../components";
 import { RedComponent } from "../components";
-import { ComponenteContainer, Sistema } from "../core";
+import { Sistema } from "../core";
 import type { TipoProtocolo, RegistroTrafico } from "../../types/TrafficEnums";
 import { PROTOCOLOS } from "../../types/TrafficEnums";
 import { EventosRed } from "../../types/EventosEnums";
@@ -9,16 +9,26 @@ import type { Activo } from "../../types/EscenarioTypes";
 export class SistemaRed extends Sistema {
     public componentesRequeridos = new Set([ActivoComponent, RedComponent]);
 
-    public enviarActivo(dispEnvio: string, dispReceptor: string, activo: string) {
-        // Obtener dispositivos
-        // const dispEnvio = this.getDispositivo(entidadDispEnvio);
-        // const dispReceptor = this.getDispositivo(entidadDispReceptor);
-        //
-        // if (!dispEnvio || !dispReceptor) {
-        //     console.log("Dispositivos no encontrados");
-        //     return;
-        // }
+    public asignarRed(nombreDisp: string, nombreRed: string): void {
+        // Obtenemos la red
+        let red;
+        for (const [,c] of this.ecsManager.getEntidades()) {
+            if (c.get(RedComponent)?.nombre == nombreRed) {
+                red = c.get(RedComponent);
+                break;
+            }
+        }
 
+        // Verificamos que el dispositivo no esté en la red
+        if(red?.dispositivosConectados.some((d) => d == nombreDisp)){
+            console.warn(`El dispositivo ${nombreDisp} ya se encuentra conectado a la red ${nombreRed}`);
+            return;
+        }
+
+        red?.dispositivosConectados.push(nombreDisp);
+    }
+
+    public enviarActivo(dispEnvio: string, dispReceptor: string, activo: string): void {
         // Verificar conectividad
         if (!this.estanConectados(dispEnvio, dispReceptor)) {
             console.log("El dispositivo receptor no está conectado a una red del dispositivo de envío");

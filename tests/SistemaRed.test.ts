@@ -25,8 +25,12 @@ describe("SistemaRed", () => {
         em.agregarComponente(entidadDisp2, activoComponente2);
 
         const entidadRed = em.agregarEntidad()
-        const red = new RedComponent("LAN1", "#00DD00", [nombreDisp1, nombreDisp2], "zona1");
+        const red = new RedComponent("LAN1", "#00DD00", [], "zona1");
         em.agregarComponente(entidadRed, red);
+
+        // Se asignan los dispositivos en la red deseada
+        sistema.asignarRed(nombreDisp1, red.nombre);
+        sistema.asignarRed(nombreDisp2, red.nombre);
 
         // Se envía el activo
         sistema.enviarActivo(nombreDisp1, nombreDisp2, activoComponente.activos[0].nombre);
