@@ -23,11 +23,14 @@ function CheckableItem({
         }
     };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        e.stopPropagation();
+    const handleChange = () => {
         if (!disabled) {
             onChange?.(!checked);
         }
+    };
+
+    const handleCheckboxClick = (e: React.MouseEvent<HTMLInputElement>) => {
+        e.stopPropagation();
     };
 
     return (
@@ -42,6 +45,7 @@ function CheckableItem({
                     type="checkbox"
                     checked={checked}
                     onChange={handleChange}
+                    onClick={handleCheckboxClick}
                     disabled={disabled}
                     className={styles.checkbox}
                 />
