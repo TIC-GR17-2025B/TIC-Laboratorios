@@ -1,0 +1,66 @@
+.vistaTopologica{
+    border: 1px solid var(--border-primary);
+    padding: 3rem 2rem;
+    border-radius: var(--border-radius);
+}
+.zonas{
+    display: flex;
+    gap: 60px;
+}
+
+.contenedorNodo{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: fit-content;
+    gap: 8px;
+}
+
+.nodo{
+    background-color: #656565;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    position: relative;
+}
+.nombreNodo{
+    font-size: 12px;
+}
+.indicadorConectado{
+    background-color: #52F88F;
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    outline: 2px solid var(--surface-primary);
+    position: absolute;
+    top: 0;
+    right: 2px;
+    top: 2px;
+}
+
+.zonaTopologia{
+    background-color: var(--surface-secondary);
+    border: 1px solid var(--border-primary);
+    display: flex;
+    flex-direction: column;
+    gap: 60px;
+    padding: 16px;
+    border-radius: 8px;
+}
+.zonaTopologiaNombre{
+    font-size: 13px;
+    margin-bottom: 10px; 
+}
+.internet{
+    display: flex;
+    gap: 60px;
+    margin-top: 40px;
+}
+.internet > *{
+    padding: 16px;
+}
