@@ -1,7 +1,7 @@
 import { ActivoComponent, DispositivoComponent, RouterComponent  } from "../components";
 import { RedComponent } from "../components";
 import { Sistema } from "../core";
-import { TipoProtocolo, PROTOCOLOS } from "../../types/TrafficEnums";
+import { TipoProtocolo } from "../../types/TrafficEnums";
 import type { RegistroTrafico, RegistroFirewallBloqueado, RegistroFirewallPermitido } from "../../types/TrafficEnums";
 import { EventosRed } from "../../types/EventosEnums";
 import type { Activo } from "../../types/EscenarioTypes";
@@ -63,12 +63,6 @@ export class SistemaRed extends Sistema {
     }
 
     private enviarActivo(dispEnvio: string, dispReceptor: string, activo: string): void {
-        // Verificar conectividad
-        // if (!this.estanConectados(dispEnvio, dispReceptor)) {
-        //     console.log("El dispositivo receptor no está conectado a una red del dispositivo de envío");
-        //     return;
-        // }
-
         // Obtener lista de activos del receptor
         let activosDispR;
         for (const [,c] of this.ecsManager.getEntidades()) {
@@ -117,11 +111,6 @@ export class SistemaRed extends Sistema {
         return redes;
     }
 
-    // private getDispositivo(entidadId: number): DispositivoComponent | null {
-    //     const componentes = this.ecsManager.getComponentes(entidadId);
-    //     return componentes?.get(DispositivoComponent) || null;
-    // }
-
     private estanConectados(nombreDispOrigen: string, nombreDispDestino: string): boolean {
         const redes = this.getRedes();
         
@@ -131,20 +120,24 @@ export class SistemaRed extends Sistema {
             red.dispositivosConectados.includes(nombreDispDestino)
         );
         
+        console.log("Llegó caso 1")
         if (mismaRed) {
+            console.log("Verificó caso 1")
             return true;
         }
         
         // Caso 2: Uno interno y otro externo - verificar si hay router con Internet
         const origenEnRed = redes.some(red => red.dispositivosConectados.includes(nombreDispOrigen));
         const destinoEnRed = redes.some(red => red.dispositivosConectados.includes(nombreDispDestino));
-        
+       
+        console.log("Llegó caso 2")
         // Si uno está en red y otro no, verificar router con Internet
         if (origenEnRed !== destinoEnRed) {
             // Buscar router con Internet en la red del dispositivo interno
             for (const container of this.ecsManager.getEntidades().values()) {
                 const router = container.get(RouterComponent);
                 const red = container.get(RedComponent);
+                console.log(red?.nombre, red?.dispositivosConectados);
                 
                 if (router?.conectadoAInternet && red) {
                     // Verificar que el dispositivo interno esté en esta red
@@ -155,7 +148,8 @@ export class SistemaRed extends Sistema {
                 }
             }
         }
-        
+       
+        console.log("LLegó caso 3")
         // Caso 3: Ambos en redes diferentes - verificar si ambos tienen routers con Internet
         if (origenEnRed && destinoEnRed) {
             let routerOrigenTieneInternet = false;
@@ -174,7 +168,8 @@ export class SistemaRed extends Sistema {
                     }
                 }
             }
-            
+           
+            console.log("Llegó a ultimo if caso 3")
             // Si ambos routers tienen internet, pueden comunicarse a través de internet
             if (routerOrigenTieneInternet && routerDestinoTieneInternet) {
                 return true;

@@ -1,4 +1,5 @@
 import { EventosRed } from "../../types/EventosEnums";
+import type { DireccionTrafico } from "../../types/FirewallTypes";
 import { TipoProtocolo } from "../../types/TrafficEnums";
 import type { ECSManager } from "../core";
 import { SistemaRed } from "../systems";
@@ -48,4 +49,67 @@ export class RedController {
       console.log(`Se envió el activo "${d.nombreActivo}" desde ${d.d1} hacia ${d.d2}.`);
     });
   }
+
+  public asignarRed(nombreDisp: string, nombreRed: string): void {
+    if (!this.sistemaRed) {
+      console.error("Sistema de red no inicializado");
+      return;
+    }
+    this.sistemaRed.asignarRed(nombreDisp, nombreRed);
+  }
+
+  public toggleActivacionFirewall(nombreRouter: string, habilitado: boolean): void {
+    if (!this.sistemaRed) {
+      console.error("Sistema de red no inicializado");
+      return;
+    }
+
+    this.sistemaRed.toggleFirewall(nombreRouter, habilitado);
+  }
+
+  public agregarReglaFirewall(nombreRouter: string,
+    protocolo: TipoProtocolo,
+    accion: "PERMITIR" | "DENEGAR",
+    direccion: DireccionTrafico
+  ): void {
+    if (!this.sistemaRed) {
+      console.error("Sistema de red no inicializado");
+      return;
+    }
+    this.sistemaRed.agregarReglaFirewall(nombreRouter, protocolo, accion, direccion);
+  }
+
+  public agregarExcepcionFirewall(
+    nombreRouter: string,
+    protocolo: TipoProtocolo,
+    nombreDispositivo: string,
+    accion: "PERMITIR" | "DENEGAR",
+    direccion: DireccionTrafico
+  ): void {
+    if (!this.sistemaRed) {
+      console.error("Sistema de red no inicializado");
+      return;
+    }
+    this.sistemaRed.agregarExcepcionFirewall(nombreRouter, protocolo, nombreDispositivo, accion, direccion);
+  }
+
+  public setPoliticaFirewall(
+    nombreRouter: string,
+    politica: "PERMITIR" | "DENEGAR"
+  ): void {
+    if (!this.sistemaRed) {
+      console.error("Sistema de red no inicializado");
+      return;
+    }
+    this.sistemaRed.setPoliticaFirewall(nombreRouter, politica);
+  }
+
+  public obtenerRouters(): string[] {
+    if (!this.sistemaRed) {
+      console.error("Sistema de red no inicializado");
+      return [];
+    }
+    return this.sistemaRed.obtenerRouters();
+  }
+
 }

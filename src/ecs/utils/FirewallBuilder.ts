@@ -21,8 +21,7 @@ export class FirewallBuilder {
     return this;
   }
 
-  //Establece la política por defecto (aplicada cuando no hay reglas específicas)
-   
+  //Establece la política por defecto (aplicada cuando no hay reglas específicas) 
   setPoliticaPorDefecto(politica: AccionFirewall): this {
     this.config.politicaPorDefecto = politica;
     return this;
