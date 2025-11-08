@@ -1,9 +1,9 @@
 import { EventosRed } from "../../types/EventosEnums";
 import type { DireccionTrafico } from "../../types/FirewallTypes";
 import { TipoProtocolo } from "../../types/TrafficEnums";
-import type { ECSManager } from "../core";
+import type { ECSManager, Entidad } from "../core";
 import { SistemaRed } from "../systems";
-import { DispositivoComponent, RouterComponent, RedComponent } from "../components";
+import { DispositivoComponent, RouterComponent, RedComponent, ZonaComponent, EspacioComponent, OficinaComponent } from "../components";
 
 export class RedController {
   public ecsManager: ECSManager;
@@ -267,4 +267,69 @@ export class RedController {
     return false;
   }
 
+  // Se obtienen todas las redes que pertenecen a la zona del dispositivo indicado
+  public getRedesZonaPorDispositivo(nombreDisp: string): RedComponent[] {
+    let redesZonaDispActual: RedComponent[] = [];
+
+    let entidadDispActual: Entidad;
+
+    // Se busca la entidad que coincida con el nombre del dispositivo
+    for (const [entidad, c] of this.ecsManager.getEntidades()) {
+      if (c.tiene(DispositivoComponent)) {
+        if (c.get(DispositivoComponent)?.nombre == nombreDisp) {
+          entidadDispActual = entidad;
+          break;
+        }
+      }
+    }
+
+    let entidadEspacioDispActual: Entidad;
+
+    // Con la entidad del dispositivo se busca a qué espacio pertence
+    for (const [entidad, c] of this.ecsManager.getEntidades()) {
+      if (c.tiene(EspacioComponent)) {
+        if (c.get(EspacioComponent)?.dispositivos.includes(entidadDispActual!)) {
+          entidadEspacioDispActual = entidad; 
+          break;
+        }
+      }
+    }
+    
+    let entidadOficinaDispActual: Entidad;
+
+    // Con la entidad del espacio se busca a qué oficina pertence
+    for (const [entidad, c] of this.ecsManager.getEntidades()) {
+      if (c.tiene(OficinaComponent)) {
+        if (c.get(OficinaComponent)?.espacios.includes(entidadEspacioDispActual!)) {
+          entidadOficinaDispActual = entidad; 
+          break;
+        }
+      }
+    }
+
+    let zonaDispActual: string;
+
+    // Con la entidad de la oficina se busca a qué zona pertence,
+    // y cuando la encuentre se extrae el nombre de la zona a la que pertenece
+    for (const [,c] of this.ecsManager.getEntidades()) {
+      if (c.tiene(ZonaComponent)) {
+        if (c.get(ZonaComponent)?.oficinas.includes(entidadOficinaDispActual!)) {
+          zonaDispActual = c.get(ZonaComponent)?.nombre!; 
+          break;
+        }
+      }
+    }
+
+    // Con el nombre de la zona del dispositivo actual, se busca 
+    // entre las entidades de redes, cuáles son las que están definidas para esa zona
+    for (const [,c] of this.ecsManager.getEntidades()) {
+      if (c.tiene(RedComponent)) {
+        if (c.get(RedComponent)?.zona == zonaDispActual!) {
+          redesZonaDispActual.push(c.get(RedComponent)!);
+        }
+      }
+    }
+
+    return redesZonaDispActual;
+  }
 }
