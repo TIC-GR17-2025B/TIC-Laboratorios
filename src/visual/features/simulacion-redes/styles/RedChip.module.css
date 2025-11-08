@@ -1,0 +1,10 @@
+.colorDot {
+  height: 8px;
+  width: 8px;
+  border-radius: 50%;
+}
+.redChipContainer {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}

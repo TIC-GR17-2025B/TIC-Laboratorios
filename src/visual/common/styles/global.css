@@ -250,3 +250,8 @@ body.context-mode-active [data-context]:hover::after {
 .IaActivo::before {
   animation: shimmerSlide 2.5s ease-in-out infinite;
 }
+.react-flow__node-group {
+  background-color: var(--surface-secondary) !important;
+  border: 1px solid var(--border-primary) !important;
+  border-radius: 8px !important;
+}
