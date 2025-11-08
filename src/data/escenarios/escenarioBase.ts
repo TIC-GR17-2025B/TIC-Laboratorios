@@ -103,8 +103,8 @@ export const escenarioBase: unknown = {
               dispositivos: [
                 {
                   id: 1003,
-                  tipo: TipoDispositivo.WORKSTATION,
-                  nombre: "Computadora Jacob",
+                  tipo: TipoDispositivo.ROUTER,
+                  nombre: "ROUTER Jacob",
                   sistemaOperativo: "pfSense",
                   hardware: "Fortinet FortiGate 200F",
                   software: "IDS/IPS, VPN",

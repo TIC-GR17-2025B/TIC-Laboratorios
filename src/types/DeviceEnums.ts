@@ -9,20 +9,20 @@ export enum TipoDispositivo {
   SERVER = "server",
   ROUTER = "router",
   SWITCH = "switch",
-  PORTATIL = "portatil",
+  VPN = "vpn",
   NAS = "nas",
   OTRO = "otro",
 }
 
 export enum EstadoAtaqueDispositivo {
-    NORMAL = "normal",
-    COMPROMETIDO = "comprometido", // Que está bajo un ataque
+  NORMAL = "normal",
+  COMPROMETIDO = "comprometido", // Que está bajo un ataque
 }
 
 export enum TipoAtaque {
-    INFECCION_TROYANO = "Infección de troyano",
+  INFECCION_TROYANO = "Infección de troyano",
 }
 
 export enum TipoEvento {
-    ENVIO_ACTIVO = "Envío de activo",
+  ENVIO_ACTIVO = "Envío de activo",
 }

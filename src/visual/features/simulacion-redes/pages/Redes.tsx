@@ -2,6 +2,7 @@ import { useState } from "react";
 import Toggle from "../../../common/components/Toggle";
 import styles from "../styles/Redes.module.css";
 import VistaTabla from "../components/VistaTabla";
+import VistaTopologica from "../components/VistaTopologica";
 
 const opcionesVista = [
     { value: 'topologia', label: 'Topología' },
@@ -17,8 +18,8 @@ export default function Redes() {
         {
             <div className={styles.contenedorVistas}>
                 {vistaSeleccionada === 'topologia' ? (
-                    <div className={styles.vistaTopologia}>Vista de Topología de Redes (a implementar)</div>
-                ) : (
+                    <VistaTopologica />
+                    ) : (
                     <VistaTabla />
                 )}
             </div>
