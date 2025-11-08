@@ -273,8 +273,8 @@ export class RedController {
   }
 
   // Se obtienen todas las redes que pertenecen a la zona del dispositivo indicado
-  public getRedesZonaPorDispositivo(nombreDisp: string): RedComponent[] {
-    let redesZonaDispActual: RedComponent[] = [];
+  public getRedesZonaPorDispositivo(nombreDisp: string): string[] {
+    let redesZonaDispActual: string[] = [];
 
     let entidadDispActual: Entidad;
 
@@ -330,7 +330,7 @@ export class RedController {
     for (const [,c] of this.ecsManager.getEntidades()) {
       if (c.tiene(RedComponent)) {
         if (c.get(RedComponent)?.zona == zonaDispActual!) {
-          redesZonaDispActual.push(c.get(RedComponent)!);
+          redesZonaDispActual.push(c.get(RedComponent)?.nombre!);
         }
       }
     }
