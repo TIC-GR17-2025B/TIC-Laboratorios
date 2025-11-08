@@ -1,4 +1,4 @@
-import { ActivoComponent, RedComponent } from "../components";
+import { ActivoComponent, RouterComponent, RedComponent } from "../components";
 import { Sistema } from "../core";
 import { TipoProtocolo } from "../../types/TrafficEnums";
 import type { DireccionTrafico } from "../../types/FirewallTypes";
@@ -12,7 +12,7 @@ import {
 
 // Sistema encargado de gestionar redes, conectividad y firewalls
 export class SistemaRed extends Sistema {
-    public componentesRequeridos = new Set([ActivoComponent, RedComponent]);
+    public componentesRequeridos = new Set([ActivoComponent, RouterComponent]);
 
     // Servicios especializados
     private conectividadService: ConectividadService;
@@ -74,21 +74,27 @@ export class SistemaRed extends Sistema {
 
     // Conecta un dispositivo a una red específica
     public asignarRed(nombreDisp: string, nombreRed: string): void {
-        // Obtenemos la red
-        let red;
-        for (const [,c] of this.ecsManager.getEntidades()) {
-            if (c.get(RedComponent)?.nombre == nombreRed) {
-                red = c.get(RedComponent);
+        // Buscar la red como entidad RedComponent
+        let redEncontrada;
+        for (const [, container] of this.ecsManager.getEntidades()) {
+            const redComp = container.get(RedComponent);
+            if (redComp && redComp.nombre === nombreRed) {
+                redEncontrada = redComp;
                 break;
             }
         }
 
-        // Verificamos que el dispositivo no esté en la red
-        if(red?.dispositivosConectados.some((d) => d == nombreDisp)){
+        if (!redEncontrada) {
+            console.warn(`Red "${nombreRed}" no encontrada`);
             return;
         }
 
-        red?.dispositivosConectados.push(nombreDisp);
+        // Verificamos que el dispositivo no esté en la red
+        if(redEncontrada.dispositivosConectados.some((d) => d === nombreDisp)){
+            return;
+        }
+
+        redEncontrada.dispositivosConectados.push(nombreDisp);
     }
 
     // Envía tráfico entre dos dispositivos validando conectividad y firewall
@@ -99,17 +105,14 @@ export class SistemaRed extends Sistema {
         protocolo: TipoProtocolo,
         payload: unknown
     ): boolean {
-        // Verificar conectividad
         if (!this.getConectividadService().estanConectados(dispOrigen, dispDestino)) {
             return false;
         }
 
-        // Verificar firewall
         if (!this.getFirewallService().validarFirewall(dispOrigen, dispDestino, protocolo)) {
             return false;
         }
 
-        // Se verifica qué tipo de comunicación es y según eso se aplica el método correspondiente
         switch(protocolo){
             case TipoProtocolo.FTP: {
                 const activo = payload as string;
@@ -124,14 +127,11 @@ export class SistemaRed extends Sistema {
         
         return true;
     }
-    /**
-     * Habilita o deshabilita el firewall de un router
-     */
+
     public toggleFirewall(nombreRouter: string, habilitado: boolean): void {
         this.getFirewallConfigService().toggleFirewall(nombreRouter, habilitado);
     }
 
-    // Agrega una regla global al firewall de un router
     public agregarReglaFirewall(
         nombreRouter: string,
         protocolo: TipoProtocolo,
@@ -141,7 +141,6 @@ export class SistemaRed extends Sistema {
         this.getFirewallConfigService().agregarReglaFirewall(nombreRouter, protocolo, accion, direccion);
     }
 
-    // Agrega una excepción (regla por dispositivo específico) al firewall
     public agregarExcepcionFirewall(
         nombreRouter: string,
         protocolo: TipoProtocolo,
@@ -158,7 +157,6 @@ export class SistemaRed extends Sistema {
         );
     }
 
-    // Cambia la política por defecto del firewall de un router
     public setPoliticaFirewall(
         nombreRouter: string,
         politica: "PERMITIR" | "DENEGAR"
@@ -166,7 +164,6 @@ export class SistemaRed extends Sistema {
         this.getFirewallConfigService().setPoliticaFirewall(nombreRouter, politica);
     }
 
-    // Cambia la política por defecto para tráfico SALIENTE
     public setPoliticaFirewallSaliente(
         nombreRouter: string,
         politica: "PERMITIR" | "DENEGAR"
@@ -174,7 +171,6 @@ export class SistemaRed extends Sistema {
         this.getFirewallConfigService().setPoliticaFirewallSaliente(nombreRouter, politica);
     }
 
-    // Cambia la política por defecto para tráfico ENTRANTE
     public setPoliticaFirewallEntrante(
         nombreRouter: string,
         politica: "PERMITIR" | "DENEGAR"

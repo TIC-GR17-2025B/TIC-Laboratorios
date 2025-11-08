@@ -60,7 +60,7 @@ export const escenarioBase: unknown = {
       nombre: "LAN1",
       color: "#00DD00",
       dispositivosConectados: ["Computadora Administrativa", "Computadora Jacob"],
-      zona: "Edificio Principal - Piso 1"
+      zona: "Edificio Principal - Piso 1",
     },
   ],
   zonas: [
@@ -129,12 +129,8 @@ export const escenarioBase: unknown = {
                   posicion: { x: 1.5, y: 0, z: 2, rotacionY: 180 },
                   // Configuración de router
                   conectadoAInternet: true,
-                  // Configuración de red
-                  red: {
-                    nombre: "LAN1",
-                    color: "#00DD00",
-                    dispositivosConectados: ["Computadora Administrativa", "Computadora Jacob"],
-                  },
+                  // Referencias a redes (solo nombres)
+                  redes: ["LAN1"],
                 },
               ],
             },

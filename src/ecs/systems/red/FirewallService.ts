@@ -84,30 +84,44 @@ export class FirewallService {
         nombreDestino: string,
         protocolo: TipoProtocolo
     ): boolean {
-        const redRouter = this.conectividadService.obtenerRedDelRouter(router);
+        // Obtener las redes del router resolviendo las entidades
+        const redes = this.conectividadService.obtenerRedesDelRouter(router);
         
-        if (!redRouter) {
-            return true; // Sin red, permitir tráfico
+        // Sin redes configuradas, permitir tráfico
+        if (redes.length === 0) {
+            return true;
         }
 
-        // Verificar si origen y destino están en la red interna
-        const origenEnRedInterna = redRouter.dispositivosConectados.includes(nombreOrigen);
-        const destinoEnRedInterna = redRouter.dispositivosConectados.includes(nombreDestino);
+        // Buscar en qué redes están el origen y destino
+        let origenEnRedInterna = false;
+        let destinoEnRedInterna = false;
+        let mismaRed = false;
 
-        // Si AMBOS están en la red interna → Tráfico LOCAL, no aplica firewall
-        if (origenEnRedInterna && destinoEnRedInterna) {
-            return true; // Permitir siempre tráfico interno
+        for (const red of redes) {
+            const origenEnEstaRed = red.dispositivosConectados.includes(nombreOrigen);
+            const destinoEnEstaRed = red.dispositivosConectados.includes(nombreDestino);
+            
+            if (origenEnEstaRed) origenEnRedInterna = true;
+            if (destinoEnEstaRed) destinoEnRedInterna = true;
+            
+            // Si ambos están en la MISMA red, es tráfico local
+            if (origenEnEstaRed && destinoEnEstaRed) {
+                mismaRed = true;
+                break;
+            }
         }
 
-        // Si NINGUNO está en la red → No gestiona este router
+        // Si AMBOS están en la misma red interna → Tráfico LOCAL, no aplica firewall
+        if (mismaRed) {
+            return true; // Permitir siempre tráfico interno en la misma red
+        }
         if (!origenEnRedInterna && !destinoEnRedInterna) {
-            return true; // No es responsabilidad de este router
+            return true; 
         }
 
         // Determinar dirección del tráfico (origen en red → SALIENTE, destino en red → ENTRANTE)
         const direccion = origenEnRedInterna ? 'SALIENTE' : 'ENTRANTE';
 
-        // Evaluar regla del firewall con dirección
         return this.evaluarReglaFirewall(
             router.firewall, 
             protocolo, 
@@ -116,10 +130,7 @@ export class FirewallService {
         );
     }
 
-    /**
-     * Evalúa una regla de firewall específica
-     * Prioridad: Excepciones > Reglas Globales > Política por defecto
-     */
+    // Evalúa las reglas del firewall según protocolo, dispositivo y dirección
     evaluarReglaFirewall(
         firewall: ConfiguracionFirewall,
         protocolo: TipoProtocolo,

@@ -330,11 +330,7 @@ export class ScenarioBuilder {
       tipo?: unknown;
       posicion?: { x: number; y: number; z: number; rotacionY?: number };
       conectadoAInternet?: boolean;
-      red?: {
-        nombre: string;
-        color: string;
-        dispositivosConectados: string[];
-      };
+      redes?: string[]; // Array de NOMBRES de redes (referencias)
     };
     
     // 1. Agregar DispositivoComponent (routers no tienen estadoAtaque)
@@ -360,27 +356,35 @@ export class ScenarioBuilder {
       )
     );
 
-    // 3. Agregar RouterComponent con firewall
+    // 3. Buscar las entidades RedComponent existentes por nombre
+    const redesIds: Entidad[] = [];
+    const nombresRedes = r.redes ?? [];
+    
+    for (const nombreRed of nombresRedes) {
+      let redEncontrada = false;
+      for (const [entidadId, container] of this.ecsManager.getEntidades()) {
+        const redComp = container.get(RedComponent);
+        if (redComp && redComp.nombre === nombreRed) {
+          redesIds.push(entidadId);
+          redEncontrada = true;
+          break;
+        }
+      }
+      
+      if (!redEncontrada) {
+        console.warn(`Red "${nombreRed}" no encontrada para el router "${r.nombre}". Asegúrate de definir la red en escenario.redes antes de referenciarla.`);
+      }
+    }
+
+    // 4. Agregar RouterComponent con firewall y referencias a redes
     const firewallConfig = new FirewallBuilder().build();
+    
     this.ecsManager.agregarComponente(
       entidadRouter,
-      new RouterComponent(r.conectadoAInternet ?? true, firewallConfig)
+      new RouterComponent(r.conectadoAInternet ?? true, firewallConfig, redesIds)
     );
     
-    // 4. Si tiene configuración de red, agregar RedComponent
-    if (r.red) {
-      this.ecsManager.agregarComponente(
-        entidadRouter,
-        new RedComponent(
-          r.red.nombre,
-          r.red.color,
-          r.red.dispositivosConectados,
-          "" // zona vacía por ahora
-        )
-      );
-    }
-    
-    // 5. Agregar relación con espacio
+    // 4. Agregar relación con espacio
     const relacion = new SistemaRelaciones(
       EspacioComponent,
       DispositivoComponent,

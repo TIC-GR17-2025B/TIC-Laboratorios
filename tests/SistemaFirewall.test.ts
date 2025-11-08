@@ -5,10 +5,11 @@ import { TipoProtocolo } from '../src/types/TrafficEnums';
 import { FirewallBuilder } from '../src/ecs/utils/FirewallBuilder';
 import { 
   DispositivoComponent, 
-  RedComponent,
-  RouterComponent
+  RouterComponent,
+  RedComponent
 } from '../src/ecs/components';
 import { EstadoAtaqueDispositivo, TipoDispositivo } from '../src/types/DeviceEnums';
+import type { Entidad } from '../src/ecs/core/Componente';
 
 describe("SistemaFirewall - Casos Completos", () => {
   let em: ECSManager;
@@ -19,6 +20,13 @@ describe("SistemaFirewall - Casos Completos", () => {
     sistema = new SistemaRed();
     em.agregarSistema(sistema);
   });
+
+  // Helper para crear entidades de red
+  function crearRed(nombre: string, color: string, dispositivos: string[], zona: string = ""): Entidad {
+    const entidadRed = em.agregarEntidad();
+    em.agregarComponente(entidadRed, new RedComponent(nombre, color, dispositivos, zona));
+    return entidadRed;
+  }
 
 
   test("Caso 3: No permitir tráfico con filtro activado (protocolo específico denegado)", () => {
@@ -39,9 +47,9 @@ describe("SistemaFirewall - Casos Completos", () => {
       new DispositivoComponent("router1", "Cisco", "hw", 
         TipoDispositivo.ROUTER, EstadoAtaqueDispositivo.NORMAL)
     );
-    em.agregarComponente(router, 
-      new RedComponent("LAN", "#00FF00", ["pc-interno"], "zona1")
-    );
+    
+    // Configurar redes del router
+    const red1 = crearRed("LAN", "#00FF00", ["pc-interno"]);
     
     // Firewall: Permite todo excepto SSH en AMBAS direcciones
     const firewallConfig = new FirewallBuilder()
@@ -49,7 +57,7 @@ describe("SistemaFirewall - Casos Completos", () => {
       .agregarReglaGlobal(TipoProtocolo.SSH, 'DENEGAR', 'AMBAS')
       .build();
     
-    em.agregarComponente(router, new RouterComponent(true, firewallConfig));
+    em.agregarComponente(router, new RouterComponent(true, firewallConfig, [red1]));
 
     // SSH: BLOQUEADO (regla global)
     const resultadoSSH = sistema.enviarTrafico("pc-interno", "servidor-externo", TipoProtocolo.SSH, null);
@@ -84,9 +92,9 @@ describe("SistemaFirewall - Casos Completos", () => {
       new DispositivoComponent("router1", "Cisco", "hw", 
         TipoDispositivo.ROUTER, EstadoAtaqueDispositivo.NORMAL)
     );
-    em.agregarComponente(router, 
-      new RedComponent("LAN", "#00FF00", ["admin1", "user1"], "zona1")
-    );
+    
+    // Configurar redes del router
+    const red1 = crearRed("LAN", "#00FF00", ["admin1", "user1"]);
     
     // Firewall: Bloquea SSH excepto para admin1 (SALIENTE)
     const firewallConfig = new FirewallBuilder()
@@ -95,7 +103,7 @@ describe("SistemaFirewall - Casos Completos", () => {
       .agregarExcepcion(TipoProtocolo.SSH, 'admin1', 'PERMITIR', 'SALIENTE')
       .build();
     
-    em.agregarComponente(router, new RouterComponent(true, firewallConfig));
+    em.agregarComponente(router, new RouterComponent(true, firewallConfig, [red1]));
 
     // admin1 → externo: PERMITIDO (excepción)
     const resultadoAdmin = sistema.enviarTrafico("admin1", "servidor-externo", TipoProtocolo.SSH, null);
@@ -130,9 +138,9 @@ describe("SistemaFirewall - Casos Completos", () => {
       new DispositivoComponent("router1", "Cisco", "hw", 
         TipoDispositivo.ROUTER, EstadoAtaqueDispositivo.NORMAL)
     );
-    em.agregarComponente(router, 
-      new RedComponent("LAN", "#00FF00", ["pc-seguro", "malware-pc"], "zona1")
-    );
+    
+    // Configurar redes del router
+    const red1 = crearRed("LAN", "#00FF00", ["pc-seguro", "malware-pc"]);
     
     // Firewall: Permite HTTPS excepto para malware-pc (SALIENTE)
     const firewallConfig = new FirewallBuilder()
@@ -140,7 +148,7 @@ describe("SistemaFirewall - Casos Completos", () => {
       .agregarExcepcion(TipoProtocolo.WEB_SERVER_SSL, 'malware-pc', 'DENEGAR', 'SALIENTE')
       .build();
     
-    em.agregarComponente(router, new RouterComponent(true, firewallConfig));
+    em.agregarComponente(router, new RouterComponent(true, firewallConfig, [red1]));
 
     // pc-seguro → externo: PERMITIDO (política por defecto)
     const resultadoPcSeguro = sistema.enviarTrafico("pc-seguro", "servidor-externo", TipoProtocolo.WEB_SERVER_SSL, null);
@@ -177,9 +185,9 @@ describe("SistemaFirewall - Casos Completos", () => {
       new DispositivoComponent("router1", "Cisco", "hw", 
         TipoDispositivo.ROUTER, EstadoAtaqueDispositivo.NORMAL)
     );
-    em.agregarComponente(router, 
-      new RedComponent("LAN", "#00FF00", ["pc1", "server1"], "zona1")
-    );
+    
+    // Configurar redes del router
+    const red1 = crearRed("LAN", "#00FF00", ["pc1", "server1"]);
     
     // Firewall: Bloquea tráfico saliente
     const firewallConfig = new FirewallBuilder()
@@ -187,7 +195,7 @@ describe("SistemaFirewall - Casos Completos", () => {
       .setPoliticaSaliente('DENEGAR')
       .build();
     
-    em.agregarComponente(router, new RouterComponent(true, firewallConfig));
+    em.agregarComponente(router, new RouterComponent(true, firewallConfig, [red1]));
 
     // pc1 → server1: INTERNO → PERMITIDO (no pasa por firewall)
     const resultadoInterno = sistema.enviarTrafico("pc1", "server1", TipoProtocolo.SSH, null);
@@ -216,9 +224,9 @@ describe("SistemaFirewall - Casos Completos", () => {
       new DispositivoComponent("router1", "Cisco", "hw", 
         TipoDispositivo.ROUTER, EstadoAtaqueDispositivo.NORMAL)
     );
-    em.agregarComponente(router, 
-      new RedComponent("LAN", "#00FF00", ["pc-interno"], "zona1")
-    );
+    
+    // Configurar redes del router
+    const red1 = crearRed("LAN", "#00FF00", ["pc-interno"]);
     
     // Firewall: Bloquea SSH entrante (Direction: TO)
     const firewallConfig = new FirewallBuilder()
@@ -226,7 +234,7 @@ describe("SistemaFirewall - Casos Completos", () => {
       .agregarReglaGlobal(TipoProtocolo.SSH, 'DENEGAR', 'ENTRANTE')
       .build();
     
-    em.agregarComponente(router, new RouterComponent(true, firewallConfig));
+    em.agregarComponente(router, new RouterComponent(true, firewallConfig, [red1]));
 
     // Externo → interno: BLOQUEADO (regla ENTRANTE)
     const resultadoEntrante = sistema.enviarTrafico("atacante-externo", "pc-interno", TipoProtocolo.SSH, null);
@@ -255,9 +263,9 @@ describe("SistemaFirewall - Casos Completos", () => {
       new DispositivoComponent("router1", "Cisco", "hw", 
         TipoDispositivo.ROUTER, EstadoAtaqueDispositivo.NORMAL)
     );
-    em.agregarComponente(router, 
-      new RedComponent("LAN", "#00FF00", ["pc-interno"], "zona1")
-    );
+    
+    // Configurar redes del router
+    const red1 = crearRed("LAN", "#00FF00", ["pc-interno"]);
     
     // Firewall: Usuario marca SSH, FTP y TELNET como denegados
     const firewallConfig = new FirewallBuilder()
@@ -269,7 +277,7 @@ describe("SistemaFirewall - Casos Completos", () => {
       )
       .build();
     
-    em.agregarComponente(router, new RouterComponent(true, firewallConfig));
+    em.agregarComponente(router, new RouterComponent(true, firewallConfig, [red1]));
 
     // Los 3 protocolos deben estar bloqueados
     expect(sistema.enviarTrafico("pc-interno", "servidor-externo", TipoProtocolo.SSH, null)).toBe(false);
@@ -298,12 +306,11 @@ describe("SistemaFirewall - Casos Completos", () => {
       new DispositivoComponent("router1", "Cisco", "hw", 
         TipoDispositivo.ROUTER, EstadoAtaqueDispositivo.NORMAL)
     );
-    em.agregarComponente(router, 
-      new RedComponent("LAN", "#00FF00", ["pc-interno"], "zona1")
-    );
     
-    // Firewall: Usuario hace click en "Deny All" → Marca TODOS los protocolos
-    // Bloquea en AMBAS direcciones (saliente Y entrante)
+    // Configurar redes del router
+    const red1 = crearRed("LAN", "#00FF00", ["pc-interno"]);
+    
+    // Firewall: Usuario hace click en "Deny All" 
     const firewallConfig = new FirewallBuilder()
       .setPoliticaPorDefecto('PERMITIR')
       .agregarReglasGlobales(
@@ -313,16 +320,14 @@ describe("SistemaFirewall - Casos Completos", () => {
           TipoProtocolo.TELNET,
           TipoProtocolo.WEB_SERVER,
           TipoProtocolo.WEB_SERVER_SSL,
-          // En producción: TODOS los protocolos del enum
         ],
         'DENEGAR',
         'AMBAS' // ← Bloquea en ambas direcciones
       )
       .build();
     
-    em.agregarComponente(router, new RouterComponent(true, firewallConfig));
+    em.agregarComponente(router, new RouterComponent(true, firewallConfig, [red1]));
 
-    // TODO debe estar bloqueado (saliente Y entrante)
     expect(sistema.enviarTrafico("pc-interno", "servidor-externo", TipoProtocolo.SSH, null)).toBe(false);
     expect(sistema.enviarTrafico("pc-interno", "servidor-externo", TipoProtocolo.WEB_SERVER, null)).toBe(false);
     expect(sistema.enviarTrafico("servidor-externo", "pc-interno", TipoProtocolo.FTP, null)).toBe(false);
@@ -346,16 +351,16 @@ describe("SistemaFirewall - Casos Completos", () => {
       new DispositivoComponent("router1", "Cisco", "hw", 
         TipoDispositivo.ROUTER, EstadoAtaqueDispositivo.NORMAL)
     );
-    em.agregarComponente(router, 
-      new RedComponent("LAN", "#00FF00", ["pc-interno"], "zona1")
-    );
+    
+    // Configurar redes del router
+    const red1 = crearRed("LAN", "#00FF00", ["pc-interno"]);
     
     // Firewall: Usuario hace click en "Permit All" (configuración de fábrica)
     const firewallConfig = new FirewallBuilder()
       .setPoliticaPorDefecto('PERMITIR')
       .build();
     
-    em.agregarComponente(router, new RouterComponent(true, firewallConfig));
+    em.agregarComponente(router, new RouterComponent(true, firewallConfig, [red1]));
 
     // TODO debe estar permitido
     expect(sistema.enviarTrafico("pc-interno", "servidor-externo", TipoProtocolo.SSH, null)).toBe(true);
@@ -381,9 +386,9 @@ describe("SistemaFirewall - Casos Completos", () => {
       new DispositivoComponent("router1", "Cisco", "hw", 
         TipoDispositivo.ROUTER, EstadoAtaqueDispositivo.NORMAL)
     );
-    em.agregarComponente(router, 
-      new RedComponent("LAN", "#00FF00", ["server-dmz"], "zona1")
-    );
+    
+    // Configurar redes del router
+    const red1 = crearRed("LAN", "#00FF00", ["server-dmz"]);
     
     // Firewall: HTTP saliente permitido, HTTP entrante denegado
     const firewallConfig = new FirewallBuilder()
@@ -392,7 +397,7 @@ describe("SistemaFirewall - Casos Completos", () => {
       .agregarReglaGlobal(TipoProtocolo.WEB_SERVER, 'DENEGAR', 'ENTRANTE')
       .build();
     
-    em.agregarComponente(router, new RouterComponent(true, firewallConfig));
+    em.agregarComponente(router, new RouterComponent(true, firewallConfig, [red1]));
 
     // server-dmz → externo: PERMITIDO (regla SALIENTE)
     const resultadoSaliente = sistema.enviarTrafico("server-dmz", "cliente-externo", TipoProtocolo.WEB_SERVER, null);
@@ -421,9 +426,9 @@ describe("SistemaFirewall - Casos Completos", () => {
       new DispositivoComponent("router1", "Cisco", "hw", 
         TipoDispositivo.ROUTER, EstadoAtaqueDispositivo.NORMAL)
     );
-    em.agregarComponente(router, 
-      new RedComponent("LAN", "#00FF00", ["pc-interno"], "zona1")
-    );
+    
+    // Configurar redes del router
+    const red1 = crearRed("LAN", "#00FF00", ["pc-interno"]);
     
     // Firewall DESHABILITADO con reglas que normalmente bloquearían
     const firewallConfig = new FirewallBuilder()
@@ -432,7 +437,7 @@ describe("SistemaFirewall - Casos Completos", () => {
       .agregarReglaGlobal(TipoProtocolo.SSH, 'DENEGAR', 'AMBAS')
       .build();
     
-    em.agregarComponente(router, new RouterComponent(true, firewallConfig));
+    em.agregarComponente(router, new RouterComponent(true, firewallConfig, [red1]));
 
     // TODO debe pasar porque el firewall está deshabilitado
     expect(sistema.enviarTrafico("pc-interno", "servidor-externo", TipoProtocolo.SSH, null)).toBe(true);
@@ -452,9 +457,9 @@ describe("SistemaFirewall - Casos Completos", () => {
       new DispositivoComponent("router-madrid", "Cisco", "hw", 
         TipoDispositivo.ROUTER, EstadoAtaqueDispositivo.NORMAL)
     );
-    em.agregarComponente(routerZonaA, 
-      new RedComponent("LAN-Madrid", "#FF0000", ["pc-madrid"], "ZonaA-Madrid")
-    );
+    
+    // Configurar redes del router Madrid
+    const redMadrid = crearRed("LAN-Madrid", "#FF0000", ["pc-madrid"], "Zona A");
     
     // Router Madrid: conectado a internet, firewall ACTIVADO
     const firewallMadrid = new FirewallBuilder()
@@ -463,7 +468,7 @@ describe("SistemaFirewall - Casos Completos", () => {
       .agregarReglaGlobal(TipoProtocolo.SSH, 'DENEGAR', 'SALIENTE') // Bloquea SSH saliente
       .build();
     
-    em.agregarComponente(routerZonaA, new RouterComponent(true, firewallMadrid));
+    em.agregarComponente(routerZonaA, new RouterComponent(true, firewallMadrid, [redMadrid]));
 
     // ZONA B: Edificio en Barcelona
     const serverZonaB = em.agregarEntidad();
@@ -477,9 +482,9 @@ describe("SistemaFirewall - Casos Completos", () => {
       new DispositivoComponent("router-barcelona", "Cisco", "hw", 
         TipoDispositivo.ROUTER, EstadoAtaqueDispositivo.NORMAL)
     );
-    em.agregarComponente(routerZonaB, 
-      new RedComponent("LAN-Barcelona", "#0000FF", ["server-barcelona"], "ZonaB-Barcelona")
-    );
+    
+    // Configurar redes del router Barcelona
+    const redBarcelona = crearRed("LAN-Barcelona", "#0000FF", ["server-barcelona"], "Zona B");
     
     // Router Barcelona: conectado a internet, firewall ACTIVADO
     const firewallBarcelona = new FirewallBuilder()
@@ -488,7 +493,7 @@ describe("SistemaFirewall - Casos Completos", () => {
       .agregarReglaGlobal(TipoProtocolo.TELNET, 'DENEGAR', 'ENTRANTE') // Bloquea TELNET entrante
       .build();
     
-    em.agregarComponente(routerZonaB, new RouterComponent(true, firewallBarcelona));
+    em.agregarComponente(routerZonaB, new RouterComponent(true, firewallBarcelona, [redBarcelona]));
 
     // CASO 1: PC Madrid → Server Barcelona con WEB_SERVER
     // - Pasa por router-madrid (saliente): PERMITIDO (no hay regla para WEB)
