@@ -97,6 +97,24 @@ export const escenarioBase: unknown = {
               ],
             },
             {
+              id: 4,
+              mueble: Mueble.MESA,
+              posicion: { x: -2, y: 0, z: 0, rotacionY: 0 },
+              dispositivos: [
+                {
+                  id: 1007,
+                  tipo: TipoDispositivo.WORKSTATION,
+                  nombre: "Computadora Jacob",
+                  sistemaOperativo: "pfSense",
+                  hardware: "Fortinet FortiGate 200F",
+                  software: "IDS/IPS, VPN",
+                  posicion: { x: -2, y: 0, z: 0, rotacionY: 180 },
+                  estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
+                  activos: [],
+                },
+              ],
+            },
+            {
               id: 2,
               mueble: Mueble.MESA,
               posicion: { x: 3, y: 0, z: 0, rotacionY: 0 },

@@ -69,15 +69,10 @@ export class ScenarioBuilder {
           const espacioEntidad = this.crearEspacio(espacio, oficinaEntidad);
           const esp = espacio as { dispositivos?: Dispositivo[] };
           (esp.dispositivos ?? []).forEach((dispositivo: Dispositivo) => {
-            let dispositivoEntidad: Entidad;
-            
-            // Detectar si es un router y usar método específico
-            if (dispositivo.tipo === TipoDispositivo.ROUTER) {
-              dispositivoEntidad = this.crearRouter(dispositivo, espacioEntidad);
-            } else {
-              dispositivoEntidad = this.crearDispositivo(dispositivo, espacioEntidad);
-            }
-            
+            const dispositivoEntidad = this.crearDispositivo(
+              dispositivo,
+              espacioEntidad
+            );
             this.crearActivos(dispositivoEntidad, dispositivo.activos);
           });
         });
@@ -307,6 +302,41 @@ export class ScenarioBuilder {
         );
         break;
       }
+      case TipoDispositivo.ROUTER: {
+        const r = dispositivo as {
+          nombre?: string;
+          conectadoAInternet?: boolean;
+          redes?: string[]; // Array de NOMBRES de redes (referencias)
+        };
+        // Buscar las entidades RedComponent existentes por nombre
+        const redesIds: Entidad[] = [];
+        const nombresRedes = r.redes ?? [];
+        
+        for (const nombreRed of nombresRedes) {
+          let redEncontrada = false;
+          for (const [entidadId, container] of this.ecsManager.getEntidades()) {
+            const redComp = container.get(RedComponent);
+            if (redComp && redComp.nombre === nombreRed) {
+              redesIds.push(entidadId);
+              redEncontrada = true;
+              break;
+            }
+          }
+          
+          if (!redEncontrada) {
+            console.warn(`Red "${nombreRed}" no encontrada para el router "${r.nombre}". Asegúrate de definir la red en escenario.redes antes de referenciarla.`);
+          }
+        }
+
+        // Agregar RouterComponent con firewall y referencias a redes
+        const firewallConfig = new FirewallBuilder().build();
+        this.ecsManager.agregarComponente(
+          entidadDispositivo,
+          new RouterComponent(r.conectadoAInternet ?? true, firewallConfig, redesIds)
+        );
+
+        break;
+      }
     }
 
     // Agregar relación con espacio
@@ -319,81 +349,6 @@ export class ScenarioBuilder {
     relacion.agregar(espacioId, entidadDispositivo);
     
     return entidadDispositivo;
-  }
-
-  crearRouter(router: unknown, espacioId: number): Entidad {
-    const entidadRouter = this.ecsManager.agregarEntidad();
-    const r = router as {
-      nombre?: string;
-      sistemaOperativo?: string;
-      hardware?: string;
-      tipo?: unknown;
-      posicion?: { x: number; y: number; z: number; rotacionY?: number };
-      conectadoAInternet?: boolean;
-      redes?: string[]; // Array de NOMBRES de redes (referencias)
-    };
-    
-    // 1. Agregar DispositivoComponent (routers no tienen estadoAtaque)
-    this.ecsManager.agregarComponente(
-      entidadRouter,
-      new DispositivoComponent(
-        r.nombre ?? "",
-        r.sistemaOperativo ?? "",
-        r.hardware ?? "",
-        r.tipo as unknown as TipoDispositivo,
-        EstadoAtaqueDispositivo.NORMAL // Default para routers
-      )
-    );
-    
-    // 2. Agregar Transform (posición 3D)
-    this.ecsManager.agregarComponente(
-      entidadRouter,
-      new Transform(
-        r.posicion?.x ?? 0,
-        r.posicion?.y ?? 0,
-        r.posicion?.z ?? 0,
-        r.posicion?.rotacionY ?? 0
-      )
-    );
-
-    // 3. Buscar las entidades RedComponent existentes por nombre
-    const redesIds: Entidad[] = [];
-    const nombresRedes = r.redes ?? [];
-    
-    for (const nombreRed of nombresRedes) {
-      let redEncontrada = false;
-      for (const [entidadId, container] of this.ecsManager.getEntidades()) {
-        const redComp = container.get(RedComponent);
-        if (redComp && redComp.nombre === nombreRed) {
-          redesIds.push(entidadId);
-          redEncontrada = true;
-          break;
-        }
-      }
-      
-      if (!redEncontrada) {
-        console.warn(`Red "${nombreRed}" no encontrada para el router "${r.nombre}". Asegúrate de definir la red en escenario.redes antes de referenciarla.`);
-      }
-    }
-
-    // 4. Agregar RouterComponent con firewall y referencias a redes
-    const firewallConfig = new FirewallBuilder().build();
-    
-    this.ecsManager.agregarComponente(
-      entidadRouter,
-      new RouterComponent(r.conectadoAInternet ?? true, firewallConfig, redesIds)
-    );
-    
-    // 4. Agregar relación con espacio
-    const relacion = new SistemaRelaciones(
-      EspacioComponent,
-      DispositivoComponent,
-      "dispositivos"
-    );
-    relacion.ecsManager = this.ecsManager;
-    relacion.agregar(espacioId, entidadRouter);
-    
-    return entidadRouter;
   }
 
   crearActivos(entidadDispositivo: number, activos: any) {

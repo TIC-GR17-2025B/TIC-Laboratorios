@@ -49,6 +49,11 @@ export class RedController {
       const d = data as { d1: string, d2: string, nombreActivo: string };
       console.log(`Se envió el activo "${d.nombreActivo}" desde ${d.d1} hacia ${d.d2}.`);
     });
+
+    this.ecsManager.on(EventosRed.TRAFICO_ENVIADO, (data: unknown) => {
+      const registro = data as { origen: string, destino: string, protocolo: TipoProtocolo };
+      console.log(`Tráfico enviado: ${registro.origen} -> ${registro.destino}. Protocolo: ${registro.protocolo}`);
+    });
   }
 
   public asignarRed(nombreDisp: string, nombreRed: string): void {
