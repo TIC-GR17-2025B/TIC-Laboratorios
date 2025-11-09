@@ -38,14 +38,6 @@ export class RedController {
     }
 
     this.ecsManager.on(EventosRed.RED_ENVIAR_ACTIVO, (data: unknown) => {
-<<<<<<< HEAD
-      const d = data as { evento: unknown };
-     const resultado =  this.sistemaRed?.enviarTrafico(d.evento.infoAdicional.dispositivoEmisor,
-                                    d.evento.infoAdicional.dispositivoReceptor,
-                                    TipoProtocolo.FTP,
-                                    d.evento.infoAdicional.nombreActivo);
-      console.log("Activo enviado desde el controlador de red", resultado);
-=======
       const d = data as { eventoConEntidades: {
         entidadEmisor: number,
         entidadReceptor: number,
@@ -57,7 +49,6 @@ export class RedController {
         TipoProtocolo.FTP,
         d.eventoConEntidades.nombreActivo
       );
->>>>>>> 24ea409 (Fix: Arreglo de envío de activos)
     });
 
     this.ecsManager.on(EventosRed.RED_ACTIVO_ENVIADO, (data: unknown) => {
