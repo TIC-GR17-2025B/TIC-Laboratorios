@@ -190,7 +190,7 @@ export class RedController {
   /**
    * Obtiene todas las redes de un router específico
    */
-  public obtenerRedesDelRouter(nombreRouter: string): Array<{ nombre: string; color: string; zona: string; dispositivos: string[] }> {
+  public obtenerRedesDelRouter(nombreRouter: string): Array<{ nombre: string; color: string; }> {
     if (!this.sistemaRed) {
       console.error("Sistema de red no inicializado");
       return [];
@@ -219,9 +219,7 @@ export class RedController {
     
     return redes.map(red => ({
       nombre: red.nombre,
-      color: red.color,
-      zona: red.zona,
-      dispositivos: [...red.dispositivosConectados]
+      color: red.color
     }));
   }
 

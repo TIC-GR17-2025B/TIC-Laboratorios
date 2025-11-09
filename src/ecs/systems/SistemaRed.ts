@@ -1,5 +1,5 @@
-import { ActivoComponent, RouterComponent, RedComponent } from "../components";
-import { Sistema } from "../core";
+import { ActivoComponent, RouterComponent, RedComponent, DispositivoComponent } from "../components";
+import { Sistema, type Entidad } from "../core";
 import { TipoProtocolo } from "../../types/TrafficEnums";
 import type { DireccionTrafico } from "../../types/FirewallTypes";
 import {
@@ -73,28 +73,15 @@ export class SistemaRed extends Sistema {
     }
 
     // Conecta un dispositivo a una red específica
-    public asignarRed(nombreDisp: string, nombreRed: string): void {
-        // Buscar la red como entidad RedComponent
-        let redEncontrada;
-        for (const [, container] of this.ecsManager.getEntidades()) {
-            const redComp = container.get(RedComponent);
-            if (redComp && redComp.nombre === nombreRed) {
-                redEncontrada = redComp;
-                break;
-            }
-        }
-
-        if (!redEncontrada) {
-            console.warn(`Red "${nombreRed}" no encontrada`);
-            return;
-        }
-
+    public asignarRed(entidadDisp: Entidad, entidadRed: Entidad): void {
+        const dispositivo = this.ecsManager.getComponentes(entidadDisp)?.get(DispositivoComponent);
+        
         // Verificamos que el dispositivo no esté en la red
-        if(redEncontrada.dispositivosConectados.some((d) => d === nombreDisp)){
+        if(dispositivo?.redes.some((d) => d === entidadRed)){
             return;
         }
 
-        redEncontrada.dispositivosConectados.push(nombreDisp);
+        dispositivo?.redes.push(entidadRed);
     }
 
     // Envía tráfico entre dos dispositivos validando conectividad y firewall
