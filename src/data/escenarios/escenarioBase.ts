@@ -40,11 +40,11 @@ export const escenarioBase: unknown = {
       nombreEvento: "Prueba de tráfico SSH",
       tipoEvento: TipoEvento.TRAFICO_RED,
       tiempoNotificacion: 15,
-      descripcion: "Se probará conexión SSH entre computadoras.",
+      descripcion: "Se probará conexión SSH entre zonas (WWW → LAN1).",
       fase: 1,
       infoAdicional: {
-        dispositivoOrigen: "Internet",
-        dispositivoDestino: "Computadora Jacob",
+        dispositivoOrigen: "Servidor Web Externo",
+        dispositivoDestino: "Computadora Administrativa",
         protocolo: TipoProtocolo.SSH,
       },
     },
@@ -144,7 +144,6 @@ export const escenarioBase: unknown = {
                   posicion: { x: 1.5, y: 0, z: 2, rotacionY: 180 },
                   // Configuración de router
                   conectadoAInternet: true,
-                  // Referencias a redes (solo nombres)
                   redes: ["LAN1"],
                 },
               ],
@@ -153,5 +152,63 @@ export const escenarioBase: unknown = {
         },
       ],
     },
+    {
+      id: 2,
+      nombre: "WWW - Red Externa",
+      redes: [
+        {
+          nombre: "RedWWW",
+          color: "#ff6600",
+        }
+      ],
+      oficinas: [
+        {
+          id: 201,
+          nombre: "Datacenter Externo",
+          posicion: { x: 10, y: 0, z: 0, rotacionY: 0 },
+          espacios: [
+            {
+              id: 1,
+              mueble: Mueble.MESA,
+              posicion: { x: 0, y: 0, z: 0, rotacionY: 0 },
+              dispositivos: [
+                {
+                  id: 2001,
+                  tipo: TipoDispositivo.SERVER,
+                  nombre: "Servidor Web Externo",
+                  sistemaOperativo: "Ubuntu Server 22.04",
+                  hardware: "Dell PowerEdge R740",
+                  software: "Apache, MySQL, DNS",
+                  posicion: { x: 0, y: 0, z: 0, rotacionY: 0 },
+                  estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
+                  activos: [],
+                  redes: ["RedWWW"],
+                },
+              ],
+            },
+            {
+              id: 2,
+              mueble: Mueble.MESA,
+              posicion: { x: 2, y: 0, z: 0, rotacionY: 0 },
+              dispositivos: [
+                {
+                  id: 2002,
+                  tipo: TipoDispositivo.ROUTER,
+                  nombre: "Router WWW",
+                  sistemaOperativo: "Cisco IOS",
+                  hardware: "Cisco ASR 1001-X",
+                  software: "Routing, Firewall, NAT",
+                  posicion: { x: 2, y: 0, z: 0, rotacionY: 180 },
+                  // Configuración de router
+                  conectadoAInternet: true,
+                  redes: ["RedWWW"],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
   ],
+
 };

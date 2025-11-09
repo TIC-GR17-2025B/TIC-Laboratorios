@@ -63,10 +63,15 @@ export class SistemaEvento extends Sistema {
     switch(evento.tipoEvento){
       case TipoEvento.ENVIO_ACTIVO: {
         console.log("Ejecutando evento de envío de activo...");
-        // Convertir nombres de dispositivos a entidades (null = Internet)
+        // Convertir nombres de dispositivos a entidades
         const info = evento.infoAdicional as { dispositivoEmisor: string, dispositivoReceptor: string, nombreActivo: string };
         const entidadEmisor = this.buscarDispositivoPorNombre(info.dispositivoEmisor);
         const entidadReceptor = this.buscarDispositivoPorNombre(info.dispositivoReceptor);
+        
+        if (!entidadEmisor || !entidadReceptor) {
+          console.error(`No se encontraron los dispositivos: ${info.dispositivoEmisor}, ${info.dispositivoReceptor}`);
+          return;
+        }
         
         const eventoConEntidades = {
           ...evento,

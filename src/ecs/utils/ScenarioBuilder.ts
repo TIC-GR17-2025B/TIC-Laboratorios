@@ -213,8 +213,10 @@ export class ScenarioBuilder {
     );
 
     this.ecsManager.agregarComponente(entidadRed, redComponente);
-    const relacionZonaRed = new SistemaRelaciones(ZonaComponent,RedComponent,"redes");
-    relacionZonaRed.ecsManager = this.ecsManager;
+    
+    // Crear sistema de relaciones Zona-Red y agregarlo al ECSManager
+    const relacionZonaRed = new SistemaRelaciones(ZonaComponent, RedComponent, "redes");
+    this.ecsManager.agregarSistema(relacionZonaRed);
     relacionZonaRed.agregar(entidadZona, entidadRed);
   }
 

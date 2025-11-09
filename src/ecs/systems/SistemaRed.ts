@@ -86,51 +86,35 @@ export class SistemaRed extends Sistema {
     }
 
     // Envía tráfico entre dos dispositivos validando conectividad y firewall
-    // null = Internet (sin dispositivo físico)
     public enviarTrafico(
-        entidadOrigen: Entidad | null,
-        entidadDestino: Entidad | null,
+        entidadOrigen: Entidad,
+        entidadDestino: Entidad,
         protocolo: TipoProtocolo,
         payload: unknown
     ): boolean {
-        // Si origen o destino es Internet (null), manejar de forma especial
-        const nombreOrigen = entidadOrigen 
-            ? this.ecsManager.getComponentes(entidadOrigen)?.get(DispositivoComponent)?.nombre ?? "Desconocido"
-            : "Internet";
-        const nombreDestino = entidadDestino
-            ? this.ecsManager.getComponentes(entidadDestino)?.get(DispositivoComponent)?.nombre ?? "Desconocido"
-            : "Internet";
-
-        // Si ambos son Internet, no tiene sentido
-        if (!entidadOrigen && !entidadDestino) {
-            console.error("No se puede enviar tráfico entre Internet e Internet");
-            return false;
-        }
-
-        // Si al menos uno es Internet, verificar firewall del router
-        if (!entidadOrigen || !entidadDestino) {
-            if (!this.getFirewallService().validarFirewall(entidadOrigen, entidadDestino, protocolo)) {
-                return false;
-            }
-            
-            this.getEventoService().registrarTrafico(nombreOrigen, nombreDestino, protocolo);
-            return true;
-        }
-
         const dispOrigen = this.ecsManager.getComponentes(entidadOrigen)?.get(DispositivoComponent);
         const dispDestino = this.ecsManager.getComponentes(entidadDestino)?.get(DispositivoComponent);
         
         if (!dispOrigen || !dispDestino) {
+            console.log(`❌ SistemaRed.enviarTrafico: Dispositivos no encontrados`);
             return false;
         }
+
+        console.log(`🔄 SistemaRed.enviarTrafico: ${dispOrigen.nombre} → ${dispDestino.nombre} [${protocolo}]`);
 
         if (!this.getConectividadService().estanConectados(entidadOrigen, entidadDestino)) {
+            console.log(`❌ SistemaRed.enviarTrafico: Dispositivos NO están conectados`);
             return false;
         }
 
+        console.log(`✅ SistemaRed.enviarTrafico: Dispositivos ESTÁN conectados`);
+
         if (!this.getFirewallService().validarFirewall(entidadOrigen, entidadDestino, protocolo)) {
+            console.log(`❌ SistemaRed.enviarTrafico: Tráfico BLOQUEADO por firewall`);
             return false;
         }
+
+        console.log(`✅ SistemaRed.enviarTrafico: Firewall PERMITIÓ el tráfico`);
 
         switch(protocolo){
             case TipoProtocolo.FTP: {

@@ -54,12 +54,13 @@ export class RedController {
       }}};
       
       // Enviar tráfico directamente con el protocolo del evento
-      this.sistemaRed?.enviarTrafico(
+      const resultado = this.sistemaRed?.enviarTrafico(
         d.evento.infoAdicional.entidadOrigen,
         d.evento.infoAdicional.entidadDestino,
         d.evento.infoAdicional.protocolo,
-        null // No hay activo en tráfico genérico
+        null 
       );
+      console.log("Tráfico enviado desde el controlador de red", resultado);
     });
   }
 

@@ -15,17 +15,11 @@ export class FirewallService {
     ) {}
 
     // Valida si el tráfico pasa los firewalls de origen y destino
-    // null = Internet (tráfico externo)
     validarFirewall(
-        entidadOrigen: Entidad | null,
-        entidadDestino: Entidad | null,
+        entidadOrigen: Entidad,
+        entidadDestino: Entidad,
         protocolo: TipoProtocolo
     ): boolean {
-        // Si alguno es Internet (null), manejar tráfico externo
-        if (entidadOrigen === null || entidadDestino === null) {
-            return this.validarFirewallInternet(entidadOrigen, entidadDestino, protocolo);
-        }
-
         const routers = this.conectividadService.obtenerRoutersDeRed(entidadOrigen, entidadDestino);
         
         // Si no hay routers con firewall, permitir tráfico
@@ -218,48 +212,5 @@ export class FirewallService {
         
         // Política general por defecto
         return firewall.politicaPorDefecto === 'PERMITIR';
-    }
-
-
-    private validarFirewallInternet(
-        entidadOrigen: Entidad | null,
-        entidadDestino: Entidad | null,
-        protocolo: TipoProtocolo
-    ): boolean {
-
-        const entidadInterna = entidadOrigen ?? entidadDestino;
-        const esTraficoSaliente = entidadOrigen !== null; 
-        
-        if (!entidadInterna) {
-            return false; 
-        }
-
-        const infoRouter = this.conectividadService.buscarRouterConDispositivo(entidadInterna);
-        if (!infoRouter) {
-            return true;
-        }
-
-
-        const dispInterno = this.ecsManager.getComponentes(entidadInterna)?.get(DispositivoComponent);
-        const nombreInterno = dispInterno?.nombre || 'dispositivo';
-        const nombreOrigen = esTraficoSaliente ? nombreInterno : 'Internet';
-        const nombreDestino = esTraficoSaliente ? 'Internet' : nombreInterno;
-        const direccion: DireccionTrafico = esTraficoSaliente ? 'SALIENTE' : 'ENTRANTE';
-
-        const permitido = this.evaluarReglaFirewall(
-            infoRouter.router.firewall,
-            protocolo,
-            nombreInterno,
-            direccion
-        );
-
-
-        if (permitido) {
-            this.eventoService.emitirEventoPermitido(nombreOrigen, nombreDestino, protocolo);
-        } else {
-            this.eventoService.emitirEventoBloqueado(nombreOrigen, nombreDestino, protocolo, 'Bloqueado por firewall');
-        }
-
-        return permitido;
     }
 }
