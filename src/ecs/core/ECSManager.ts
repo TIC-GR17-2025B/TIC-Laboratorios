@@ -83,6 +83,28 @@ export class ECSManager {
     this.sistemas.delete(sistema);
   }
 
+  /**
+   * Obtiene un sistema específico por su tipo/clase
+   * Útil para acceder a sistemas desde controllers
+   */
+  public getSistema<T extends Sistema>(
+    ClaseSistema: new (...args: unknown[]) => T
+  ): T | undefined {
+    for (const sistema of this.sistemas.keys()) {
+      if (sistema instanceof ClaseSistema) {
+        return sistema as T;
+      }
+    }
+    return undefined;
+  }
+
+  /**
+   * Obtiene todos los sistemas registrados
+   */
+  public getSistemas(): Map<Sistema, Set<Entidad>> {
+    return this.sistemas;
+  }
+
   /*public actualizar(): void {
     for (let [sistema, entidades] of this.sistemas.entries()) {
       sistema.actualizar(entidades);

@@ -4,8 +4,13 @@ import type { Entidad } from "../../../../ecs/core/Componente";
 import { getDispositivoHeight } from "../config/modelConfig";
 import { useEscenarioActual } from "../../../common/contexts/EscenarioContext";
 import { EscenarioController } from "../../../../ecs/controllers/EscenarioController";
-import { EventosAtaque, EventosPresupuesto, EventosTiempo } from "../../../../types/EventosEnums";
+import {
+  EventosAtaque,
+  EventosPresupuesto,
+  EventosTiempo,
+} from "../../../../types/EventosEnums";
 import { RedController } from "../../../../ecs/controllers/RedController";
+import { SistemaJerarquiaEscenario } from "../../../../ecs/systems";
 
 export interface ECSSceneEntity {
   entidadId: Entidad;
@@ -113,6 +118,7 @@ export function useECSScene() {
 
     // PRIMERO: Inicializar el escenario
     escenarioController.iniciarEscenario();
+
     // SEGUNDO: Configurar tiempo
     escenarioController.ejecutarTiempo();
     // TERCERO: Cargar eventos DIRECTAMENTE en el sistema de tiempo
@@ -128,7 +134,6 @@ export function useECSScene() {
     // SÉPTIMO: Iniciar el tiempo automáticamente desde useEffect
     escenarioController.iniciarTiempo();
     tiempoIniciadoRef.current = true;
-
     const unsubscribePresupuesto = escenarioController.on(
       EventosPresupuesto.PRESUPUESTO_ACTUALIZADO,
       (data: unknown) => {

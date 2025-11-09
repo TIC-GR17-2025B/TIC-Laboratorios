@@ -15,7 +15,7 @@ import {
 } from "../components";
 import type { ComponenteContainer, Entidad } from "../core/Componente";
 import type { Dispositivo, Escenario } from "../../types/EscenarioTypes";
-import { SistemaRelaciones } from "../systems/SistemaRelaciones";
+import { SistemaJerarquiaEscenario } from "../systems/SistemaJerarquiaEscenario";
 import {
   TipoAtaque,
   TipoDispositivo,
@@ -28,12 +28,27 @@ import { FirewallBuilder } from "./FirewallBuilder";
 /**
  * Builder para crear escenarios de forma declarativa y simple
  * Facilita la construcción inicial y modificaciones posteriores
+ *
+ * Usa el SistemaJerarquiaEscenario centralizado del ECSManager para
+ * mantener las relaciones jerárquicas de forma consistente.
  */
 export class ScenarioBuilder {
   private ecsManager: ECSManager;
+  private sistemaJerarquia: SistemaJerarquiaEscenario;
 
   constructor(ecsManager: ECSManager) {
     this.ecsManager = ecsManager;
+
+    // Obtener o crear el sistema de jerarquía centralizado
+    let sistema = this.ecsManager.getSistema(SistemaJerarquiaEscenario);
+
+    if (!sistema) {
+      // Si no existe, crearlo y agregarlo al ECSManager
+      sistema = new SistemaJerarquiaEscenario();
+      this.ecsManager.agregarSistema(sistema);
+    }
+
+    this.sistemaJerarquia = sistema;
   }
 
   /**
@@ -61,7 +76,7 @@ export class ScenarioBuilder {
 
     escenario.zonas.forEach((zona: unknown) => {
       const zonaEntidad = this.crearZona(zona, escenarioPadre);
-      const z = zona as { oficinas?: unknown[]; };
+      const z = zona as { oficinas?: unknown[] };
       (z.oficinas ?? []).forEach((oficina: unknown) => {
         const oficinaEntidad = this.crearOficina(oficina, zonaEntidad);
         const ofi = oficina as { espacios?: unknown[] };
@@ -170,20 +185,14 @@ export class ScenarioBuilder {
 
   crearZona(zona: unknown, escenarioEntidad?: Entidad): Entidad {
     const entidadZona = this.ecsManager.agregarEntidad();
-    const z = zona as { id: number; nombre: string; };
+    const z = zona as { id: number; nombre: string };
     this.ecsManager.agregarComponente(
       entidadZona,
       new ZonaComponent(z.id, z.nombre)
     );
     const escEntidad = escenarioEntidad;
     if (escEntidad != null) {
-      const relacion = new SistemaRelaciones(
-        EscenarioComponent,
-        ZonaComponent,
-        "zonas"
-      );
-      relacion.ecsManager = this.ecsManager;
-      relacion.agregar(escEntidad, entidadZona);
+      this.sistemaJerarquia.agregarZonaAEscenario(escEntidad, entidadZona);
     }
     return entidadZona;
   }
@@ -194,14 +203,14 @@ export class ScenarioBuilder {
       color: string;
       dispositivosConectados: string[];
       zona: string;
-    }
+    };
     const entidadRed = this.ecsManager.agregarEntidad();
     const redComponente = new RedComponent(
       r.nombre,
       r.color,
       r.dispositivosConectados,
       r.zona
-    )
+    );
     this.ecsManager.agregarComponente(entidadRed, redComponente);
   }
 
@@ -215,13 +224,7 @@ export class ScenarioBuilder {
 
     const ofiEntidad = entidadOficina;
     if (ofiEntidad != null) {
-      const relacion = new SistemaRelaciones(
-        ZonaComponent,
-        OficinaComponent,
-        "oficinas"
-      );
-      relacion.ecsManager = this.ecsManager;
-      relacion.agregar(zonaId, ofiEntidad);
+      this.sistemaJerarquia.agregarOficinaAZona(zonaId, ofiEntidad);
     }
     return entidadOficina;
   }
@@ -248,13 +251,7 @@ export class ScenarioBuilder {
     );
     const espEntidad = entidadEspacio;
     if (espEntidad != null) {
-      const relacion = new SistemaRelaciones(
-        OficinaComponent,
-        EspacioComponent,
-        "espacios"
-      );
-      relacion.ecsManager = this.ecsManager;
-      relacion.agregar(oficinaId, espEntidad);
+      this.sistemaJerarquia.agregarEspacioAOficina(oficinaId, espEntidad);
     }
     return entidadEspacio;
   }
@@ -269,7 +266,7 @@ export class ScenarioBuilder {
       estadoAtaque?: unknown;
       posicion?: { x: number; y: number; z: number; rotacionY?: number };
     };
-    
+
     // Agregar componente de dispositivo
     this.ecsManager.agregarComponente(
       entidadDispositivo,
@@ -281,7 +278,7 @@ export class ScenarioBuilder {
         d.estadoAtaque as EstadoAtaqueDispositivo
       )
     );
-    
+
     // Agregar Transform (posición 3D)
     this.ecsManager.agregarComponente(
       entidadDispositivo,
@@ -311,7 +308,7 @@ export class ScenarioBuilder {
         // Buscar las entidades RedComponent existentes por nombre
         const redesIds: Entidad[] = [];
         const nombresRedes = r.redes ?? [];
-        
+
         for (const nombreRed of nombresRedes) {
           let redEncontrada = false;
           for (const [entidadId, container] of this.ecsManager.getEntidades()) {
@@ -322,9 +319,11 @@ export class ScenarioBuilder {
               break;
             }
           }
-          
+
           if (!redEncontrada) {
-            console.warn(`Red "${nombreRed}" no encontrada para el router "${r.nombre}". Asegúrate de definir la red en escenario.redes antes de referenciarla.`);
+            console.warn(
+              `Red "${nombreRed}" no encontrada para el router "${r.nombre}". Asegúrate de definir la red en escenario.redes antes de referenciarla.`
+            );
           }
         }
 
@@ -332,7 +331,11 @@ export class ScenarioBuilder {
         const firewallConfig = new FirewallBuilder().build();
         this.ecsManager.agregarComponente(
           entidadDispositivo,
-          new RouterComponent(r.conectadoAInternet ?? true, firewallConfig, redesIds)
+          new RouterComponent(
+            r.conectadoAInternet ?? true,
+            firewallConfig,
+            redesIds
+          )
         );
 
         break;
@@ -340,14 +343,10 @@ export class ScenarioBuilder {
     }
 
     // Agregar relación con espacio
-    const relacion = new SistemaRelaciones(
-      EspacioComponent,
-      DispositivoComponent,
-      "dispositivos"
+    this.sistemaJerarquia.agregarDispositivoAEspacio(
+      espacioId,
+      entidadDispositivo
     );
-    relacion.ecsManager = this.ecsManager;
-    relacion.agregar(espacioId, entidadDispositivo);
-    
     return entidadDispositivo;
   }
 
@@ -359,5 +358,12 @@ export class ScenarioBuilder {
 
   public getEntidades(): Map<Entidad, ComponenteContainer> {
     return this.ecsManager.getEntidades();
+  }
+
+  /**
+   * Obtiene el sistema de jerarquía para acceso directo desde controllers
+   */
+  public getSistemaJerarquia(): SistemaJerarquiaEscenario {
+    return this.sistemaJerarquia;
   }
 }
