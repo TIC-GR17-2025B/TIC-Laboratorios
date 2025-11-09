@@ -1,20 +1,24 @@
 import { EventosRed, EventosFirewall } from "../../types/EventosEnums";
 import type { DireccionTrafico } from "../../types/FirewallTypes";
 import { TipoProtocolo } from "../../types/TrafficEnums";
-import type { RegistroFirewallPermitido, RegistroFirewallBloqueado, RegistroTrafico } from "../../types/TrafficEnums";
+import type {
+  RegistroFirewallPermitido,
+  RegistroFirewallBloqueado,
+  RegistroTrafico,
+} from "../../types/TrafficEnums";
 import type { ECSManager } from "../core";
 import type { Entidad } from "../core/Componente";
 import { SistemaRed } from "../systems";
 
 export class RedController {
   public ecsManager: ECSManager;
-    
+
   private sistemaRed?: SistemaRed;
 
   private static instance: RedController | null = null;
-  
-  constructor(ecsManager: ECSManager){
-      this.ecsManager = ecsManager;
+
+  constructor(ecsManager: ECSManager) {
+    this.ecsManager = ecsManager;
   }
 
   // Singleton
@@ -40,25 +44,31 @@ export class RedController {
 
     this.ecsManager.on(EventosRed.RED_ENVIAR_ACTIVO, (data: unknown) => {
       const d = data as { evento: unknown };
-      this.sistemaRed?.enviarTrafico(d.evento.infoAdicional.dispositivoEmisor,
-                                    d.evento.infoAdicional.dispositivoReceptor,
-                                    TipoProtocolo.FTP,
-                                    d.evento.infoAdicional.nombreActivo);
+      this.sistemaRed?.enviarTrafico(
+        d.evento.infoAdicional.dispositivoEmisor,
+        d.evento.infoAdicional.dispositivoReceptor,
+        TipoProtocolo.FTP,
+        d.evento.infoAdicional.nombreActivo
+      );
     });
 
     this.ecsManager.on(EventosRed.RED_TRAFICO, (data: unknown) => {
-      const d = data as { evento: { infoAdicional: { 
-        entidadOrigen: Entidad, 
-        entidadDestino: Entidad, 
-        protocolo: TipoProtocolo 
-      }}};
-      
+      const d = data as {
+        evento: {
+          infoAdicional: {
+            entidadOrigen: Entidad;
+            entidadDestino: Entidad;
+            protocolo: TipoProtocolo;
+          };
+        };
+      };
+
       // Enviar tráfico directamente con el protocolo del evento
       const resultado = this.sistemaRed?.enviarTrafico(
         d.evento.infoAdicional.entidadOrigen,
         d.evento.infoAdicional.entidadDestino,
         d.evento.infoAdicional.protocolo,
-        null 
+        null
       );
       console.log("Tráfico enviado desde el controlador de red", resultado);
     });
@@ -72,7 +82,18 @@ export class RedController {
     this.sistemaRed.asignarRed(entidadDisp, entidadRed);
   }
 
-  public toggleActivacionFirewall(entidadRouter: Entidad, habilitado: boolean): void {
+  public removerRed(entidadDisp: Entidad, entidadRed: Entidad): void {
+    if (!this.sistemaRed) {
+      console.error("Sistema de red no inicializado");
+      return;
+    }
+    this.sistemaRed.removerRed(entidadDisp, entidadRed);
+  }
+
+  public toggleActivacionFirewall(
+    entidadRouter: Entidad,
+    habilitado: boolean
+  ): void {
     if (!this.sistemaRed) {
       console.error("Sistema de red no inicializado");
       return;
@@ -91,7 +112,12 @@ export class RedController {
       console.error("Sistema de red no inicializado");
       return;
     }
-    this.sistemaRed.agregarReglaFirewall(entidadRouter, protocolo, accion, direccion);
+    this.sistemaRed.agregarReglaFirewall(
+      entidadRouter,
+      protocolo,
+      accion,
+      direccion
+    );
   }
 
   public agregarExcepcionFirewall(
@@ -105,7 +131,13 @@ export class RedController {
       console.error("Sistema de red no inicializado");
       return;
     }
-    this.sistemaRed.agregarExcepcionFirewall(entidadRouter, protocolo, entidadDispositivo, accion, direccion);
+    this.sistemaRed.agregarExcepcionFirewall(
+      entidadRouter,
+      protocolo,
+      entidadDispositivo,
+      accion,
+      direccion
+    );
   }
 
   public setPoliticaFirewall(
@@ -140,5 +172,4 @@ export class RedController {
     }
     this.sistemaRed.setPoliticaFirewallEntrante(entidadRouter, politica);
   }
-
 }

@@ -81,6 +81,10 @@ export const escenarioBase: unknown = {
           nombre: "LAN1",
           color: "#00ff00",
         },
+        {
+          nombre: "LAN2",
+          color: "#00ccff",
+        },
       ],
       oficinas: [
         {
@@ -108,7 +112,7 @@ export const escenarioBase: unknown = {
                       contenido: "La contraseña secreta es 123",
                     },
                   ],
-                  redes: ["LAN1"],
+                  redes: ["LAN1", "LAN2"],
                 },
               ],
             },
@@ -127,7 +131,7 @@ export const escenarioBase: unknown = {
                   posicion: { x: -2, y: 0, z: 0, rotacionY: 180 },
                   estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
                   activos: [],
-                  redes: [],
+                  redes: ["LAN2"],
                 },
               ],
             },

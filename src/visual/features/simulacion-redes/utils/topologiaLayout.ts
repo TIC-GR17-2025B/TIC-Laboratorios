@@ -1,17 +1,20 @@
 import type { Node, Edge } from "@xyflow/react";
 import { TipoDispositivo } from "../../../../types/DeviceEnums";
+import type { Entidad } from "../../../../ecs/core/Componente";
 
 export interface NodoTopologia {
   id: string;
   nombre: string;
   tipo: TipoDispositivo;
   redes: { nombre: string; color: string }[];
+  entidadId?: Entidad;
 }
 
 export interface ZonaTopologia {
   id: string;
   nombre: string;
   nodos: NodoTopologia[];
+  entidadZona?: Entidad;
 }
 
 export interface Topologia {
@@ -95,6 +98,7 @@ function calcularPosicionesZona(
         label: nodo.nombre,
         tipo: nodo.tipo,
         redes: nodo.redes,
+        entidadId: nodo.entidadId,
       },
       draggable: false,
       selectable: false,
@@ -121,6 +125,7 @@ function calcularPosicionesZona(
         label: nodo.nombre,
         tipo: nodo.tipo,
         redes: nodo.redes,
+        entidadId: nodo.entidadId,
       },
       draggable: false,
       selectable: false,

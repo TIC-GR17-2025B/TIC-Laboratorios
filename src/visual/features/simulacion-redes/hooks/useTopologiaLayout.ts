@@ -7,10 +7,6 @@ import {
   type LayoutConfig,
 } from "../utils/topologiaLayout";
 
-/**
- * Custom hook que encapsula la lógica de generación de nodos y aristas
- * para la visualización de topología de red
- */
 export function useTopologiaLayout(
   topologia: Topologia,
   layoutConfig?: Partial<LayoutConfig>

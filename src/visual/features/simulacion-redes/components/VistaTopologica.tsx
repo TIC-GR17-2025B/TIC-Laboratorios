@@ -3,11 +3,10 @@ import { TipoDispositivo } from "../../../../types/DeviceEnums";
 import "@xyflow/react/dist/style.css";
 import { Handle, Position } from '@xyflow/react';
 import styles from '../styles/VistaTopologica.module.css';
-import { useTopologiaLayout } from '../hooks/useTopologiaLayout';
-import type { Topologia } from '../utils/topologiaLayout';
+import { useTopologiaLayout, useTopologiaData, useDispositivoRedes } from '../hooks';
 import getIconoNodo from "../utils/getIconoNodo";
 import ConexionIcon from "../../../common/icons/ConexionIcon";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import RedChip from "./RedChip";
 
 function DeviceNode({ data }: any) {
@@ -52,78 +51,34 @@ const nodeTypes = {
     group: GroupNode
 };
 
-// datos de ejemplo, esto debo reemplazarlo luego por el contexto
-const TOPOLOGIA_EJEMPLO: Topologia = {
-    zonas: [
-        {
-            id: 'hq',
-            nombre: 'Boilplate Corporate HQ',
-            nodos: [
-                { id: 'hq-server', nombre: 'Server', tipo: TipoDispositivo.SERVER, redes: [{ nombre: "lan-hq", color: "#E5E56C" }, { nombre: "lan-hq2", color: "#3C91E6" }] },
-                { id: 'hq-pc1', nombre: 'PC de Harry', tipo: TipoDispositivo.WORKSTATION, redes: [{ nombre: "lan-hq", color: "#E5E56C" }, { nombre: "lan-hq2", color: "#3C91E6" }] },
-                { id: 'hq-router', nombre: 'Router 1', tipo: TipoDispositivo.ROUTER, redes: [{ nombre: "lan-hq", color: "#E5E56C" }] },
-                { id: 'hq-vpn1', nombre: 'VPN 1', tipo: TipoDispositivo.VPN, redes: [{ nombre: "lan-hq", color: "#E5E56C" }] }
-            ]
-        },
-        {
-            id: 'west',
-            nombre: 'Boilplate West',
-            nodos: [
-                { id: 'west-pc1', nombre: 'PC de Lisa', tipo: TipoDispositivo.WORKSTATION, redes: [{ nombre: "lan1", color: "#f87ead" }] },
-                { id: 'west-router', nombre: 'Router 2', tipo: TipoDispositivo.ROUTER, redes: [{ nombre: "lan1", color: "#f87ead" }] }
-            ]
-        },
-        {
-            id: 'www',
-            nombre: 'World Wide Web',
-            nodos: [
-                { id: 'www-router', nombre: 'WWW Router', tipo: TipoDispositivo.ROUTER, redes: [{ nombre: "lan1", color: "#F2973C" }] },
-                { id: 'www-server', nombre: 'WWW Server', tipo: TipoDispositivo.SERVER, redes: [{ nombre: "lan1", color: "#F2973C" }] }
-            ]
-        },
-        {
-            id: 'east',
-            nombre: 'Boilplate East Subsidiary',
-            nodos: [
-                { id: 'east-pc1', nombre: 'PC de Isaac', tipo: TipoDispositivo.WORKSTATION, redes: [{ nombre: "lan-este2", color: "#60d8d2" }] },
-                { id: 'east-pc2', nombre: 'PC de Eliath', tipo: TipoDispositivo.WORKSTATION, redes: [{ nombre: "lan-este", color: "#B847D4" }] },
-                { id: 'east-pc3', nombre: 'PC de Jacob', tipo: TipoDispositivo.WORKSTATION, redes: [{ nombre: "lan-este", color: "#B847D4" }, { nombre: "lan-este2", color: "#60d8d2" }] },
-                { id: 'east-router', nombre: 'Router Este', tipo: TipoDispositivo.ROUTER, redes: [{ nombre: "lan-este", color: "#B847D4" }] },
-                { id: 'east-router2', nombre: 'Router Este 2', tipo: TipoDispositivo.ROUTER, redes: [{ nombre: "lan-este", color: "#B847D4" }] },
-                { id: 'east-vpn', nombre: 'VPN Este', tipo: TipoDispositivo.VPN, redes: [{ nombre: "lan-este", color: "#B847D4" }] }
-            ]
-        }
-    ]
-};
-
-interface VistaTopologicaProps {
-    topologia?: Topologia;
-}
-
-/**
- * Componente para visualizar topología de red.
- */
-export default function VistaTopologicaFlow({ topologia = TOPOLOGIA_EJEMPLO }: VistaTopologicaProps) {
-    // Hook que encapsula toda la lógica de generación de nodos/edges
+export default function VistaTopologicaFlow() {
+    const { topologia, redesDisponibles, ecsManager } = useTopologiaData();
     const { nodes: initialNodes, edges: initialEdges } = useTopologiaLayout(topologia);
 
-    const [nodes] = useNodesState(initialNodes);
-    const [edges] = useEdgesState(initialEdges);
+    const [nodes, setNodes] = useNodesState(initialNodes);
+    const [edges, setEdges] = useEdgesState(initialEdges);
 
-    const [estaConexionesAbierto, setEstaConexionesAbierto] = useState(false);
+    const [estaPanelAbierto, setEstaPanelAbierto] = useState(false);
+    const [entidadSeleccionada, setEntidadSeleccionada] = useState<number | null>(null);
 
-    // redes de prueba, esto se obtendria desde las redes de la zona
-    const redesDisponibles = [
-        { nombre: "lan-hq", color: "#E5E56C" },
-        { nombre: "lan-este", color: "#B847D4" },
-        { nombre: "lan-este2", color: "#60d8d2" },
-        { nombre: "lan-oeste", color: "#F2973C" },
-        { nombre: "lan-oeste2", color: "#78ce4d" },
-        { nombre: "Internet", color: "#D4474A" },
-    ];
+    useEffect(() => {
+        setNodes(initialNodes);
+        setEdges(initialEdges);
+    }, [initialNodes, initialEdges, setNodes, setEdges]);
 
     const handleNodeClick = (_event: React.MouseEvent, node: any) => {
-        console.log('Nodo clickeado:', node.data);
+        if (node.data.entidadId !== undefined) {
+            setEntidadSeleccionada(node.data.entidadId);
+            const containerCompleto = ecsManager.getComponentes(node.data.entidadId);
+
+            console.log('Nodo clickeado:', {
+                datosBasicos: node.data,
+                containerCompleto
+            });
+        } else {
+            setEntidadSeleccionada(null);
+            console.log('Nodo clickeado (sin entidad ECS):', node.data);
+        }
     };
 
     return (
@@ -131,11 +86,11 @@ export default function VistaTopologicaFlow({ topologia = TOPOLOGIA_EJEMPLO }: V
             <div className={styles.conexionesContainer}>
                 <button
                     className={styles.botonConexiones}
-                    onClick={() => setEstaConexionesAbierto(!estaConexionesAbierto)}
+                    onClick={() => setEstaPanelAbierto(!estaPanelAbierto)}
                 >
                     <ConexionIcon />
                 </button>
-                {estaConexionesAbierto && <div className={styles.conexionesDisponibles}>
+                {estaPanelAbierto && <div className={styles.conexionesDisponibles}>
                     {redesDisponibles.map((red) => (
                         <div className={styles.redChipContainer} onClick={() => { }}>
                             <RedChip key={red.nombre} nombre={red.nombre} color={red.color} />
@@ -143,6 +98,7 @@ export default function VistaTopologicaFlow({ topologia = TOPOLOGIA_EJEMPLO }: V
                     ))}
                 </div>}
             </div>
+            <PanelLateralTopologia entidadId={entidadSeleccionada} ecsManager={ecsManager} />
             <ReactFlow
                 nodes={nodes}
                 edges={edges}
@@ -159,6 +115,49 @@ export default function VistaTopologicaFlow({ topologia = TOPOLOGIA_EJEMPLO }: V
                 proOptions={{ hideAttribution: true }}
             >
             </ReactFlow>
+        </div>
+    );
+}
+
+interface PanelLateralTopologiaProps {
+    entidadId: number | null;
+    ecsManager: any;
+}
+
+function PanelLateralTopologia({ entidadId, ecsManager }: PanelLateralTopologiaProps) {
+    const { dispositivo, redesDisponibles, toggleRed } = useDispositivoRedes(entidadId, ecsManager);
+
+    if (!entidadId || !dispositivo) {
+        return (
+            <div className={styles.panelLateral}>
+                <div className={styles.dispositivoInfoHeader}>
+                    <h3>Selecciona un dispositivo</h3>
+                </div>
+                <p className={styles.tipoDispo}>Haz clic en un nodo para ver su información</p>
+            </div>
+        );
+    }
+
+    return (
+        <div className={styles.panelLateral}>
+            <div className={styles.dispositivoInfoHeader}>
+                <h3>{dispositivo.nombre}</h3>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10.6667 5.60016L4.73337 11.5335C4.61114 11.6557 4.45559 11.7168 4.2667 11.7168C4.07781 11.7168 3.92225 11.6557 3.80003 11.5335C3.67781 11.4113 3.6167 11.2557 3.6167 11.0668C3.6167 10.8779 3.67781 10.7224 3.80003 10.6002L9.73337 4.66683H4.6667C4.47781 4.66683 4.31959 4.60283 4.19203 4.47483C4.06448 4.34683 4.00048 4.18861 4.00003 4.00016C3.99959 3.81172 4.06359 3.6535 4.19203 3.5255C4.32048 3.3975 4.4787 3.3335 4.6667 3.3335H11.3334C11.5223 3.3335 11.6807 3.3975 11.8087 3.5255C11.9367 3.6535 12.0005 3.81172 12 4.00016V10.6668C12 10.8557 11.936 11.0142 11.808 11.1422C11.68 11.2702 11.5218 11.3339 11.3334 11.3335C11.1449 11.3331 10.9867 11.2691 10.8587 11.1415C10.7307 11.0139 10.6667 10.8557 10.6667 10.6668V5.60016Z" fill="currentColor" />
+                </svg>
+            </div>
+            <p className={styles.tipoDispo}>{dispositivo.tipo}</p>
+            <div className={styles.redChipContainer}>
+                {redesDisponibles.map((red) => (
+                    <div
+                        key={red.nombre}
+                        className={`${styles.redChipWrapper} ${red.estaActiva ? styles.selected : ''}`}
+                        onClick={() => toggleRed(red.entidadId)}
+                    >
+                        <RedChip nombre={red.nombre} color={red.color} activado={red.estaActiva} />
+                    </div>
+                ))}
+            </div>
         </div>
     );
 }
