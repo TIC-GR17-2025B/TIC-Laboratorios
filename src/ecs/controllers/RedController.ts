@@ -44,12 +44,11 @@ export class RedController {
 
     this.ecsManager.on(EventosRed.RED_ENVIAR_ACTIVO, (data: unknown) => {
       const d = data as { evento: unknown };
-      this.sistemaRed?.enviarTrafico(
-        d.evento.infoAdicional.dispositivoEmisor,
-        d.evento.infoAdicional.dispositivoReceptor,
-        TipoProtocolo.FTP,
-        d.evento.infoAdicional.nombreActivo
-      );
+     const resultado =  this.sistemaRed?.enviarTrafico(d.evento.infoAdicional.dispositivoEmisor,
+                                    d.evento.infoAdicional.dispositivoReceptor,
+                                    TipoProtocolo.FTP,
+                                    d.evento.infoAdicional.nombreActivo);
+      console.log("Activo enviado desde el controlador de red", resultado);
     });
 
     this.ecsManager.on(EventosRed.RED_TRAFICO, (data: unknown) => {
@@ -172,4 +171,13 @@ export class RedController {
     }
     this.sistemaRed.setPoliticaFirewallEntrante(entidadRouter, politica);
   }
+
+  public toggleConexionInternet(entidadRouter: Entidad, conectado: boolean): void {
+    if (!this.sistemaRed) {
+      console.error("Sistema de red no inicializado");
+      return;
+    }
+    this.sistemaRed.setConectadoAInternet(entidadRouter, conectado);
+  }
+
 }

@@ -25,6 +25,8 @@ export enum EventosRed {
   TRAFICO_ENVIADO = "trafico:enviado",
   RED_ASIGNADA = "red:redAsignada",
   RED_REMOVIDA = "red:redRemovida",
+  INTERNET_CONECTADO = "red:internetConectado",
+  INTERNET_DESCONECTADO = "red:internetDesconectado",
 }
 
 export enum EventosFirewall {

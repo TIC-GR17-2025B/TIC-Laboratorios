@@ -6,6 +6,7 @@ import {
 import { Sistema, type Entidad } from "../core";
 import { TipoProtocolo } from "../../types/TrafficEnums";
 import type { DireccionTrafico } from "../../types/FirewallTypes";
+import { EventosRed } from "../../types/EventosEnums";
 import {
   ConectividadService,
   EventoRedService,
@@ -90,7 +91,7 @@ export class SistemaRed extends Sistema {
 
     dispositivo?.redes.push(entidadRed);
 
-    this.ecsManager.emit("red:redAsignada", {
+    this.ecsManager.emit(EventosRed.RED_ASIGNADA, {
       entidadDispositivo: entidadDisp,
       entidadRed: entidadRed,
     });
@@ -108,7 +109,7 @@ export class SistemaRed extends Sistema {
     if (index > -1) {
       dispositivo.redes.splice(index, 1);
 
-      this.ecsManager.emit("red:redRemovida", {
+      this.ecsManager.emit(EventosRed.RED_REMOVIDA, {
         entidadDispositivo: entidadDisp,
         entidadRed: entidadRed,
       });
@@ -253,4 +254,26 @@ export class SistemaRed extends Sistema {
       politica
     );
   }
+
+  public setConectadoAInternet(entidadRouter: Entidad, conectado: boolean): void {
+        const router = this.ecsManager.getComponentes(entidadRouter)?.get(RouterComponent);
+        const dispositivo = this.ecsManager.getComponentes(entidadRouter)?.get(DispositivoComponent);
+        
+        if (!router || !dispositivo) {
+            console.error(`Router con entidad "${entidadRouter}" no encontrado`);
+            return;
+        }
+
+        const estadoAnterior = router.conectadoAInternet;
+        router.conectadoAInternet = conectado;
+        if (estadoAnterior !== conectado) {
+            const evento = conectado ? EventosRed.INTERNET_CONECTADO : EventosRed.INTERNET_DESCONECTADO;
+            this.ecsManager.emit(evento, {
+                router: dispositivo.nombre,
+                conectado,
+                mensaje: `Router "${dispositivo.nombre}" ${conectado ? 'conectado a' : 'desconectado de'} Internet`,
+                tipo: conectado ? 'INTERNET_CONECTADO' : 'INTERNET_DESCONECTADO'
+            });
+        }
+    }
 }
