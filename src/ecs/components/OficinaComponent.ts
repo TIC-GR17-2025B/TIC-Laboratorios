@@ -7,7 +7,6 @@ export class OficinaComponent extends Componente {
   constructor(
     public id: number,
     public nombre: string,
-    public zonaId: number,
     public espacios: Entidad[] = [],
     public tipo: string = "oficina"
   ) {

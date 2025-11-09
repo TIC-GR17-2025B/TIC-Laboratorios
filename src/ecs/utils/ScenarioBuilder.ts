@@ -219,7 +219,7 @@ export class ScenarioBuilder {
     const ofi = oficina as { id: number; nombre?: string };
     this.ecsManager.agregarComponente(
       entidadOficina,
-      new OficinaComponent(ofi.id, ofi.nombre ?? "", zonaId)
+      new OficinaComponent(ofi.id, ofi.nombre ?? "")
     );
 
     const ofiEntidad = entidadOficina;
@@ -238,7 +238,7 @@ export class ScenarioBuilder {
     };
     this.ecsManager.agregarComponente(
       entidadEspacio,
-      new EspacioComponent(esp.id, oficinaId, String(esp.mueble ?? "libre"))
+      new EspacioComponent(esp.id, String(esp.mueble ?? "libre"))
     );
     this.ecsManager.agregarComponente(
       entidadEspacio,
