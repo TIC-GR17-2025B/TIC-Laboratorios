@@ -1,5 +1,7 @@
-import { color } from "framer-motion";
-import { AccionesRealizables, ObjetosManejables } from "../../types/AccionesEnums";
+import {
+  AccionesRealizables,
+  ObjetosManejables,
+} from "../../types/AccionesEnums";
 import {
   EstadoAtaqueDispositivo,
   Mueble,
@@ -54,13 +56,13 @@ export const escenarioBase: unknown = {
       tiempoNotificacion: 25,
       descripcion: "Se enviará un archivo entre dispositivos.",
       fase: 1,
-      infoAdicional: { // Como es de un activo, se indica el nombre del activo a enviar, y los dispositivos involucrados
+      infoAdicional: {
+        // Como es de un activo, se indica el nombre del activo a enviar, y los dispositivos involucrados
         nombreActivo: "Activo1",
         dispositivoEmisor: "Computadora Administrativa",
         dispositivoReceptor: "Computadora Jacob",
       },
     },
-    
   ],
   fases: [
     {
@@ -78,7 +80,7 @@ export const escenarioBase: unknown = {
         {
           nombre: "LAN1",
           color: "#00ff00",
-        }
+        },
       ],
       oficinas: [
         {
@@ -159,27 +161,27 @@ export const escenarioBase: unknown = {
         {
           nombre: "RedWWW",
           color: "#ff6600",
-        }
+        },
       ],
       oficinas: [
         {
           id: 201,
           nombre: "Datacenter Externo",
-          posicion: { x: 10, y: 0, z: 0, rotacionY: 0 },
+          posicion: { x: 10, y: 0, z: 1, rotacionY: 0 },
           espacios: [
             {
               id: 1,
               mueble: Mueble.MESA,
-              posicion: { x: 0, y: 0, z: 0, rotacionY: 0 },
+              posicion: { x: -2, y: 0, z: 1, rotacionY: 0 },
               dispositivos: [
                 {
                   id: 2001,
-                  tipo: TipoDispositivo.SERVER,
+                  tipo: TipoDispositivo.WORKSTATION,
                   nombre: "Servidor Web Externo",
                   sistemaOperativo: "Ubuntu Server 22.04",
                   hardware: "Dell PowerEdge R740",
                   software: "Apache, MySQL, DNS",
-                  posicion: { x: 0, y: 0, z: 0, rotacionY: 0 },
+                  posicion: { x: -2, y: 0, z: 1, rotacionY: 0 },
                   estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
                   activos: [],
                   redes: ["RedWWW"],
@@ -210,5 +212,4 @@ export const escenarioBase: unknown = {
       ],
     },
   ],
-
 };

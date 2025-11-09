@@ -12,12 +12,23 @@ import {
 } from '../config/scene3DConfig';
 import { preloadAllModels } from '../config/modelConfig';
 import ECSSceneRenderer from './ECSSceneRenderer';
+import ZoneToast from './ZoneToast';
+import Controles3D from './Controles3D';
+import { useECSSceneContext } from '../context/ECSSceneContext';
 
 /**
  * Componente principal de la escena 3D
  * Orquesta la visualización 3D del escenario usando ECS con luces y controles 
  */
 const Escena3D: React.FC = () => {
+    const {
+        zonasDisponibles,
+        zonaActual,
+        showZoneToast,
+        zoneToastName,
+        hideZoneToast
+    } = useECSSceneContext();
+
     // Precargar todos los modelos al montar el componente
     useEffect(() => {
         preloadAllModels();
@@ -25,6 +36,16 @@ const Escena3D: React.FC = () => {
 
     return (
         <section className={styles.vista3D} aria-label="Vista 3D de la escena">
+            {zonasDisponibles.length > 1 && zonaActual !== null && (
+                <>
+                    <ZoneToast
+                        zoneName={zoneToastName}
+                        show={showZoneToast}
+                        onHide={hideZoneToast}
+                    />
+                    <Controles3D />
+                </>
+            )}
             <Scene3DCanvas className={styles.canvas}>
                 <ResizeHandler />
                 <Lights

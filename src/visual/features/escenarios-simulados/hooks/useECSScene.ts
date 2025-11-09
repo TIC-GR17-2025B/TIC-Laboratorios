@@ -10,7 +10,6 @@ import {
   EventosTiempo,
 } from "../../../../types/EventosEnums";
 import { RedController } from "../../../../ecs/controllers/RedController";
-import { SistemaJerarquiaEscenario } from "../../../../ecs/systems";
 
 export interface ECSSceneEntity {
   entidadId: Entidad;
@@ -49,6 +48,12 @@ export function useECSScene() {
   const [presupuesto, setPresupuesto] = useState(0);
   const [logsPanelOpen, setLogsPanelOpen] = useState(false);
   const [hasNewLog, setHasNewLog] = useState(false);
+  const [zonaActual, setZonaActual] = useState<number | null>(null);
+  const [zonasDisponibles, setZonasDisponibles] = useState<
+    Array<{ id: number; nombre: string }>
+  >([]);
+  const [showZoneToast, setShowZoneToast] = useState(false);
+  const [zoneToastName, setZoneToastName] = useState("");
 
   // useRef para evitar múltiples inicializaciones
   const inicializado = useRef(false);
@@ -129,6 +134,18 @@ export function useECSScene() {
     setEntities(escenarioController.builder.getEntidades());
     setIsPaused(escenarioController.estaTiempoPausado());
     setPresupuesto(escenarioController.getPresupuestoActual());
+
+    // Obtener zonas del escenario
+    const zonas = escenarioController.builder.obtenerZonas();
+    setZonasDisponibles(zonas);
+    // Establecer la primera zona como activa por defecto
+    if (zonas.length > 0) {
+      setZonaActual(zonas[0].id);
+      // Mostrar toast inicial con la zona cargada
+      setZoneToastName(zonas[0].nombre);
+      setShowZoneToast(true);
+    }
+
     // SEXTO: Iniciar sistema de red
     redController.iniciarController();
     // SÉPTIMO: Iniciar el tiempo automáticamente desde useEffect
@@ -224,12 +241,18 @@ export function useECSScene() {
 
   /**
    * Devuelve un array de entidades listo para render 3D
-   * Sin filtrar ni perder datos, mantiene referencia a la entidad original
+   * Filtra las entidades según la zona actual seleccionada
    */
   const processEntities = (): ECSSceneEntity[] => {
     if (!entities) return [];
 
-    return Array.from(entities.entries()).map(
+    // Si hay una zona seleccionada, obtener solo las entidades de esa zona
+    const entidadesAMostrar =
+      zonaActual !== null
+        ? escenarioController.builder.obtenerEntidadesDeZona(zonaActual)
+        : entities;
+
+    return Array.from(entidadesAMostrar.entries()).map(
       ([entidadId, entidadObjeto]): ECSSceneEntity => {
         const componentes = Array.from(
           (
@@ -310,6 +333,44 @@ export function useECSScene() {
     [escenarioController]
   );
 
+  const cambiarZona = useCallback(
+    (nuevaZonaId: number) => {
+      setZonaActual(nuevaZonaId);
+      // Mostrar toast con el nombre de la zona
+      const zona = zonasDisponibles.find((z) => z.id === nuevaZonaId);
+      if (zona) {
+        setZoneToastName(zona.nombre);
+        setShowZoneToast(true);
+      }
+    },
+    [zonasDisponibles]
+  );
+
+  const siguienteZona = useCallback(() => {
+    if (zonasDisponibles.length === 0 || zonaActual === null) return;
+
+    const currentIndex = zonasDisponibles.findIndex((z) => z.id === zonaActual);
+    const nextIndex = (currentIndex + 1) % zonasDisponibles.length;
+    const siguienteZonaId = zonasDisponibles[nextIndex].id;
+
+    cambiarZona(siguienteZonaId);
+  }, [zonasDisponibles, zonaActual, cambiarZona]);
+
+  const anteriorZona = useCallback(() => {
+    if (zonasDisponibles.length === 0 || zonaActual === null) return;
+
+    const currentIndex = zonasDisponibles.findIndex((z) => z.id === zonaActual);
+    const prevIndex =
+      (currentIndex - 1 + zonasDisponibles.length) % zonasDisponibles.length;
+    const anteriorZonaId = zonasDisponibles[prevIndex].id;
+
+    cambiarZona(anteriorZonaId);
+  }, [zonasDisponibles, zonaActual, cambiarZona]);
+
+  const hideZoneToast = useCallback(() => {
+    setShowZoneToast(false);
+  }, []);
+
   return {
     entities,
     mostrarNuevoLog,
@@ -332,5 +393,13 @@ export function useECSScene() {
     isPaused,
     presupuesto,
     toggleConfigWorkstation,
+    zonaActual,
+    anteriorZona,
+    zonasDisponibles,
+    cambiarZona,
+    siguienteZona,
+    showZoneToast,
+    zoneToastName,
+    hideZoneToast,
   };
 }

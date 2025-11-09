@@ -73,11 +73,14 @@ export class ScenarioBuilder {
 
     escenario.zonas.forEach((zona: unknown) => {
       const zonaEntidad = this.crearZona(zona, escenarioPadre);
-      const z = zona as { oficinas?: unknown[]; redes?: unknown[]; };
-      let redesConEntidades = new Map<Entidad, {nombre: string; color: string}>();
+      const z = zona as { oficinas?: unknown[]; redes?: unknown[] };
+      let redesConEntidades = new Map<
+        Entidad,
+        { nombre: string; color: string }
+      >();
       (z.redes ?? []).forEach((red) => {
         const entidadRed = this.ecsManager.agregarEntidad();
-        const r = red as {nombre: string; color: string};
+        const r = red as { nombre: string; color: string };
         redesConEntidades.set(entidadRed, r);
         this.crearRed(zonaEntidad, entidadRed, red);
       });
@@ -207,15 +210,16 @@ export class ScenarioBuilder {
       nombre: string;
       color: string;
     };
-    const redComponente = new RedComponent(
-      r.nombre,
-      r.color
-    );
+    const redComponente = new RedComponent(r.nombre, r.color);
 
     this.ecsManager.agregarComponente(entidadRed, redComponente);
-    
+
     // Crear sistema de relaciones Zona-Red y agregarlo al ECSManager
-    const relacionZonaRed = new SistemaRelaciones(ZonaComponent, RedComponent, "redes");
+    const relacionZonaRed = new SistemaRelaciones(
+      ZonaComponent,
+      RedComponent,
+      "redes"
+    );
     this.ecsManager.agregarSistema(relacionZonaRed);
     relacionZonaRed.agregar(entidadZona, entidadRed);
   }
@@ -262,7 +266,11 @@ export class ScenarioBuilder {
     return entidadEspacio;
   }
 
-  crearDispositivo(dispositivo: unknown, espacioId: number, reds: Map<Entidad, {nombre: string, color: string}>): Entidad {
+  crearDispositivo(
+    dispositivo: unknown,
+    espacioId: number,
+    reds: Map<Entidad, { nombre: string; color: string }>
+  ): Entidad {
     const entidadDispositivo = this.ecsManager.agregarEntidad();
     const d = dispositivo as {
       nombre?: string;
@@ -325,10 +333,7 @@ export class ScenarioBuilder {
         const firewallConfig = new FirewallBuilder().build();
         this.ecsManager.agregarComponente(
           entidadDispositivo,
-          new RouterComponent(
-            r.conectadoAInternet ?? true,
-            firewallConfig
-          )
+          new RouterComponent(r.conectadoAInternet ?? true, firewallConfig)
         );
 
         break;
@@ -358,5 +363,83 @@ export class ScenarioBuilder {
    */
   public getSistemaJerarquia(): SistemaJerarquiaEscenario {
     return this.sistemaJerarquia;
+  }
+
+  /**
+   * Obtiene todas las zonas del escenario con su id y nombre
+   */
+  public obtenerZonas(): Array<{ id: number; nombre: string }> {
+    const zonas: Array<{ id: number; nombre: string }> = [];
+
+    // Recorrer todas las entidades y buscar las que tienen ZonaComponent
+    for (const [, container] of this.ecsManager.getEntidades()) {
+      const zonaComponent = container.get(ZonaComponent);
+      if (zonaComponent) {
+        zonas.push({
+          id: zonaComponent.id,
+          nombre: zonaComponent.nombre,
+        });
+      }
+    }
+
+    return zonas.sort((a, b) => a.id - b.id);
+  }
+
+  /**
+   * Obtiene la entidad de zona por su id
+   */
+  public obtenerEntidadZonaPorId(zonaId: number): Entidad | undefined {
+    for (const [entidadId, container] of this.ecsManager.getEntidades()) {
+      const zonaComponent = container.get(ZonaComponent);
+      if (zonaComponent && zonaComponent.id === zonaId) {
+        return entidadId;
+      }
+    }
+    return undefined;
+  }
+
+  /**
+   * Obtiene todas las entidades visibles de una zona específica
+   * Incluye oficinas, espacios y dispositivos de esa zona
+   */
+  public obtenerEntidadesDeZona(
+    zonaId: number
+  ): Map<Entidad, ComponenteContainer> {
+    const entidadesVisibles = new Map<Entidad, ComponenteContainer>();
+
+    // Buscar la entidad de zona
+    const entidadZona = this.obtenerEntidadZonaPorId(zonaId);
+    if (!entidadZona) return entidadesVisibles;
+
+    // Obtener todas las oficinas de esta zona
+    const oficinas = this.sistemaJerarquia.obtenerOficinasDeZona(entidadZona);
+
+    for (const oficinaId of oficinas) {
+      // Obtener todos los espacios de cada oficina
+      const espacios =
+        this.sistemaJerarquia.obtenerEspaciosDeOficina(oficinaId);
+
+      for (const espacioId of espacios) {
+        // Agregar el espacio
+        const espacioContainer = this.ecsManager.getComponentes(espacioId);
+        if (espacioContainer) {
+          entidadesVisibles.set(espacioId, espacioContainer);
+        }
+
+        // Obtener todos los dispositivos de cada espacio
+        const dispositivos =
+          this.sistemaJerarquia.obtenerDispositivosDeEspacio(espacioId);
+
+        for (const dispositivoId of dispositivos) {
+          const dispositivoContainer =
+            this.ecsManager.getComponentes(dispositivoId);
+          if (dispositivoContainer) {
+            entidadesVisibles.set(dispositivoId, dispositivoContainer);
+          }
+        }
+      }
+    }
+
+    return entidadesVisibles;
   }
 }
