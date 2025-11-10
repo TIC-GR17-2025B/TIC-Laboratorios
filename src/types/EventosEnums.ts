@@ -37,3 +37,9 @@ export enum EventosFirewall {
   REGLA_AGREGADA = "firewall:reglaAgregada",
   POLITICA_CAMBIADA = "firewall:politicaCambiada",
 }
+
+export enum EventosVPN {
+  VPN_SOLICITUD_CONEXION = "vpn:solicitudConexion",
+  VPN_CONEXION_ESTABLECIDA = "vpn:conexionEstablecida",
+  VPN_CONEXION_RECHAZADA = "vpn:conexionRechazada",
+}

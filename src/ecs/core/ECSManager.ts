@@ -20,10 +20,10 @@ export class ECSManager {
 
   // Sistema de registro de acciones realizadas durante la simulacion
   private accionesSimulacion = new Array<[string, string, number, unknown?]>();
-  /* Set<nombre de acción,
-                                     objeto sobre el cual se hizo la acción (no necesariamente es un objeto de la escena 3D),
-                                     tiempo actual (total) en segundos justo cuando se realizó la acción,
-                                     estado resultante u otro valor relevante (opcional, creo que puede ser útil en algunos casos)> >*/
+  /* Array<nombre de acción,
+        objeto sobre el cual se hizo la acción (no necesariamente es un objeto de la escena 3D),
+        tiempo actual (total) en segundos justo cuando se realizó la acción,
+        estado resultante u otro valor relevante (opcional, creo que puede ser útil en algunos casos)> >*/
 
   // Para Entidades
 

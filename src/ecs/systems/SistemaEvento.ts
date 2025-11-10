@@ -1,6 +1,7 @@
 import { ObjetosManejables } from "../../types/AccionesEnums";
 import { EstadoAtaqueDispositivo, TipoEvento } from "../../types/DeviceEnums";
-import { EventosAtaque, EventosRed, EventosFirewall } from "../../types/EventosEnums";
+import type { PerfilClienteVPN, PerfilVPNGateway } from "../../types/EscenarioTypes";
+import { EventosAtaque, EventosRed, EventosVPN } from "../../types/EventosEnums";
 import { AtaqueComponent, DispositivoComponent, EventoComponent, WorkstationComponent } from "../components";
 import { Sistema, type Entidad } from "../core";
 import type { ClaseComponente } from "../core/Componente";
@@ -99,6 +100,25 @@ export class SistemaEvento extends Sistema {
         };
         
         this.ecsManager.emit(EventosRed.RED_TRAFICO, { evento: eventoConEntidades });
+        break;
+      }
+      case TipoEvento.CONEXION_VPN: {
+        //Obtenemos los permisos del gateway y del cliente
+        const info = evento.infoAdicional as {
+          gateway: PerfilVPNGateway,
+          cliente: PerfilClienteVPN
+        };
+
+        const entidadOrigen = this.buscarDispositivoPorNombre(info.gateway.hostRemoto);
+        const entidadDestino = this.buscarDispositivoPorNombre(info.gateway.hostLan);
+
+        const permisosConEntidades = {
+          entidadOrigen,
+          entidadDestino,
+          permisos: info
+        };
+        
+        this.ecsManager.emit(EventosVPN.VPN_SOLICITUD_CONEXION, { permisosConEntidades });
         break;
       }
         // Próximamente para futuros eventos

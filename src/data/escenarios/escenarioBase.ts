@@ -8,6 +8,7 @@ import {
   TipoAtaque,
   TipoDispositivo,
   TipoEvento,
+  TipoProteccionVPN,
 } from "../../types/DeviceEnums";
 import { TipoProtocolo } from "../../types/TrafficEnums";
 export const escenarioBase: unknown = {
@@ -63,6 +64,27 @@ export const escenarioBase: unknown = {
         dispositivoReceptor: "Computadora Jacob",
       },
     },
+    {
+      nombreEvento: "Conexión VPN",
+      tipoEvento: TipoEvento.CONEXION_VPN,
+      tiempoNotificacion: 40,
+      descripcion: "Lisa solicitará conexión a través de VPN, asegúrate de definir los permisos correctos.",
+      fase: 1,
+      infoAdicional: { // Se definen los perfiles (permisos) que deben tener configurado el gateway y el cliente
+        gateway: {
+          lanLocal: "LAN2",
+          hostLan: "Computadora Jacob",
+          proteccion: TipoProteccionVPN.EA,
+          dominioRemoto: "Off-site",
+          hostRemoto: "Computadora Lisa",
+        },
+        cliente: {
+          proteccion: TipoProteccionVPN.EA,
+          dominioRemoto: "Corporación",
+          hostRemoto: "Computadora Jacob",
+        },
+      },
+    },
   ],
   fases: [
     {
@@ -76,6 +98,7 @@ export const escenarioBase: unknown = {
     {
       id: 1,
       nombre: "Edificio Principal - Piso 1",
+      domini: "Corporación",
       redes: [
         {
           nombre: "LAN1",
@@ -154,6 +177,25 @@ export const escenarioBase: unknown = {
                 },
               ],
             },
+            {
+              id: 4,
+              mueble: Mueble.MESA,
+              posicion: { x: -4, y: 0, z: 3, rotacionY: 0 },
+              dispositivos: [
+                {
+                  id: 1004,
+                  tipo: TipoDispositivo.VPN,
+                  nombre: "VPN Gateway",
+                  sistemaOperativo: "VPN OS",
+                  hardware: "Cisco VPN",
+                  software: "VPN",
+                  posicion: { x: -4, y: 0, z: 3, rotacionY: 180 },
+                  // Configuración de router
+                  conectadoAInternet: true,
+                  redes: ["LAN2"],
+                },
+              ],
+            }
           ],
         },
       ],
@@ -161,6 +203,7 @@ export const escenarioBase: unknown = {
     {
       id: 2,
       nombre: "WWW - Red Externa",
+      dominio: "WWW",
       redes: [
         {
           nombre: "RedWWW",
@@ -208,6 +251,64 @@ export const escenarioBase: unknown = {
                   // Configuración de router
                   conectadoAInternet: true,
                   redes: ["RedWWW"],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 3,
+      nombre: "Casa Empleado",
+      dominio: "Off-site",
+      redes: [
+        {
+          nombre: "Red-Lisa",
+          color: "#ff00ff",
+        },
+      ],
+      oficinas: [
+        {
+          id: 201,
+          nombre: "Estudio de Lisa",
+          posicion: { x: 10, y: 0, z: 1, rotacionY: 0 },
+          espacios: [
+            {
+              id: 1,
+              mueble: Mueble.MESA,
+              posicion: { x: -2, y: 0, z: 1, rotacionY: 0 },
+              dispositivos: [
+                {
+                  id: 2001,
+                  tipo: TipoDispositivo.WORKSTATION,
+                  nombre: "Computadora Lisa",
+                  sistemaOperativo: "Windows 11",
+                  hardware: "Dell PowerEdge R740",
+                  software: "IDS/IPS, VPN",
+                  posicion: { x: -2, y: 0, z: 1, rotacionY: 0 },
+                  estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
+                  activos: [],
+                  redes: ["Red-Lisa"],
+                },
+              ],
+            },
+            {
+              id: 2,
+              mueble: Mueble.MESA,
+              posicion: { x: 2, y: 0, z: 0, rotacionY: 0 },
+              dispositivos: [
+                {
+                  id: 2002,
+                  tipo: TipoDispositivo.ROUTER,
+                  nombre: "Router Lisa",
+                  sistemaOperativo: "Cisco IOS",
+                  hardware: "Cisco ASR 1001-X",
+                  software: "Routing, Firewall, NAT",
+                  posicion: { x: 2, y: 0, z: 0, rotacionY: 180 },
+                  // Configuración de router
+                  conectadoAInternet: true,
+                  redes: ["Red-Lisa"],
                 },
               ],
             },

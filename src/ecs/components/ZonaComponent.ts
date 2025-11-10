@@ -7,9 +7,10 @@ export class ZonaComponent extends Componente {
   constructor(
     public id: number,
     public nombre: string,
+    public dominio: string,
     public oficinas: Entidad[] = [],
     public redes: Entidad[] = [],
-    public tipo: string = "zona"
+    public tipo: string = "zona" 
   ) {
     super();
   }

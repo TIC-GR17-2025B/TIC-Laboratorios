@@ -19,6 +19,13 @@ export enum EstadoAtaqueDispositivo {
   COMPROMETIDO = "comprometido", // Que está bajo un ataque
 }
 
+export enum TipoProteccionVPN {
+  EA = "Encriptar y Autenticar",
+  A = "Solo Autenticar",
+  N = "Ninguna",
+  B = "Bloquear",
+}
+
 export enum TipoAtaque {
   INFECCION_TROYANO = "Infección de troyano",
 }
@@ -26,4 +33,5 @@ export enum TipoAtaque {
 export enum TipoEvento {
   ENVIO_ACTIVO = "Envío de activo",
   TRAFICO_RED = "Tráfico de red",
+  CONEXION_VPN = "Conexión VPN",
 }

@@ -3,3 +3,4 @@ export { EventoRedService } from "./EventoRedService";
 export { FirewallService } from "./FirewallService";
 export { FirewallConfigService } from "./FirewallConfigService";
 export { TransferenciaService } from "./TransferenciaService";
+export { VPNService } from "./VPNService";

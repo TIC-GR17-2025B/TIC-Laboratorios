@@ -1,6 +1,7 @@
-import { EventosRed } from "../../types/EventosEnums";
+import { EventosRed, EventosVPN } from "../../types/EventosEnums";
 import type { DireccionTrafico } from "../../types/FirewallTypes";
 import { TipoProtocolo } from "../../types/TrafficEnums";
+import { ClienteVPNComponent } from "../components";
 import type { ECSManager } from "../core";
 import type { Entidad } from "../core/Componente";
 import { SistemaRed } from "../systems";
@@ -75,6 +76,35 @@ export class RedController {
         null
       );
       console.log("Tráfico enviado desde el controlador de red", resultado);
+    });
+
+    this.ecsManager.on(EventosVPN.VPN_SOLICITUD_CONEXION, (data: unknown) => {
+      const d = data as {
+        permisosConEntidades: {
+          entidadOrigen: Entidad;
+          entidadDestino: Entidad;
+          permisos: unknown;
+        };
+      };
+
+      console.log(this.ecsManager.getComponentes(d.permisosConEntidades.entidadOrigen)?.get(ClienteVPNComponent)?.perfilesClienteVPN);
+
+      this.sistemaRed?.enviarTrafico(
+        d.permisosConEntidades.entidadOrigen,
+        d.permisosConEntidades.entidadDestino,
+        TipoProtocolo.VPN_GATEWAY,
+        d.permisosConEntidades.permisos
+      );
+    });
+
+    this.ecsManager.on(EventosVPN.VPN_CONEXION_RECHAZADA, (data: unknown) => {
+      const d = data as string;
+      console.log(d);
+    });
+
+    this.ecsManager.on(EventosVPN.VPN_CONEXION_ESTABLECIDA, (data: unknown) => {
+      const d = data as string;
+      console.log(d);
     });
   }
 

@@ -4,6 +4,7 @@ import {
   EstadoAtaqueDispositivo,
   Mueble,
   TipoDispositivo,
+  TipoProteccionVPN,
 } from "./DeviceEnums";
 
 export interface Escenario {
@@ -42,6 +43,20 @@ export interface Dispositivo {
 export interface Activo {
   nombre: string;
   contenido: string;
+}
+
+export interface PerfilVPNGateway {
+  lanLocal: string;
+  hostLan: string;
+  proteccion: TipoProteccionVPN;
+  dominioRemoto: string;
+  hostRemoto: string;
+}
+
+export interface PerfilClienteVPN {
+  proteccion: TipoProteccionVPN;
+  dominioRemoto: string;
+  hostRemoto: string;
 }
 
 export interface Espacio {

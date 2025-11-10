@@ -13,7 +13,9 @@ import {
   FirewallService,
   FirewallConfigService,
   TransferenciaService,
+  VPNService,
 } from "./red";
+import type { PerfilClienteVPN, PerfilVPNGateway } from "../../types/EscenarioTypes";
 
 // Sistema encargado de gestionar redes, conectividad y firewalls
 export class SistemaRed extends Sistema {
@@ -25,6 +27,7 @@ export class SistemaRed extends Sistema {
   private firewallService: FirewallService;
   private firewallConfigService: FirewallConfigService;
   private transferenciaService: TransferenciaService;
+  private vpnService: VPNService;
 
   constructor() {
     super();
@@ -33,6 +36,7 @@ export class SistemaRed extends Sistema {
     this.firewallService = null as any;
     this.firewallConfigService = null as any;
     this.transferenciaService = null as any;
+    this.vpnService = null as any;
   }
 
   // Inicializa servicios de forma lazy (solo la primera vez que se accede)
@@ -76,6 +80,15 @@ export class SistemaRed extends Sistema {
       );
     }
     return this.transferenciaService;
+  }
+
+  private getVPNService(): VPNService {
+    if (!this.vpnService) {
+      this.vpnService = new VPNService(
+        this.ecsManager
+      );
+    }
+    return this.vpnService;
   }
 
   // Conecta un dispositivo a una red específica
@@ -175,6 +188,18 @@ export class SistemaRed extends Sistema {
           entidadOrigen,
           entidadDestino,
           activo
+        );
+        break;
+      }
+      case TipoProtocolo.VPN_GATEWAY: {
+        const permisosVPN = payload as {
+          gateway: PerfilVPNGateway,
+          cliente: PerfilClienteVPN
+        };
+        this.getVPNService().establecerConexion(
+          entidadOrigen,
+          entidadDestino,
+          permisosVPN
         );
         break;
       }

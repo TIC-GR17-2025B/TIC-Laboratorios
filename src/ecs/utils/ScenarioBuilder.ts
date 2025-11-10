@@ -12,9 +12,11 @@ import {
   RouterComponent,
   ActivoComponent,
   EventoComponent,
+  VPNGatewayComponent,
+  ClienteVPNComponent,
 } from "../components";
 import type { ComponenteContainer, Entidad } from "../core/Componente";
-import type { Dispositivo, Escenario } from "../../types/EscenarioTypes";
+import { type Dispositivo, type Escenario } from "../../types/EscenarioTypes";
 import { SistemaJerarquiaEscenario } from "../systems/SistemaJerarquiaEscenario";
 import {
   TipoAtaque,
@@ -193,10 +195,10 @@ export class ScenarioBuilder {
 
   crearZona(zona: unknown, escenarioEntidad?: Entidad): Entidad {
     const entidadZona = this.ecsManager.agregarEntidad();
-    const z = zona as { id: number; nombre: string };
+    const z = zona as { id: number; nombre: string; dominio: string };
     this.ecsManager.agregarComponente(
       entidadZona,
-      new ZonaComponent(z.id, z.nombre)
+      new ZonaComponent(z.id, z.nombre, z.dominio)
     );
     const escEntidad = escenarioEntidad;
     if (escEntidad != null) {
@@ -321,6 +323,10 @@ export class ScenarioBuilder {
           entidadDispositivo,
           new WorkstationComponent()
         );
+        this.ecsManager.agregarComponente(
+          entidadDispositivo,
+          new ClienteVPNComponent()
+        );
         break;
       }
       case TipoDispositivo.ROUTER: {
@@ -335,7 +341,13 @@ export class ScenarioBuilder {
           entidadDispositivo,
           new RouterComponent(r.conectadoAInternet ?? true, firewallConfig)
         );
-
+        break;
+      }
+      case TipoDispositivo.VPN: {
+        this.ecsManager.agregarComponente(
+          entidadDispositivo,
+          new VPNGatewayComponent()
+        );
         break;
       }
     }
