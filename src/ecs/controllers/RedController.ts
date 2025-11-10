@@ -1,7 +1,7 @@
 import { EventosRed, EventosVPN } from "../../types/EventosEnums";
-import type { DireccionTrafico } from "../../types/FirewallTypes";
+import type { DireccionTrafico, ConfiguracionFirewall, LogFirewall } from "../../types/FirewallTypes";
 import { TipoProtocolo } from "../../types/TrafficEnums";
-import { ClienteVPNComponent } from "../components";
+import { ClienteVPNComponent, RouterComponent } from "../components";
 import type { ECSManager } from "../core";
 import type { Entidad } from "../core/Componente";
 import { SistemaRed } from "../systems";
@@ -213,6 +213,38 @@ export class RedController {
       return;
     }
     this.sistemaRed.setConectadoAInternet(entidadRouter, conectado);
+  }
+
+  public obtenerConfiguracionFirewall(entidadRouter: Entidad): ConfiguracionFirewall | null {
+    const container = this.ecsManager.getComponentes(entidadRouter);
+    const routerComponent = container?.get(RouterComponent);
+    return routerComponent?.firewall || null;
+  }
+
+  public obtenerLogsFirewall(entidadRouter: Entidad): string[] {
+    const container = this.ecsManager.getComponentes(entidadRouter);
+    const routerComponent = container?.get(RouterComponent);
+    return routerComponent?.logsFirewall.map(log => log.mensaje) || [];
+  }
+
+  public agregarLogFirewall(entidadRouter: Entidad, mensaje: string, tipo: LogFirewall['tipo']): void {
+    const container = this.ecsManager.getComponentes(entidadRouter);
+    const routerComponent = container?.get(RouterComponent);
+    
+    if (routerComponent) {
+      const nuevoLog: LogFirewall = {
+        timestamp: Date.now(),
+        mensaje,
+        tipo
+      };
+      
+      routerComponent.logsFirewall.push(nuevoLog);
+      
+      // Mantener solo los últimos 100 logs para evitar acumulación excesiva
+      if (routerComponent.logsFirewall.length > 100) {
+        routerComponent.logsFirewall = routerComponent.logsFirewall.slice(-100);
+      }
+    }
   }
 
 }

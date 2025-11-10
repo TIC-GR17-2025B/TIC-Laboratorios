@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import ComboBox from '../../../common/components/ComboBox';
 import styles from '../styles/ModalFirewall.module.css';
+import { useFirewall } from '../hooks';
+import { useECSSceneContext } from '../../escenarios-simulados/context/ECSSceneContext';
+import { useEscenario } from '../../../common/contexts';
 
 /**
  * Componente para configurar el Firewall de un router
@@ -23,65 +26,27 @@ const REDES = [
 
 type RedOption = typeof REDES[number];
 
-interface ReglaFirewall {
-    red: string;
-    direccion: 'inbound' | 'outbound';
-    servicios: string[];
+interface ModalFirewallProps {
+    entidadRouter?: number | null;
 }
 
-export default function ModalFirewall() {
-    const [reglas, setReglas] = useState<ReglaFirewall[]>([]);
+export default function ModalFirewall({ entidadRouter: entidadRouterProp }: ModalFirewallProps = {}) {
     const [redSeleccionada, setRedSeleccionada] = useState<RedOption | null>(REDES[0]);
-    const [logs, setLogs] = useState<string[]>([]);
+    const { ecsManager } = useECSSceneContext();
+    const { dispositivoSeleccionado } = useEscenario();
+    
+    // Usar el prop si viene, sino extraer del contexto
+    const entidadRouter = entidadRouterProp ?? (dispositivoSeleccionado as { entidadId?: number })?.entidadId ?? null;
+    
+    const {
+        logs,
+        obtenerRegla,
+        estaServicioBloqueado,
+        toggleServicio,
+        toggleTodos
+    } = useFirewall(entidadRouter, ecsManager);
 
-    const obtenerRegla = (red: string, direccion: 'inbound' | 'outbound'): ReglaFirewall => {
-        const reglaExistente = reglas.find(r => r.red === red && r.direccion === direccion);
-        if (reglaExistente) return reglaExistente;
-        return { red, direccion, servicios: [] };
-    };
 
-    // Verificar si un servicio está bloqueado
-    const estaServicioBloqueado = (red: string, direccion: 'inbound' | 'outbound', servicio: string): boolean => {
-        const regla = obtenerRegla(red, direccion);
-        return regla.servicios.includes(servicio);
-    };
-
-    const toggleServicio = (red: string, direccion: 'inbound' | 'outbound', servicio: string) => {
-        const reglaActual = obtenerRegla(red, direccion);
-        const estaBloqueado = reglaActual.servicios.includes(servicio);
-
-        let nuevosServicios: string[];
-        if (estaBloqueado) {
-            nuevosServicios = reglaActual.servicios.filter(s => s !== servicio);
-        } else {
-            nuevosServicios = [...reglaActual.servicios, servicio];
-        }
-
-        // Actualizar o agregar regla
-        const reglasActualizadas = reglas.filter(r => !(r.red === red && r.direccion === direccion));
-        if (nuevosServicios.length > 0) {
-            reglasActualizadas.push({ red, direccion, servicios: nuevosServicios });
-        }
-        setReglas(reglasActualizadas);
-    };
-
-    const toggleTodos = (red: string, direccion: 'inbound' | 'outbound') => {
-        const reglaActual = obtenerRegla(red, direccion);
-        const todosBloqueados = reglaActual.servicios.length === SERVICIOS.length;
-
-        const reglasActualizadas = reglas.filter(r => !(r.red === red && r.direccion === direccion));
-
-        if (todosBloqueados) {
-            setReglas(reglasActualizadas); // permitir todos
-        } else {
-            reglasActualizadas.push({
-                red,
-                direccion,
-                servicios: SERVICIOS.map(s => s.value)
-            }); // bloquear todos agrega todos los servicios a la lista
-            setReglas(reglasActualizadas);
-        }
-    };
 
     return (
         <div className={styles.modalFirewallContainer}>
@@ -180,7 +145,9 @@ export default function ModalFirewall() {
             )}
 
             <div className={styles.logsSection}>
-                <h3 className={styles.subtitle}>Resumen de bloqueos</h3>
+                <div className={styles.logsHeader}>
+                    <h3 className={styles.subtitle}>Resumen de bloqueos</h3>
+                </div>
                 <div className={styles.resumenContent}>
                     {logs.length === 0 ? (
                         <p className={styles.textoVacio}>No hay logs sobre bloqueos.</p>

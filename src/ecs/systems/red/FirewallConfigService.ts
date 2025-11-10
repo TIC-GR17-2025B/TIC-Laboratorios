@@ -1,7 +1,7 @@
 import type { ECSManager } from "../../core/ECSManager";
 import type { Entidad } from "../../core";
 import { DispositivoComponent, RouterComponent } from "../../components";
-import { EventosRed, EventosFirewall } from "../../../types/EventosEnums";
+import { EventosFirewall } from "../../../types/EventosEnums";
 import type { TipoProtocolo } from "../../../types/TrafficEnums";
 import type { DireccionTrafico } from "../../../types/FirewallTypes";
 
@@ -57,10 +57,13 @@ export class FirewallConfigService {
         const nuevaRegla = { accion, direccion };
         router.firewall.reglasGlobales.set(protocolo, [...reglasExistentes, nuevaRegla]);
 
+        // Persistir log de regla agregada usando el mismo mensaje del evento
+        const mensajeLog = `Regla agregada en "${dispositivo.nombre}": ${accion} ${protocolo} (${direccion})`;
+        this.persistirLogEnRouter(entidadRouter, mensajeLog, 'REGLA_AGREGADA');
 
         this.ecsManager.emit(EventosFirewall.REGLA_AGREGADA, {
             router: dispositivo.nombre,
-            mensaje: `Regla agregada en "${dispositivo.nombre}": ${accion} ${protocolo} (${direccion})`,
+            mensaje: mensajeLog,
             tipo: 'REGLA_AGREGADA',
             protocolo,
             accion,
@@ -96,10 +99,13 @@ export class FirewallConfigService {
         };
         router.firewall.excepciones.set(protocolo, [...excepcionesExistentes, nuevaExcepcion]);
 
+        // Persistir log de excepción agregada usando el mismo mensaje del evento
+        const mensajeLog = `Excepción agregada en "${dispositivoRouter.nombre}": ${accion} ${protocolo} para "${dispositivoExcepcion.nombre}" (${direccion})`;
+        this.persistirLogEnRouter(entidadRouter, mensajeLog, 'REGLA_AGREGADA');
 
         this.ecsManager.emit(EventosFirewall.REGLA_AGREGADA, {
             router: dispositivoRouter.nombre,
-            mensaje: `Excepción agregada en "${dispositivoRouter.nombre}": ${accion} ${protocolo} para "${dispositivoExcepcion.nombre}" (${direccion})`,
+            mensaje: mensajeLog,
             tipo: 'REGLA_AGREGADA',
             protocolo,
             accion,
@@ -183,5 +189,30 @@ export class FirewallConfigService {
             politicaAnterior,
             politicaNueva: politica
         });
+    }
+
+    /**
+     * Persiste un log en el RouterComponent
+     */
+    private persistirLogEnRouter(
+        entidadRouter: Entidad,
+        mensaje: string,
+        tipo: 'PERMITIDO' | 'BLOQUEADO' | 'REGLA_AGREGADA'
+    ): void {
+        const router = this.ecsManager.getComponentes(entidadRouter)?.get(RouterComponent);
+        if (!router) return;
+
+        const log = {
+            timestamp: Date.now(),
+            mensaje,
+            tipo
+        };
+
+        router.logsFirewall.push(log);
+
+        // Limitar a 100 logs
+        if (router.logsFirewall.length > 100) {
+            router.logsFirewall.shift();
+        }
     }
 }

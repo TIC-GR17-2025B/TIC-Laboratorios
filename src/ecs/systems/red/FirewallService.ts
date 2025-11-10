@@ -1,5 +1,5 @@
 import { RouterComponent, DispositivoComponent } from "../../components";
-import type { ConfiguracionFirewall, DireccionTrafico } from "../../../types/FirewallTypes";
+import type { ConfiguracionFirewall, DireccionTrafico, LogFirewall } from "../../../types/FirewallTypes";
 import type { TipoProtocolo } from "../../../types/TrafficEnums";
 import type { ConectividadService } from "./ConectividadService";
 import type { EventoRedService } from "./EventoRedService";
@@ -64,6 +64,7 @@ export class FirewallService {
                 
                 if (!permitidoSaliente) {
                     this.eventoService.emitirEventoBloqueado(nombreOrigen, nombreDestino, protocolo, 'Router origen');
+                    this.persistirLogEnRouter(entidadRouterOrigen, `Conexión bloqueada: ${nombreOrigen} → ${nombreDestino} [${protocolo}] - Razón: Router origen`, 'BLOQUEADO');
                     return false;
                 }
             }
@@ -83,17 +84,52 @@ export class FirewallService {
                 
                 if (!permitidoEntrante) {
                     this.eventoService.emitirEventoBloqueado(nombreOrigen, nombreDestino, protocolo, 'Router destino');
+                    this.persistirLogEnRouter(entidadRouterDestino, `Conexión bloqueada: ${nombreOrigen} → ${nombreDestino} [${protocolo}] - Razón: Router destino`, 'BLOQUEADO');
                     return false;
                 }
             }
         }
 
-        // Si pasó ambos firewalls, emitir evento de éxito
+        // Si pasó ambos firewalls, emitir evento de éxito y persistir log
         if (permitido) {
             this.eventoService.emitirEventoPermitido(nombreOrigen, nombreDestino, protocolo);
+            
+            // Persistir log en el router relevante
+            if (infoRouterDestino) {
+                const entidadRouterDestino = this.encontrarEntidadRouter(infoRouterDestino.router);
+                if (entidadRouterDestino) {
+                    this.persistirLogEnRouter(entidadRouterDestino, `Conexión permitida: ${nombreOrigen} → ${nombreDestino} [${protocolo}]`, 'PERMITIDO');
+                }
+            } else if (infoRouterOrigen) {
+                const entidadRouterOrigen = this.encontrarEntidadRouter(infoRouterOrigen.router);
+                if (entidadRouterOrigen) {
+                    this.persistirLogEnRouter(entidadRouterOrigen, `Conexión permitida: ${nombreOrigen} → ${nombreDestino} [${protocolo}]`, 'PERMITIDO');
+                }
+            }
         }
 
         return permitido;
+    }
+
+    // Método para persistir logs en el componente del router
+    private persistirLogEnRouter(entidadRouter: Entidad, mensaje: string, tipo: LogFirewall['tipo']): void {
+        const container = this.ecsManager.getComponentes(entidadRouter);
+        const routerComponent = container?.get(RouterComponent);
+        
+        if (routerComponent) {
+            const nuevoLog: LogFirewall = {
+                timestamp: Date.now(),
+                mensaje,
+                tipo
+            };
+            
+            routerComponent.logsFirewall.push(nuevoLog);
+            
+            // Mantener solo los últimos 100 logs para evitar acumulación excesiva
+            if (routerComponent.logsFirewall.length > 100) {
+                routerComponent.logsFirewall = routerComponent.logsFirewall.slice(-100);
+            }
+        }
     }
 
     private encontrarEntidadRouter(routerComponent: RouterComponent): Entidad | null {

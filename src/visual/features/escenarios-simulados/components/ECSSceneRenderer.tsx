@@ -62,8 +62,7 @@ const ECSSceneRenderer: React.FC = () => {
                 {
                     label: 'Configurar Firewall',
                     onClick: () => {
-                        console.log('Configurar Firewall de router:', menuOpenForEntity);
-                        openModal(<ModalFirewall />);
+                        openModal(<ModalFirewall entidadRouter={menuOpenForEntity} />);
                         setMenuOpenForEntity(null);
                     },
                     color: '#ff8800'

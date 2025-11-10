@@ -42,7 +42,7 @@ export const escenarioBase: unknown = {
     {
       nombreEvento: "Prueba de tráfico SSH",
       tipoEvento: TipoEvento.TRAFICO_RED,
-      tiempoNotificacion: 15,
+      tiempoNotificacion: 5,
       descripcion: "Se probará conexión SSH entre zonas (WWW → LAN1).",
       fase: 1,
       infoAdicional: {
