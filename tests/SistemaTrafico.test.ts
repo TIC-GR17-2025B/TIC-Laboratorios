@@ -33,7 +33,7 @@ describe("SistemaTrafico", () => {
     em.agregarComponente(red1, new RedComponent("LAN", "#00FF00"));
     
     const zona1 = em.agregarEntidad();
-    em.agregarComponente(zona1, new ZonaComponent(1, "Zona1", [], [red1], "zona"));
+    em.agregarComponente(zona1, new ZonaComponent(1, "Zona1", "",[], [red1], "zona"));
     sistemaRelaciones.agregar(zona1, red1);
 
     // Crear dos dispositivos en la misma red
@@ -70,13 +70,13 @@ describe("SistemaTrafico", () => {
     const red1 = em.agregarEntidad();
     em.agregarComponente(red1, new RedComponent("LAN1", "#00FF00"));
     const zona1 = em.agregarEntidad();
-    em.agregarComponente(zona1, new ZonaComponent(1, "Zona1", [], [red1], "zona"));
+    em.agregarComponente(zona1, new ZonaComponent(1, "Zona1", "",[], [red1], "zona"));
     sistemaRelaciones.agregar(zona1, red1);
     
     const red2 = em.agregarEntidad();
     em.agregarComponente(red2, new RedComponent("LAN2", "#FF0000"));
     const zona2 = em.agregarEntidad();
-    em.agregarComponente(zona2, new ZonaComponent(2, "Zona2", [], [red2], "zona"));
+    em.agregarComponente(zona2, new ZonaComponent(2, "Zona2", "",[], [red2], "zona"));
     sistemaRelaciones.agregar(zona2, red2);
 
     // Crear dos dispositivos en redes diferentes

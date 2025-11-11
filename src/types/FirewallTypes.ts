@@ -28,9 +28,3 @@ export interface ConfiguracionFirewall {
     reglasGlobales: Map<TipoProtocolo, ReglaGlobal[]>; 
     excepciones: Map<TipoProtocolo, ReglaDispositivo[]>;
 }
-
-export interface LogFirewall {
-    timestamp: number;
-    mensaje: string;
-    tipo: 'PERMITIDO' | 'BLOQUEADO' | 'REGLA_AGREGADA';
-}

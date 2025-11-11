@@ -4,6 +4,7 @@ import styles from '../styles/ModalFirewall.module.css';
 import { useFirewall } from '../hooks';
 import { useECSSceneContext } from '../../escenarios-simulados/context/ECSSceneContext';
 import { useEscenario } from '../../../common/contexts';
+import { useFirewallLogs } from '../context/FirewallLogsContext';
 
 /**
  * Componente para configurar el Firewall de un router
@@ -34,17 +35,21 @@ export default function ModalFirewall({ entidadRouter: entidadRouterProp }: Moda
     const [redSeleccionada, setRedSeleccionada] = useState<RedOption | null>(REDES[0]);
     const { ecsManager } = useECSSceneContext();
     const { dispositivoSeleccionado } = useEscenario();
+    const { obtenerLogsPorRouter } = useFirewallLogs();
     
     // Usar el prop si viene, sino extraer del contexto
     const entidadRouter = entidadRouterProp ?? (dispositivoSeleccionado as { entidadId?: number })?.entidadId ?? null;
     
     const {
-        logs,
         obtenerRegla,
         estaServicioBloqueado,
         toggleServicio,
-        toggleTodos
+        toggleTodos,
+        router
     } = useFirewall(entidadRouter, ecsManager);
+    
+    // Obtener logs del router específico
+    const logs = router ? obtenerLogsPorRouter(router.nombre).map(log => log.mensaje) : [];
 
 
 

@@ -58,6 +58,8 @@ export interface RegistroFirewallBloqueado {
   mensaje: string;
   tipo: 'BLOQUEADO';
   razon?: string;
+  entidadRouter?: number; // Entidad del router que bloqueó
+  router?: string; // Nombre del router (calculado para UI)
 }
 
 // Registro de tráfico permitido por firewall
@@ -67,6 +69,8 @@ export interface RegistroFirewallPermitido {
   protocolo: TipoProtocolo;
   mensaje: string;
   tipo: 'PERMITIDO';
+  entidadRouter?: number; // Entidad del router que permitió
+  router?: string; // Nombre del router (calculado para UI)
 }
 
 // Registro de configuración del firewall (habilitado/deshabilitado)

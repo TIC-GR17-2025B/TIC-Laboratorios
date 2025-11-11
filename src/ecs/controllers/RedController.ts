@@ -1,6 +1,6 @@
 import type { PerfilClienteVPN, PerfilVPNGateway } from "../../types/EscenarioTypes";
 import { EventosRed, EventosVPN } from "../../types/EventosEnums";
-import type { DireccionTrafico, ConfiguracionFirewall, LogFirewall } from "../../types/FirewallTypes";
+import type { DireccionTrafico, ConfiguracionFirewall } from "../../types/FirewallTypes";
 import { TipoProtocolo } from "../../types/TrafficEnums";
 import { ClienteVPNComponent, RouterComponent, VPNGatewayComponent } from "../components";
 import type { ECSManager } from "../core";
@@ -222,31 +222,6 @@ export class RedController {
     return routerComponent?.firewall || null;
   }
 
-  public obtenerLogsFirewall(entidadRouter: Entidad): string[] {
-    const container = this.ecsManager.getComponentes(entidadRouter);
-    const routerComponent = container?.get(RouterComponent);
-    return routerComponent?.logsFirewall.map(log => log.mensaje) || [];
-  }
-
-  public agregarLogFirewall(entidadRouter: Entidad, mensaje: string, tipo: LogFirewall['tipo']): void {
-    const container = this.ecsManager.getComponentes(entidadRouter);
-    const routerComponent = container?.get(RouterComponent);
-    
-    if (routerComponent) {
-      const nuevoLog: LogFirewall = {
-        timestamp: Date.now(),
-        mensaje,
-        tipo
-      };
-      
-      routerComponent.logsFirewall.push(nuevoLog);
-      
-      // Mantener solo los últimos 100 logs para evitar acumulación excesiva
-      if (routerComponent.logsFirewall.length > 100) {
-        routerComponent.logsFirewall = routerComponent.logsFirewall.slice(-100);
-      }
-    }
-  }
 
   getDispositivosPorZona(entidadZona: Entidad): Entidad[] | undefined {
     return this.sistemaJerarquia?.obtenerDispositivosDeZona(entidadZona);

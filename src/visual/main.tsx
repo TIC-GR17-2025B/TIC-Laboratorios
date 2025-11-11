@@ -10,24 +10,27 @@ import TarjetaLogNuevo from './features/escenarios-simulados/components/TarjetaL
 import { ChatProvider } from './features/chat/context/ChatContext.tsx'
 import Redes from './features/simulacion-redes/pages/Redes.tsx'
 import Modal from './common/components/Modal.tsx'
+import { FirewallLogsProviderWrapper } from './features/simulacion-redes/context/FirewallLogsProviderWrapper.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <EscenarioProvider>
     <ModalProvider>
       <ChatProvider>
         <ECSSceneProvider>
-          <BrowserRouter>
-            <Header />
-            <div className="content">
-              <Routes>
-                <Route path='/' element={<VistaOficina />} />
-                <Route path='/dispositivos' element={<Dispositivos />} />
-                <Route path='/redes' element={<Redes />} />
-              </Routes>
-              <TarjetaLogNuevo />
-            </div>
-            <Modal />
-          </BrowserRouter>
+          <FirewallLogsProviderWrapper>
+            <BrowserRouter>
+              <Header />
+              <div className="content">
+                <Routes>
+                  <Route path='/' element={<VistaOficina />} />
+                  <Route path='/dispositivos' element={<Dispositivos />} />
+                  <Route path='/redes' element={<Redes />} />
+                </Routes>
+                <TarjetaLogNuevo />
+              </div>
+              <Modal />
+            </BrowserRouter>
+          </FirewallLogsProviderWrapper>
         </ECSSceneProvider>
       </ChatProvider>
     </ModalProvider>

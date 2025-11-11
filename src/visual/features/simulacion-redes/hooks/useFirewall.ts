@@ -4,7 +4,6 @@ import type { Entidad } from "../../../../ecs/core/Componente";
 import { RedController } from "../../../../ecs/controllers/RedController";
 import { EventosFirewall } from "../../../../types/EventosEnums";
 import { TipoProtocolo } from "../../../../types/TrafficEnums";
-import type { RegistroFirewallBloqueado, RegistroFirewallPermitido, RegistroFirewallEstado, RegistroFirewallRegla } from "../../../../types/TrafficEnums";
 import type { DireccionTrafico, ConfiguracionFirewall } from "../../../../types/FirewallTypes";
 import { DispositivoComponent } from "../../../../ecs/components";
 
@@ -88,7 +87,6 @@ function convertirConfiguracionAReglas(configuracion: ConfiguracionFirewall): Re
 
 export function useFirewall(entidadRouter: Entidad | null, ecsManager: ECSManager) {
   const [reglas, setReglas] = useState<ReglaFirewall[]>([]);
-  const [logs, setLogs] = useState<string[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
 
   const redController = useMemo(() => {
@@ -106,10 +104,6 @@ export function useFirewall(entidadRouter: Entidad | null, ecsManager: ECSManage
       const reglasFromBackend = convertirConfiguracionAReglas(configuracion);
       setReglas(reglasFromBackend);
     }
-
-    // Cargar logs existentes del backend
-    const logsExistentes = redController.obtenerLogsFirewall(entidadRouter);
-    setLogs(logsExistentes);
   }, [entidadRouter, redController]);
 
   // Obtener información del dispositivo router
@@ -119,44 +113,26 @@ export function useFirewall(entidadRouter: Entidad | null, ecsManager: ECSManage
     return container?.get(DispositivoComponent);
   }, [entidadRouter, ecsManager, refreshKey]);
 
-  // Suscripción a eventos del firewall para actualizar logs
+  // Suscripción a eventos del firewall para refrescar configuración
   useEffect(() => {
     if (!ecsManager) {
       console.warn('ECSManager no está disponible para suscribirse a eventos de firewall');
       return;
     }
 
-    const unsubscribePermitido = ecsManager.on(EventosFirewall.TRAFICO_PERMITIDO, (data: unknown) => {
-      const registro = data as RegistroFirewallPermitido;
-      setLogs(prev => [...prev, registro.mensaje]);
-    });
-
-    const unsubscribeBloqueado = ecsManager.on(EventosFirewall.TRAFICO_BLOQUEADO, (data: unknown) => {
-      const registro = data as RegistroFirewallBloqueado;
-      setLogs(prev => [...prev, registro.mensaje]);
-    });
-
-    const unsubscribeHabilitado = ecsManager.on(EventosFirewall.HABILITADO, (data: unknown) => {
-      const registro = data as RegistroFirewallEstado;
-      setLogs(prev => [...prev, registro.mensaje]);
+    const unsubscribeHabilitado = ecsManager.on(EventosFirewall.HABILITADO, () => {
       setRefreshKey(prev => prev + 1);
     });
 
-    const unsubscribeDeshabilitado = ecsManager.on(EventosFirewall.DESHABILITADO, (data: unknown) => {
-      const registro = data as RegistroFirewallEstado;
-      setLogs(prev => [...prev, registro.mensaje]);
+    const unsubscribeDeshabilitado = ecsManager.on(EventosFirewall.DESHABILITADO, () => {
       setRefreshKey(prev => prev + 1);
     });
 
-    const unsubscribeReglaAgregada = ecsManager.on(EventosFirewall.REGLA_AGREGADA, (data: unknown) => {
-      const registro = data as RegistroFirewallRegla;
-      setLogs(prev => [...prev, registro.mensaje]);
+    const unsubscribeReglaAgregada = ecsManager.on(EventosFirewall.REGLA_AGREGADA, () => {
       setRefreshKey(prev => prev + 1);
     });
 
     return () => {
-      unsubscribePermitido();
-      unsubscribeBloqueado();
       unsubscribeHabilitado();
       unsubscribeDeshabilitado();
       unsubscribeReglaAgregada();
@@ -247,7 +223,6 @@ export function useFirewall(entidadRouter: Entidad | null, ecsManager: ECSManage
 
   return {
     reglas,
-    logs,
     router,
     obtenerRegla,
     estaServicioBloqueado,

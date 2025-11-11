@@ -37,7 +37,7 @@ describe("SistemaFirewall - Casos Completos", () => {
   // Helper para crear zona con redes
   function crearZona(id: number, nombre: string, redes: Entidad[]): Entidad {
     const zona = em.agregarEntidad();
-    em.agregarComponente(zona, new ZonaComponent(id, nombre, [], redes, "zona"));
+    em.agregarComponente(zona, new ZonaComponent(id, nombre, "",[], redes, "zona"));
     
     // Asociar redes a la zona vía SistemaRelaciones
     redes.forEach(red => {

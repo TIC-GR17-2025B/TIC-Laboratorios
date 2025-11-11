@@ -57,13 +57,9 @@ export class FirewallConfigService {
         const nuevaRegla = { accion, direccion };
         router.firewall.reglasGlobales.set(protocolo, [...reglasExistentes, nuevaRegla]);
 
-        // Persistir log de regla agregada usando el mismo mensaje del evento
-        const mensajeLog = `Regla agregada en "${dispositivo.nombre}": ${accion} ${protocolo} (${direccion})`;
-        this.persistirLogEnRouter(entidadRouter, mensajeLog, 'REGLA_AGREGADA');
-
         this.ecsManager.emit(EventosFirewall.REGLA_AGREGADA, {
             router: dispositivo.nombre,
-            mensaje: mensajeLog,
+            mensaje: `Regla agregada en "${dispositivo.nombre}": ${accion} ${protocolo} (${direccion})`,
             tipo: 'REGLA_AGREGADA',
             protocolo,
             accion,
@@ -99,13 +95,9 @@ export class FirewallConfigService {
         };
         router.firewall.excepciones.set(protocolo, [...excepcionesExistentes, nuevaExcepcion]);
 
-        // Persistir log de excepción agregada usando el mismo mensaje del evento
-        const mensajeLog = `Excepción agregada en "${dispositivoRouter.nombre}": ${accion} ${protocolo} para "${dispositivoExcepcion.nombre}" (${direccion})`;
-        this.persistirLogEnRouter(entidadRouter, mensajeLog, 'REGLA_AGREGADA');
-
         this.ecsManager.emit(EventosFirewall.REGLA_AGREGADA, {
             router: dispositivoRouter.nombre,
-            mensaje: mensajeLog,
+            mensaje: `Excepción agregada en "${dispositivoRouter.nombre}": ${accion} ${protocolo} para "${dispositivoExcepcion.nombre}" (${direccion})`,
             tipo: 'REGLA_AGREGADA',
             protocolo,
             accion,
@@ -191,28 +183,4 @@ export class FirewallConfigService {
         });
     }
 
-    /**
-     * Persiste un log en el RouterComponent
-     */
-    private persistirLogEnRouter(
-        entidadRouter: Entidad,
-        mensaje: string,
-        tipo: 'PERMITIDO' | 'BLOQUEADO' | 'REGLA_AGREGADA'
-    ): void {
-        const router = this.ecsManager.getComponentes(entidadRouter)?.get(RouterComponent);
-        if (!router) return;
-
-        const log = {
-            timestamp: Date.now(),
-            mensaje,
-            tipo
-        };
-
-        router.logsFirewall.push(log);
-
-        // Limitar a 100 logs
-        if (router.logsFirewall.length > 100) {
-            router.logsFirewall.shift();
-        }
-    }
 }
