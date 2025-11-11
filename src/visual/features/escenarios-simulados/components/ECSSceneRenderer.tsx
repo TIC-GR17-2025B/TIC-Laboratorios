@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import Model3D from './Model3D';
 import { getModelo } from '../config/modelConfig';
@@ -16,6 +16,10 @@ const ECSSceneRenderer: React.FC = () => {
     const { openModal } = useModal();
     const [menuOpenForEntity, setMenuOpenForEntity] = useState<number | null>(null);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        setDispositivoSeleccionado(null);
+    }, []);
 
     const handleEntityClick = (entity: unknown) => {
         console.log('Entidad clickeada:', entity);

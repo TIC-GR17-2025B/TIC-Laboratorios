@@ -3,9 +3,14 @@ import Escena3D from "../components/Escena3D"
 import TarjetaEntidadSeleccionada from "../components/TarjetaEntidadSeleccionada";
 import { useEscenario } from "../../../common/contexts";
 import EventLogsPanel from "../components/EventLogsPanel";
+import { useEffect } from "react";
 
 function VistaOficina() {
-  const { dispositivoSeleccionado } = useEscenario();
+  const { dispositivoSeleccionado, setDispositivoSeleccionado } = useEscenario();
+
+  useEffect(() => {
+    setDispositivoSeleccionado(null);
+  }, []);
 
   return (
     <div className={styles.contenedor}>

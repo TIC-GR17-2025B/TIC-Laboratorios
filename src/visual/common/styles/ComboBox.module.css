@@ -3,6 +3,7 @@
   display: inline-block;
   width: 100%;
   /* min-width: 240px; */
+  user-select: none;
 }
 
 .trigger {

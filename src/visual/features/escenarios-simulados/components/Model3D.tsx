@@ -28,7 +28,7 @@ interface Model3DProps {
  * Componente reutilizable para cargar y renderizar modelos GLTF
  * Muestra wireframe en hover para debugging
  */
-const Model3D: React.FC<Model3DProps> = ({
+const Model3D: React.FC<Model3DProps> = React.memo(({
     modelPath,
     position = [0, 0, 0],
     rotation = [0, 0, 0],
@@ -41,27 +41,30 @@ const Model3D: React.FC<Model3DProps> = ({
     menuOptions = [],
     onMenuClose,
     onNavigate
-}) => {
+}: Model3DProps) => {
     const groupRef = useRef<Group>(null);
     const [hovered, setHovered] = useState(false);
     const { scene } = useGLTF(modelPath);
 
     const clonedScene = useMemo(() => {
-        const cloned = scene.clone();
+        const cloned = scene.clone(true);
 
-        cloned.traverse((child) => {
-            const mesh = child as Mesh;
-            if (mesh.isMesh && mesh.material) {
-                if (Array.isArray(mesh.material)) {
-                    mesh.material = mesh.material.map(mat => mat.clone());
-                } else {
-                    mesh.material = (mesh.material as Material).clone();
+        // Solo clonar materiales si enableHover está activo
+        if (enableHover) {
+            cloned.traverse((child) => {
+                const mesh = child as Mesh;
+                if (mesh.isMesh && mesh.material) {
+                    if (Array.isArray(mesh.material)) {
+                        mesh.material = mesh.material.map(mat => mat.clone());
+                    } else {
+                        mesh.material = (mesh.material as Material).clone();
+                    }
                 }
-            }
-        });
+            });
+        }
 
         return cloned;
-    }, [scene]);
+    }, [scene, enableHover]);
 
     const modelSize = useMemo(() => {
         const box = new Box3().setFromObject(scene);
@@ -173,6 +176,8 @@ const Model3D: React.FC<Model3DProps> = ({
             )}
         </group>
     );
-};
+});
+
+Model3D.displayName = 'Model3D';
 
 export default Model3D;

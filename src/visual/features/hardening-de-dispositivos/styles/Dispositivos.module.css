@@ -38,18 +38,18 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  user-select: none;
   color: var(--text-secondary);
 }
 
 .imagenDispositivo {
   margin-right: 16px;
-  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
   min-width: 260px;
   height: 260px !important;
   width: 260px !important;
   border-radius: var(--border-radius);
-  border: 1px solid var(--border-primary);
   overflow: hidden;
+  user-select: none;
 }
 .descripcion {
   width: 100%;

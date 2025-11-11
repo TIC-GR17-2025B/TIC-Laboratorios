@@ -10,11 +10,11 @@ import {
     DEFAULT_CONTROLS_CONFIG,
     DEFAULT_ENVIRONMENT_CONFIG,
 } from '../config/scene3DConfig';
-import { preloadAllModels } from '../config/modelConfig';
 import ECSSceneRenderer from './ECSSceneRenderer';
 import ZoneToast from './ZoneToast';
 import Controles3D from './Controles3D';
 import { useECSSceneContext } from '../context/ECSSceneContext';
+import { useModelsReady } from '../../../common/components/ModelPreloader';
 
 /**
  * Componente principal de la escena 3D
@@ -29,13 +29,22 @@ const Escena3D: React.FC = () => {
         hideZoneToast
     } = useECSSceneContext();
 
-    // Precargar todos los modelos al montar el componente
+    const modelsReady = useModelsReady();
+    const [isReady, setIsReady] = React.useState(false);
+
+    // Activar fade-in cuando los modelos estén listos
     useEffect(() => {
-        preloadAllModels();
-    }, []);
+        if (modelsReady) {
+            // Pequeño delay para transición suave
+            setTimeout(() => setIsReady(true), 150);
+        }
+    }, [modelsReady]);
 
     return (
-        <section className={styles.vista3D} aria-label="Vista 3D de la escena">
+        <section
+            className={styles.vista3D}
+            aria-label="Vista 3D de la escena"
+        >
             {zonasDisponibles.length > 1 && zonaActual !== null && (
                 <>
                     <ZoneToast
@@ -46,7 +55,7 @@ const Escena3D: React.FC = () => {
                     <Controles3D />
                 </>
             )}
-            <Scene3DCanvas className={styles.canvas}>
+            <Scene3DCanvas className={`${styles.canvas} ${isReady ? styles.ready : ''}`}>
                 <ResizeHandler />
                 <Lights
                     ambientIntensity={DEFAULT_LIGHT_CONFIG.ambientIntensity}

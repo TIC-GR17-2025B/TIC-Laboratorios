@@ -10,7 +10,6 @@ import type { Dispositivo } from "../../../../types/EscenarioTypes";
 import ConexionIcon from "../../../common/icons/ConexionIcon";
 import RedChip from "../../simulacion-redes/components/RedChip";
 import { useDispositivos } from "../hooks";
-import DispositivoViewer3D from "../components/DispositivoViewer3D";
 
 function Dispositivos() {
     const { setDispositivoSeleccionado, dispositivoSeleccionado } = useEscenario();
@@ -43,11 +42,7 @@ function Dispositivos() {
             />
         </div>
         <div className={styles.contenidoDispositivo}>
-            <div className={styles.imagenDispositivo}>
-                {dispositivoSeleccionado && (
-                    <DispositivoViewer3D tipoDispositivo={dispositivoSeleccionado.tipo} />
-                )}
-            </div>
+            <img draggable={false} className={styles.imagenDispositivo} src="/assets/models_picture/workstation.webp" alt="Imagen de Estación de trabajo" />
             <section className={styles.descripcion}>
                 <div className={styles.item}>
                     <div className={styles.etiqueta}>

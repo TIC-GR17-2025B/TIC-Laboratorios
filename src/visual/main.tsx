@@ -11,6 +11,20 @@ import { ChatProvider } from './features/chat/context/ChatContext.tsx'
 import Redes from './features/simulacion-redes/pages/Redes.tsx'
 import Modal from './common/components/Modal.tsx'
 import { FirewallLogsProviderWrapper } from './features/simulacion-redes/context/FirewallLogsProviderWrapper.tsx'
+import ModelPreloader from './common/components/ModelPreloader.tsx'
+
+const shouldRedirect = sessionStorage.getItem('redirect-on-reload');
+if (shouldRedirect === 'true') {
+  sessionStorage.removeItem('redirect-on-reload');
+  window.history.replaceState(null, '', '/');
+}
+
+window.addEventListener('beforeunload', () => {
+  const currentPath = window.location.pathname;
+  if (currentPath === '/dispositivos' || currentPath === '/redes') {
+    sessionStorage.setItem('redirect-on-reload', 'true');
+  }
+});
 
 createRoot(document.getElementById('root')!).render(
   <EscenarioProvider>
@@ -19,6 +33,7 @@ createRoot(document.getElementById('root')!).render(
         <ECSSceneProvider>
           <FirewallLogsProviderWrapper>
             <BrowserRouter>
+              <ModelPreloader />
               <Header />
               <div className="content">
                 <Routes>
