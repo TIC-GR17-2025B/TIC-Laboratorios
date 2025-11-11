@@ -222,6 +222,18 @@ export class RedController {
     return routerComponent?.firewall || null;
   }
 
+  public obtenerRouter(entidadRouter: Entidad): RouterComponent | null {
+    const container = this.ecsManager.getComponentes(entidadRouter);
+    return container?.get(RouterComponent) || null;
+  }
+
+  public obtenerRedesDeRouter(entidadRouter: Entidad): Entidad[] {
+    if (!this.sistemaRed) {
+      return [];
+    }
+    return this.sistemaRed.obtenerRedesDeRouter(entidadRouter);
+  }
+
 
   getDispositivosPorZona(entidadZona: Entidad): Entidad[] | undefined {
     return this.sistemaJerarquia?.obtenerDispositivosDeZona(entidadZona);

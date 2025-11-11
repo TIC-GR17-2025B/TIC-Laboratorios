@@ -8,7 +8,7 @@ export class ConectividadService {
     constructor(private ecsManager: ECSManager) {}
 
 
-    private obtenerRedesDeZona(zonaEntidad: Entidad): Entidad[] {
+    public obtenerRedesDeZona(zonaEntidad: Entidad): Entidad[] {
         const sistemasArray = Array.from(this.ecsManager.getSistemas().keys());
         const sistemasRelaciones = sistemasArray.filter((s): s is SistemaRelaciones => s instanceof SistemaRelaciones);
         for (const sistema of sistemasRelaciones) {
@@ -22,11 +22,6 @@ export class ConectividadService {
         }
         
         return [];
-    }
-
-
-    obtenerRedesDelRouter(routerEntidad: Entidad): Entidad[] {
-        return this.obtenerRedesDelDispositivo(routerEntidad);
     }
 
     private obtenerRedesDelDispositivo(entidadDispositivo: Entidad): Entidad[] {
@@ -124,12 +119,6 @@ export class ConectividadService {
         
         return null;
     }
-
-
-    obtenerRouterDelDispositivo(entidadDispositivo: Entidad): RouterComponent | null {
-        return this.buscarRouterConDispositivo(entidadDispositivo)?.router || null;
-    }
-
 
     obtenerRoutersDeRed(entidadDisp1: Entidad, entidadDisp2: Entidad): RouterComponent[] {
         const routersAplicables: RouterComponent[] = [];

@@ -301,4 +301,12 @@ export class SistemaRed extends Sistema {
             });
         }
     }
+
+
+  public obtenerRedesDeRouter(entidadRouter: Entidad): Entidad[] {
+    const dispositivo = this.ecsManager.getComponentes(entidadRouter)?.get(DispositivoComponent);
+    return dispositivo?.redes || [];
+  }
+
+
 }
