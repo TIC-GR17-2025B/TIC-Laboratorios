@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ComboBox from '../../../common/components/ComboBox';
 import styles from '../styles/ModalFirewall.module.css';
 import { useFirewall } from '../hooks';
 import { useECSSceneContext } from '../../escenarios-simulados/context/ECSSceneContext';
 import { useEscenario } from '../../../common/contexts';
 import { useFirewallLogs } from '../context/FirewallLogsContext';
+import { SistemaJerarquiaEscenario } from '../../../../ecs/systems';
 
 /**
  * Componente para configurar el Firewall de un router
@@ -27,31 +28,28 @@ const REDES = [
 
 type RedOption = typeof REDES[number];
 
-interface ModalFirewallProps {
-    entidadRouter?: number | null;
-}
-
-export default function ModalFirewall({ entidadRouter: entidadRouterProp }: ModalFirewallProps = {}) {
+export default function ModalFirewall() {
     const [redSeleccionada, setRedSeleccionada] = useState<RedOption | null>(REDES[0]);
     const { ecsManager } = useECSSceneContext();
-    const { dispositivoSeleccionado } = useEscenario();
     const { obtenerLogsPorRouter } = useFirewallLogs();
-    
-    // Usar el prop si viene, sino extraer del contexto
-    const entidadRouter = entidadRouterProp ?? (dispositivoSeleccionado as { entidadId?: number })?.entidadId ?? null;
-    
+    const { entidadSeleccionadaId } = useEscenario();
+
+    useEffect(() => {
+        const sistemaJerarquiaEscenario = ecsManager.getSistema(SistemaJerarquiaEscenario);
+        const zonaDeRouter = sistemaJerarquiaEscenario!.obtenerZonaDeDispositivo(entidadSeleccionadaId!);
+        console.log(zonaDeRouter);
+    }, []);
+
     const {
         obtenerRegla,
         estaServicioBloqueado,
         toggleServicio,
         toggleTodos,
         router
-    } = useFirewall(entidadRouter, ecsManager);
-    
+    } = useFirewall(entidadSeleccionadaId, ecsManager);
+
     // Obtener logs del router específico
     const logs = router ? obtenerLogsPorRouter(router.nombre).map(log => log.mensaje) : [];
-
-
 
     return (
         <div className={styles.modalFirewallContainer}>

@@ -63,7 +63,7 @@ const ECSSceneRenderer: React.FC = () => {
                 {
                     label: 'Configurar Firewall',
                     onClick: () => {
-                        openModal(<ModalFirewall entidadRouter={menuOpenForEntity} />);
+                        openModal(<ModalFirewall />);
                         setMenuOpenForEntity(null);
                     },
                 }
@@ -78,7 +78,7 @@ const ECSSceneRenderer: React.FC = () => {
                     }
 
                 }];
-            }
+        }
         // Opciones por defecto para otros dispositivos
         return [
             {

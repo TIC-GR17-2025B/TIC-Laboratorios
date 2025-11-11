@@ -1,6 +1,7 @@
 import type { Node, Edge } from "@xyflow/react";
 import { TipoDispositivo } from "../../../../types/DeviceEnums";
 import type { Entidad } from "../../../../ecs/core/Componente";
+import { ColoresRed } from "../../../../data/colores";
 
 export interface NodoTopologia {
   id: string;
@@ -36,9 +37,9 @@ const DEFAULT_LAYOUT_CONFIG: LayoutConfig = {
   espaciadoDispositivos: 120,
   minGroupWidth: 80,
   groupPadding: 16,
-  groupHeight: 240,
+  groupHeight: 250,
   topY: 70,
-  bottomY: 200,
+  bottomY: 220,
 };
 
 /**
@@ -138,7 +139,7 @@ function calcularPosicionesZona(
     type: "device",
     position: {
       x: xOffset + groupWidth / 2 - 20,
-      y: 310,
+      y: config.bottomY + 150,
     },
     data: { label: "Internet", tipo: "Internet", conectado: true },
     draggable: false,
@@ -192,24 +193,6 @@ function agruparPorRed(
   return redesMap;
 }
 
-/**
- * Encuentra el router/gateway principal de una red específica
- */
-function encontrarRouterDeRed(
-  red: string,
-  routers: NodoTopologia[]
-): NodoTopologia | null {
-  // Buscar el primer router/VPN que pertenezca a esta red
-  return (
-    routers.find((router) => router.redes.some((r) => r.nombre === red)) || null
-  );
-}
-
-/**
- * Genera las aristas (edges) de conexión entre dispositivos usando topología estrella:
- * - Cada dispositivo se conecta al router de su red (no entre sí directamente)
- * - Mantiene la visualización limpia y legible
- */
 export function generarAristas(topologia: Topologia): Edge[] {
   const edges: Edge[] = [];
 
@@ -225,30 +208,53 @@ export function generarAristas(topologia: Topologia): Edge[] {
     const todosDispositivos = [...otros, ...routers];
     const redesMap = agruparPorRed(todosDispositivos);
 
-    // Para cada red, conectar dispositivos al router principal de esa red
+    // para cada red, conectar dispositivos al router principal de esa red
     redesMap.forEach((grupoRed, nombreRed) => {
-      const routerPrincipal = encontrarRouterDeRed(nombreRed, routers);
+      const routersEnRed = grupoRed.nodos.filter(
+        (n) =>
+          n.tipo === TipoDispositivo.ROUTER || n.tipo === TipoDispositivo.VPN
+      );
+      const dispositivosEnRed = grupoRed.nodos.filter(
+        (n) =>
+          n.tipo !== TipoDispositivo.ROUTER && n.tipo !== TipoDispositivo.VPN
+      );
 
-      if (routerPrincipal) {
-        // Conectar cada dispositivo (que no sea router) al router principal
-        grupoRed.nodos.forEach((nodo) => {
-          if (
-            nodo.id !== routerPrincipal.id &&
-            nodo.tipo !== TipoDispositivo.ROUTER &&
-            nodo.tipo !== TipoDispositivo.VPN
-          ) {
-            edges.push({
-              id: `${nodo.id}-${routerPrincipal.id}-${nombreRed}`,
-              source: nodo.id,
-              target: routerPrincipal.id,
-              type: "step",
-              style: {
-                stroke: grupoRed.color,
-                strokeWidth: 2,
-              },
-              data: { red: nombreRed },
-            } as Edge);
-          }
+      // para conectar routers entre sí por arriba
+      for (let i = 0; i < routersEnRed.length; i++) {
+        for (let j = i + 1; j < routersEnRed.length; j++) {
+          edges.push({
+            id: `${routersEnRed[i].id}-${routersEnRed[j].id}-${nombreRed}`,
+            source: routersEnRed[i].id,
+            sourceHandle: "top",
+            target: routersEnRed[j].id,
+            targetHandle: "top-target",
+            type: "step",
+            className: "network-edge",
+            style: {
+              stroke: grupoRed.color,
+              strokeWidth: 3,
+            },
+            data: { red: nombreRed, color: grupoRed.color },
+          } as Edge);
+        }
+      }
+
+      // Conectar dispositivos normales al primer router de la red
+      if (routersEnRed.length > 0) {
+        const routerPrincipal = routersEnRed[0];
+        dispositivosEnRed.forEach((dispositivo) => {
+          edges.push({
+            id: `${dispositivo.id}-${routerPrincipal.id}-${nombreRed}`,
+            source: dispositivo.id,
+            target: routerPrincipal.id,
+            type: "step",
+            className: "network-edge",
+            style: {
+              stroke: grupoRed.color,
+              strokeWidth: 2,
+            },
+            data: { red: nombreRed, color: grupoRed.color },
+          } as Edge);
         });
       } else {
         // Si no hay router, conectar dispositivos en cadena (fallback)
@@ -264,25 +270,31 @@ export function generarAristas(topologia: Topologia): Edge[] {
             source: nodosNoRouter[i].id,
             target: nodosNoRouter[i + 1].id,
             type: "step",
+            className: "network-edge",
             style: {
               stroke: grupoRed.color,
-              strokeWidth: 2,
+              strokeWidth: 3,
             },
-            data: { red: nombreRed },
+            data: { red: nombreRed, color: grupoRed.color },
           } as Edge);
         }
       }
     });
 
-    // Conectar routers a Internet (siempre con rojo)
+    // Conectar routers a Internet (siempre con rojo, desde el handler inferior)
     routers.forEach((router) => {
       edges.push({
         id: `${router.id}-internet-${zona.id}`,
         source: router.id,
+        sourceHandle: "bottom",
         target: `internet-${zona.id}`,
         type: "step",
-        style: { stroke: "#D4474A", strokeWidth: 2 },
-        data: { red: "internet" },
+        className: "network-edge",
+        style: {
+          stroke: ColoresRed.ROJO,
+          strokeWidth: 3,
+        },
+        data: { red: "internet", color: ColoresRed.ROJO },
       } as Edge);
     });
   });

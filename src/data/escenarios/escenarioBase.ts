@@ -11,6 +11,7 @@ import {
   TipoProteccionVPN,
 } from "../../types/DeviceEnums";
 import { TipoProtocolo } from "../../types/TrafficEnums";
+import { ColoresRed } from "../colores";
 export const escenarioBase: unknown = {
   id: 2,
   titulo: "Infraestructura Corporativa Completa",
@@ -68,9 +69,11 @@ export const escenarioBase: unknown = {
       nombreEvento: "Conexión VPN",
       tipoEvento: TipoEvento.CONEXION_VPN,
       tiempoNotificacion: 40,
-      descripcion: "Lisa solicitará conexión a través de VPN, asegúrate de definir los permisos correctos.",
+      descripcion:
+        "Lisa solicitará conexión a través de VPN, asegúrate de definir los permisos correctos.",
       fase: 1,
-      infoAdicional: { // Se definen los perfiles (permisos) que deben tener configurado el gateway y el cliente
+      infoAdicional: {
+        // Se definen los perfiles (permisos) que deben tener configurado el gateway y el cliente
         gateway: {
           lanLocal: "LAN2",
           hostLan: "Computadora Jacob",
@@ -102,11 +105,11 @@ export const escenarioBase: unknown = {
       redes: [
         {
           nombre: "LAN1",
-          color: "#00ff00",
+          color: ColoresRed.CIAN,
         },
         {
           nombre: "LAN2",
-          color: "#00ccff",
+          color: ColoresRed.VERDE,
         },
       ],
       oficinas: [
@@ -195,7 +198,7 @@ export const escenarioBase: unknown = {
                   redes: ["LAN2"],
                 },
               ],
-            }
+            },
           ],
         },
       ],
@@ -207,7 +210,7 @@ export const escenarioBase: unknown = {
       redes: [
         {
           nombre: "RedWWW",
-          color: "#ff6600",
+          color: ColoresRed.NARANJA,
         },
       ],
       oficinas: [
@@ -265,7 +268,7 @@ export const escenarioBase: unknown = {
       redes: [
         {
           nombre: "Red-Lisa",
-          color: "#ff00ff",
+          color: ColoresRed.INDIGO,
         },
       ],
       oficinas: [

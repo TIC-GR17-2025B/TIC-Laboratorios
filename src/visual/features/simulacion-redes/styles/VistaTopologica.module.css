@@ -5,15 +5,22 @@
   border: 1px solid var(--border-primary);
   position: relative;
   border-radius: var(--border-radius, 8px);
+  overflow: hidden;
 }
 .deviceNodeContainer {
   display: flex;
   flex-direction: column;
+  cursor: pointer;
   align-items: center;
   gap: 4px;
   max-width: 40px;
   position: relative;
   padding-bottom: 4px;
+}
+.deviceLabel {
+  max-width: 105px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .deviceNode {
   background: #656565;
@@ -89,33 +96,71 @@
 .redChipWrapper {
   padding: 0.5rem 1rem;
   cursor: pointer;
-  background: var(--surface-primary);
   border-radius: var(--border-radius);
+  border: 1px solid var(--border-primary);
 }
 .redChipWrapper.selected {
   opacity: 1;
+  background-color: var(--surface-secondary);
 }
 
 .panelLateral {
   position: absolute;
   top: 0;
   right: 0;
-  padding: 1rem;
+  bottom: 0;
+  padding: 16px;
   width: 300px;
-  height: 100%;
-  background-color: var(--surface-secondary);
+  background-color: var(--surface-primary);
   border-left: 1px solid var(--border-primary);
-  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease, opacity 0.2s ease;
+  z-index: 2;
 }
+
+.panelLateral.hidden {
+  transform: translateX(100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
 .panelLateral h3 {
   font-weight: normal;
-  line-height: 0;
   margin: 10px 0;
 }
 .panelLateral .tipoDispo {
   font-size: 13px;
+  margin-top: -15px;
+  margin-bottom: 0.5rem;
   color: var(--text-secondary);
+  text-transform: capitalize;
+}
+
+.botonCerrarPanel {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--border-radius);
+  transition: all 0.2s ease;
+}
+
+.botonCerrarPanel:hover {
+  background: var(--border-primary);
+  color: var(--text-primary);
+}
+
+.botonCerrarPanel:active {
+  transform: scale(0.95);
 }
 .dispositivoInfoHeader {
   display: flex;
@@ -124,9 +169,26 @@
   margin-bottom: 1rem;
   width: fit-content;
   /* border-bottom: 1px solid currentColor; */
-  cursor: pointer;
   transition: 0.15s all ease-in-out;
 }
-.dispositivoInfoHeader:hover {
-  color: var(--blue);
+
+.networkBadges {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  display: flex;
+  gap: 4px;
+  z-index: 10;
+}
+
+.networkBadge {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  overflow: hidden;
+  outline: 2px solid var(--surface-secondary);
+}
+
+:global(.react-flow__edge-path) {
+  stroke-width: 2 !important;
 }
