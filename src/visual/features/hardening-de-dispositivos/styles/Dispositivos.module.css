@@ -4,7 +4,9 @@
   flex: 1 1 auto;
   min-height: 0;
 }
-
+.comboBoxDispositivo {
+  width: 290px;
+}
 .contenidoDispositivo {
   margin-top: 8px;
   display: flex;
@@ -19,6 +21,19 @@
   padding: 12px 0;
   border-bottom: 1px solid var(--border-primary);
 }
+
+.itemLista {
+  gap: 8px;
+  align-items: start;
+}
+
+.itemListaDetalle {
+  width: 100%;
+  margin-bottom: 0.75rem;
+}
+.itemLista:last-child {
+  border-bottom: none;
+}
 .etiqueta {
   display: flex;
   align-items: center;
@@ -28,11 +43,13 @@
 
 .imagenDispositivo {
   margin-right: 16px;
-  background-color: var(--border-primary);
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
   min-width: 260px;
   height: 260px !important;
   width: 260px !important;
   border-radius: var(--border-radius);
+  border: 1px solid var(--border-primary);
+  overflow: hidden;
 }
 .descripcion {
   width: 100%;

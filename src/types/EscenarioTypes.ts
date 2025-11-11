@@ -1,4 +1,8 @@
-import type { AtaqueComponent, EventoComponent, FaseComponent } from "../ecs/components";
+import type {
+  AtaqueComponent,
+  EventoComponent,
+  FaseComponent,
+} from "../ecs/components";
 import type { Entidad } from "../ecs/core";
 import {
   EstadoAtaqueDispositivo,
@@ -38,6 +42,7 @@ export interface Dispositivo {
   // Configuraciones del Workstation si aplica (las provee WorkstationComponent)
   configuraciones?: unknown;
   activos: Activo[];
+  redes?: Array<{ nombre: string; color: string; entidadId: number }>;
 }
 
 export interface Activo {
