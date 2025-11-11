@@ -5,6 +5,7 @@ import { getModelo } from '../config/modelConfig';
 import { useEscenario, useModal } from '../../../common/contexts';
 import { useECSSceneContext } from '../context/ECSSceneContext';
 import ModalFirewall from '../../simulacion-redes/components/ModalFirewall';
+import ModalVPN from '../../simulacion-redes/components/ModalVPN';
 
 /**
  * Componente que renderiza todas las entidades del ECS como modelos 3D
@@ -65,21 +66,27 @@ const ECSSceneRenderer: React.FC = () => {
                         openModal(<ModalFirewall entidadRouter={menuOpenForEntity} />);
                         setMenuOpenForEntity(null);
                     },
-                    color: '#ff8800'
                 }
             ];
-        }
+        } else if (deviceType === 'VPN') {
+            return [
+                {
+                    label: 'Configurar VPN',
+                    onClick: () => {
+                        openModal(<ModalVPN />);
+                        setMenuOpenForEntity(null);
+                    }
 
+                }];
+            }
         // Opciones por defecto para otros dispositivos
         return [
             {
                 label: 'Configurar',
                 to: '/dispositivos',
                 onClick: () => {
-                    console.log('Configurar entidad:', menuOpenForEntity);
                     setMenuOpenForEntity(null);
                 },
-                color: '#0088ff'
             }
         ];
     };

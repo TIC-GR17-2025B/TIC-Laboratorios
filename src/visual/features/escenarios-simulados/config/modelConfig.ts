@@ -19,6 +19,7 @@ export const MUEBLE_MODELS: Record<string, string> = {
 export const DISPOSITIVO_MODELS: Record<string, string> = {
   [TipoDispositivo.WORKSTATION]: "/assets/models/computadora.gltf",
   [TipoDispositivo.ROUTER]: "/assets/models/router.gltf",
+  [TipoDispositivo.VPN]: "/assets/models/vpn.gltf",
 };
 
 /**
@@ -44,6 +45,7 @@ export const preloadAllModels = () => {
 export const DISPOSITIVO_HEIGHTS: Record<string, number> = {
   [TipoDispositivo.WORKSTATION]: 0.71,
   [TipoDispositivo.ROUTER]: 0.71,
+  [TipoDispositivo.VPN]: 0.71,
 };
 
 /**
