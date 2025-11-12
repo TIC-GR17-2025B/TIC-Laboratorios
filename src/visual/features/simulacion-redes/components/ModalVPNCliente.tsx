@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import ComboBox from "../../../common/components/ComboBox";
 import styles from "../styles/ModalVPN.module.css";
 import { TipoProteccionVPN } from "../../../../types/DeviceEnums";
-import { useECSScene } from "../../escenarios-simulados/hooks/useECSScene";
+import { useECSSceneContext } from "../../escenarios-simulados/context/ECSSceneContext";
 import { useEscenario } from "../../../common/contexts";
 import type { PerfilClienteVPN } from "../../../../types/EscenarioTypes";
 import TrashIcon from "../../../common/icons/TrashIcon";
@@ -33,7 +33,7 @@ export default function ModalVPNCliente() {
 
     const isFormularioCompleto = proteccion && dominioRemoto && hostRemoto;
 
-    const { redController } = useECSScene();
+    const { redController } = useECSSceneContext();
     const { entidadSeleccionadaId } = useEscenario();
 
     function eliminarPerfilClienteVPN(indiceEnTabla: number) {
@@ -218,7 +218,7 @@ export default function ModalVPNCliente() {
 
 interface ConfiguracionVpnClienteProps extends PerfilClienteVPN {
     index: number;
-    redController: ReturnType<typeof useECSScene>["redController"];
+    redController: ReturnType<typeof useECSSceneContext>["redController"];
     onEliminar: (index: number) => void;
 }
 
