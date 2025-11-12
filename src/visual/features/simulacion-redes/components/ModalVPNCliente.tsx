@@ -114,8 +114,8 @@ export default function ModalVPNCliente() {
                 entidadSeleccionadaId!,
                 {
                     proteccion: proteccion!.value as TipoProteccionVPN,
-                    dominioRemoto: dominioRemoto!.value,
-                    hostRemoto: hostRemoto!.value,
+                    dominioRemoto: dominioRemoto!.label,
+                    hostRemoto: hostRemoto!.label,
                 }
             );
 

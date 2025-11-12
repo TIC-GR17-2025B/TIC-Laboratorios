@@ -139,11 +139,11 @@ export default function ModalVPN() {
     if (isFormularioCompleto) {
       const configExistente = configuraciones.some(
         (config) =>
-          config.lanLocal === lanLocal!.value &&
-          config.hostLan === hostLan!.value &&
+          config.lanLocal === lanLocal!.label &&
+          config.hostLan === hostLan!.label &&
           config.proteccion === proteccion!.value &&
-          config.dominioRemoto === dominioRemoto!.value &&
-          config.hostRemoto === hostRemoto!.value
+          config.dominioRemoto === dominioRemoto!.label &&
+          config.hostRemoto === hostRemoto!.label
       );
 
       if (configExistente) {

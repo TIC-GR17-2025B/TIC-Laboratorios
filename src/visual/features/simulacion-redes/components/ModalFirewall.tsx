@@ -21,7 +21,6 @@ export default function ModalFirewall() {
     const { entidadSeleccionadaId } = useEscenario();
 
     const {
-        router,
         redesRouter,
         estaProtocoloBloqueado,
         toggleProtocolo,
