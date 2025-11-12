@@ -67,7 +67,7 @@ const ECSSceneRenderer: React.FC = () => {
                 {
                     label: 'Configurar Firewall',
                     onClick: () => {
-                        openModal(<ModalFirewall />, "Configuración de Firewall");
+                        openModal(<ModalFirewall />);
                         setMenuOpenForEntity(null);
                     },
                 }

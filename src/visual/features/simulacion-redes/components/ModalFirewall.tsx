@@ -21,12 +21,14 @@ export default function ModalFirewall() {
     const { entidadSeleccionadaId } = useEscenario();
 
     const {
+        router,
         redesRouter,
         estaProtocoloBloqueado,
         toggleProtocolo,
         bloquearTodos,
         permitirTodos,
-        todosBloqueados,
+        modoEntrante,
+        modoSaliente,
         logsFirewall
     } = useFirewall(entidadSeleccionadaId, ecsManager);
 
@@ -41,32 +43,25 @@ export default function ModalFirewall() {
 
     const logs = logsFirewall.map((log: any) => log.mensaje);
 
-    // Obtener lista de protocolos
     const protocolos = useMemo(() => {
         return ConfiguracionProtocolos.map(p => p.protocolo);
     }, []);
 
-    // Verificar si todos están bloqueados para cada dirección
-    const todosEntrantes = useMemo(() => {
-        return todosBloqueados(protocolos, 'ENTRANTE');
-    }, [todosBloqueados, protocolos]);
-
-    const todosSalientes = useMemo(() => {
-        return todosBloqueados(protocolos, 'SALIENTE');
-    }, [todosBloqueados, protocolos]);
-
     return (
         <div className={styles.modalFirewallContainer}>
-            <div style={{ width: "200px" }}>
-                <ComboBox
-                    items={REDES}
-                    value={redSeleccionada}
-                    onChange={setRedSeleccionada}
-                    getKey={(item) => item.value}
-                    getLabel={(item) => item.label}
-                    placeholder="Selecciona una red"
-                />
-            </div>
+            <h2 className={styles.modalFirewallTitle}>Configuración de Firewall</h2>
+            <p className={styles.descripcion}>
+                Configura qué servicios bloquear para cada red y dirección de tráfico
+            </p>
+
+            <ComboBox
+                items={REDES}
+                value={redSeleccionada}
+                onChange={setRedSeleccionada}
+                getKey={(item) => item.value}
+                getLabel={(item) => item.label}
+                placeholder="Selecciona una red"
+            />
 
             {redSeleccionada && (
                 <div className={styles.reglasGrid}>
@@ -81,15 +76,15 @@ export default function ModalFirewall() {
                                     <button
                                         className={styles.toggleTodosBtn}
                                         onClick={() => {
-                                            if (todosEntrantes) {
-                                                permitirTodos(protocolos, 'ENTRANTE');
-                                            } else {
+                                            if (modoEntrante === 'bloquear') {
                                                 bloquearTodos(protocolos, 'ENTRANTE');
+                                            } else {
+                                                permitirTodos(protocolos, 'ENTRANTE');
                                             }
                                         }}
-                                        title={todosEntrantes ? "Permitir todos" : "Bloquear todos"}
+                                        title={modoEntrante === 'permitir' ? "Permitir todos" : "Bloquear todos"}
                                     >
-                                        {todosEntrantes ? '✓ Permitir todos' : '✗ Bloquear todos'}
+                                        {modoEntrante === 'permitir' ? '✓ Permitir todos' : '✗ Bloquear todos'}
                                     </button>
                                 </div>
                                 <div className={styles.serviciosGrid}>
@@ -119,15 +114,15 @@ export default function ModalFirewall() {
                                     <button
                                         className={styles.toggleTodosBtn}
                                         onClick={() => {
-                                            if (todosSalientes) {
-                                                permitirTodos(protocolos, 'SALIENTE');
-                                            } else {
+                                            if (modoSaliente === 'bloquear') {
                                                 bloquearTodos(protocolos, 'SALIENTE');
+                                            } else {
+                                                permitirTodos(protocolos, 'SALIENTE');
                                             }
                                         }}
-                                        title={todosSalientes ? "Permitir todos" : "Bloquear todos"}
+                                        title={modoSaliente === 'permitir' ? "Permitir todos" : "Bloquear todos"}
                                     >
-                                        {todosSalientes ? '✓ Permitir todos' : '✗ Bloquear todos'}
+                                        {modoSaliente === 'permitir' ? '✓ Permitir todos' : '✗ Bloquear todos'}
                                     </button>
                                 </div>
                                 <div className={styles.serviciosGrid}>
