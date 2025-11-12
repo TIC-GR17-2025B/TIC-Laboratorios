@@ -57,19 +57,16 @@ export default function ModalFirewall() {
 
     return (
         <div className={styles.modalFirewallContainer}>
-            <h2 className={styles.modalFirewallTitle}>Configuración de Firewall</h2>
-            <p className={styles.descripcion}>
-                Configura qué servicios bloquear para cada red y dirección de tráfico
-            </p>
-
-            <ComboBox
-                items={REDES}
-                value={redSeleccionada}
-                onChange={setRedSeleccionada}
-                getKey={(item) => item.value}
-                getLabel={(item) => item.label}
-                placeholder="Selecciona una red"
-            />
+            <div style={{ width: "200px" }}>
+                <ComboBox
+                    items={REDES}
+                    value={redSeleccionada}
+                    onChange={setRedSeleccionada}
+                    getKey={(item) => item.value}
+                    getLabel={(item) => item.label}
+                    placeholder="Selecciona una red"
+                />
+            </div>
 
             {redSeleccionada && (
                 <div className={styles.reglasGrid}>

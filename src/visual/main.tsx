@@ -30,19 +30,19 @@ createRoot(document.getElementById('root')!).render(
     <ModalProvider>
       <ChatProvider>
         <ECSSceneProvider>
-            <BrowserRouter>
-              <ModelPreloader />
-              <Header />
-              <div className="content">
-                <Routes>
-                  <Route path='/' element={<VistaOficina />} />
-                  <Route path='/dispositivos' element={<Dispositivos />} />
-                  <Route path='/redes' element={<Redes />} />
-                </Routes>
-                <TarjetaLogNuevo />
-              </div>
-              <Modal />
-            </BrowserRouter>
+          <BrowserRouter>
+            <ModelPreloader />
+            <Header />
+            <div className="content">
+              <Routes>
+                <Route path='/' element={<VistaOficina />} />
+                <Route path='/dispositivos' element={<Dispositivos />} />
+                <Route path='/redes' element={<Redes />} />
+              </Routes>
+              <TarjetaLogNuevo />
+            </div>
+            <Modal />
+          </BrowserRouter>
         </ECSSceneProvider>
       </ChatProvider>
     </ModalProvider>
