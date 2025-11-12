@@ -20,7 +20,6 @@ import {
   EventosPresupuesto,
   EventosTiempo,
 } from "../../types/EventosEnums";
-import type { SistemaRelaciones } from "../systems/SistemaRelaciones";
 
 export class EscenarioController {
   public escenario: Escenario;

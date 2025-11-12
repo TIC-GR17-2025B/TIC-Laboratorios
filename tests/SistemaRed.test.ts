@@ -1,8 +1,8 @@
 import { describe, test, expect } from 'vitest'
 import { ECSManager } from '../src/ecs/core';
-import { SistemaRed } from '../src/ecs/systems';
+import { SistemaRed, SistemaRelaciones } from '../src/ecs/systems';
 import { EstadoAtaqueDispositivo, TipoDispositivo } from '../src/types/DeviceEnums';
-import { ActivoComponent, DispositivoComponent, RouterComponent, RedComponent } from '../src/ecs/components';
+import { ActivoComponent, DispositivoComponent, RouterComponent, RedComponent, ZonaComponent } from '../src/ecs/components';
 import { TipoProtocolo } from '../src/types/TrafficEnums';
 import { FirewallBuilder } from '../src/ecs/utils/FirewallBuilder';
 
@@ -33,16 +33,16 @@ describe("SistemaRed", () => {
         );
         
         const red1 = em.agregarEntidad();
-        em.agregarComponente(red1, new RedComponent("LAN1", "#00DD00", [], ""));
+        em.agregarComponente(red1, new RedComponent("LAN1", "#00DD00"));
         
         const firewallConfig = new FirewallBuilder().build();
-        em.agregarComponente(router, new RouterComponent(true, firewallConfig, [red1]));
+        em.agregarComponente(router, new RouterComponent(true, firewallConfig));
 
   
-        sistema.asignarRed(nombreDisp1, "LAN1");
-        sistema.asignarRed(nombreDisp2, "LAN1");
+        sistema.asignarRed(entidadDisp1, red1);
+        sistema.asignarRed(entidadDisp2, red1);
 
-        sistema.enviarTrafico(nombreDisp1, nombreDisp2, TipoProtocolo.FTP, activoComponente.activos[0].nombre);
+        sistema.enviarTrafico(entidadDisp1, entidadDisp2, TipoProtocolo.FTP, activoComponente.activos[0].nombre);
 
         expect(activoComponente2.activos.includes(activoComponente.activos[0])).toBe(true);
     });
@@ -50,8 +50,20 @@ describe("SistemaRed", () => {
     test("se pueden enviar activos entre dispositivos de distintas redes pero en la misma zona", () => {
         const em = new ECSManager();
         const sistema = new SistemaRed();
-        em.agregarSistema(sistema);
+        em.agregarSistema(sistema); 
+        
+        const sistemaRelaciones = new SistemaRelaciones(ZonaComponent, RedComponent, "redes");
+        em.agregarSistema(sistemaRelaciones);
 
+        const red1 = em.agregarEntidad();
+        em.agregarComponente(red1, new RedComponent("LAN1", "#00DD00"));
+        const red2 = em.agregarEntidad();
+        em.agregarComponente(red2, new RedComponent("LAN2", "#0000FF"));
+
+        const zona1 = em.agregarEntidad();
+        em.agregarComponente(zona1, new ZonaComponent(1, "Zona1", "",[], [red1, red2], "zona"));
+        sistemaRelaciones.agregar(zona1, red1);
+        sistemaRelaciones.agregar(zona1, red2);
 
         const nombreDisp1 = "dispo1";
         const entidadDisp1 = em.agregarEntidad();
@@ -69,22 +81,15 @@ describe("SistemaRed", () => {
         const router = em.agregarEntidad();
         em.agregarComponente(router, 
           new DispositivoComponent("router1", "Cisco", "hw", 
-            TipoDispositivo.ROUTER, EstadoAtaqueDispositivo.NORMAL)
+            TipoDispositivo.ROUTER, EstadoAtaqueDispositivo.NORMAL, [red1, red2])
         );
-        
-        const red1 = em.agregarEntidad();
-        em.agregarComponente(red1, new RedComponent("LAN1", "#00DD00", [], ""));
-        const red2 = em.agregarEntidad();
-        em.agregarComponente(red2, new RedComponent("LAN2", "#0000FF", [], ""));
-        
         const firewallConfig = new FirewallBuilder().build();
-        em.agregarComponente(router, new RouterComponent(true, firewallConfig, [red1, red2]));
+        em.agregarComponente(router, new RouterComponent(true, firewallConfig));
 
+        sistema.asignarRed(entidadDisp1, red1);
+        sistema.asignarRed(entidadDisp2, red2);
 
-        sistema.asignarRed(nombreDisp1, "LAN1");
-        sistema.asignarRed(nombreDisp2, "LAN2");
-
-        sistema.enviarTrafico(nombreDisp1, nombreDisp2, TipoProtocolo.FTP, activoComponente.activos[0].nombre);
+        sistema.enviarTrafico(entidadDisp1, entidadDisp2, TipoProtocolo.FTP, activoComponente.activos[0].nombre);
 
         expect(activoComponente2.activos.includes(activoComponente.activos[0])).toBe(true);
     });

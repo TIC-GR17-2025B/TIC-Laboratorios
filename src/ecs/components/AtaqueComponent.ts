@@ -1,4 +1,4 @@
-import type { TipoAtaque } from "../../types/DeviceEnums";
+import { TipoEvento, type TipoAtaque } from "../../types/DeviceEnums";
 import { EventoComponent } from "./EventoComponent";
 
 export class AtaqueComponent extends EventoComponent {
@@ -27,6 +27,6 @@ export class AtaqueComponent extends EventoComponent {
      */
     public tiempoEnOcurrir: number = tiempoNotificacion + 10
   ) {
-    super(nombreAtaque, tiempoNotificacion, descripcion, fase);
+    super(nombreAtaque, TipoEvento.NO_APLICA, tiempoNotificacion, descripcion, fase);
   }
 }

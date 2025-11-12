@@ -1,4 +1,4 @@
-import { Componente, type Entidad } from "../core";
+import { Componente } from "../core";
 
 export class RedComponent extends Componente {
     constructor(

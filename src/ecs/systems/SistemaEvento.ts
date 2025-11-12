@@ -37,17 +37,26 @@ export class SistemaEvento extends Sistema {
     // Se obtiene el dispositivo general sobre el cual se realiza el ataque
     const containerDispositivo = this.ecsManager.getComponentes(entidadDispositivo);
     if(!containerDispositivo) throw new Error(`No existe contenedor para Entidad: ${entidadDispositivo}`);
-   
+  
+    const condicion = condicionMitigacion as {
+      objeto: string;
+    };
     /* A partir del objeto de la condición de mitigación (o sea, lo que se supone que debe haberse topado para
      * mitigar el ataque), se verifica (en el preciso momento del ataque) que lo demás de la condición de mitigación 
      * del ataque actual se haya cumplido; para lo cual, se extrae, en el momento del ataque, lo necesario para la 
      * verificación de la condición de mitigación. De esta forma ya no se depende del registro de acciones ni del tiempo 
      * en que estas hayan sido realizadas. */
-    switch (condicionMitigacion?.objeto){
+    switch (condicion?.objeto){
       case ObjetosManejables.CONFIG_WORKSTATION: {
+        const c = condicionMitigacion as {
+          val: {
+            nombreConfig: string;
+            activado: boolean;
+          }
+        };
         const dispositivo = containerDispositivo.get(WorkstationComponent);
-        const config = dispositivo?.configuraciones.find((conf) => conf.nombreConfig == condicionMitigacion?.val.nombreConfig);
-        if (config?.activado == condicionMitigacion?.val.activado) return true; 
+        const config = dispositivo?.configuraciones.find((conf) => conf.nombreConfig == c?.val.nombreConfig);
+        if (config?.activado == c?.val.activado) return true; 
         return false;
       }
       // Próximamente para otros dispositivos y/o configuraciones
