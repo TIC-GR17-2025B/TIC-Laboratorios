@@ -20,8 +20,11 @@
   z-index: 9999;
   max-width: 90vw;
   max-height: 85vh;
+  min-height: 400px;
   overflow: hidden;
   animation: modalSlideIn 0.3s ease-out;
+  display: flex;
+  flex-direction: column;
 }
 
 .modalHeader {
@@ -72,7 +75,6 @@
 /* Contenido del modal */
 .modalContent {
   overflow-y: auto;
-  max-height: 90vh;
 }
 
 @keyframes fadeIn {

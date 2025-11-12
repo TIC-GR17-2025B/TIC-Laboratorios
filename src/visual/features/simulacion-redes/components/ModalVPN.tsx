@@ -7,7 +7,7 @@ import { useEscenario } from "../../../common/contexts";
 import type { PerfilVPNGateway } from "../../../../types/EscenarioTypes";
 import TrashIcon from "../../../common/icons/TrashIcon";
 import { ZonaComponent } from "../../../../ecs/components/ZonaComponent";
-import { DispositivoComponent } from "../../../../ecs/components";
+import { DispositivoComponent, RedComponent } from "../../../../ecs/components";
 import getIconoNodo from "../utils/getIconoNodo";
 
 type OptionItem = { label: string; value: string };
@@ -57,13 +57,15 @@ export default function ModalVPN() {
     }
 
     // Obtener LANs locales (zonas del gateway actual)
-    const lanLocalesEntidades = redController.getZonasLocales(entidadSeleccionadaId!);
-    if (lanLocalesEntidades) {
-      const opciones = lanLocalesEntidades
-        .map((entidad) => {
-          const zonaComponent = redController.ecsManager.getComponentes(entidad)?.get(ZonaComponent);
-          return zonaComponent
-            ? { label: zonaComponent.nombre || zonaComponent.dominio, value: entidad.toString() }
+
+    const redesLocalesEntidades = redController.ecsManager.getComponentes(entidadSeleccionadaId!)?.get(DispositivoComponent)!.redes;
+
+    if (redesLocalesEntidades) {
+      const opciones = redesLocalesEntidades
+        .map((redEntidad) => {
+          const redComponent = redController.ecsManager.getComponentes(redEntidad)?.get(RedComponent);
+          return redComponent
+            ? { label: redComponent.nombre, value: redEntidad.toString() }
             : null;
         })
         .filter((opcion): opcion is OptionItem => opcion !== null);
@@ -91,9 +93,7 @@ export default function ModalVPN() {
       return;
     }
 
-    const entidadZona = parseInt(lanLocal.value);
-    const hosts = redController.getDispositivosPorZona(entidadZona);
-
+    const hosts = redController.obtenerDispositivosPorRed(parseInt(lanLocal.value));
     if (hosts) {
       const opcionesHosts = hosts
         .map((entidad) => {

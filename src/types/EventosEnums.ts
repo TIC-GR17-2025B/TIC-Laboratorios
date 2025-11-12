@@ -21,6 +21,7 @@ export enum EventosAtaque {
 export enum EventosRed {
   RED_ENVIAR_ACTIVO = "red:enviarActivo",
   RED_ACTIVO_ENVIADO = "red:activoEnviado",
+  RED_ACTIVO_NO_ENVIADO = "red_activoNoEnviado",
   RED_TRAFICO = "red:trafico",
   TRAFICO_ENVIADO = "trafico:enviado",
   RED_ASIGNADA = "red:redAsignada",

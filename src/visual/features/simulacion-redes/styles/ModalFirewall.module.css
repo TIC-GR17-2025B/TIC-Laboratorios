@@ -1,8 +1,10 @@
-/* Container principal */
 .modalFirewallContainer {
   width: 700px;
   max-width: 100%;
-  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 24px 24px;
 }
 
 .descripcion {
@@ -11,35 +13,11 @@
   margin-bottom: 24px;
 }
 
-/* Selector de red */
-.selectorRed {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 24px;
-  padding: 16px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-}
-
-.labelRed {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-primary, #fff);
-  min-width: 40px;
-}
-
-.selectorRed > div {
-  flex: 1;
-  max-width: 200px;
-}
-
-/* Grid de reglas */
 .reglasGrid {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
+  flex-shrink: 0;
 }
 
 .redSection {
@@ -49,7 +27,10 @@
   transition: all 0.2s ease;
   user-select: none;
   box-sizing: border-box;
-  margin-top: 20px;
+  padding: 16px;
+  background-color: var(--surface-secondary);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-primary);
 }
 
 .direccionHeader {
@@ -96,7 +77,7 @@
   margin-top: 1.5rem;
   display: flex;
   flex-wrap: wrap;
-  gap: 19px;
+  gap: 13px;
 }
 
 .servicioBtn {
@@ -148,122 +129,143 @@
 }
 
 .logsSection {
-  margin-top: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .subtitle {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: normal;
   color: var(--text-primary);
-  margin-bottom: 12px;
+  margin: 0;
 }
 
-.resumenContent {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  padding: 12px;
+.logsContent {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
-.textoVacio {
-  font-size: 13px;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.5));
+.emptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
   text-align: center;
-  padding: 8px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  background-color: var(--surface-secondary);
+  border: 1px dashed var(--border-primary);
+  border-radius: var(--border-radius);
 }
 
-.resumenGrid {
+.emptyState p {
+  margin: 0;
+}
+
+.logsGrid {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.resumenItem {
+.logItem {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 6px;
-  font-size: 13px;
-}
-
-.resumenRed {
-  font-weight: 600;
-  color: var(--text-primary, #fff);
-  min-width: 80px;
-}
-
-.resumenDireccion {
-  font-size: 16px;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.6));
-}
-
-.resumenServicios {
-  flex: 1;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
-}
-
-.resumenBtnLimpiar {
-  padding: 4px;
-  background: transparent;
-  border: none;
-  color: rgb(248, 113, 113);
-  cursor: pointer;
-  border-radius: 4px;
+  padding: 12px;
+  border: 1px solid var(--border-primary);
+  border-radius: var(--border-radius);
+  background-color: var(--surface-secondary);
   transition: all 0.2s ease;
+}
+
+.logPermitido {
+  border-left: 3px solid rgb(52, 211, 153);
+}
+
+.logBloqueado {
+  border-left: 3px solid rgb(248, 113, 113);
+}
+
+.logEstado {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 50%;
+  background-color: var(--surface-primary);
 }
 
-.resumenBtnLimpiar:hover {
-  background: rgba(248, 113, 113, 0.1);
-  color: rgb(252, 165, 165);
+.logPermitido .logEstado {
+  color: rgb(52, 211, 153);
+  background-color: rgba(52, 211, 153, 0.1);
 }
 
-.logsContent {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  padding: 12px;
-  max-height: 150px;
-  overflow-y: auto;
+.logBloqueado .logEstado {
+  color: rgb(248, 113, 113);
+  background-color: rgba(248, 113, 113, 0.1);
 }
 
-.listaLogs {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.logDetalles {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-width: 0;
 }
 
-.logItem {
+.logConexion {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.logOrigen,
+.logDestino {
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.logFlecha {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+}
+
+.logMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 12px;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.6));
-  padding: 6px 8px;
-  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-secondary);
+}
+
+.logProtocolo {
+  padding: 2px 8px;
+  background-color: rgba(255, 255, 255, 0.05);
   border-radius: 4px;
-  border-left: 2px solid rgba(255, 255, 255, 0.2);
+  font-weight: 500;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-/* Scrollbar personalizada */
-.logsContent::-webkit-scrollbar {
-  width: 6px;
+.logSeparador {
+  color: var(--border-primary);
 }
 
-.logsContent::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 3px;
-}
-
-.logsContent::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 3px;
-}
-
-.logsContent::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+.logRouter {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

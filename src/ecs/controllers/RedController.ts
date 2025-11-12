@@ -293,6 +293,18 @@ export class RedController {
     return this.sistemaRed.obtenerRedesDeRouter(entidadRouter);
   }
 
+  /**
+   * Obtiene todos los dispositivos conectados a una red específica
+   * @param entidadRed - La entidad de la red
+   * @returns Array de entidades de dispositivos conectados a la red
+   */
+  public obtenerDispositivosPorRed(entidadRed: Entidad): Entidad[] {
+    if (!this.sistemaRed) {
+      return [];
+    }
+    return this.sistemaRed.obtenerDispositivosPorRed(entidadRed);
+  }
+
   getDispositivosPorZona(entidadZona: Entidad): Entidad[] | undefined {
     return this.sistemaJerarquia?.obtenerDispositivosDeZona(entidadZona);
   }

@@ -189,8 +189,8 @@ export default function ModalVPNCliente() {
                     )}
                 </div>
 
-                <div className={styles.listSection}>
-                    <h3 className={styles.sectionTitle}>Perfiles Activos</h3>
+                <div>
+                    <h3 className={styles.sectionTitle} style={{ margin: "1rem 0" }}>Perfiles Activos</h3>
                     {configuraciones.length === 0 ? (
                         <div className={styles.emptyState}>
                             <p>No hay configuraciones agregadas</p>

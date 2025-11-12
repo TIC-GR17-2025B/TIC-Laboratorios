@@ -7,6 +7,7 @@ import { EscenarioController } from "../../../../ecs/controllers/EscenarioContro
 import {
   EventosAtaque,
   EventosPresupuesto,
+  EventosRed,
   EventosTiempo,
 } from "../../../../types/EventosEnums";
 import { RedController } from "../../../../ecs/controllers/RedController";
@@ -151,6 +152,52 @@ export function useECSScene() {
     // SÉPTIMO: Iniciar el tiempo automáticamente desde useEffect
     escenarioController.iniciarTiempo();
     tiempoIniciadoRef.current = true;
+
+    const unsubscribeActivoNoEnviado = escenarioController.on(
+      EventosRed.RED_ACTIVO_NO_ENVIADO,
+      (data: unknown) => {
+        const d = data as { descripcion: string };
+        setMostrarNuevoLog(true);
+        setMensajeLog(d.descripcion);
+        setTiempoLog(escenarioController.tiempoTranscurrido);
+        setTipoLog("advertencia");
+        agregarLog(d.descripcion, "ADVERTENCIA");
+      }
+    );
+
+    const unsubscribeActivoEnviado = escenarioController.on(
+      EventosRed.RED_ACTIVO_ENVIADO,
+      (data: unknown) => {
+        const d = data as {
+          nombreActivo: string;
+          d1: string;
+          d2: string;
+        };
+        setMostrarNuevoLog(true);
+        setMensajeLog(
+          `Se ha enviado ${d.nombreActivo} desde ${d.d1} hacia ${d.d2}`
+        );
+        setTiempoLog(escenarioController.tiempoTranscurrido);
+        setTipoLog("completado");
+        agregarLog(
+          `Se ha enviado ${d.nombreActivo} desde ${d.d1} hacia ${d.d2}`,
+          "INFO"
+        );
+      }
+    );
+
+    const unsubscribeNotificacionEvento = escenarioController.on(
+      EventosTiempo.TIEMPO_NOTIFICACION_EVENTO,
+      (data: unknown) => {
+        const d = data as { descripcionEvento: string };
+        setMostrarNuevoLog(true);
+        setMensajeLog(d.descripcionEvento);
+        setTiempoLog(escenarioController.tiempoTranscurrido);
+        setTipoLog("advertencia");
+        agregarLog(d.descripcionEvento, "ADVERTENCIA");
+      }
+    );
+
     const unsubscribePresupuesto = escenarioController.on(
       EventosPresupuesto.PRESUPUESTO_ACTUALIZADO,
       (data: unknown) => {
@@ -232,10 +279,13 @@ export function useECSScene() {
       unsubscribePresupuesto();
       unsubscribeActualizado();
       unsubscribePausado();
+      unsubscribeNotificacionEvento();
       unsubscribeReanudado();
+      unsubscribeActivoNoEnviado();
       unsubscribeAtaqueRealizado();
       unsubscribeAtaqueMitigado();
       unsubscribeNotificacionAtaque();
+      unsubscribeActivoEnviado();
     };
   }, []); // Sin dependencias - solo se ejecuta una vez
 

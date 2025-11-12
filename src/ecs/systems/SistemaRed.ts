@@ -15,7 +15,10 @@ import {
   TransferenciaService,
   VPNService,
 } from "./red";
-import type { PerfilClienteVPN, PerfilVPNGateway } from "../../types/EscenarioTypes";
+import type {
+  PerfilClienteVPN,
+  PerfilVPNGateway,
+} from "../../types/EscenarioTypes";
 
 // Sistema encargado de gestionar redes, conectividad y firewalls
 export class SistemaRed extends Sistema {
@@ -84,9 +87,7 @@ export class SistemaRed extends Sistema {
 
   private getVPNService(): VPNService {
     if (!this.vpnService) {
-      this.vpnService = new VPNService(
-        this.ecsManager
-      );
+      this.vpnService = new VPNService(this.ecsManager);
     }
     return this.vpnService;
   }
@@ -193,8 +194,8 @@ export class SistemaRed extends Sistema {
       }
       case TipoProtocolo.VPN_GATEWAY: {
         const permisosVPN = payload as {
-          gateway: PerfilVPNGateway,
-          cliente: PerfilClienteVPN
+          gateway: PerfilVPNGateway;
+          cliente: PerfilClienteVPN;
         };
         this.getVPNService().establecerConexion(
           entidadOrigen,
@@ -207,11 +208,13 @@ export class SistemaRed extends Sistema {
     }
 
     // Tráfico exitoso
-    this.getEventoService().registrarTrafico(
-      dispOrigen.nombre,
-      dispDestino.nombre,
-      protocolo
-    );
+    if (protocolo != TipoProtocolo.VPN_GATEWAY) {
+      this.getEventoService().registrarTrafico(
+        dispOrigen.nombre,
+        dispDestino.nombre,
+        protocolo
+      );
+    }
 
     return true;
   }
@@ -280,33 +283,67 @@ export class SistemaRed extends Sistema {
     );
   }
 
-  public setConectadoAInternet(entidadRouter: Entidad, conectado: boolean): void {
-        const router = this.ecsManager.getComponentes(entidadRouter)?.get(RouterComponent);
-        const dispositivo = this.ecsManager.getComponentes(entidadRouter)?.get(DispositivoComponent);
-        
-        if (!router || !dispositivo) {
-            console.error(`Router con entidad "${entidadRouter}" no encontrado`);
-            return;
-        }
+  public setConectadoAInternet(
+    entidadRouter: Entidad,
+    conectado: boolean
+  ): void {
+    const router = this.ecsManager
+      .getComponentes(entidadRouter)
+      ?.get(RouterComponent);
+    const dispositivo = this.ecsManager
+      .getComponentes(entidadRouter)
+      ?.get(DispositivoComponent);
 
-        const estadoAnterior = router.conectadoAInternet;
-        router.conectadoAInternet = conectado;
-        if (estadoAnterior !== conectado) {
-            const evento = conectado ? EventosRed.INTERNET_CONECTADO : EventosRed.INTERNET_DESCONECTADO;
-            this.ecsManager.emit(evento, {
-                router: dispositivo.nombre,
-                conectado,
-                mensaje: `Router "${dispositivo.nombre}" ${conectado ? 'conectado a' : 'desconectado de'} Internet`,
-                tipo: conectado ? 'INTERNET_CONECTADO' : 'INTERNET_DESCONECTADO'
-            });
-        }
+    if (!router || !dispositivo) {
+      console.error(`Router con entidad "${entidadRouter}" no encontrado`);
+      return;
     }
 
+    const estadoAnterior = router.conectadoAInternet;
+    router.conectadoAInternet = conectado;
+    if (estadoAnterior !== conectado) {
+      const evento = conectado
+        ? EventosRed.INTERNET_CONECTADO
+        : EventosRed.INTERNET_DESCONECTADO;
+      this.ecsManager.emit(evento, {
+        router: dispositivo.nombre,
+        conectado,
+        mensaje: `Router "${dispositivo.nombre}" ${
+          conectado ? "conectado a" : "desconectado de"
+        } Internet`,
+        tipo: conectado ? "INTERNET_CONECTADO" : "INTERNET_DESCONECTADO",
+      });
+    }
+  }
 
   public obtenerRedesDeRouter(entidadRouter: Entidad): Entidad[] {
-    const dispositivo = this.ecsManager.getComponentes(entidadRouter)?.get(DispositivoComponent);
+    const dispositivo = this.ecsManager
+      .getComponentes(entidadRouter)
+      ?.get(DispositivoComponent);
     return dispositivo?.redes || [];
   }
 
+  /**
+   * Obtiene todos los dispositivos que están conectados a una red específica
+   * @param entidadRed - La entidad de la red
+   * @returns Array de entidades de dispositivos conectados a la red
+   */
+  public obtenerDispositivosPorRed(entidadRed: Entidad): Entidad[] {
+    const dispositivos: Entidad[] = [];
 
+    // Itera una sola vez por todas las entidades del ECS
+    for (const [entidad, container] of this.ecsManager.getEntidades()) {
+      // Solo verifica entidades que tienen DispositivoComponent
+      if (container.tiene(DispositivoComponent)) {
+        const dispositivo = container.get(DispositivoComponent);
+
+        // Verifica si el dispositivo tiene la red especificada
+        if (dispositivo?.redes.includes(entidadRed)) {
+          dispositivos.push(entidad);
+        }
+      }
+    }
+
+    return dispositivos;
+  }
 }
