@@ -1,16 +1,13 @@
 import type { ECSManager } from "../../core/ECSManager";
-import { EventosRed, EventosFirewall } from "../../../types/EventosEnums";
+import { EventosRed } from "../../../types/EventosEnums";
 import type { TipoProtocolo, RegistroTrafico, RegistroFirewallBloqueado, RegistroFirewallPermitido } from "../../../types/TrafficEnums";
 import type { Entidad } from "../../core";
-import { DispositivoComponent } from "../../components";
+import { DispositivoComponent, RouterComponent } from "../../components";
 
-/**
- * Servicio responsable de emitir eventos relacionados con la red
- */
 export class EventoRedService {
     constructor(private ecsManager: ECSManager) {}
 
-    // Emite evento cuando el tráfico es permitido por el firewall
+
     emitirEventoPermitido(origen: string, destino: string, protocolo: TipoProtocolo, entidadRouter?: Entidad): void {
         const nombreRouter = this.obtenerNombreRouter(entidadRouter);
         
@@ -24,10 +21,15 @@ export class EventoRedService {
             router: nombreRouter
         };
         
-        this.ecsManager.emit(EventosFirewall.TRAFICO_PERMITIDO, registro);
+
+        if (entidadRouter) {
+            const routerComponent = this.ecsManager.getComponentes(entidadRouter)?.get(RouterComponent);
+            routerComponent?.logsFirewall.push(registro);
+        }
+        
     }
 
-    // Emite evento cuando el tráfico es bloqueado por el firewall
+
     emitirEventoBloqueado(origen: string, destino: string, protocolo: TipoProtocolo, razon?: string, entidadRouter?: Entidad): void {
         const nombreRouter = this.obtenerNombreRouter(entidadRouter);
         
@@ -42,7 +44,12 @@ export class EventoRedService {
             router: nombreRouter
         };
         
-        this.ecsManager.emit(EventosFirewall.TRAFICO_BLOQUEADO, registro);
+
+        if (entidadRouter) {
+            const routerComponent = this.ecsManager.getComponentes(entidadRouter)?.get(RouterComponent);
+            routerComponent?.logsFirewall.push(registro);
+        }
+        
     }
 
     private obtenerNombreRouter(entidadRouter?: Entidad): string | undefined {
@@ -52,7 +59,7 @@ export class EventoRedService {
         return dispositivo?.nombre;
     }
 
-    // Registra tráfico exitoso
+
     registrarTrafico(origen: string, destino: string, protocolo: TipoProtocolo): void {
         const registro: RegistroTrafico = {
             origen,
@@ -63,7 +70,7 @@ export class EventoRedService {
         this.ecsManager.emit(EventosRed.TRAFICO_ENVIADO, registro);
     }
 
-    // Emite evento de envío de activo
+
     emitirActivoEnviado(nombreActivo: string, origen: string, destino: string): void {
         this.ecsManager.emit(EventosRed.RED_ACTIVO_ENVIADO, {
             nombreActivo,

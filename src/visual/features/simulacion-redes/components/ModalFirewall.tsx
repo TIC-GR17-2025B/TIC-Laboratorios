@@ -4,7 +4,6 @@ import styles from '../styles/ModalFirewall.module.css';
 import { useFirewall } from '../hooks';
 import { useECSSceneContext } from '../../escenarios-simulados/context/ECSSceneContext';
 import { useEscenario } from '../../../common/contexts';
-import { useFirewallLogs } from '../context/FirewallLogsContext';
 import { ConfiguracionProtocolos } from '../../../../data/configuraciones/configProtocolos';
 
 /**
@@ -19,14 +18,14 @@ type RedOption = {
 
 export default function ModalFirewall() {
     const { ecsManager } = useECSSceneContext();
-    const { obtenerLogsPorRouter } = useFirewallLogs();
     const { entidadSeleccionadaId } = useEscenario();
 
     const {
         router,
         redesRouter,
         estaProtocoloBloqueado,
-        toggleProtocolo
+        toggleProtocolo,
+        logsFirewall
     } = useFirewall(entidadSeleccionadaId, ecsManager);
 
     const REDES: RedOption[] = useMemo(() => {
@@ -38,7 +37,7 @@ export default function ModalFirewall() {
 
     const [redSeleccionada, setRedSeleccionada] = useState<RedOption | null>(REDES[0] || null);
 
-    const logs = router ? obtenerLogsPorRouter(router.nombre).map(log => log.mensaje) : [];
+    const logs = logsFirewall.map((log: any) => log.mensaje);
 
     return (
         <div className={styles.modalFirewallContainer}>

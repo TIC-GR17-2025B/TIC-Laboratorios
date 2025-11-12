@@ -1,7 +1,6 @@
 import type { ECSManager } from "../../core/ECSManager";
 import type { Entidad } from "../../core";
 import { DispositivoComponent, RouterComponent } from "../../components";
-import { EventosFirewall } from "../../../types/EventosEnums";
 import type { TipoProtocolo } from "../../../types/TrafficEnums";
 import type { DireccionTrafico } from "../../../types/FirewallTypes";
 
@@ -19,20 +18,22 @@ export class FirewallConfigService {
             return;
         }
 
-        // Preservar la configuración actual y solo cambiar el estado
+
         const configActual = router.firewall;
         router.firewall = {
             ...configActual,
             habilitado
         };
 
-        // Emitir evento de cambio de estado
-        const evento = habilitado ? EventosFirewall.HABILITADO : EventosFirewall.DESHABILITADO;
-        this.ecsManager.emit(evento, {
+
+        const registroEvento = {
             router: dispositivo.nombre,
             mensaje: `Firewall del router "${dispositivo.nombre}" ${habilitado ? 'habilitado' : 'deshabilitado'}`,
             tipo: habilitado ? 'HABILITADO' : 'DESHABILITADO'
-        });
+        };
+        
+
+        router.logsFirewall.push(registroEvento);
     }
 
    
@@ -59,14 +60,16 @@ export class FirewallConfigService {
         const nuevaRegla = { accion, direccion };
         router.firewall.reglasGlobales.set(protocolo, [...reglasFiltradas, nuevaRegla]);
 
-        this.ecsManager.emit(EventosFirewall.REGLA_AGREGADA, {
+        const registroEvento = {
             router: dispositivo.nombre,
             mensaje: `Regla agregada en "${dispositivo.nombre}": ${accion} ${protocolo} (${direccion})`,
             tipo: 'REGLA_AGREGADA',
             protocolo,
             accion,
             direccion
-        });
+        };
+        
+        router.logsFirewall.push(registroEvento);
     }
 
 
@@ -97,14 +100,18 @@ export class FirewallConfigService {
         };
         router.firewall.excepciones.set(protocolo, [...excepcionesExistentes, nuevaExcepcion]);
 
-        this.ecsManager.emit(EventosFirewall.REGLA_AGREGADA, {
+        const registroEvento = {
             router: dispositivoRouter.nombre,
             mensaje: `Excepción agregada en "${dispositivoRouter.nombre}": ${accion} ${protocolo} para "${dispositivoExcepcion.nombre}" (${direccion})`,
             tipo: 'REGLA_AGREGADA',
             protocolo,
             accion,
             direccion
-        });
+        };
+        
+
+        router.logsFirewall.push(registroEvento);
+        
     }
 
     
@@ -123,14 +130,17 @@ export class FirewallConfigService {
         const politicaAnterior = router.firewall.politicaPorDefecto;
         router.firewall.politicaPorDefecto = politica;
 
-        // Emitir evento
-        this.ecsManager.emit(EventosFirewall.POLITICA_CAMBIADA, {
+        const registroEvento = {
             router: dispositivo.nombre,
             mensaje: `Política general de "${dispositivo.nombre}" cambiada de ${politicaAnterior} a ${politica}`,
             tipo: 'POLITICA_CAMBIADA',
             politicaAnterior,
             politicaNueva: politica
-        });
+        };
+        
+       router.logsFirewall.push(registroEvento);
+
+        
     }
 
     
@@ -149,14 +159,16 @@ export class FirewallConfigService {
         const politicaAnterior = router.firewall.politicaPorDefectoSaliente || router.firewall.politicaPorDefecto;
         router.firewall.politicaPorDefectoSaliente = politica;
 
-        // Emitir evento
-        this.ecsManager.emit(EventosFirewall.POLITICA_CAMBIADA, {
+        const registroEvento = {
             router: dispositivo.nombre,
             mensaje: `Política SALIENTE de "${dispositivo.nombre}" cambiada de ${politicaAnterior} a ${politica}`,
             tipo: 'POLITICA_CAMBIADA',
             politicaAnterior,
             politicaNueva: politica
-        });
+        };
+        
+
+        router.logsFirewall.push(registroEvento);
     }
 
     
@@ -175,14 +187,16 @@ export class FirewallConfigService {
         const politicaAnterior = router.firewall.politicaPorDefectoEntrante || router.firewall.politicaPorDefecto;
         router.firewall.politicaPorDefectoEntrante = politica;
 
-
-        this.ecsManager.emit(EventosFirewall.POLITICA_CAMBIADA, {
+        const registroEvento = {
             router: dispositivo.nombre,
             mensaje: `Política ENTRANTE de "${dispositivo.nombre}" cambiada de ${politicaAnterior} a ${politica}`,
             tipo: 'POLITICA_CAMBIADA',
             politicaAnterior,
             politicaNueva: politica
-        });
+        };
+        
+ 
+        router.logsFirewall.push(registroEvento);
     }
 
 }

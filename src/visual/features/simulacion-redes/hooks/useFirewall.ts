@@ -1,12 +1,10 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback } from "react";
 import type { ECSManager } from "../../../../ecs/core";
 import type { Entidad } from "../../../../ecs/core/Componente";
 import { RedController } from "../../../../ecs/controllers/RedController";
-import { EventosFirewall } from "../../../../types/EventosEnums";
 import type { TipoProtocolo } from "../../../../types/TrafficEnums";
 import type { DireccionTrafico } from "../../../../types/FirewallTypes";
 import { DispositivoComponent, RouterComponent, RedComponent } from "../../../../ecs/components";
-import { useFirewallLogs } from "../context/FirewallLogsContext";
 
 interface RedInfo {
   nombre: string;
@@ -16,91 +14,21 @@ interface RedInfo {
 
 export function useFirewall(entidadRouter: Entidad | null, ecsManager: ECSManager) {
   const [refreshKey, setRefreshKey] = useState(0);
-  const { agregarLog } = useFirewallLogs();
 
   const redController = useMemo(() => {
     if (!ecsManager) return null;
     return RedController.getInstance(ecsManager);
   }, [ecsManager]);
 
-  useEffect(() => {
-    if (!ecsManager) return;
-
-    const unsubscribePermitido = ecsManager.on(EventosFirewall.TRAFICO_PERMITIDO, (data: unknown) => {
-      const d = data as { mensaje: string; router?: string };
-      agregarLog({
-        timestamp: Date.now(),
-        mensaje: d.mensaje,
-        tipo: 'PERMITIDO',
-        routerNombre: d.router
-      });
-      setRefreshKey(prev => prev + 1);
-    });
-
-    const unsubscribeBloqueado = ecsManager.on(EventosFirewall.TRAFICO_BLOQUEADO, (data: unknown) => {
-      const d = data as { mensaje: string; router?: string };
-      agregarLog({
-        timestamp: Date.now(),
-        mensaje: d.mensaje,
-        tipo: 'BLOQUEADO',
-        routerNombre: d.router
-      });
-      setRefreshKey(prev => prev + 1);
-    });
-
-    const unsubscribeHabilitado = ecsManager.on(EventosFirewall.HABILITADO, (data: unknown) => {
-      const d = data as { router: string; mensaje: string };
-      agregarLog({
-        timestamp: Date.now(),
-        mensaje: d.mensaje,
-        tipo: 'HABILITADO',
-        routerNombre: d.router
-      });
-      setRefreshKey(prev => prev + 1);
-    });
-
-    const unsubscribeDeshabilitado = ecsManager.on(EventosFirewall.DESHABILITADO, (data: unknown) => {
-      const d = data as { router: string; mensaje: string };
-      agregarLog({
-        timestamp: Date.now(),
-        mensaje: d.mensaje,
-        tipo: 'DESHABILITADO',
-        routerNombre: d.router
-      });
-      setRefreshKey(prev => prev + 1);
-    });
-
-    const unsubscribeReglaAgregada = ecsManager.on(EventosFirewall.REGLA_AGREGADA, (data: unknown) => {
-      const d = data as { router: string; mensaje: string };
-      agregarLog({
-        timestamp: Date.now(),
-        mensaje: d.mensaje,
-        tipo: 'REGLA_AGREGADA',
-        routerNombre: d.router
-      });
-      setRefreshKey(prev => prev + 1);
-    });
-
-    const unsubscribePoliticaCambiada = ecsManager.on(EventosFirewall.POLITICA_CAMBIADA, (data: unknown) => {
-      const d = data as { router: string; mensaje: string };
-      agregarLog({
-        timestamp: Date.now(),
-        mensaje: d.mensaje,
-        tipo: 'POLITICA_CAMBIADA',
-        routerNombre: d.router
-      });
-      setRefreshKey(prev => prev + 1);
-    });
-
-    return () => {
-      unsubscribePermitido();
-      unsubscribeBloqueado();
-      unsubscribeHabilitado();
-      unsubscribeDeshabilitado();
-      unsubscribeReglaAgregada();
-      unsubscribePoliticaCambiada();
-    };
-  }, [ecsManager, agregarLog]);
+  // Obtener logs directamente del RouterComponent
+  const logsFirewall = useMemo(() => {
+    if (!entidadRouter) return [];
+    
+    const routerComponent = ecsManager.getComponentes(entidadRouter)?.get(RouterComponent);
+    console.log('RouterComponent:', routerComponent);
+    console.log('logsFirewall:', routerComponent?.logsFirewall);
+    return routerComponent?.logsFirewall || [];
+  }, [entidadRouter, ecsManager, refreshKey]);
 
   const redesRouter = useMemo((): RedInfo[] => {
     if (!entidadRouter || !redController) return [];
@@ -165,13 +93,20 @@ export function useFirewall(entidadRouter: Entidad | null, ecsManager: ECSManage
     const accion = estaBloqueado ? 'PERMITIR' : 'DENEGAR';
     
     redController.agregarReglaFirewall(entidadRouter, protocolo, accion, direccion);
+    setRefreshKey(prev => prev + 1); // Refrescar para mostrar el nuevo log
   }, [entidadRouter, redController, estaProtocoloBloqueado]);
+
+  const refrescarLogs = useCallback(() => {
+    setRefreshKey(prev => prev + 1);
+  }, []);
 
   return {
     router: routerInfo,
     redesRouter,
     configuracionFirewall,
     estaProtocoloBloqueado,
-    toggleProtocolo
+    toggleProtocolo,
+    logsFirewall,
+    refrescarLogs
   };
 }
