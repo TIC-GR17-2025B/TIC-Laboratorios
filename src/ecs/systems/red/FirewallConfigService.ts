@@ -50,12 +50,14 @@ export class FirewallConfigService {
             return;
         }
 
-
         const reglasExistentes = router.firewall.reglasGlobales.get(protocolo) || [];
         
-
+        const reglasFiltradas = reglasExistentes.filter(regla => 
+            regla.direccion !== direccion && regla.direccion !== 'AMBAS'
+        );
+        
         const nuevaRegla = { accion, direccion };
-        router.firewall.reglasGlobales.set(protocolo, [...reglasExistentes, nuevaRegla]);
+        router.firewall.reglasGlobales.set(protocolo, [...reglasFiltradas, nuevaRegla]);
 
         this.ecsManager.emit(EventosFirewall.REGLA_AGREGADA, {
             router: dispositivo.nombre,

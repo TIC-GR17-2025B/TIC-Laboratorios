@@ -10,7 +10,7 @@ import TarjetaLogNuevo from './features/escenarios-simulados/components/TarjetaL
 import { ChatProvider } from './features/chat/context/ChatContext.tsx'
 import Redes from './features/simulacion-redes/pages/Redes.tsx'
 import Modal from './common/components/Modal.tsx'
-import { FirewallLogsProviderWrapper } from './features/simulacion-redes/context/FirewallLogsProviderWrapper.tsx'
+import { FirewallLogsProvider } from './features/simulacion-redes/context/FirewallLogsContext.tsx'
 import ModelPreloader from './common/components/ModelPreloader.tsx'
 
 const shouldRedirect = sessionStorage.getItem('redirect-on-reload');
@@ -31,7 +31,7 @@ createRoot(document.getElementById('root')!).render(
     <ModalProvider>
       <ChatProvider>
         <ECSSceneProvider>
-          <FirewallLogsProviderWrapper>
+          <FirewallLogsProvider>
             <BrowserRouter>
               <ModelPreloader />
               <Header />
@@ -45,7 +45,7 @@ createRoot(document.getElementById('root')!).render(
               </div>
               <Modal />
             </BrowserRouter>
-          </FirewallLogsProviderWrapper>
+          </FirewallLogsProvider>
         </ECSSceneProvider>
       </ChatProvider>
     </ModalProvider>

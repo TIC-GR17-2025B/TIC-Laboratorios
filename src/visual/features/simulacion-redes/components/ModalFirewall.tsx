@@ -1,54 +1,43 @@
-import { useEffect, useState } from 'react';
+import { useState, useMemo } from 'react';
 import ComboBox from '../../../common/components/ComboBox';
 import styles from '../styles/ModalFirewall.module.css';
 import { useFirewall } from '../hooks';
 import { useECSSceneContext } from '../../escenarios-simulados/context/ECSSceneContext';
 import { useEscenario } from '../../../common/contexts';
 import { useFirewallLogs } from '../context/FirewallLogsContext';
-import { SistemaJerarquiaEscenario } from '../../../../ecs/systems';
+import { ConfiguracionProtocolos } from '../../../../data/configuraciones/configProtocolos';
 
 /**
  * Componente para configurar el Firewall de un router
  * Permite permitir o denegar servicios por red y dirección
  */
 
-const SERVICIOS = [
-    { label: 'HTTP', value: 'http' },
-    { label: 'HTTPS', value: 'https' },
-    { label: 'FTP', value: 'ftp' },
-    { label: 'SSH', value: 'ssh' },
-    { label: 'Email', value: 'email' },
-    { label: 'Web Server', value: 'web_server' },
-];
-
-const REDES = [
-    { label: 'LAN 1', value: 'lan1' },
-    { label: 'Internet', value: 'internet' },
-];
-
-type RedOption = typeof REDES[number];
+type RedOption = {
+    label: string;
+    value: string;
+};
 
 export default function ModalFirewall() {
-    const [redSeleccionada, setRedSeleccionada] = useState<RedOption | null>(REDES[0]);
     const { ecsManager } = useECSSceneContext();
     const { obtenerLogsPorRouter } = useFirewallLogs();
     const { entidadSeleccionadaId } = useEscenario();
 
-    useEffect(() => {
-        const sistemaJerarquiaEscenario = ecsManager.getSistema(SistemaJerarquiaEscenario);
-        const zonaDeRouter = sistemaJerarquiaEscenario!.obtenerZonaDeDispositivo(entidadSeleccionadaId!);
-        console.log(zonaDeRouter);
-    }, []);
-
     const {
-        obtenerRegla,
-        estaServicioBloqueado,
-        toggleServicio,
-        toggleTodos,
-        router
+        router,
+        redesRouter,
+        estaProtocoloBloqueado,
+        toggleProtocolo
     } = useFirewall(entidadSeleccionadaId, ecsManager);
 
-    // Obtener logs del router específico
+    const REDES: RedOption[] = useMemo(() => {
+        return redesRouter.map(red => ({
+            label: red.nombre,
+            value: red.nombre.toLowerCase().replace(/\s+/g, '_')
+        }));
+    }, [redesRouter]);
+
+    const [redSeleccionada, setRedSeleccionada] = useState<RedOption | null>(REDES[0] || null);
+
     const logs = router ? obtenerLogsPorRouter(router.nombre).map(log => log.mensaje) : [];
 
     return (
@@ -79,27 +68,27 @@ export default function ModalFirewall() {
                                     </span>
                                     <button
                                         className={styles.toggleTodosBtn}
-                                        onClick={() => toggleTodos(red.value, 'inbound')}
-                                        title={obtenerRegla(red.value, 'inbound').servicios.length === SERVICIOS.length
-                                            ? "Permitir todos"
-                                            : "Bloquear todos"}
+                                        onClick={() => {
+                                            // Toggle todos los protocolos ENTRANTES
+                                            ConfiguracionProtocolos.forEach(protocolo => {
+                                                toggleProtocolo(protocolo.protocolo, 'ENTRANTE');
+                                            });
+                                        }}
+                                        title="Bloquear/Permitir todos"
                                     >
-                                        {obtenerRegla(red.value, 'inbound').servicios.length === SERVICIOS.length
-                                            ? '✓ Permitir todos'
-                                            : '✗ Bloquear todos'}
+                                        ✗ Bloquear todos
                                     </button>
                                 </div>
                                 <div className={styles.serviciosGrid}>
-                                    {SERVICIOS.map(servicio => {
-                                        const bloqueado = estaServicioBloqueado(red.value, 'inbound', servicio.value);
+                                    {ConfiguracionProtocolos.map(protocolo => {
+                                        const bloqueado = estaProtocoloBloqueado(protocolo.protocolo, 'ENTRANTE');
                                         return (
                                             <button
-                                                key={servicio.value}
+                                                key={protocolo.protocolo}
                                                 className={`${styles.servicioBtn} ${bloqueado ? styles.bloqueado : styles.permitido}`}
-                                                onClick={() => toggleServicio(red.value, 'inbound', servicio.value)}
+                                                onClick={() => toggleProtocolo(protocolo.protocolo, 'ENTRANTE')}
                                             >
-                                                <span className={styles.servicioNombre}>{servicio.label}</span>
-
+                                                <span className={styles.servicioNombre}>{protocolo.nombre}</span>
                                             </button>
                                         );
                                     })}
@@ -116,27 +105,27 @@ export default function ModalFirewall() {
                                     </span>
                                     <button
                                         className={styles.toggleTodosBtn}
-                                        onClick={() => toggleTodos(red.value, 'outbound')}
-                                        title={obtenerRegla(red.value, 'outbound').servicios.length === SERVICIOS.length
-                                            ? "Permitir todos"
-                                            : "Bloquear todos"}
+                                        onClick={() => {
+                                            // Toggle todos los protocolos SALIENTES
+                                            ConfiguracionProtocolos.forEach(protocolo => {
+                                                toggleProtocolo(protocolo.protocolo, 'SALIENTE');
+                                            });
+                                        }}
+                                        title="Bloquear/Permitir todos"
                                     >
-                                        {obtenerRegla(red.value, 'outbound').servicios.length === SERVICIOS.length
-                                            ? '✓ Permitir todos'
-                                            : '✗ Bloquear todos'}
+                                        ✗ Bloquear todos
                                     </button>
                                 </div>
                                 <div className={styles.serviciosGrid}>
-                                    {SERVICIOS.map(servicio => {
-                                        const bloqueado = estaServicioBloqueado(red.value, 'outbound', servicio.value);
+                                    {ConfiguracionProtocolos.map(protocolo => {
+                                        const bloqueado = estaProtocoloBloqueado(protocolo.protocolo, 'SALIENTE');
                                         return (
                                             <button
-                                                key={servicio.value}
+                                                key={protocolo.protocolo}
                                                 className={`${styles.servicioBtn} ${bloqueado ? styles.bloqueado : styles.permitido}`}
-                                                onClick={() => toggleServicio(red.value, 'outbound', servicio.value)}
+                                                onClick={() => toggleProtocolo(protocolo.protocolo, 'SALIENTE')}
                                             >
-                                                <span className={styles.servicioNombre}>{servicio.label}</span>
-
+                                                <span className={styles.servicioNombre}>{protocolo.nombre}</span>
                                             </button>
                                         );
                                     })}
