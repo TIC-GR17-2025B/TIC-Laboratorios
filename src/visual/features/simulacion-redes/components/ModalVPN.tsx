@@ -154,11 +154,11 @@ export default function ModalVPN() {
       redController.agregarPerfilVPNGateway(
         entidadSeleccionadaId!,
         {
-          lanLocal: lanLocal.value,
-          hostLan: hostLan!.value,
+          lanLocal: lanLocal.label,
+          hostLan: hostLan!.label,
           proteccion: proteccion!.value as TipoProteccionVPN,
-          dominioRemoto: dominioRemoto!.value,
-          hostRemoto: hostRemoto!.value
+          dominioRemoto: dominioRemoto!.label,
+          hostRemoto: hostRemoto!.label
         }
       );
 

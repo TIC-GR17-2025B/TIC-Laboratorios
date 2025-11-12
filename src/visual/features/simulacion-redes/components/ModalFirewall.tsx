@@ -39,7 +39,7 @@ export default function ModalFirewall() {
     }, [redesRouter]);
 
     const [redSeleccionada, setRedSeleccionada] = useState<RedOption | null>(REDES[0] || null);
-
+    console.log('logsFirewall sin tipo VPN', logsFirewall.filter(log => !log.mensaje.includes('VPN')));
     const logs = logsFirewall.map((log: any) => log.mensaje);
 
     const protocolos = useMemo(() => {

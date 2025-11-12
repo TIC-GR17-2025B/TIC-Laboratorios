@@ -19,6 +19,7 @@ export enum EventosAtaque {
 }
 
 export enum EventosRed {
+  RED_FIREWALL_BLOQUEO = "red:firewallBloqueo",
   RED_ENVIAR_ACTIVO = "red:enviarActivo",
   RED_ACTIVO_ENVIADO = "red:activoEnviado",
   RED_ACTIVO_NO_ENVIADO = "red_activoNoEnviado",

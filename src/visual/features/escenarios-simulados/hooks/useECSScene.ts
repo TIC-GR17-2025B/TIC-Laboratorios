@@ -9,6 +9,7 @@ import {
   EventosPresupuesto,
   EventosRed,
   EventosTiempo,
+  EventosVPN,
 } from "../../../../types/EventosEnums";
 import { RedController } from "../../../../ecs/controllers/RedController";
 
@@ -198,6 +199,18 @@ export function useECSScene() {
       }
     );
 
+    const unsubscribeBloqueoFirewall = escenarioController.on(
+      EventosRed.RED_FIREWALL_BLOQUEO,
+      (data: unknown) => {
+        const d = data as { descripcion: string };
+        setMostrarNuevoLog(true);
+        setMensajeLog(d.descripcion);
+        setTiempoLog(escenarioController.tiempoTranscurrido);
+        setTipoLog("advertencia");
+        agregarLog(d.descripcion, "ADVERTENCIA");
+      }
+    );
+
     const unsubscribePresupuesto = escenarioController.on(
       EventosPresupuesto.PRESUPUESTO_ACTUALIZADO,
       (data: unknown) => {
@@ -250,6 +263,30 @@ export function useECSScene() {
       }
     );
 
+    const unsubscribeVPNEstablecida = escenarioController.on(
+      EventosVPN.VPN_CONEXION_ESTABLECIDA,
+      (data: unknown) => {
+        const d = data as string;
+        setMostrarNuevoLog(true);
+        setMensajeLog(d);
+        setTiempoLog(escenarioController.tiempoTranscurrido);
+        setTipoLog("completado");
+        agregarLog(d, "INFO");
+      }
+    );
+
+    const unsubscribeVPNRechazada = escenarioController.on(
+      EventosVPN.VPN_CONEXION_RECHAZADA,
+      (data: unknown) => {
+        const d = data as string;
+        setMostrarNuevoLog(true);
+        setMensajeLog(d);
+        setTiempoLog(escenarioController.tiempoTranscurrido);
+        setTipoLog("advertencia");
+        agregarLog(d, "ADVERTENCIA");
+      }
+    );
+
     const unsubscribeAtaqueMitigado = escenarioController.on(
       EventosAtaque.ATAQUE_MITIGADO,
       (data: unknown) => {
@@ -275,8 +312,9 @@ export function useECSScene() {
     );
 
     return () => {
-      console.log("Limpiando suscripciones");
+      unsubscribeVPNRechazada();
       unsubscribePresupuesto();
+      unsubscribeVPNEstablecida();
       unsubscribeActualizado();
       unsubscribePausado();
       unsubscribeNotificacionEvento();
@@ -285,6 +323,7 @@ export function useECSScene() {
       unsubscribeAtaqueRealizado();
       unsubscribeAtaqueMitigado();
       unsubscribeNotificacionAtaque();
+      unsubscribeBloqueoFirewall();
       unsubscribeActivoEnviado();
     };
   }, []); // Sin dependencias - solo se ejecuta una vez
