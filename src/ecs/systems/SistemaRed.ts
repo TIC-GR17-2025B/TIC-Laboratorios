@@ -189,20 +189,36 @@ export class SistemaRed extends Sistema {
 
     console.log(`✅ SistemaRed.enviarTrafico: Dispositivos ESTÁN conectados`);
 
-    if (
-      !this.getFirewallService().validarFirewall(
-        entidadOrigen,
-        entidadDestino,
-        protocolo
-      )
-    ) {
+    const resultadoFirewall = this.getFirewallService().validarFirewall(
+      entidadOrigen,
+      entidadDestino,
+      protocolo
+    );
+
+    if (!resultadoFirewall.permitido) {
       console.log(
         `❌ SistemaRed.enviarTrafico: Tráfico BLOQUEADO por firewall`
       );
+      
+      // Emitir evento de bloqueo
+      this.getEventoService().emitirEventoBloqueado(
+        dispOrigen.nombre,
+        dispDestino.nombre,
+        protocolo,
+        resultadoFirewall.entidadRouter
+      );
+      
       return;
     }
 
     console.log(`✅ SistemaRed.enviarTrafico: Firewall PERMITIÓ el tráfico`);
+    
+    // Emitir evento de tráfico permitido
+    this.getEventoService().emitirEventoPermitido(
+      dispOrigen.nombre,
+      dispDestino.nombre,
+      protocolo
+    );
 
     switch (protocolo) {
       case TipoProtocolo.FTP: {

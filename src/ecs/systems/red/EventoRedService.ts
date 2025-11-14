@@ -4,7 +4,6 @@ import type {
   TipoProtocolo,
   // RegistroTrafico,
   RegistroFirewallBloqueado,
-  RegistroFirewallPermitido,
 } from "../../../types/TrafficEnums";
 import type { Entidad } from "../../core";
 import { DispositivoComponent, RouterComponent } from "../../components";
@@ -15,68 +14,45 @@ export class EventoRedService {
   emitirEventoPermitido(
     origen: string,
     destino: string,
-    protocolo: TipoProtocolo,
-    entidadRouter?: Entidad
+    protocolo: TipoProtocolo
   ): void {
-    const nombreRouter = this.obtenerNombreRouter(entidadRouter);
-
-    const registro: RegistroFirewallPermitido = {
-      origen,
-      destino,
-      protocolo,
-      mensaje: `Conexión permitida: ${origen} → ${destino} [${protocolo}]${
-        nombreRouter ? ` (${nombreRouter})` : ""
-      }`,
-      tipo: "PERMITIDO",
-      entidadRouter,
-      router: nombreRouter,
-    };
-
-    if (entidadRouter) {
-      const routerComponent = this.ecsManager
-        .getComponentes(entidadRouter)
-        ?.get(RouterComponent);
-      routerComponent?.logsTrafico.push(registro);
-    }
+    this.ecsManager.emit(EventosPublicos.TRAFICO_PERMITIDO, {
+      mensaje: `Trafico permitido: desde ${origen} hacia ${destino} [${protocolo}]`
+    });
   }
 
   emitirEventoBloqueado(
     origen: string,
     destino: string,
     protocolo: TipoProtocolo,
-    razon?: string,
     entidadRouter?: Entidad
   ): void {
-    const nombreRouter = this.obtenerNombreRouter(entidadRouter);
-
-    const registro: RegistroFirewallBloqueado = {
-      origen,
-      destino,
-      protocolo,
-      mensaje: `Conexión bloqueada: ${origen} → ${destino} [${protocolo}]${
-        razon ? ` - Razón: ${razon}` : ""
-      }${nombreRouter ? ` (${nombreRouter})` : ""}`,
-      tipo: "BLOQUEADO",
-      razon,
-      entidadRouter,
-      router: nombreRouter,
-    };
-
     if (entidadRouter) {
+      const dispositivo = this.ecsManager
+        .getComponentes(entidadRouter)
+        ?.get(DispositivoComponent);
+      const nombreRouter = dispositivo?.nombre;
+
+      const registro: RegistroFirewallBloqueado = {
+        origen,
+        destino,
+        protocolo,
+        mensaje: `Trafico bloqueado: desde ${origen} hacia ${destino} [${protocolo}]
+        }`,
+        tipo: "BLOQUEADO",
+        entidadRouter,
+        router: nombreRouter,
+      };
+
       const routerComponent = this.ecsManager
         .getComponentes(entidadRouter)
         ?.get(RouterComponent);
       routerComponent?.logsTrafico.push(registro);
     }
-  }
 
-  private obtenerNombreRouter(entidadRouter?: Entidad): string | undefined {
-    if (!entidadRouter) return undefined;
-
-    const dispositivo = this.ecsManager
-      .getComponentes(entidadRouter)
-      ?.get(DispositivoComponent);
-    return dispositivo?.nombre;
+    this.ecsManager.emit(EventosPublicos.TRAFICO_BLOQUEADO,{
+      mensaje: `Trafico bloqueado: desde ${origen} hacia ${destino} [${protocolo}]`
+    });
   }
 
   // registrarTrafico(

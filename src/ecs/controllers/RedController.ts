@@ -169,6 +169,18 @@ export class RedController {
       const log = { tipo: TipoLogGeneral.ADVERTENCIA, mensaje: mensaje };
       this.agregarLogGeneralEscenario(log);
     });
+
+    this.ecsManager.on(EventosPublicos.TRAFICO_PERMITIDO, (data: unknown) => {
+      const d = data as { mensaje: string };
+      const log = { tipo: TipoLogGeneral.COMPLETADO, mensaje: d.mensaje };
+      this.agregarLogGeneralEscenario(log);
+    });
+
+    this.ecsManager.on(EventosPublicos.TRAFICO_BLOQUEADO, (data: unknown) => {
+      const d = data as { mensaje: string};
+      const log = { tipo: TipoLogGeneral.COMPLETADO, mensaje: d.mensaje};
+      this.agregarLogGeneralEscenario(log);
+    });
   }
 
   private agregarLogGeneralEscenario(log: LogGeneral): void {

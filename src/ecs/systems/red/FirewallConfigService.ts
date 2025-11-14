@@ -5,17 +5,9 @@ import type { TipoProtocolo } from "../../../types/TrafficEnums";
 import { DireccionTrafico, AccionFirewall } from "../../../types/FirewallTypes";
 import type { Reglas } from "../../../types/FirewallTypes";
 
-/**
- * Servicio para configurar el firewall de routers
- * Trabaja con bloqueosFirewall: Map<Entidad, Reglas[]>
- * donde Entidad representa una red
- */
 export class FirewallConfigService {
     constructor(private ecsManager: ECSManager) {}
 
-    /**
-     * Agrega o actualiza una regla de bloqueo para una red específica
-     */
     agregarReglaFirewall(
         entidadRouter: Entidad,
         entidadRed: Entidad,
@@ -45,9 +37,6 @@ export class FirewallConfigService {
         router.bloqueosFirewall.set(entidadRed, [...reglasFiltradas, nuevaRegla]);
     }
 
-    /**
-     * Bloquea todos los protocolos especificados para una red
-     */
     bloquearProtocolosEnRed(
         entidadRouter: Entidad,
         entidadRed: Entidad,
@@ -65,9 +54,6 @@ export class FirewallConfigService {
         });
     }
 
-    /**
-     * Permite múltiples protocolos eliminando sus reglas de bloqueo
-     */
     permitirProtocolosEnRed(
         entidadRouter: Entidad,
         entidadRed: Entidad,
@@ -84,9 +70,6 @@ export class FirewallConfigService {
         });
     }
 
-    /**
-     * Obtiene todas las reglas configuradas para una red
-     */
     obtenerReglasDeRed(entidadRouter: Entidad, entidadRed: Entidad): Reglas[] {
         const router = this.ecsManager.getComponentes(entidadRouter)?.get(RouterComponent);
         
@@ -98,9 +81,6 @@ export class FirewallConfigService {
         return router.bloqueosFirewall.get(entidadRed) || [];
     }
 
-    /**
-     * Elimina una regla específica de una red
-     */
     eliminarRegla(
         entidadRouter: Entidad,
         entidadRed: Entidad,
@@ -128,9 +108,6 @@ export class FirewallConfigService {
 
     }
 
-    /**
-     * Obtiene todas las redes con reglas de firewall configuradas
-     */
     obtenerRedesConReglas(entidadRouter: Entidad): Entidad[] {
         const router = this.ecsManager.getComponentes(entidadRouter)?.get(RouterComponent);
         

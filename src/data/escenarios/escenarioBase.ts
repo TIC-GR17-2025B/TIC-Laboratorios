@@ -1,11 +1,6 @@
 import {
-  AccionesRealizables,
-  ObjetosManejables,
-} from "../../types/AccionesEnums";
-import {
   EstadoAtaqueDispositivo,
   Mueble,
-  TipoAtaque,
   TipoDispositivo,
   TipoEvento,
   TipoProteccionVPN,

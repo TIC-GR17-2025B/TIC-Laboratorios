@@ -29,7 +29,7 @@ export class FirewallService {
     entidadOrigen: Entidad,
     entidadDestino: Entidad,
     protocolo: TipoProtocolo
-  ): boolean {
+  ): { permitido: boolean; entidadRouter?: Entidad } {
     console.log("\nVALIDANDO FIREWALL");
     console.log(`Origen: ${entidadOrigen}, Destino: ${entidadDestino}, Protocolo: ${protocolo}`);
 
@@ -43,12 +43,12 @@ export class FirewallService {
 
     if (rutaRoutersEntidades === null) {
       console.log("No hay ruta disponible");
-      return false;
+      return { permitido: false };
     }
 
     if (rutaRoutersEntidades.length === 0) {
       console.log("Misma red, sin routers intermedios");
-      return true;
+      return { permitido: true };
     }
 
     // Obtener las redes de origen y destino
@@ -123,7 +123,7 @@ export class FirewallService {
       
       if (!permitidoDesdeOrigen) {
         console.log(` TRÁFICO BLOQUEADO: La red ${redDesdeViene} tiene ENTRANTE bloqueado (no deja SALIR tráfico de esa red)`);
-        return false;
+        return { permitido: false, entidadRouter: entidadRouterActual };
       }
 
       // 5. Verificar reglas SALIENTES en las redes hacia donde VA el tráfico
@@ -140,13 +140,13 @@ export class FirewallService {
       
       if (!permitidoHaciaDestino) {
         console.log(` TRÁFICO BLOQUEADO: La red ${redHaciaVa} tiene SALIENTE bloqueado (no deja ENTRAR tráfico a esa red)`);
-        return false;
+        return { permitido: false, entidadRouter: entidadRouterActual };
       }
     }
 
     // 6. Todos los routers permiten el tráfico
     console.log("\n TRÁFICO PERMITIDO por todos los routers\n");
-    return true;
+    return { permitido: true };
   }
 
   /**
