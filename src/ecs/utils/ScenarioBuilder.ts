@@ -456,7 +456,8 @@ export class ScenarioBuilder {
       for (const espacio of ofi.espacios ?? []) {
         const esp = espacio as { dispositivos?: Array<{ tipo?: unknown }> };
         for (const dispositivo of esp.dispositivos ?? []) {
-          if (dispositivo.tipo === TipoDispositivo.ROUTER) {
+          if (dispositivo.tipo === TipoDispositivo.ROUTER ||
+              dispositivo.tipo === TipoDispositivo.VPN) {
             return true;
           }
         }

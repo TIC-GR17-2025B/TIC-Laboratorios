@@ -75,7 +75,7 @@ export class VPNService {
             perfil.hostRemoto === permisosEvento.gateway.hostRemoto
         )) {
             this.ecsManager.emit(EventosPublicos.VPN_CONEXION_RECHAZADA,
-                `Conexión VPN rechazada: ${dispositivoDeVPN?.nombre} no cuenta con un permiso para permitir una conexión VPN con ${permisosEvento.gateway.hostRemoto}.`
+                `Conexión VPN rechazada: ${dispositivoDeVPN?.nombre} no cuenta con un permiso para permitir una conexión VPN entre ${permisosEvento.gateway.hostRemoto} y ${permisosEvento.gateway.hostLan}.`
             );
             return;
         }
