@@ -1,13 +1,13 @@
 import { TipoDispositivo } from "../../types/DeviceEnums";
-import type { PerfilClienteVPN, PerfilVPNGateway } from "../../types/EscenarioTypes";
-import { EventosRed, EventosVPN } from "../../types/EventosEnums";
+import type { LogGeneral, PerfilClienteVPN, PerfilVPNGateway } from "../../types/EscenarioTypes";
+import { EventosInternos, EventosPublicos, TipoLogGeneral } from "../../types/EventosEnums";
 import { AccionFirewall } from "../../types/FirewallTypes";
 import type {
   DireccionTrafico,
   Reglas,
 } from "../../types/FirewallTypes";
 import { TipoProtocolo } from "../../types/TrafficEnums";
-import { ClienteVPNComponent, DispositivoComponent, RouterComponent, VPNGatewayComponent } from "../components";
+import { ClienteVPNComponent, DispositivoComponent, EscenarioComponent, RouterComponent, VPNGatewayComponent } from "../components";
 import type { ECSManager } from "../core";
 import type { Entidad } from "../core/Componente";
 import { SistemaEvento, SistemaJerarquiaEscenario, SistemaRed } from "../systems";
@@ -65,7 +65,7 @@ export class RedController {
       this.redDisponibilidadService = new RedDisponibilidadService(this.ecsManager);
     }
 
-    this.ecsManager.on(EventosRed.RED_ENVIAR_ACTIVO, (data: unknown) => {
+    this.ecsManager.on(EventosInternos.RED_ENVIAR_ACTIVO, (data: unknown) => {
       const d = data as {
         eventoConEntidades: {
           entidadEmisor: number;
@@ -81,35 +81,43 @@ export class RedController {
       );
     });
 
-    this.ecsManager.on(EventosRed.RED_ACTIVO_ENVIADO, (data: unknown) => {
+    this.ecsManager.on(EventosPublicos.RED_ACTIVO_ENVIADO, (data: unknown) => {
       const d = data as { nombreActivo: string; d1: string; d2: string };
-      console.log(
-        `Se envió un activo: ${d.nombreActivo}. Desde ${d.d1} hacia ${d.d2}.`
-      );
-    });
-
-    this.ecsManager.on(EventosRed.RED_TRAFICO, (data: unknown) => {
-      const d = data as {
-        evento: {
-          infoAdicional: {
-            entidadOrigen: Entidad;
-            entidadDestino: Entidad;
-            protocolo: TipoProtocolo;
-          };
-        };
+      const log = { 
+        tipo: TipoLogGeneral.COMPLETADO, 
+        mensaje: `Se envió un activo: ${d.nombreActivo}. Desde ${d.d1} hacia ${d.d2}.`
       };
-
-      // Enviar tráfico directamente con el protocolo del evento
-      const resultado = this.sistemaRed?.enviarTrafico(
-        d.evento.infoAdicional.entidadOrigen,
-        d.evento.infoAdicional.entidadDestino,
-        d.evento.infoAdicional.protocolo,
-        null
-      );
-      console.log("Tráfico enviado desde el controlador de red", resultado);
+      this.agregarLogGeneralEscenario(log);
     });
 
-    this.ecsManager.on(EventosVPN.VPN_SOLICITUD_CONEXION, (data: unknown) => {
+    this.ecsManager.on(EventosPublicos.RED_ACTIVO_NO_ENVIADO, (data: unknown) => {
+      const mensaje = data as string;
+      const log = { tipo: TipoLogGeneral.ADVERTENCIA, mensaje: mensaje };
+      this.agregarLogGeneralEscenario(log);
+    });
+
+    // this.ecsManager.on(EventosRed.RED_TRAFICO, (data: unknown) => {
+    //   const d = data as {
+    //     evento: {
+    //       infoAdicional: {
+    //         entidadOrigen: Entidad;
+    //         entidadDestino: Entidad;
+    //         protocolo: TipoProtocolo;
+    //       };
+    //     };
+    //   };
+    //
+    //   // Enviar tráfico directamente con el protocolo del evento
+    //   const resultado = this.sistemaRed?.enviarTrafico(
+    //     d.evento.infoAdicional.entidadOrigen,
+    //     d.evento.infoAdicional.entidadDestino,
+    //     d.evento.infoAdicional.protocolo,
+    //     null
+    //   );
+    //   console.log("Tráfico enviado desde el controlador de red", resultado);
+    // });
+
+    this.ecsManager.on(EventosInternos.VPN_SOLICITUD_CONEXION, (data: unknown) => {
       const d = data as {
         permisosConEntidades: {
           entidadOrigen: Entidad;
@@ -123,18 +131,54 @@ export class RedController {
         d.permisosConEntidades.entidadDestino,
         TipoProtocolo.VPN_GATEWAY,
         d.permisosConEntidades.permisos
-      );
+      ); 
     });
 
-    this.ecsManager.on(EventosVPN.VPN_CONEXION_RECHAZADA, (data: unknown) => {
-      const d = data as string;
-      console.log(d);
+    this.ecsManager.on(EventosPublicos.VPN_CONEXION_RECHAZADA, (data: unknown) => {
+      const mensaje = data as string;
+      const log = { tipo: TipoLogGeneral.ADVERTENCIA, mensaje: mensaje };
+      this.agregarLogGeneralEscenario(log);
     });
 
-    this.ecsManager.on(EventosVPN.VPN_CONEXION_ESTABLECIDA, (data: unknown) => {
-      const d = data as string;
-      console.log(d);
+    this.ecsManager.on(EventosPublicos.VPN_CONEXION_ESTABLECIDA, (data: unknown) => {
+      const mensaje = data as string;
+      const log = { tipo: TipoLogGeneral.COMPLETADO, mensaje: mensaje };
+      this.agregarLogGeneralEscenario(log);
     });
+
+    this.ecsManager.on(EventosPublicos.VPN_CLIENTE_PERFIL_AGREGADO, (data: unknown) => {
+      const mensaje = data as string;
+      const log = { tipo: TipoLogGeneral.ADVERTENCIA, mensaje: mensaje };
+      this.agregarLogGeneralEscenario(log);
+    });
+
+    this.ecsManager.on(EventosPublicos.VPN_CLIENTE_PERFIL_ELIMINADO, (data: unknown) => {
+      const mensaje = data as string;
+      const log = { tipo: TipoLogGeneral.ADVERTENCIA, mensaje: mensaje };
+      this.agregarLogGeneralEscenario(log);
+    });
+
+    this.ecsManager.on(EventosPublicos.VPN_GATEWAY_PERFIL_AGREGADO, (data: unknown) => {
+      const mensaje = data as string;
+      const log = { tipo: TipoLogGeneral.ADVERTENCIA, mensaje: mensaje };
+      this.agregarLogGeneralEscenario(log);
+    });
+
+    this.ecsManager.on(EventosPublicos.VPN_GATEWAY_PERFIL_ELIMINADO, (data: unknown) => {
+      const mensaje = data as string;
+      const log = { tipo: TipoLogGeneral.ADVERTENCIA, mensaje: mensaje };
+      this.agregarLogGeneralEscenario(log);
+    });
+  }
+
+  private agregarLogGeneralEscenario(log: LogGeneral): void {
+    for (const [entidad,container] of this.ecsManager.getEntidades()) {
+      if (container.tiene(EscenarioComponent)) {
+        this.ecsManager.getComponentes(entidad)?.get(EscenarioComponent)?.logsGenerales.push(log);
+        break;
+      }
+    }
+    this.ecsManager.emit(EventosPublicos.LOGS_GENERALES_ACTUALIZADOS);
   }
 
   public asignarRed(entidadDisp: Entidad, entidadRed: Entidad): void {
@@ -332,22 +376,14 @@ export class RedController {
     entidadVpnGateway: Entidad,
     perfil: PerfilVPNGateway
   ): void {
-    this.ecsManager
-      .getComponentes(entidadVpnGateway)
-      ?.get(VPNGatewayComponent)
-      ?.perfilesVPNGateway.push(perfil);
+    this.sistemaRed?.agregarPerfilVPNGateway(entidadVpnGateway, perfil);
   }
 
-  // Se pasa la entidad del gateway de la cual se quiere eliminar un perfil, y se le pasa el índice de la tabla
-  // que se corresponde con el array de perfiles (desde arriba de la tabla es el índice 0)
   removerPerfilVPNGateway(
     entidadVpnGateway: Entidad,
     indexEnTabla: number
   ): void {
-    let actualesPerfilesGateway = this.ecsManager
-      .getComponentes(entidadVpnGateway)
-      ?.get(VPNGatewayComponent)?.perfilesVPNGateway;
-    actualesPerfilesGateway = actualesPerfilesGateway?.splice(indexEnTabla, 1);
+    this.sistemaRed?.removerPerfilVPNGateway(entidadVpnGateway, indexEnTabla);
   }
 
   getPerfilesClienteVPN(
@@ -362,19 +398,13 @@ export class RedController {
     entidadClienteVpn: Entidad,
     perfil: PerfilClienteVPN
   ): void {
-    this.ecsManager
-      .getComponentes(entidadClienteVpn)
-      ?.get(ClienteVPNComponent)
-      ?.perfilesClienteVPN.push(perfil);
+    this.sistemaRed?.agregarPerfilClienteVPN(entidadClienteVpn, perfil);
   }
 
   removerPerfilClienteVPN(
     entidadClienteVpn: Entidad,
     indexEnTabla: number
   ): void {
-    let actualesPerfilesCliente = this.ecsManager
-      .getComponentes(entidadClienteVpn)
-      ?.get(ClienteVPNComponent)?.perfilesClienteVPN;
-    actualesPerfilesCliente = actualesPerfilesCliente?.splice(indexEnTabla, 1);
+    this.sistemaRed?.removerPerfilClienteVPN(entidadClienteVpn, indexEnTabla);
   }
 }

@@ -1,6 +1,7 @@
 import {
   AtaqueComponent,
   DispositivoComponent,
+  EscenarioComponent,
   EventoComponent,
   PresupuestoComponent,
   TiempoComponent,
@@ -14,11 +15,11 @@ import {
   SistemaTiempo,
 } from "../systems";
 import { ScenarioBuilder } from "../utils/ScenarioBuilder";
-import type { Escenario } from "../../types/EscenarioTypes";
+import type { Escenario, LogGeneral } from "../../types/EscenarioTypes";
 import {
-  EventosAtaque,
-  EventosPresupuesto,
-  EventosTiempo,
+  EventosInternos,
+  EventosPublicos,
+  TipoLogGeneral,
 } from "../../types/EventosEnums";
 
 export class EscenarioController {
@@ -75,24 +76,26 @@ export class EscenarioController {
 
     // NO emitir el evento aquí - lo haremos después de que los sistemas se suscriban
     this.ecsManager.on(
-      EventosTiempo.TIEMPO_NOTIFICACION_ATAQUE,
+      EventosPublicos.TIEMPO_NOTIFICACION_ATAQUE,
       (data: unknown) => {
         const d = data as { descripcionAtaque: string };
-        console.log(d.descripcionAtaque);
+        const log = { tipo: TipoLogGeneral.ADVERTENCIA, mensaje: d.descripcionAtaque };
+        this.agregarLogGeneralEscenario(log);
       }
     );
 
     // Lo mismo que ariba pero para eventos generalizados
     this.ecsManager.on(
-      EventosTiempo.TIEMPO_NOTIFICACION_EVENTO,
+      EventosPublicos.TIEMPO_NOTIFICACION_EVENTO,
       (data: unknown) => {
         const d = data as { descripcionEvento: string };
-        console.log(d.descripcionEvento);
+        const log = { tipo: TipoLogGeneral.ADVERTENCIA, mensaje: d.descripcionEvento };
+        this.agregarLogGeneralEscenario(log);
       }
     );
 
     this.ecsManager.on(
-      EventosTiempo.TIEMPO_EJECUCION_ATAQUE,
+      EventosInternos.TIEMPO_EJECUCION_ATAQUE,
       (data: unknown) => {
         const d = data as { ataque: AtaqueComponent };
         this.ejecutarAtaque(d.ataque);
@@ -101,33 +104,51 @@ export class EscenarioController {
 
     // Lo mismo que ariba pero para eventos generalizados
     this.ecsManager.on(
-      EventosTiempo.TIEMPO_EJECUCION_EVENTO,
+      EventosInternos.TIEMPO_EJECUCION_EVENTO,
       (data: unknown) => {
         const d = data as { evento: EventoComponent };
         this.ejecutarEvento(d.evento);
       }
     );
 
-    this.ecsManager.on(EventosAtaque.ATAQUE_REALIZADO, (data: unknown) => {
+    this.ecsManager.on(EventosPublicos.ATAQUE_REALIZADO, (data: unknown) => {
       const d = data as { ataque: AtaqueComponent };
-      console.log(
-        `Se comprometió el dispositivo: ${d.ataque.dispositivoAAtacar}. Causa: ${d.ataque.tipoAtaque}`
-      );
+      const log = {
+        tipo: TipoLogGeneral.ATAQUE,
+        mensaje: `Se comprometió el dispositivo: ${d.ataque.dispositivoAAtacar}. Causa: ${d.ataque.tipoAtaque}`
+      };
+      this.agregarLogGeneralEscenario(log);
     });
 
-    this.ecsManager.on(EventosAtaque.ATAQUE_MITIGADO, (data: unknown) => {
+    this.ecsManager.on(EventosPublicos.ATAQUE_MITIGADO, (data: unknown) => {
       const d = data as { ataque: AtaqueComponent };
-      console.log(
-        `Se mitigó el ataque a: ${d.ataque.dispositivoAAtacar}. Ataque mitigado: ${d.ataque.tipoAtaque}`
-      );
+      const log = {
+        tipo: TipoLogGeneral.COMPLETADO,
+        mensaje: `Se mitigó el ataque a: ${d.ataque.dispositivoAAtacar}. Ataque mitigado: ${d.ataque.tipoAtaque}`
+      };
+      this.agregarLogGeneralEscenario(log);
     });
 
-    this.ecsManager.on(EventosPresupuesto.PRESUPUESTO_AGOTADO, () => {
+    this.ecsManager.on(EventosPublicos.PRESUPUESTO_AGOTADO, () => {
       this.sistemaTiempo?.pausar(this.entidadTiempo!);
-      console.log("Se agotó el presupuesto, fin de la partida.");
+      const log = {
+        tipo: TipoLogGeneral.ADVERTENCIA,
+        mensaje: "Se agotó el presupuesto, fin de la partida."
+      };
+      this.agregarLogGeneralEscenario(log);
     });
 
     this.escenarioIniciado = true;
+  }
+
+  private agregarLogGeneralEscenario(log: LogGeneral): void {
+    for (const [entidad,container] of this.ecsManager.getEntidades()) {
+      if (container.tiene(EscenarioComponent)) {
+        this.ecsManager.getComponentes(entidad)?.get(EscenarioComponent)?.logsGenerales.push(log);
+        break;
+      }
+    }
+    this.ecsManager.emit(EventosPublicos.LOGS_GENERALES_ACTUALIZADOS);
   }
 
   public cargarEventosEnSistema(): void {

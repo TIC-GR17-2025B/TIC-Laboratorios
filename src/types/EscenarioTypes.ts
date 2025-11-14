@@ -10,6 +10,7 @@ import {
   TipoDispositivo,
   TipoProteccionVPN,
 } from "./DeviceEnums";
+import type { TipoLogGeneral } from "./EventosEnums";
 
 export interface Escenario {
   id: number;
@@ -76,4 +77,9 @@ export interface Oficina {
   nombre?: string;
   posicion?: { x: number; y: number; z: number };
   espacios: Espacio[];
+}
+
+export interface LogGeneral {
+  tipo: TipoLogGeneral;
+  mensaje: string;
 }

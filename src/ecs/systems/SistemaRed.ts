@@ -2,12 +2,13 @@ import {
   ActivoComponent,
   RouterComponent,
   DispositivoComponent,
+  VPNGatewayComponent,
+  ClienteVPNComponent,
 } from "../components";
 import { Sistema, type Entidad } from "../core";
 import { TipoProtocolo } from "../../types/TrafficEnums";
 import { AccionFirewall } from "../../types/FirewallTypes";
 import type { DireccionTrafico, Reglas } from "../../types/FirewallTypes";
-import { EventosRed } from "../../types/EventosEnums";
 import {
   ConectividadService,
   EventoRedService,
@@ -20,6 +21,7 @@ import type {
   PerfilClienteVPN,
   PerfilVPNGateway,
 } from "../../types/EscenarioTypes";
+import { EventosPublicos } from "../../types/EventosEnums";
 
 // Sistema encargado de gestionar redes, conectividad y firewalls
 export class SistemaRed extends Sistema {
@@ -131,10 +133,10 @@ export class SistemaRed extends Sistema {
 
     dispositivo?.redes.push(entidadRed);
 
-    this.ecsManager.emit(EventosRed.RED_ASIGNADA, {
-      entidadDispositivo: entidadDisp,
-      entidadRed: entidadRed,
-    });
+    // this.ecsManager.emit(EventosRed.RED_ASIGNADA, {
+    //   entidadDispositivo: entidadDisp,
+    //   entidadRed: entidadRed,
+    // });
   }
 
   // Remueve un dispositivo de una red específica
@@ -149,10 +151,10 @@ export class SistemaRed extends Sistema {
     if (index > -1) {
       dispositivo.redes.splice(index, 1);
 
-      this.ecsManager.emit(EventosRed.RED_REMOVIDA, {
-        entidadDispositivo: entidadDisp,
-        entidadRed: entidadRed,
-      });
+      // this.ecsManager.emit(EventosRed.RED_REMOVIDA, {
+      //   entidadDispositivo: entidadDisp,
+      //   entidadRed: entidadRed,
+      // });
     }
   }
 
@@ -228,13 +230,13 @@ export class SistemaRed extends Sistema {
     }
 
     // Tráfico exitoso
-    if (protocolo != TipoProtocolo.VPN_GATEWAY) {
-      this.getEventoService().registrarTrafico(
-        dispOrigen.nombre,
-        dispDestino.nombre,
-        protocolo
-      );
-    }
+    // if (protocolo != TipoProtocolo.VPN_GATEWAY) {
+    //   this.getEventoService().registrarTrafico(
+    //     dispOrigen.nombre,
+    //     dispDestino.nombre,
+    //     protocolo
+    //   );
+    // }
 
     return;
   }
@@ -321,5 +323,81 @@ export class SistemaRed extends Sistema {
     }
 
     return dispositivos;
+  }
+
+  /////////////////////////////// Métodos VPN //////////////////////////////////
+
+  agregarPerfilVPNGateway(
+    entidadVpnGateway: Entidad,
+    perfil: PerfilVPNGateway
+  ): void {
+    this.ecsManager
+      .getComponentes(entidadVpnGateway)
+      ?.get(VPNGatewayComponent)
+      ?.perfilesVPNGateway.push(perfil);
+
+    const nombreVPN = this.ecsManager
+                      .getComponentes(entidadVpnGateway)
+                      ?.get(DispositivoComponent)?.nombre;
+      
+    this.ecsManager.emit(EventosPublicos.VPN_GATEWAY_PERFIL_AGREGADO,
+      `Se agregó correctamente un nuevo perfil de conexión VPN en ${nombreVPN}`    
+    );
+  }
+
+  // Se pasa la entidad del gateway de la cual se quiere eliminar un perfil, y se le pasa el índice de la tabla
+  // que se corresponde con el array de perfiles (desde arriba de la tabla es el índice 0)
+  removerPerfilVPNGateway(
+    entidadVpnGateway: Entidad,
+    indexEnTabla: number
+  ): void {
+    let actualesPerfilesGateway = this.ecsManager
+      .getComponentes(entidadVpnGateway)
+      ?.get(VPNGatewayComponent)?.perfilesVPNGateway;
+    actualesPerfilesGateway = actualesPerfilesGateway?.splice(indexEnTabla, 1);
+
+    const nombreVPN = this.ecsManager
+                      .getComponentes(entidadVpnGateway)
+                      ?.get(DispositivoComponent)?.nombre;
+      
+    this.ecsManager.emit(EventosPublicos.VPN_GATEWAY_PERFIL_ELIMINADO,
+      `Se eliminó correctamente un perfil de conexión VPN en ${nombreVPN}`    
+    );
+  }
+
+  agregarPerfilClienteVPN(
+    entidadClienteVpn: Entidad,
+    perfil: PerfilClienteVPN
+  ): void {
+    this.ecsManager
+      .getComponentes(entidadClienteVpn)
+      ?.get(ClienteVPNComponent)
+      ?.perfilesClienteVPN.push(perfil);
+
+    const nombreCliente = this.ecsManager
+                      .getComponentes(entidadClienteVpn)
+                      ?.get(DispositivoComponent)?.nombre;
+      
+    this.ecsManager.emit(EventosPublicos.VPN_CLIENTE_PERFIL_AGREGADO,
+      `Se agregó correctamente un nuevo perfil de conexión VPN en ${nombreCliente}`    
+    );
+  }
+
+  removerPerfilClienteVPN(
+    entidadClienteVpn: Entidad,
+    indexEnTabla: number
+  ): void {
+    let actualesPerfilesCliente = this.ecsManager
+      .getComponentes(entidadClienteVpn)
+      ?.get(ClienteVPNComponent)?.perfilesClienteVPN;
+    actualesPerfilesCliente = actualesPerfilesCliente?.splice(indexEnTabla, 1);
+
+    const nombreCliente = this.ecsManager
+                      .getComponentes(entidadClienteVpn)
+                      ?.get(DispositivoComponent)?.nombre;
+      
+    this.ecsManager.emit(EventosPublicos.VPN_GATEWAY_PERFIL_ELIMINADO,
+      `Se eliminó correctamente un perfil de conexión VPN en ${nombreCliente}`    
+    );
   }
 }

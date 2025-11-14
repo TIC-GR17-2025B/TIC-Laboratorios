@@ -1,5 +1,5 @@
 import type { PerfilClienteVPN, PerfilVPNGateway } from "../../../types/EscenarioTypes";
-import { EventosVPN } from "../../../types/EventosEnums";
+import { EventosPublicos } from "../../../types/EventosEnums";
 import { ClienteVPNComponent, DispositivoComponent, RedComponent, VPNGatewayComponent, ZonaComponent } from "../../components";
 import type { ECSManager, Entidad } from "../../core";
 import { SistemaRelaciones } from "../SistemaRelaciones";
@@ -25,7 +25,7 @@ export class VPNService {
         const perfilesCliente = this.ecsManager.getComponentes(entidadOrigen)?.get(ClienteVPNComponent)?.perfilesClienteVPN;
        
         if (perfilesCliente?.length === 0) {
-            this.ecsManager.emit(EventosVPN.VPN_CONEXION_RECHAZADA,
+            this.ecsManager.emit(EventosPublicos.VPN_CONEXION_RECHAZADA,
                 `Conexión VPN rechazada: No existen perfiles de conexión VPN definidos en ${permisosEvento.gateway.hostRemoto}.`
             );
             return;
@@ -37,7 +37,7 @@ export class VPNService {
             perfil.dominioRemoto === permisosEvento.cliente.dominioRemoto &&
             perfil.hostRemoto === permisosEvento.cliente.hostRemoto
         )) {
-            this.ecsManager.emit(EventosVPN.VPN_CONEXION_RECHAZADA,
+            this.ecsManager.emit(EventosPublicos.VPN_CONEXION_RECHAZADA,
                 `Conexión VPN rechazada: ${permisosEvento.gateway.hostRemoto} no cuenta con un permiso para establecer una conexión VPN con ${permisosEvento.cliente.hostRemoto}.`
             );
             return;
@@ -60,7 +60,7 @@ export class VPNService {
         const dispositivoDeVPN = this.ecsManager.getComponentes(entidadVPN!)?.get(DispositivoComponent);
 
         if (perfilesVPN.length === 0) {
-            this.ecsManager.emit(EventosVPN.VPN_CONEXION_RECHAZADA,
+            this.ecsManager.emit(EventosPublicos.VPN_CONEXION_RECHAZADA,
                 `Conexión VPN rechazada: No existen perfiles de conexión VPN definidos en ${dispositivoDeVPN?.nombre}.`
             );
             return;
@@ -74,14 +74,14 @@ export class VPNService {
             perfil.dominioRemoto === permisosEvento.gateway.dominioRemoto &&
             perfil.hostRemoto === permisosEvento.gateway.hostRemoto
         )) {
-            this.ecsManager.emit(EventosVPN.VPN_CONEXION_RECHAZADA,
+            this.ecsManager.emit(EventosPublicos.VPN_CONEXION_RECHAZADA,
                 `Conexión VPN rechazada: ${dispositivoDeVPN?.nombre} no cuenta con un permiso para permitir una conexión VPN con ${permisosEvento.gateway.hostRemoto}.`
             );
             return;
         }
 
         // Si pasó todas las verificaciones, entonces se establece conexión
-        this.ecsManager.emit(EventosVPN.VPN_CONEXION_ESTABLECIDA,
+        this.ecsManager.emit(EventosPublicos.VPN_CONEXION_ESTABLECIDA,
             `Conexión VPN establecida: ${permisosEvento.gateway.hostRemoto} se conectó a ${permisosEvento.gateway.hostLan}`
         );
     }

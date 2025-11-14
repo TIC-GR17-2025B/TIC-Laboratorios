@@ -2,7 +2,7 @@ import type { ECSManager } from "../../core/ECSManager";
 import type { Entidad } from "../../core";
 import { ActivoComponent, DispositivoComponent } from "../../components";
 import type { EventoRedService } from "./EventoRedService";
-import { EventosRed } from "../../../types/EventosEnums";
+import { EventosPublicos } from "../../../types/EventosEnums";
 
 // Servicio responsable de transferir activos entre dispositivos
 export class TransferenciaService {
@@ -32,34 +32,34 @@ export class TransferenciaService {
       ?.get(DispositivoComponent);
 
         if (!activosReceptor || !dispReceptor) {
-            this.ecsManager.emit(EventosRed.RED_ACTIVO_NO_ENVIADO, {
-                descripcion: `Activo no enviado: ${dispReceptor?.nombre} no tiene componente de activos.`
-            });
+            this.ecsManager.emit(EventosPublicos.RED_ACTIVO_NO_ENVIADO,
+                `Activo no enviado: ${dispReceptor?.nombre} no tiene componente de activos.`
+            );
             return;
         }
 
         if (!activosEmisor || !dispEmisor) {
-            this.ecsManager.emit(EventosRed.RED_ACTIVO_NO_ENVIADO, {
-                descripcion: `Activo no enviado: ${dispEmisor?.nombre} no tiene componente de activos.`
-            });
+            this.ecsManager.emit(EventosPublicos.RED_ACTIVO_NO_ENVIADO,
+                `Activo no enviado: ${dispEmisor?.nombre} no tiene componente de activos.`
+            );
             return;
         }
 
         // Obtener el activo a enviar
         const activoAenviar = activosEmisor.activos.find((a) => a.nombre === activo);
         if (!activoAenviar) {
-            this.ecsManager.emit(EventosRed.RED_ACTIVO_NO_ENVIADO, {
-                descripcion: `Activo no enviado: ${dispEmisor?.nombre} no tiene el activo: ${activo}.`
-            });
+            this.ecsManager.emit(EventosPublicos.RED_ACTIVO_NO_ENVIADO,
+                `Activo no enviado: ${dispEmisor?.nombre} no tiene el activo: ${activo}.`
+            );
             return;
         }
 
         // Verificar si el receptor ya tiene el activo
         if (activosReceptor.activos.some(a => a.nombre === activoAenviar.nombre &&
                                    a.contenido === activoAenviar.contenido)) {
-            this.ecsManager.emit(EventosRed.RED_ACTIVO_NO_ENVIADO, {
-                descripcion: `Activo no enviado: ${dispReceptor?.nombre} ya contiene el activo: ${activo}.`
-            });
+            this.ecsManager.emit(EventosPublicos.RED_ACTIVO_NO_ENVIADO,
+                `Activo no enviado: ${dispReceptor?.nombre} ya contiene el activo: ${activo}.`
+            );
             return;
         }
  

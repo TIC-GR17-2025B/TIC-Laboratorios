@@ -1,8 +1,8 @@
 import type { ECSManager } from "../../core/ECSManager";
-import { EventosRed } from "../../../types/EventosEnums";
+import { EventosPublicos } from "../../../types/EventosEnums";
 import type {
   TipoProtocolo,
-  RegistroTrafico,
+  // RegistroTrafico,
   RegistroFirewallBloqueado,
   RegistroFirewallPermitido,
 } from "../../../types/TrafficEnums";
@@ -79,26 +79,26 @@ export class EventoRedService {
     return dispositivo?.nombre;
   }
 
-  registrarTrafico(
-    origen: string,
-    destino: string,
-    protocolo: TipoProtocolo
-  ): void {
-    const registro: RegistroTrafico = {
-      origen,
-      destino,
-      protocolo,
-    };
-
-    this.ecsManager.emit(EventosRed.TRAFICO_ENVIADO, registro);
-  }
+  // registrarTrafico(
+  //   origen: string,
+  //   destino: string,
+  //   protocolo: TipoProtocolo
+  // ): void {
+  //   const registro: RegistroTrafico = {
+  //     origen,
+  //     destino,
+  //     protocolo,
+  //   };
+  //
+  //   this.ecsManager.emit(EventosRed.TRAFICO_ENVIADO, registro);
+  // }
 
   emitirActivoEnviado(
     nombreActivo: string,
     origen: string,
     destino: string
   ): void {
-    this.ecsManager.emit(EventosRed.RED_ACTIVO_ENVIADO, {
+    this.ecsManager.emit(EventosPublicos.RED_ACTIVO_ENVIADO, {
       nombreActivo,
       d1: origen,
       d2: destino,

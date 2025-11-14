@@ -152,7 +152,7 @@ export class ScenarioBuilder {
         escenario.titulo,
         escenario.descripcion,
         escenario.presupuestoInicial
-      )
+      )      
     );
     return entidadEscenario;
   }

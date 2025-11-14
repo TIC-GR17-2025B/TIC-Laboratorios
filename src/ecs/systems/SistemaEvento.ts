@@ -5,9 +5,8 @@ import type {
   PerfilVPNGateway,
 } from "../../types/EscenarioTypes";
 import {
-  EventosAtaque,
-  EventosRed,
-  EventosVPN,
+  EventosPublicos,
+  EventosInternos,
 } from "../../types/EventosEnums";
 import {
   AtaqueComponent,
@@ -22,10 +21,6 @@ export class SistemaEvento extends Sistema {
   public componentesRequeridos: Set<ClaseComponente> = new Set([
     AtaqueComponent,
   ]);
-
-  public on(eventName: string, callback: (data: unknown) => void): () => void {
-    return this.ecsManager.on(eventName, callback);
-  }
 
   public ejecutarAtaque(
     entidadDispositivo: Entidad,
@@ -43,9 +38,9 @@ export class SistemaEvento extends Sistema {
       )
     ) {
       dispositivoAAtacar.estadoAtaque = EstadoAtaqueDispositivo.COMPROMETIDO;
-      this.ecsManager.emit(EventosAtaque.ATAQUE_REALIZADO, { ataque });
+      this.ecsManager.emit(EventosPublicos.ATAQUE_REALIZADO, { ataque });
     } else {
-      this.ecsManager.emit(EventosAtaque.ATAQUE_MITIGADO, { ataque });
+      this.ecsManager.emit(EventosPublicos.ATAQUE_MITIGADO, { ataque });
     }
   }
 
@@ -125,40 +120,40 @@ export class SistemaEvento extends Sistema {
           nombreActivo: info.nombreActivo,
         };
 
-        this.ecsManager.emit(EventosRed.RED_ENVIAR_ACTIVO, {
+        this.ecsManager.emit(EventosInternos.RED_ENVIAR_ACTIVO, {
           eventoConEntidades,
         });
         break;
       }
-      case TipoEvento.TRAFICO_RED: {
-        console.log("Ejecutando evento de tráfico de red...");
-        // Convertir nombres de dispositivos a entidades (null = Internet)
-        const info = evento.infoAdicional as {
-          dispositivoOrigen: string;
-          dispositivoDestino: string;
-          protocolo: unknown;
-        };
-        const entidadOrigen = this.buscarDispositivoPorNombre(
-          info.dispositivoOrigen
-        );
-        const entidadDestino = this.buscarDispositivoPorNombre(
-          info.dispositivoDestino
-        );
-
-        const eventoConEntidades = {
-          ...evento,
-          infoAdicional: {
-            entidadOrigen,
-            entidadDestino,
-            protocolo: info.protocolo,
-          },
-        };
-
-        this.ecsManager.emit(EventosRed.RED_TRAFICO, {
-          evento: eventoConEntidades,
-        });
-        break;
-      }
+      // case TipoEvento.TRAFICO_RED: {
+      //   console.log("Ejecutando evento de tráfico de red...");
+      //   // Convertir nombres de dispositivos a entidades (null = Internet)
+      //   const info = evento.infoAdicional as {
+      //     dispositivoOrigen: string;
+      //     dispositivoDestino: string;
+      //     protocolo: unknown;
+      //   };
+      //   const entidadOrigen = this.buscarDispositivoPorNombre(
+      //     info.dispositivoOrigen
+      //   );
+      //   const entidadDestino = this.buscarDispositivoPorNombre(
+      //     info.dispositivoDestino
+      //   );
+      //
+      //   const eventoConEntidades = {
+      //     ...evento,
+      //     infoAdicional: {
+      //       entidadOrigen,
+      //       entidadDestino,
+      //       protocolo: info.protocolo,
+      //     },
+      //   };
+      //
+      //   this.ecsManager.emit(EventosRed.RED_TRAFICO, {
+      //     evento: eventoConEntidades,
+      //   });
+      //   break;
+      // }
       case TipoEvento.CONEXION_VPN: {
         //Obtenemos los permisos del gateway y del cliente
         const info = evento.infoAdicional as {
@@ -179,10 +174,9 @@ export class SistemaEvento extends Sistema {
           permisos: info,
         };
 
-        this.ecsManager.emit(EventosVPN.VPN_SOLICITUD_CONEXION, {
+        this.ecsManager.emit(EventosInternos.VPN_SOLICITUD_CONEXION, {
           permisosConEntidades,
         });
-        break;
       }
       // Próximamente para futuros eventos
     }
