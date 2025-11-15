@@ -136,49 +136,81 @@ export class RedController {
 
     this.ecsManager.on(EventosPublicos.VPN_CONEXION_RECHAZADA, (data: unknown) => {
       const mensaje = data as string;
-      const log = { tipo: TipoLogGeneral.ADVERTENCIA, mensaje: mensaje };
+      const log = { 
+        tipo: TipoLogGeneral.ADVERTENCIA,
+        mensaje: mensaje, 
+        pausarTiempo: 
+      };
       this.agregarLogGeneralEscenario(log);
     });
 
     this.ecsManager.on(EventosPublicos.VPN_CONEXION_ESTABLECIDA, (data: unknown) => {
       const mensaje = data as string;
-      const log = { tipo: TipoLogGeneral.COMPLETADO, mensaje: mensaje };
+      const log = { 
+        tipo: TipoLogGeneral.COMPLETADO,
+        mensaje: mensaje, 
+        pausarTiempo: 
+      };
       this.agregarLogGeneralEscenario(log);
     });
 
     this.ecsManager.on(EventosPublicos.VPN_CLIENTE_PERFIL_AGREGADO, (data: unknown) => {
       const mensaje = data as string;
-      const log = { tipo: TipoLogGeneral.ADVERTENCIA, mensaje: mensaje };
+      const log = { 
+        tipo: TipoLogGeneral.ADVERTENCIA,
+        mensaje: mensaje, 
+        pausarTiempo: 
+      };
       this.agregarLogGeneralEscenario(log);
     });
 
     this.ecsManager.on(EventosPublicos.VPN_CLIENTE_PERFIL_ELIMINADO, (data: unknown) => {
       const mensaje = data as string;
-      const log = { tipo: TipoLogGeneral.ADVERTENCIA, mensaje: mensaje };
+      const log = { 
+        tipo: TipoLogGeneral.ADVERTENCIA,
+        mensaje: mensaje, 
+        pausarTiempo: 
+      };
       this.agregarLogGeneralEscenario(log);
     });
 
     this.ecsManager.on(EventosPublicos.VPN_GATEWAY_PERFIL_AGREGADO, (data: unknown) => {
       const mensaje = data as string;
-      const log = { tipo: TipoLogGeneral.ADVERTENCIA, mensaje: mensaje };
+      const log = { 
+        tipo: TipoLogGeneral.ADVERTENCIA,
+        mensaje: mensaje, 
+        pausarTiempo: 
+      };
       this.agregarLogGeneralEscenario(log);
     });
 
     this.ecsManager.on(EventosPublicos.VPN_GATEWAY_PERFIL_ELIMINADO, (data: unknown) => {
       const mensaje = data as string;
-      const log = { tipo: TipoLogGeneral.ADVERTENCIA, mensaje: mensaje };
+      const log = { 
+        tipo: TipoLogGeneral.ADVERTENCIA,
+        mensaje: mensaje, 
+        pausarTiempo: 
+      };
       this.agregarLogGeneralEscenario(log);
     });
 
     this.ecsManager.on(EventosPublicos.TRAFICO_PERMITIDO, (data: unknown) => {
       const d = data as { mensaje: string };
-      const log = { tipo: TipoLogGeneral.COMPLETADO, mensaje: d.mensaje };
+      const log = { 
+        tipo: TipoLogGeneral.COMPLETADO,
+        mensaje: d.mensaje, 
+        pausarTiempo: 
+      };
       this.agregarLogGeneralEscenario(log);
     });
 
     this.ecsManager.on(EventosPublicos.TRAFICO_BLOQUEADO, (data: unknown) => {
       const d = data as { mensaje: string};
-      const log = { tipo: TipoLogGeneral.COMPLETADO, mensaje: d.mensaje};
+      const log = { 
+        tipo: TipoLogGeneral.COMPLETADO,
+        mensaje: d.mensaje,
+        pausarTiempo: 
+      };
       this.agregarLogGeneralEscenario(log);
     });
   }
@@ -190,7 +222,7 @@ export class RedController {
         break;
       }
     }
-    this.ecsManager.emit(EventosPublicos.LOGS_GENERALES_ACTUALIZADOS);
+    this.ecsManager.emit(EventosPublicos.LOGS_GENERALES_ACTUALIZADOS, log.pausarTiempo);
   }
 
   public asignarRed(entidadDisp: Entidad, entidadRed: Entidad): void {

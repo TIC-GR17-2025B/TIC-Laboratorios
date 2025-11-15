@@ -8,10 +8,13 @@ import {
   EventosPublicos,
   EventosInternos,
 } from "../../types/EventosEnums";
+import type { AccionFirewall, DireccionTrafico, Reglas } from "../../types/FirewallTypes";
+import type { TipoProtocolo } from "../../types/TrafficEnums";
 import {
   AtaqueComponent,
   DispositivoComponent,
   EventoComponent,
+  RouterComponent,
   WorkstationComponent,
 } from "../components";
 import { Sistema, type Entidad } from "../core";
@@ -78,6 +81,24 @@ export class SistemaEvento extends Sistema {
           (conf) => conf.nombreConfig == c?.val.nombreConfig
         );
         if (config?.activado == c?.val.activado) return true;
+        return false;
+      }
+      case ObjetosManejables.CONFIG_FIREWALL: {
+        const c = condicionMitigacion as {
+          val: {
+            accion: AccionFirewall;
+            direccion: DireccionTrafico;
+            protocolo: TipoProtocolo;
+          }
+        };
+        const router = containerDispositivo.get(RouterComponent);
+        for (const [,reglas] of router?.bloqueosFirewall.entries()!) {
+          for (const regla of reglas) {
+            if (regla.accion === c.val.accion && 
+                regla.direccion === c.val.direccion 
+                && regla.protocolo == c.val.protocolo) return true;
+          }
+        }
         return false;
       }
       // Próximamente para otros dispositivos y/o configuraciones

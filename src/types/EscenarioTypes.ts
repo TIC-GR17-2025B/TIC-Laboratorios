@@ -82,4 +82,5 @@ export interface Oficina {
 export interface LogGeneral {
   tipo: TipoLogGeneral;
   mensaje: string;
+  pausarTiempo: boolean;
 }

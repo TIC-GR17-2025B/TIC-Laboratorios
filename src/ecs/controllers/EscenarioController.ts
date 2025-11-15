@@ -79,7 +79,11 @@ export class EscenarioController {
       EventosPublicos.TIEMPO_NOTIFICACION_ATAQUE,
       (data: unknown) => {
         const d = data as { descripcionAtaque: string };
-        const log = { tipo: TipoLogGeneral.ADVERTENCIA, mensaje: d.descripcionAtaque };
+        const log = { 
+          tipo: TipoLogGeneral.ADVERTENCIA,
+          mensaje: d.descripcionAtaque,
+          pausarTiempo: 
+        };
         this.agregarLogGeneralEscenario(log);
       }
     );
@@ -89,7 +93,11 @@ export class EscenarioController {
       EventosPublicos.TIEMPO_NOTIFICACION_EVENTO,
       (data: unknown) => {
         const d = data as { descripcionEvento: string };
-        const log = { tipo: TipoLogGeneral.ADVERTENCIA, mensaje: d.descripcionEvento };
+        const log = { 
+          tipo: TipoLogGeneral.ADVERTENCIA,
+          mensaje: d.descripcionEvento, 
+          pausarTiempo: 
+        };
         this.agregarLogGeneralEscenario(log);
       }
     );
@@ -115,7 +123,8 @@ export class EscenarioController {
       const d = data as { ataque: AtaqueComponent };
       const log = {
         tipo: TipoLogGeneral.ATAQUE,
-        mensaje: `Se comprometió el dispositivo: ${d.ataque.dispositivoAAtacar}. Causa: ${d.ataque.tipoAtaque}`
+        mensaje: `Se comprometió el dispositivo: ${d.ataque.dispositivoAAtacar}. Causa: ${d.ataque.tipoAtaque}`,
+        pausarTiempo: 
       };
       this.agregarLogGeneralEscenario(log);
     });
@@ -124,7 +133,8 @@ export class EscenarioController {
       const d = data as { ataque: AtaqueComponent };
       const log = {
         tipo: TipoLogGeneral.COMPLETADO,
-        mensaje: `Se mitigó el ataque a: ${d.ataque.dispositivoAAtacar}. Ataque mitigado: ${d.ataque.tipoAtaque}`
+        mensaje: `Se mitigó el ataque a: ${d.ataque.dispositivoAAtacar}. Ataque mitigado: ${d.ataque.tipoAtaque}`,
+        pausarTiempo: 
       };
       this.agregarLogGeneralEscenario(log);
     });
@@ -133,7 +143,8 @@ export class EscenarioController {
       this.sistemaTiempo?.pausar(this.entidadTiempo!);
       const log = {
         tipo: TipoLogGeneral.ADVERTENCIA,
-        mensaje: "Se agotó el presupuesto, fin de la partida."
+        mensaje: "Se agotó el presupuesto, fin de la partida.",
+        pausarTiempo: 
       };
       this.agregarLogGeneralEscenario(log);
     });
@@ -148,7 +159,7 @@ export class EscenarioController {
         break;
       }
     }
-    this.ecsManager.emit(EventosPublicos.LOGS_GENERALES_ACTUALIZADOS);
+    this.ecsManager.emit(EventosPublicos.LOGS_GENERALES_ACTUALIZADOS, log.pausarTiempo);
   }
 
   public cargarEventosEnSistema(): void {
