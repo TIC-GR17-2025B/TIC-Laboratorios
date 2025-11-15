@@ -14,7 +14,7 @@ type RedOption = {
 };
 
 export default function ModalFirewall() {
-    const { redesRouter, toggleTodosServicios, obtenerTextoBoton } = useFirewall();
+    const { redesRouter, toggleTodosServicios, obtenerTextoBoton, logsFirewall } = useFirewall();
     const { entidadSeleccionadaId } = useEscenario();
 
     const REDES: RedOption[] = useMemo(() => {
@@ -25,7 +25,6 @@ export default function ModalFirewall() {
     }, [redesRouter]);
 
     const [redSeleccionada, setRedSeleccionada] = useState<Entidad>(REDES[0].value);
-    const logs = [].map((log: any) => log.mensaje);
 
     return (
         <div className={styles.modalFirewallContainer}>
@@ -103,13 +102,13 @@ export default function ModalFirewall() {
             <div className={styles.logsSection}>
                 <h3 className={styles.subtitle}>Registro de Actividad</h3>
                 <div className={styles.logsContent}>
-                    {logs.length === 0 ? (
+                    {logsFirewall.length === 0 ? (
                         <div className={styles.emptyState}>
                             <p>No hay registro de actividad en el firewall.</p>
                         </div>
                     ) : (
                         <div className={styles.logsGrid}>
-                            {[].map((log: any, index) => (
+                            {logsFirewall.map((log: any, index) => (
                                 <LogItem key={index} log={log} />
                             ))}
                         </div>

@@ -1,6 +1,11 @@
 import {
+  AccionesRealizables,
+  ObjetosManejables,
+} from "../../types/AccionesEnums";
+import {
   EstadoAtaqueDispositivo,
   Mueble,
+  TipoAtaque,
   TipoDispositivo,
   TipoEvento,
   TipoProteccionVPN,
@@ -9,19 +14,32 @@ import { TipoProtocolo } from "../../types/TrafficEnums";
 import { ColoresRed } from "../colores";
 
 export const escenarioBase: unknown = {
-  id: 3,
-  titulo: "Demo de Funcionalidad de Redes (Firewall y VPN)",
+  id: 6,
+  titulo: "Demo: Asignar Red, Firewall y VPN",
   descripcion:
-    "Un escenario enfocado para demostrar la configuración de redes, reglas de firewall y conexiones VPN.",
+    "Un escenario con 3 retos: 1) Asignar una red existente, 2) Configurar un firewall, 3) Configurar una VPN.",
   presupuestoInicial: 1000,
-  ataques: [], // Vaciado para enfocar la demo en las features de red
+  ataques: [],
   eventos: [
     {
-      nombreEvento: "Demo: Prueba de Firewall (SSH)",
+      nombreEvento: "Reto 1: Falla de Conectividad IDS",
       tipoEvento: TipoEvento.TRAFICO_RED,
-      tiempoNotificacion: 5, // Tiempo para que el PO configure el firewall
+      tiempoNotificacion: 5, // Es el primer reto
       descripcion:
-        "Se intentará una conexión SSH desde la red externa (WWW) a la LAN1. Configura el firewall del Router Principal para bloquearla.",
+        "La 'Computadora Jacob' (en LAN2) no puede contactar el servicio 'MANAGEMENT' de la 'Computadora Administrativa' (en LAN1). Asigna 'Computadora Jacob' a la 'LAN1' para permitir la comunicación.",
+      fase: 1,
+      infoAdicional: {
+        dispositivoOrigen: "Computadora Jacob",
+        dispositivoDestino: "Computadora Administrativa",
+        protocolo: TipoProtocolo.MANAGEMENT,
+      },
+    },
+    {
+      nombreEvento: "Reto 2: Asegurar LAN1 (Firewall)",
+      tipoEvento: TipoEvento.TRAFICO_RED,
+      tiempoNotificacion: 15, // Segundo reto
+      descripcion:
+        "Se intentará una conexión SSH no autorizada desde la red externa (WWW) a la LAN1. Configura el firewall del 'Router Principal' para bloquear todo el tráfico SSH entrante a LAN1.",
       fase: 1,
       infoAdicional: {
         dispositivoOrigen: "Servidor Web Externo",
@@ -30,14 +48,13 @@ export const escenarioBase: unknown = {
       },
     },
     {
-      nombreEvento: "Demo: Prueba de Conexión VPN (Lisa)",
+      nombreEvento: "Reto 3: Conexión VPN (Teletrabajo)",
       tipoEvento: TipoEvento.CONEXION_VPN,
-      tiempoNotificacion: 17, // Tiempo para que el PO configure la VPN
+      tiempoNotificacion: 30, // Tercer reto
       descripcion:
-        "Lisa (Off-site) intentará conectarse a la 'Computadora Jacob' (LAN2) vía VPN. Configura el Gateway y el Cliente VPN para permitirlo.",
+        "Lisa (Off-site) intentará conectarse a la 'Computadora Jacob' (LAN2) vía VPN. Configura el 'VPN Gateway' y el cliente de Lisa para permitirlo.",
       fase: 1,
       infoAdicional: {
-        // Configuración requerida en el 'VPN Gateway' (ID 1008)
         gateway: {
           lanLocal: "LAN2",
           hostLan: "Computadora Jacob",
@@ -45,7 +62,6 @@ export const escenarioBase: unknown = {
           dominioRemoto: "Off-site",
           hostRemoto: "Computadora Lisa",
         },
-        // Configuración requerida en el cliente VPN de 'Computadora Lisa' (ID 3001)
         cliente: {
           proteccion: TipoProteccionVPN.EA,
           dominioRemoto: "Corporación",
@@ -57,9 +73,9 @@ export const escenarioBase: unknown = {
   fases: [
     {
       id: 1,
-      nombre: "Fase 1: Configuración de Red",
+      nombre: "Fase 1: Retos de Configuración de Red",
       descripcion:
-        "Configurar correctamente el firewall y la VPN para la red corporativa.",
+        "Completar los 3 retos de asignación de red, firewall y VPN.",
       faseActual: true,
     },
   ],
@@ -68,6 +84,7 @@ export const escenarioBase: unknown = {
       id: 1,
       nombre: "Edificio Principal - Piso 1",
       dominio: "Corporación",
+      // Redes disponibles para asignar en esta zona
       redes: [
         {
           nombre: "LAN1",
@@ -78,17 +95,9 @@ export const escenarioBase: unknown = {
           color: ColoresRed.VERDE,
         },
         {
-          nombre: "LAN3",
-          color: ColoresRed.AMARILLO,
-        },
-        {
-          nombre: "LAN4",
-          color: ColoresRed.GRIS_OSCURO,
-        },
-        {
           nombre: "Internet",
           color: ColoresRed.ROJO,
-        }
+        },
       ],
       oficinas: [
         {
@@ -107,7 +116,7 @@ export const escenarioBase: unknown = {
                   nombre: "Computadora Administrativa",
                   sistemaOperativo: "Ubuntu Server 22.04",
                   hardware: "Dell PowerEdge R750",
-                  software: "Apache, MySQL, PHP",
+                  software: "Apache, MySQL, PHP, Management Service",
                   posicion: { x: 0, y: 0, z: 0, rotacionY: 0 },
                   estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
                   activos: [
@@ -116,13 +125,13 @@ export const escenarioBase: unknown = {
                       contenido: "La contraseña secreta es 123",
                     },
                   ],
-                  // --- Feature 1: Dispositivo en múltiples redes ---
-                  redes: ["LAN1", "LAN2"],
+                  // --- ESTADO INICIAL: Solo en LAN1 ---
+                  redes: ["LAN1"],
                 },
               ],
             },
             {
-              id: 2, // ID Corregido
+              id: 2,
               mueble: Mueble.MESA,
               posicion: { x: -2, y: 0, z: 0, rotacionY: 0 },
               dispositivos: [
@@ -136,7 +145,8 @@ export const escenarioBase: unknown = {
                   posicion: { x: -2, y: 0, z: 0, rotacionY: 180 },
                   estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
                   activos: [],
-                  // --- Feature 1: Dispositivo en una red ---
+                  // --- ESTADO INICIAL: Solo en LAN2 ---
+                  // --- RETO 1: El PO debe añadir "LAN1" aquí ---
                   redes: ["LAN2"],
                 },
               ],
@@ -154,26 +164,32 @@ export const escenarioBase: unknown = {
                   hardware: "Cisco ISR 4331",
                   software: "Routing, Firewall",
                   posicion: { x: 1.5, y: 0, z: 2, rotacionY: 180 },
-                  // --- Feature 2: Objetivo de configuración de Firewall ---
-                  redes: ["LAN1","Internet"],
+                  estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
+                  activos: [],
+                  // --- RETO 2: El PO debe configurar Firewall aquí ---
+                  redes: ["LAN1","Internet"], // Controla LAN1
+                  conectadoAInternet: true,
                 },
               ],
             },
             {
-              id: 4, // ID Corregido
+              id: 4,
               mueble: Mueble.MESA,
               posicion: { x: -4, y: 0, z: 3, rotacionY: 0 },
               dispositivos: [
                 {
-                  id: 1008, // ID Corregido (antes 1004)
+                  id: 1008,
                   tipo: TipoDispositivo.VPN,
                   nombre: "VPN Gateway",
                   sistemaOperativo: "VPN OS",
                   hardware: "Cisco VPN",
                   software: "VPN",
                   posicion: { x: -4, y: 0, z: 3, rotacionY: 180 },
-                  // --- Feature 3: Objetivo de configuración de VPN Gateway ---
-                  redes: ["LAN2","Internet"],
+                  estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
+                  activos: [],
+                  // --- RETO 3: El PO debe configurar esto ---
+                  redes: ["LAN2","Internet"], // Controla LAN2
+                  conectadoAInternet: true,
                 },
               ],
             },
@@ -181,6 +197,7 @@ export const escenarioBase: unknown = {
         },
       ],
     },
+    // --- ZONA WWW (Ordenada) ---
     {
       id: 2,
       nombre: "WWW - Red Externa",
@@ -193,7 +210,7 @@ export const escenarioBase: unknown = {
         {
           nombre: "Internet",
           color: ColoresRed.ROJO,
-        },
+        }
       ],
       oficinas: [
         {
@@ -216,7 +233,7 @@ export const escenarioBase: unknown = {
                   posicion: { x: -2, y: 0, z: 1, rotacionY: 0 },
                   estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
                   activos: [],
-                  // --- Feature 2: Origen del tráfico SSH ---
+                  // Origen de los Retos 1 (indirecto) y 2 (directo)
                   redes: ["RedWWW"],
                 },
               ],
@@ -234,7 +251,10 @@ export const escenarioBase: unknown = {
                   hardware: "Cisco ASR 1001-X",
                   software: "Routing, Firewall, NAT",
                   posicion: { x: 2, y: 0, z: 0, rotacionY: 180 },
+                  estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
+                  activos: [],
                   redes: ["RedWWW", "Internet"],
+                  conectadoAInternet: true,
                 },
               ],
             },
@@ -242,6 +262,7 @@ export const escenarioBase: unknown = {
         },
       ],
     },
+    // --- ZONA CASA EMPLEADO (Ordenada) ---
     {
       id: 3,
       nombre: "Casa Empleado",
@@ -251,14 +272,10 @@ export const escenarioBase: unknown = {
           nombre: "Red-Lisa",
           color: ColoresRed.INDIGO,
         },
-        {
-          nombre: "Internet",
-          color: ColoresRed.ROJO,
-        },
       ],
       oficinas: [
         {
-          id: 301, // ID Corregido (antes 201)
+          id: 301,
           nombre: "Estudio de Lisa",
           posicion: { x: 10, y: 0, z: 1, rotacionY: 0 },
           espacios: [
@@ -268,7 +285,7 @@ export const escenarioBase: unknown = {
               posicion: { x: -2, y: 0, z: 1, rotacionY: 0 },
               dispositivos: [
                 {
-                  id: 3001, // ID Corregido (antes 2001)
+                  id: 3001,
                   tipo: TipoDispositivo.WORKSTATION,
                   nombre: "Computadora Lisa",
                   sistemaOperativo: "Windows 11",
@@ -277,7 +294,7 @@ export const escenarioBase: unknown = {
                   posicion: { x: -2, y: 0, z: 1, rotacionY: 0 },
                   estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
                   activos: [],
-                  // --- Feature 3: Objetivo de configuración de VPN Client ---
+                  // Origen del Reto 3 (VPN)
                   redes: ["Red-Lisa"],
                 },
               ],
@@ -288,14 +305,17 @@ export const escenarioBase: unknown = {
               posicion: { x: 2, y: 0, z: 0, rotacionY: 0 },
               dispositivos: [
                 {
-                  id: 3002, // ID Corregido (antes 2002)
+                  id: 3002,
                   tipo: TipoDispositivo.ROUTER,
                   nombre: "Router Lisa",
                   sistemaOperativo: "Cisco IOS",
                   hardware: "Cisco ASR 1001-X",
                   software: "Routing, Firewall, NAT",
                   posicion: { x: 2, y: 0, z: 0, rotacionY: 180 },
+                  estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
+                  activos: [],
                   redes: ["Red-Lisa", "Internet"],
+                  conectadoAInternet: true,
                 },
               ],
             },

@@ -17,7 +17,7 @@ export class EventoRedService {
     protocolo: TipoProtocolo
   ): void {
     this.ecsManager.emit(EventosPublicos.TRAFICO_PERMITIDO, {
-      mensaje: `Trafico permitido: desde ${origen} hacia ${destino} [${protocolo}]`
+      descripcion: `Trafico permitido: desde ${origen} hacia ${destino} [${protocolo}]`
     });
   }
 
@@ -49,8 +49,8 @@ export class EventoRedService {
       routerComponent?.logsTrafico.push(registro);
     }
 
-    this.ecsManager.emit(EventosPublicos.TRAFICO_BLOQUEADO,{
-      mensaje: `Trafico bloqueado: desde ${origen} hacia ${destino} [${protocolo}]`
+    this.ecsManager.emit(EventosPublicos.TRAFICO_BLOQUEADO, {
+      descripcion: `Trafico bloqueado: desde ${origen} hacia ${destino} [${protocolo}]`
     });
   }
 
