@@ -181,13 +181,13 @@ export class SistemaRed extends Sistema {
         entidadDestino
       )
     ) {
-      console.log(
-        `❌ SistemaRed.enviarTrafico: Dispositivos NO están conectados`
-      );
+      // console.log(
+      //   `❌ SistemaRed.enviarTrafico: Dispositivos NO están conectados`
+      // );
       return;
     }
 
-    console.log(`✅ SistemaRed.enviarTrafico: Dispositivos ESTÁN conectados`);
+    //console.log(`✅ SistemaRed.enviarTrafico: Dispositivos ESTÁN conectados`);
 
     const resultadoFirewall = this.getFirewallService().validarFirewall(
       entidadOrigen,
@@ -196,9 +196,9 @@ export class SistemaRed extends Sistema {
     );
 
     if (!resultadoFirewall.permitido) {
-      console.log(
-        `❌ SistemaRed.enviarTrafico: Tráfico BLOQUEADO por firewall`
-      );
+      // console.log(
+      //   `❌ SistemaRed.enviarTrafico: Tráfico BLOQUEADO por firewall`
+      // );
 
       // Emitir evento de bloqueo
       this.getEventoService().emitirEventoBloqueado(
@@ -211,13 +211,12 @@ export class SistemaRed extends Sistema {
       return;
     }
 
-    console.log(`✅ SistemaRed.enviarTrafico: Firewall PERMITIÓ el tráfico`);
+    //console.log(`✅ SistemaRed.enviarTrafico: Firewall PERMITIÓ el tráfico`);
 
     // Emitir evento de tráfico permitido
     this.getEventoService().emitirEventoPermitido(
       dispOrigen.nombre,
-      dispDestino.nombre,
-      protocolo
+      dispDestino.nombre
     );
 
     switch (protocolo) {

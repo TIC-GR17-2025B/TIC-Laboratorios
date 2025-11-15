@@ -1,6 +1,10 @@
 import { Sistema } from "../core";
 import { type Entidad } from "../core";
-import { TiempoComponent, EventoComponent, AtaqueComponent } from "../components";
+import {
+  TiempoComponent,
+  EventoComponent,
+  AtaqueComponent,
+} from "../components";
 import { EventosInternos, EventosPublicos } from "../../types/EventosEnums";
 
 export class SistemaTiempo extends Sistema {
@@ -26,11 +30,11 @@ export class SistemaTiempo extends Sistema {
       this.intervalo = null;
     }
 
-    console.log("Pausando tiempo en SistemaTiempo", tiempo);
-    this.ecsManager.emit(EventosPublicos.TIEMPO_PAUSADO, {
-      transcurrido: tiempo.transcurrido,
-      pausado: true,
-    });
+    // console.log("Pausando tiempo en SistemaTiempo", tiempo);
+    // this.ecsManager.emit(EventosPublicos.TIEMPO_PAUSADO, {
+    //   transcurrido: tiempo.transcurrido,
+    //   pausado: true,
+    // });
   }
 
   public reanudar(entidad: Entidad) {
@@ -78,7 +82,7 @@ export class SistemaTiempo extends Sistema {
       */
       for (const evento of this.eventosEscenario) {
         if (tiempo.transcurrido == evento.tiempoNotificacion) {
-          if (evento instanceof AtaqueComponent){
+          if (evento instanceof AtaqueComponent) {
             this.ecsManager.emit(EventosPublicos.TIEMPO_NOTIFICACION_ATAQUE, {
               descripcionAtaque: evento.descripcion,
             });
@@ -90,9 +94,13 @@ export class SistemaTiempo extends Sistema {
         }
         if (tiempo.transcurrido == evento.tiempoEnOcurrir) {
           if (evento instanceof AtaqueComponent) {
-            this.ecsManager.emit(EventosInternos.TIEMPO_EJECUCION_ATAQUE, { ataque: evento });
+            this.ecsManager.emit(EventosInternos.TIEMPO_EJECUCION_ATAQUE, {
+              ataque: evento,
+            });
           } else {
-            this.ecsManager.emit(EventosInternos.TIEMPO_EJECUCION_EVENTO, { evento });
+            this.ecsManager.emit(EventosInternos.TIEMPO_EJECUCION_EVENTO, {
+              evento,
+            });
           }
         }
       }

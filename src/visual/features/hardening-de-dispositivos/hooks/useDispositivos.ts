@@ -11,14 +11,11 @@ import {
   EstadoAtaqueDispositivo,
   TipoDispositivo,
 } from "../../../../types/DeviceEnums";
-import { EventosPublicos } from "../../../../types/EventosEnums";
 
 export function useDispositivos() {
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [refreshKey] = useState(0);
 
   useEffect(() => {
-    const controller = EscenarioController.getInstance();
-
     /*
     const unsubscribeAsignada = controller.ecsManager.on(
       EventosPublicos.RED_ASIGNADA,

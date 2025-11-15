@@ -132,13 +132,13 @@ export class RedController {
         };
       };
       // Enviar tráfico directamente con el protocolo del evento
-      const resultado = this.sistemaRed?.enviarTrafico(
+      this.sistemaRed?.enviarTrafico(
         d.evento.infoAdicional.entidadOrigen,
         d.evento.infoAdicional.entidadDestino,
         d.evento.infoAdicional.protocolo,
         null
       );
-      console.log("Tráfico enviado desde el controlador de red", resultado);
+      //console.log("Tráfico enviado desde el controlador de red", resultado);
     });
 
     this.ecsManager.on(
@@ -252,7 +252,7 @@ export class RedController {
     this.ecsManager.on(EventosPublicos.TRAFICO_BLOQUEADO, (data: unknown) => {
       const d = data as { mensaje: string };
       const log = {
-        tipo: TipoLogGeneral.COMPLETADO,
+        tipo: TipoLogGeneral.ATAQUE,
         mensaje: d.mensaje,
         pausarTiempo: true,
       };

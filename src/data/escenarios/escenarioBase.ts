@@ -1,11 +1,6 @@
 import {
-  AccionesRealizables,
-  ObjetosManejables,
-} from "../../types/AccionesEnums";
-import {
   EstadoAtaqueDispositivo,
   Mueble,
-  TipoAtaque,
   TipoDispositivo,
   TipoEvento,
   TipoProteccionVPN,
@@ -125,15 +120,15 @@ export const escenarioBase: unknown = {
                       contenido: "La contraseña secreta es 123",
                     },
                   ],
-                  // --- ESTADO INICIAL: Solo en LAN1 ---
-                  redes: ["LAN1"],
+                  // --- ESTADO INICIAL: ninguna ---
+                  redes: [],
                 },
               ],
             },
             {
               id: 2,
               mueble: Mueble.MESA,
-              posicion: { x: -2, y: 0, z: 0, rotacionY: 0 },
+              posicion: { x: -3, y: 0, z: 0, rotacionY: 0 },
               dispositivos: [
                 {
                   id: 1007,
@@ -142,7 +137,7 @@ export const escenarioBase: unknown = {
                   sistemaOperativo: "pfSense",
                   hardware: "Fortinet FortiGate 200F",
                   software: "IDS/IPS, VPN",
-                  posicion: { x: -2, y: 0, z: 0, rotacionY: 180 },
+                  posicion: { x: -3, y: 0, z: 0, rotacionY: 180 },
                   estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
                   activos: [],
                   // --- ESTADO INICIAL: Solo en LAN2 ---
@@ -154,7 +149,7 @@ export const escenarioBase: unknown = {
             {
               id: 3,
               mueble: Mueble.MESA,
-              posicion: { x: 1.5, y: 0, z: 2, rotacionY: 0 },
+              posicion: { x: 0, y: 0, z: 2.5, rotacionY: 0 },
               dispositivos: [
                 {
                   id: 1004,
@@ -163,11 +158,11 @@ export const escenarioBase: unknown = {
                   sistemaOperativo: "Cisco IOS",
                   hardware: "Cisco ISR 4331",
                   software: "Routing, Firewall",
-                  posicion: { x: 1.5, y: 0, z: 2, rotacionY: 180 },
+                  posicion: { x: 0, y: 0, z: 2.5, rotacionY: 0 },
                   estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
                   activos: [],
                   // --- RETO 2: El PO debe configurar Firewall aquí ---
-                  redes: ["LAN1","Internet"], // Controla LAN1
+                  redes: ["LAN1", "Internet"], // Controla LAN1
                   conectadoAInternet: true,
                 },
               ],
@@ -175,7 +170,7 @@ export const escenarioBase: unknown = {
             {
               id: 4,
               mueble: Mueble.MESA,
-              posicion: { x: -4, y: 0, z: 3, rotacionY: 0 },
+              posicion: { x: -3, y: 0, z: 2.5, rotacionY: 0 },
               dispositivos: [
                 {
                   id: 1008,
@@ -184,11 +179,11 @@ export const escenarioBase: unknown = {
                   sistemaOperativo: "VPN OS",
                   hardware: "Cisco VPN",
                   software: "VPN",
-                  posicion: { x: -4, y: 0, z: 3, rotacionY: 180 },
+                  posicion: { x: -3, y: 0, z: 2.5, rotacionY: 0 },
                   estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
                   activos: [],
                   // --- RETO 3: El PO debe configurar esto ---
-                  redes: ["LAN2","Internet"], // Controla LAN2
+                  redes: ["LAN2", "Internet"], // Controla LAN2
                   conectadoAInternet: true,
                 },
               ],
@@ -210,7 +205,7 @@ export const escenarioBase: unknown = {
         {
           nombre: "Internet",
           color: ColoresRed.ROJO,
-        }
+        },
       ],
       oficinas: [
         {
@@ -221,7 +216,7 @@ export const escenarioBase: unknown = {
             {
               id: 1,
               mueble: Mueble.MESA,
-              posicion: { x: -2, y: 0, z: 1, rotacionY: 0 },
+              posicion: { x: 1, y: 0, z: 0, rotacionY: 0 },
               dispositivos: [
                 {
                   id: 2001,
@@ -230,7 +225,7 @@ export const escenarioBase: unknown = {
                   sistemaOperativo: "Ubuntu Server 22.04",
                   hardware: "Dell PowerEdge R740",
                   software: "Apache, MySQL, DNS",
-                  posicion: { x: -2, y: 0, z: 1, rotacionY: 0 },
+                  posicion: { x: 1, y: 0, z: 0, rotacionY: 0 },
                   estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
                   activos: [],
                   // Origen de los Retos 1 (indirecto) y 2 (directo)
@@ -241,7 +236,7 @@ export const escenarioBase: unknown = {
             {
               id: 2,
               mueble: Mueble.MESA,
-              posicion: { x: 2, y: 0, z: 0, rotacionY: 0 },
+              posicion: { x: 1, y: 0, z: 2.5, rotacionY: 0 },
               dispositivos: [
                 {
                   id: 2002,
@@ -250,7 +245,7 @@ export const escenarioBase: unknown = {
                   sistemaOperativo: "Cisco IOS",
                   hardware: "Cisco ASR 1001-X",
                   software: "Routing, Firewall, NAT",
-                  posicion: { x: 2, y: 0, z: 0, rotacionY: 180 },
+                  posicion: { x: 1, y: 0, z: 2.5, rotacionY: 0 },
                   estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
                   activos: [],
                   redes: ["RedWWW", "Internet"],
@@ -272,6 +267,7 @@ export const escenarioBase: unknown = {
           nombre: "Red-Lisa",
           color: ColoresRed.INDIGO,
         },
+        { nombre: "Internet", color: ColoresRed.ROJO },
       ],
       oficinas: [
         {
@@ -282,7 +278,7 @@ export const escenarioBase: unknown = {
             {
               id: 1,
               mueble: Mueble.MESA,
-              posicion: { x: -2, y: 0, z: 1, rotacionY: 0 },
+              posicion: { x: -1, y: 0, z: 0, rotacionY: 0 },
               dispositivos: [
                 {
                   id: 3001,
@@ -291,7 +287,7 @@ export const escenarioBase: unknown = {
                   sistemaOperativo: "Windows 11",
                   hardware: "Dell PowerEdge R740",
                   software: "IDS/IPS, VPN",
-                  posicion: { x: -2, y: 0, z: 1, rotacionY: 0 },
+                  posicion: { x: -1, y: 0, z: 0, rotacionY: 0 },
                   estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
                   activos: [],
                   // Origen del Reto 3 (VPN)

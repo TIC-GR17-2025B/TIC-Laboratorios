@@ -1,7 +1,6 @@
 import type { Node, Edge } from "@xyflow/react";
 import { TipoDispositivo } from "../../../../types/DeviceEnums";
 import type { Entidad } from "../../../../ecs/core/Componente";
-import { ColoresRed } from "../../../../data/colores";
 
 export interface NodoTopologia {
   id: string;

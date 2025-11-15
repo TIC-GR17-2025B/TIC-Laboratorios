@@ -8,6 +8,8 @@ import getIconoNodo from "../utils/getIconoNodo";
 import { useState, useEffect } from "react";
 import RedChip from "./RedChip";
 import { ColoresRed } from "../../../../data/colores";
+import { RedComponent } from "../../../../ecs/components";
+import { useECSSceneContext } from "../../escenarios-simulados/context/ECSSceneContext";
 
 function DeviceNode({ data }: any) {
     const isWorkstation = data.tipo === TipoDispositivo.WORKSTATION;
@@ -169,10 +171,10 @@ interface PanelLateralTopologiaProps {
 }
 
 function PanelLateralTopologia({ entidadId, ecsManager, onCerrar }: PanelLateralTopologiaProps) {
-    const { dispositivo, redesDisponibles, toggleRed } = useDispositivoRedes(entidadId, ecsManager);
+    const { dispositivo, toggleRed } = useDispositivoRedes(entidadId, ecsManager);
+    const { redController } = useECSSceneContext();
     const [isOpen, setIsOpen] = useState(false);
     const [lastDispositivo, setLastDispositivo] = useState(dispositivo);
-    const [lastRedesDisponibles, setLastRedesDisponibles] = useState(redesDisponibles);
 
     useEffect(() => {
         const shouldBeOpen = entidadId !== null && dispositivo !== null;
@@ -180,13 +182,25 @@ function PanelLateralTopologia({ entidadId, ecsManager, onCerrar }: PanelLateral
 
         if (dispositivo) {
             setLastDispositivo(dispositivo);
-            setLastRedesDisponibles(redesDisponibles);
         }
-    }, [entidadId, dispositivo, redesDisponibles]);
+    }, [entidadId, dispositivo]);
 
     const displayDispositivo = dispositivo || lastDispositivo;
-    const displayRedes = dispositivo ? redesDisponibles : lastRedesDisponibles;
 
+    const displayRedes = entidadId
+        ? redController.obtenerRedesDisponibles(entidadId).map((redEntidadId) => {
+            const redContainer = ecsManager.getComponentes(redEntidadId);
+            const redComp = redContainer?.get(RedComponent);
+            const redesActivasSet = new Set(dispositivo?.redes || []);
+
+            return {
+                entidadId: redEntidadId,
+                nombre: redComp?.nombre || 'Red',
+                color: redComp?.color || '#ccc',
+                estaActiva: redesActivasSet.has(redEntidadId),
+            };
+        })
+        : [];
     return (
         <aside
             className={`${styles.panelLateral} ${!isOpen ? styles.hidden : ''}`}

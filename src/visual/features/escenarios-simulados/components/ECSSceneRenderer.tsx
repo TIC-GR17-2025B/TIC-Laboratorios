@@ -22,7 +22,6 @@ const ECSSceneRenderer: React.FC = () => {
     }, []);
 
     const handleEntityClick = (entity: unknown) => {
-        console.log('Entidad clickeada:', entity);
         const e = entity as { objetoConTipo?: { tipo?: string } };
         // No permitir seleccionar espacios
         if (e.objetoConTipo?.tipo === 'espacio') {
@@ -57,7 +56,6 @@ const ECSSceneRenderer: React.FC = () => {
                     label: 'Configurar',
                     to: '/dispositivos',
                     onClick: () => {
-                        console.log('Configurar entidad:', menuOpenForEntity);
                         setMenuOpenForEntity(null);
                     },
                 }

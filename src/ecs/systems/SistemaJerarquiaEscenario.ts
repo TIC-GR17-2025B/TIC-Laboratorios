@@ -142,11 +142,11 @@ export class SistemaJerarquiaEscenario extends Sistema {
    */
   obtenerZonaDeDispositivo(dispositivoId: Entidad): Entidad | undefined {
     const espacioId = this.obtenerEspacioDeDispositivo(dispositivoId);
-    console.log("ESPACIO ID", espacioId);
+    //console.log("ESPACIO ID", espacioId);
     if (!espacioId) return undefined;
 
     const oficinaId = this.obtenerOficinaDeEspacio(espacioId);
-    console.log("OFICINA ID", oficinaId);
+    //console.log("OFICINA ID", oficinaId);
     if (!oficinaId) return undefined;
 
     return this.obtenerZonaDeOficina(oficinaId);

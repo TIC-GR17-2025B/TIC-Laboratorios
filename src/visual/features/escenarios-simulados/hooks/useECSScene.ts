@@ -165,7 +165,6 @@ export function useECSScene() {
           if (container.tiene(EscenarioComponent)) {
             const escenarioComp = container.get(EscenarioComponent);
             const logsGenerales = escenarioComp?.logsGenerales || [];
-            console.log("Logs generales actualizados:", logsGenerales);
             if (logsGenerales.length > 0) {
               const ultimoLog = logsGenerales[logsGenerales.length - 1];
 
@@ -307,23 +306,19 @@ export function useECSScene() {
   // Memoizar las funciones para que no cambien en cada render
   const iniciar = useCallback(() => {
     if (tiempoIniciadoRef.current) {
-      console.log("Tiempo ya iniciado, omitiendo");
       return;
     }
-    console.log("Llamando iniciar manualmente desde useECSScene");
     escenarioController.iniciarTiempo();
     tiempoIniciadoRef.current = true;
     setIsPaused(escenarioController.estaTiempoPausado());
   }, [escenarioController]);
 
   const pause = useCallback(() => {
-    console.log("efectuando pausa");
     escenarioController.pausarTiempo();
     setIsPaused(true);
   }, [escenarioController]);
 
   const resume = useCallback(() => {
-    console.log("efectuando reanudación");
     escenarioController.reanudarTiempo();
     setIsPaused(false);
   }, [escenarioController]);

@@ -139,11 +139,11 @@ export default function ModalVPN() {
     if (isFormularioCompleto) {
       const configExistente = configuraciones.some(
         (config) =>
-          config.lanLocal === lanLocal!.label &&
-          config.hostLan === hostLan!.label &&
+          config.lanLocal === lanLocal!.value &&
+          config.hostLan === hostLan!.value &&
           config.proteccion === proteccion!.value &&
-          config.dominioRemoto === dominioRemoto!.label &&
-          config.hostRemoto === hostRemoto!.label
+          config.dominioRemoto === dominioRemoto!.value &&
+          config.hostRemoto === hostRemoto!.value
       );
 
       if (configExistente) {
@@ -154,11 +154,11 @@ export default function ModalVPN() {
       redController.agregarPerfilVPNGateway(
         entidadSeleccionadaId!,
         {
-          lanLocal: lanLocal.label,
-          hostLan: hostLan!.label,
+          lanLocal: lanLocal.value,
+          hostLan: hostLan!.value,
           proteccion: proteccion!.value as TipoProteccionVPN,
-          dominioRemoto: dominioRemoto!.label,
-          hostRemoto: hostRemoto!.label
+          dominioRemoto: dominioRemoto!.value,
+          hostRemoto: hostRemoto!.value
         }
       );
 
@@ -297,13 +297,13 @@ function ConfiguracionVpnGateway({
 }: ConfiguracionVpnGatewayProps) {
 
   const entidadLanLocal = parseInt(lanLocal);
-  const zonaLocalComponent = redController.ecsManager.getComponentes(entidadLanLocal)?.get(ZonaComponent);
-  const nombreLanLocal = zonaLocalComponent?.nombre || zonaLocalComponent?.dominio || lanLocal;
+  const redLocalComponent = redController.ecsManager.getComponentes(entidadLanLocal)?.get(RedComponent);
+  const nombreLanLocal = redLocalComponent?.nombre || lanLocal;
 
   const entidadHostLan = parseInt(hostLan);
   const dispositivoLanComponent = redController.ecsManager.getComponentes(entidadHostLan)?.get(DispositivoComponent);
   const nombreHostLan = dispositivoLanComponent?.nombre || hostLan;
-  const tipoHostLan = dispositivoLanComponent?.tipo as any;
+  const tipoHostLan = dispositivoLanComponent?.tipo;
 
   const entidadZonaRemota = parseInt(dominioRemoto);
   const zonaRemotaComponent = redController.ecsManager.getComponentes(entidadZonaRemota)?.get(ZonaComponent);
@@ -312,12 +312,11 @@ function ConfiguracionVpnGateway({
   const entidadHostRemoto = parseInt(hostRemoto);
   const dispositivoRemotoComponent = redController.ecsManager.getComponentes(entidadHostRemoto)?.get(DispositivoComponent);
   const nombreHostRemoto = dispositivoRemotoComponent?.nombre || hostRemoto;
-  const tipoHostRemoto = dispositivoRemotoComponent?.tipo as any;
-
+  const tipoHostRemoto = dispositivoRemotoComponent?.tipo;
   return (
     <div className={styles.configuracionItem}>
       <div className={styles.dispositivoLocalIcon}>
-        {getIconoNodo(tipoHostLan)}
+        {tipoHostLan && getIconoNodo(tipoHostLan)}
       </div>
       <div className={styles.configuracionDetalles}>
         <div className={styles.configuracionField}>
@@ -339,7 +338,7 @@ function ConfiguracionVpnGateway({
         </div>
       </div>
       <div className={styles.dispositivoRemotoIcon}>
-        {getIconoNodo(tipoHostRemoto)}
+        {tipoHostRemoto && getIconoNodo(tipoHostRemoto)}
       </div>
       <button
         className={styles.deleteButton}

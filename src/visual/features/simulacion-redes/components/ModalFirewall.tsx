@@ -44,8 +44,7 @@ export default function ModalFirewall() {
                     <div className={styles.direccionGroup}>
                         <div className={styles.direccionHeader}>
                             <span className={styles.direccionLabel}>
-                                <span className={styles.direccionIcon}>←</span>
-                                Entrante desde
+                                Desde
                             </span>
                             <button
                                 className={styles.toggleTodosBtn}
@@ -71,8 +70,7 @@ export default function ModalFirewall() {
                     <div className={styles.direccionGroup}>
                         <div className={styles.direccionHeader}>
                             <span className={styles.direccionLabel}>
-                                <span className={styles.direccionIcon}>→</span>
-                                Saliente hacia
+                                Hacia
                             </span>
                             <button
                                 className={styles.toggleTodosBtn}

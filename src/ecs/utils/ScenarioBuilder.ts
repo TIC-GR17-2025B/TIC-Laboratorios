@@ -91,12 +91,15 @@ export class ScenarioBuilder {
 
     escenario.zonas.forEach((zona: unknown) => {
       const zonaEntidad = this.crearZona(zona, escenarioPadre);
-      const z = zona as { oficinas?: unknown[]; redes?: unknown[]; nombre?: string };
-      
+      const z = zona as {
+        oficinas?: unknown[];
+        redes?: unknown[];
+        nombre?: string;
+      };
+
       // Verificar si la zona tiene routers
       const tieneRouters = this.zonaTieneRouters(z);
 
-      
       let redesConEntidades = new Map<
         Entidad,
         { nombre: string; color: string }
@@ -105,7 +108,7 @@ export class ScenarioBuilder {
       // Procesar redes de la zona
       (z.redes ?? []).forEach((red) => {
         const r = red as { nombre: string; color: string };
-        
+
         // Si la red es "Internet", verificar que la zona tenga routers
         if (r.nombre === "Internet") {
           if (!tieneRouters) {
@@ -152,7 +155,7 @@ export class ScenarioBuilder {
         escenario.titulo,
         escenario.descripcion,
         escenario.presupuestoInicial
-      )      
+      )
     );
     return entidadEscenario;
   }
@@ -365,11 +368,11 @@ export class ScenarioBuilder {
         break;
       }
       case TipoDispositivo.ROUTER: {
-        const r = dispositivo as {
-          nombre?: string;
-          conectadoAInternet?: boolean;
-          redes?: string[]; // Array de NOMBRES de redes (referencias)
-        };
+        // const r = dispositivo as {
+        //   nombre?: string;
+        //   conectadoAInternet?: boolean;
+        //   redes?: string[]; // Array de NOMBRES de redes (referencias)
+        // };
         // Agregar RouterComponent con firewall y referencias a redes
         const firewallConfig = new FirewallBuilder().build();
         this.ecsManager.agregarComponente(
@@ -450,20 +453,22 @@ export class ScenarioBuilder {
    */
   private zonaTieneRouters(zona: unknown): boolean {
     const z = zona as { oficinas?: unknown[] };
-    
+
     for (const oficina of z.oficinas ?? []) {
       const ofi = oficina as { espacios?: unknown[] };
       for (const espacio of ofi.espacios ?? []) {
         const esp = espacio as { dispositivos?: Array<{ tipo?: unknown }> };
         for (const dispositivo of esp.dispositivos ?? []) {
-          if (dispositivo.tipo === TipoDispositivo.ROUTER ||
-              dispositivo.tipo === TipoDispositivo.VPN) {
+          if (
+            dispositivo.tipo === TipoDispositivo.ROUTER ||
+            dispositivo.tipo === TipoDispositivo.VPN
+          ) {
             return true;
           }
         }
       }
     }
-    
+
     return false;
   }
 

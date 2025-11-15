@@ -96,7 +96,7 @@ export class EscenarioController {
         const log = {
           tipo: TipoLogGeneral.ADVERTENCIA,
           mensaje: d.descripcionEvento,
-          pausarTiempo: false,
+          pausarTiempo: true,
         };
         this.agregarLogGeneralEscenario(log);
       }

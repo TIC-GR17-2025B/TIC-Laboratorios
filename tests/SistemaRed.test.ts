@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
 import { ECSManager } from "../src/ecs/core";
-import { SistemaRed, SistemaRelaciones } from "../src/ecs/systems";
+import { SistemaRed } from "../src/ecs/systems";
 import {
   EstadoAtaqueDispositivo,
   TipoDispositivo,
@@ -10,7 +10,6 @@ import {
   DispositivoComponent,
   RouterComponent,
   RedComponent,
-  ZonaComponent,
 } from "../src/ecs/components";
 import { TipoProtocolo } from "../src/types/TrafficEnums";
 import { FirewallBuilder } from "../src/ecs/utils/FirewallBuilder";

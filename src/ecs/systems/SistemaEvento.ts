@@ -4,11 +4,11 @@ import type {
   PerfilClienteVPN,
   PerfilVPNGateway,
 } from "../../types/EscenarioTypes";
-import {
-  EventosPublicos,
-  EventosInternos,
-} from "../../types/EventosEnums";
-import type { AccionFirewall, DireccionTrafico, Reglas } from "../../types/FirewallTypes";
+import { EventosPublicos, EventosInternos } from "../../types/EventosEnums";
+import type {
+  AccionFirewall,
+  DireccionTrafico,
+} from "../../types/FirewallTypes";
 import type { TipoProtocolo } from "../../types/TrafficEnums";
 import {
   AtaqueComponent,
@@ -89,14 +89,17 @@ export class SistemaEvento extends Sistema {
             accion: AccionFirewall;
             direccion: DireccionTrafico;
             protocolo: TipoProtocolo;
-          }
+          };
         };
         const router = containerDispositivo.get(RouterComponent);
-        for (const [,reglas] of router?.bloqueosFirewall.entries()!) {
+        for (const [, reglas] of router?.bloqueosFirewall.entries()!) {
           for (const regla of reglas) {
-            if (regla.accion === c.val.accion && 
-                regla.direccion === c.val.direccion 
-                && regla.protocolo == c.val.protocolo) return true;
+            if (
+              regla.accion === c.val.accion &&
+              regla.direccion === c.val.direccion &&
+              regla.protocolo == c.val.protocolo
+            )
+              return true;
           }
         }
         return false;
@@ -114,7 +117,7 @@ export class SistemaEvento extends Sistema {
   public ejecutarEvento(evento: EventoComponent): void {
     switch (evento.tipoEvento) {
       case TipoEvento.ENVIO_ACTIVO: {
-        console.log("Ejecutando evento de envío de activo...");
+        //console.log("Ejecutando evento de envío de activo...");
         // Convertir nombres de dispositivos a entidades
         const info = evento.infoAdicional as {
           nombreActivo: string;
@@ -147,34 +150,34 @@ export class SistemaEvento extends Sistema {
         break;
       }
       case TipoEvento.TRAFICO_RED: {
-         console.log("Ejecutando evento de tráfico de red...");
-         // Convertir nombres de dispositivos a entidades (null = Internet)
-         const info = evento.infoAdicional as {
-           dispositivoOrigen: string;
-           dispositivoDestino: string;
-           protocolo: unknown;
-         };
-         const entidadOrigen = this.buscarDispositivoPorNombre(
-           info.dispositivoOrigen
-         );
-         const entidadDestino = this.buscarDispositivoPorNombre(
-           info.dispositivoDestino
-         );
-      
-         const eventoConEntidades = {
-           ...evento,
-           infoAdicional: {
-             entidadOrigen,
-             entidadDestino,
-             protocolo: info.protocolo,
-           },
-       };
-      
-       this.ecsManager.emit(EventosInternos.RED_TRAFICO, {
-           evento: eventoConEntidades,
-         });
-         break;
-       }
+        //console.log("Ejecutando evento de tráfico de red...");
+        // Convertir nombres de dispositivos a entidades (null = Internet)
+        const info = evento.infoAdicional as {
+          dispositivoOrigen: string;
+          dispositivoDestino: string;
+          protocolo: unknown;
+        };
+        const entidadOrigen = this.buscarDispositivoPorNombre(
+          info.dispositivoOrigen
+        );
+        const entidadDestino = this.buscarDispositivoPorNombre(
+          info.dispositivoDestino
+        );
+
+        const eventoConEntidades = {
+          ...evento,
+          infoAdicional: {
+            entidadOrigen,
+            entidadDestino,
+            protocolo: info.protocolo,
+          },
+        };
+
+        this.ecsManager.emit(EventosInternos.RED_TRAFICO, {
+          evento: eventoConEntidades,
+        });
+        break;
+      }
       case TipoEvento.CONEXION_VPN: {
         //Obtenemos los permisos del gateway y del cliente
         const info = evento.infoAdicional as {

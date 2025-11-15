@@ -11,11 +11,7 @@ import { DispositivoComponent, RouterComponent } from "../../components";
 export class EventoRedService {
   constructor(private ecsManager: ECSManager) {}
 
-  emitirEventoPermitido(
-    origen: string,
-    destino: string,
-    protocolo: TipoProtocolo
-  ): void {
+  emitirEventoPermitido(origen: string, destino: string): void {
     this.ecsManager.emit(EventosPublicos.TRAFICO_PERMITIDO, {
       mensaje: `Trafico permitido: desde ${origen} hacia ${destino}`,
     });
@@ -37,7 +33,7 @@ export class EventoRedService {
         origen,
         destino,
         protocolo,
-        mensaje: `Trafico bloqueado: desde ${origen} hacia ${destino} [${protocolo}]`,
+        mensaje: `Trafico bloqueado: desde ${origen} hacia ${destino}`,
         tipo: "BLOQUEADO",
         entidadRouter,
         router: nombreRouter,
@@ -50,7 +46,7 @@ export class EventoRedService {
     }
 
     this.ecsManager.emit(EventosPublicos.TRAFICO_BLOQUEADO, {
-      descripcion: `Trafico bloqueado: desde ${origen} hacia ${destino} [${protocolo}]`,
+      mensaje: `Trafico bloqueado: desde ${origen} hacia ${destino}`,
     });
   }
 
