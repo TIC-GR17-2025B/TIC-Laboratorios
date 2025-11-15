@@ -7,7 +7,6 @@ import { Componente, type Entidad } from "../core/Componente";
 export class EspacioComponent extends Componente {
   constructor(
     public id: number,
-    public oficinaId: number,
     public mueble: string = "libre",
     public dispositivos: Entidad[] = [],
     public tipo: string = "espacio"

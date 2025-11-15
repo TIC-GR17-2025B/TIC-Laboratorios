@@ -1,94 +1,62 @@
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import DevicesIcon from "../../../common/icons/DevicesIcon";
 import SistemaOpIcon from "../../../common/icons/SistemaOpIcon";
 import styles from "../styles/Dispositivos.module.css"
 
 import ComboBox from "../../../common/components/ComboBox";
 import PanelConfiguraciones from "../components/PanelConfiguraciones";
-import { useEscenario } from "../../../common/contexts";
-import { EscenarioController } from "../../../../ecs/controllers/EscenarioController";
-import { DispositivoComponent, WorkstationComponent, Transform } from "../../../../ecs/components";
+import { useEscenario, useModal } from "../../../common/contexts";
 import type { Dispositivo } from "../../../../types/EscenarioTypes";
-import { EstadoAtaqueDispositivo, TipoDispositivo } from "../../../../types/DeviceEnums";
+import ConexionIcon from "../../../common/icons/ConexionIcon";
+import RedChip from "../../simulacion-redes/components/RedChip";
+import { useDispositivos } from "../hooks";
+import VPNIcon from "../../../common/icons/VPNIcon";
+import ModalVPNCliente from "../../simulacion-redes/components/ModalVPNCliente";
 
 function Dispositivos() {
-    const { setDispositivoSeleccionado, dispositivoSeleccionado } = useEscenario();
+    const { setDispositivoSeleccionado, dispositivoSeleccionado, entidadSeleccionadaId } = useEscenario();
+    const { openModal } = useModal();
+    const { dispositivos } = useDispositivos();
 
-    // Obtener dispositivos reales desde el ECS
-    const opciones = useMemo(() => {
-        try {
-            const controller = EscenarioController.getInstance();
-            const entidades = controller.getWorkstationsYServers();
-
-            return entidades.map((entidad): Dispositivo => {
-                const container = controller.ecsManager.getComponentes(entidad);
-                if (!container) {
-                    return {
-                        id: entidad,
-                        entidadId: entidad,
-                        tipo: TipoDispositivo.OTRO,
-                        nombre: "Dispositivo desconocido",
-                        sistemaOperativo: "",
-                        hardware: "",
-                        software: "",
-                        estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
-                    } as Dispositivo;
-                }
-
-                const dispComp = container.get(DispositivoComponent);
-                const wsComp = container.get(WorkstationComponent);
-                const transform = container.get(Transform);
-
-                const posicion = transform
-                    ? { x: transform.x, y: transform.y, z: transform.z, rotacionY: transform.rotacionY }
-                    : undefined;
-
-                const dispositivo: Dispositivo = {
-                    id: entidad,
-                    entidadId: entidad,
-                    tipo: dispComp?.tipo ?? TipoDispositivo.OTRO,
-                    nombre: dispComp?.nombre ?? "Dispositivo sin nombre",
-                    sistemaOperativo: dispComp?.sistemaOperativo ?? "",
-                    hardware: dispComp?.hardware ?? "",
-                    software: "",
-                    posicion,
-                    estadoAtaque: dispComp?.estadoAtaque ?? EstadoAtaqueDispositivo.NORMAL,
-                };
-
-                // Agregar configuraciones si es workstation
-                if (wsComp) {
-                    dispositivo.configuraciones = wsComp.configuraciones;
-                }
-
-                return dispositivo;
-            });
-        } catch (error) {
-            console.error("Error obteniendo dispositivos:", error);
-            return [];
-        }
-    }, []);
-
-    // Establecer el primer dispositivo como seleccionado por defecto
     useEffect(() => {
-        if (!dispositivoSeleccionado && opciones.length > 0) {
-            setDispositivoSeleccionado(opciones[0]);
+        if (dispositivos.length === 0) return;
+
+        // Verificar que sea una entidad de la lista
+        const esEntidadValida = entidadSeleccionadaId !== null &&
+            dispositivos.some(d => d.entidadId === entidadSeleccionadaId);
+
+        if (!dispositivoSeleccionado || !esEntidadValida) {
+            setDispositivoSeleccionado(dispositivos[0]);
         }
-    }, [opciones, dispositivoSeleccionado, setDispositivoSeleccionado]);
+    }, [dispositivos, dispositivoSeleccionado, entidadSeleccionadaId, setDispositivoSeleccionado]);
+
+    useEffect(() => {
+        if (dispositivoSeleccionado) {
+            const dispositivoActualizado = dispositivos.find(d => d.entidadId === dispositivoSeleccionado.entidadId);
+            if (dispositivoActualizado) {
+                setDispositivoSeleccionado(dispositivoActualizado);
+            }
+        }
+    }, [dispositivos]);
 
     return <div className={styles.contenedor}>
-        <div className={styles.comboBoxDispositivo}>
-            <ComboBox<Dispositivo>
-                items={opciones}
-                value={dispositivoSeleccionado}
-                onChange={setDispositivoSeleccionado}
-                getKey={(d) => d.id.toString()}
-                getLabel={(d) => d.nombre ?? "Dispositivo sin nombre"}
-                icon={<DevicesIcon size={16} />}
-            />
+        <div className={styles.parteSuperior}>
+            <div className={styles.comboBoxDispositivo}>
+                <ComboBox<Dispositivo>
+                    items={dispositivos}
+                    value={dispositivoSeleccionado}
+                    onChange={setDispositivoSeleccionado}
+                    getKey={(d) => d.id.toString()}
+                    getLabel={(d) => d.nombre ?? "Dispositivo sin nombre"}
+                    icon={<DevicesIcon size={16} />}
+                />
+            </div>
+            <button onClick={() => openModal(<ModalVPNCliente />, 'Configuración de VPN Cliente')}>
+                <VPNIcon />Configurar VPN
+            </button>
         </div>
         <div className={styles.contenidoDispositivo}>
-            <div className={styles.imagenDispositivo}>
-            </div>
+            <img draggable={false} className={styles.imagenDispositivo} src="/assets/models_picture/workstation.webp" alt="Imagen de Estación de trabajo" />
             <section className={styles.descripcion}>
                 <div className={styles.item}>
                     <div className={styles.etiqueta}>
@@ -104,31 +72,23 @@ function Dispositivos() {
                     </div>
                     <span className={styles.valor}>{dispositivoSeleccionado?.hardware}</span>
                 </div>
-
-                {/*
-                <div className={styles.item}>
-                    <div className={styles.etiqueta}>
-                        <SoftwareIcon size={16} />
-                        <span>Software</span>
-                    </div>
-                    <span className={styles.valor}>{dispositivoSeleccionado?.software}</span>
-                </div>
-                
                 <div className={`${styles.item} ${styles.itemLista}`}>
                     <div className={styles.etiqueta}>
-                        <ActivosIcon size={16} />
-                        <span>Activos</span>
+                        <ConexionIcon size={16} />
+                        <span>Redes</span>
                     </div>
-                    {dispositivoSeleccionado?.activos.length ? (
+                    {dispositivoSeleccionado?.redes && dispositivoSeleccionado.redes.length > 0 ? (
                         <div>
-                            {dispositivoSeleccionado?.activos.map((activo, index) => (
-                                <div className={styles.itemListaDetalle} key={index}>{activo}</div>
+                            {dispositivoSeleccionado.redes.map((red) => (
+                                <div className={styles.itemListaDetalle} key={red.entidadId}>
+                                    <RedChip nombre={red.nombre} color={red.color} activado={true} />
+                                </div>
                             ))}
                         </div>
                     ) : (
                         <span className={styles.valor}>-</span>
                     )}
-                </div> */}
+                </div>
             </section>
             <section className={styles.configuraciones}>
                 <PanelConfiguraciones />

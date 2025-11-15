@@ -4,6 +4,8 @@ import {
   PresupuestoComponent,
   DispositivoComponent,
 } from "../components";
+import { AccionesRealizables, ObjetosManejables } from "../../types/AccionesEnums";
+import { EventosPublicos } from "../../types/EventosEnums";
 
 export class SistemaPresupuesto extends Sistema {
   public componentesRequeridos = new Set([PresupuestoComponent]);
@@ -49,8 +51,8 @@ export class SistemaPresupuesto extends Sistema {
         const dispositivoComp =
           componentesEntidadWorkstation?.get(DispositivoComponent);
         this.ecsManager.registrarAccion(
-          "Click",
-          "Configuracion Workstation",
+          AccionesRealizables.CLICK,
+          ObjetosManejables.CONFIG_WORKSTATION,
           -1,
           {
             nombreConfig: listaConfigsWorkstation[i].nombreConfig,
@@ -82,8 +84,8 @@ export class SistemaPresupuesto extends Sistema {
         const dispositivoComp =
           componentesEntidadWorkstation?.get(DispositivoComponent);
         this.ecsManager.registrarAccion(
-          "Click",
-          "Configuracion Workstation",
+          AccionesRealizables.CLICK,
+          ObjetosManejables.CONFIG_WORKSTATION,
           -1,
           {
             nombreConfig: listaConfigsWorkstation[i].nombreConfig,
@@ -98,7 +100,7 @@ export class SistemaPresupuesto extends Sistema {
       .getComponentes(entidadPresupuesto)
       ?.get(PresupuestoComponent);
 
-    this.ecsManager.emit("presupuesto:actualizado", {
+    this.ecsManager.emit(EventosPublicos.PRESUPUESTO_ACTUALIZADO, {
       presupuesto: presupuestoComp?.monto ?? 0,
     });
     this.notificarPresupuestoAgotado(entidadPresupuesto);
@@ -124,6 +126,6 @@ export class SistemaPresupuesto extends Sistema {
       ?.get(PresupuestoComponent);
 
     if (presupuestoComp?.monto === 0)
-      this.ecsManager.emit("presupuesto:agotado");
+      this.ecsManager.emit(EventosPublicos.PRESUPUESTO_AGOTADO);
   }
 }

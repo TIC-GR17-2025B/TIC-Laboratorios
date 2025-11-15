@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import Model3D from './Model3D';
 import { getModelo } from '../config/modelConfig';
-import { useEscenario } from '../../../common/contexts';
+import { useEscenario, useModal } from '../../../common/contexts';
 import { useECSSceneContext } from '../context/ECSSceneContext';
+import ModalFirewall from '../../simulacion-redes/components/ModalFirewall';
+import ModalVPN from '../../simulacion-redes/components/ModalVPN';
 
 /**
  * Componente que renderiza todas las entidades del ECS como modelos 3D
@@ -11,11 +13,15 @@ import { useECSSceneContext } from '../context/ECSSceneContext';
 const ECSSceneRenderer: React.FC = () => {
     const { setDispositivoSeleccionado, entidadSeleccionadaId } = useEscenario();
     const { processEntities } = useECSSceneContext();
+    const { openModal } = useModal();
     const [menuOpenForEntity, setMenuOpenForEntity] = useState<number | null>(null);
     const navigate = useNavigate();
 
+    useEffect(() => {
+        setDispositivoSeleccionado(null);
+    }, []);
+
     const handleEntityClick = (entity: unknown) => {
-        console.log('Entidad clickeada:', entity);
         const e = entity as { objetoConTipo?: { tipo?: string } };
         // No permitir seleccionar espacios
         if (e.objetoConTipo?.tipo === 'espacio') {
@@ -39,17 +45,53 @@ const ECSSceneRenderer: React.FC = () => {
         }
     };
 
-    const menuOptions = [
-        {
-            label: 'Configurar',
-            to: '/dispositivos',
-            onClick: () => {
-                console.log('Configurar entidad:', menuOpenForEntity);
-                setMenuOpenForEntity(null);
-            },
-            color: '#0088ff'
+    // Obtener las opciones del menú según el tipo de dispositivo seleccionado
+    const getMenuOptions = () => {
+        const selectedEntity = processedEntities.find(e => e.entidadId === menuOpenForEntity);
+        const deviceType = selectedEntity?.objetoConTipo?.tipo?.toUpperCase();
+
+        if (deviceType === 'WORKSTATION') {
+            return [
+                {
+                    label: 'Configurar',
+                    to: '/dispositivos',
+                    onClick: () => {
+                        setMenuOpenForEntity(null);
+                    },
+                }
+            ];
+        } else if (deviceType === 'ROUTER') {
+            return [
+                {
+                    label: 'Configurar Firewall',
+                    onClick: () => {
+                        openModal(<ModalFirewall />, 'Configuración de Firewall');
+                        setMenuOpenForEntity(null);
+                    },
+                }
+            ];
+        } else if (deviceType === 'VPN') {
+            return [
+                {
+                    label: 'Configurar VPN',
+                    onClick: () => {
+                        openModal(<ModalVPN />, "Configuración de VPN Gateway");
+                        setMenuOpenForEntity(null);
+                    }
+
+                }];
         }
-    ];
+        // Opciones por defecto para otros dispositivos
+        return [
+            {
+                label: 'Configurar',
+                to: '/dispositivos',
+                onClick: () => {
+                    setMenuOpenForEntity(null);
+                },
+            }
+        ];
+    };
 
     return (
         <>
@@ -86,7 +128,7 @@ const ECSSceneRenderer: React.FC = () => {
                         isSelected={!isEspacio && entidadSeleccionadaId === entidadId}
                         enableHover={!isEspacio} // Deshabilitar hover en espacios
                         showMenu={menuOpenForEntity === entidadId}
-                        menuOptions={menuOptions}
+                        menuOptions={getMenuOptions()}
                         onMenuClose={() => setMenuOpenForEntity(null)}
                         onNavigate={(path) => navigate(path)}
                     />

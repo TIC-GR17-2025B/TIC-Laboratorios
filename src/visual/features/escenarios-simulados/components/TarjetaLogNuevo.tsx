@@ -33,7 +33,7 @@ export default function TarjetaLogNuevo() {
     // Mapear el tipo a categorías de log
     const tipoToCategory: Record<string, LogCategory> = {
         ataque: LogCategory.ATAQUE,
-        advertencia: LogCategory.ATAQUE, // Usamos el mismo icono de alerta
+        advertencia: LogCategory.ADVERTENCIA,
         completado: LogCategory.INFO
     };
 

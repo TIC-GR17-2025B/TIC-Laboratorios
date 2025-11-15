@@ -9,17 +9,30 @@ export enum TipoDispositivo {
   SERVER = "server",
   ROUTER = "router",
   SWITCH = "switch",
-  FIREWALL = "firewall",
-  PORTATIL = "portatil",
+  VPN = "vpn",
   NAS = "nas",
   OTRO = "otro",
 }
 
 export enum EstadoAtaqueDispositivo {
-    NORMAL = "normal",
-    COMPROMETIDO = "comprometido", // Que está bajo un ataque
+  NORMAL = "normal",
+  COMPROMETIDO = "comprometido", // Que está bajo un ataque
+}
+
+export enum TipoProteccionVPN {
+  EA = "Encriptar y Autenticar",
+  A = "Solo Autenticar",
+  N = "Ninguna",
+  B = "Bloquear",
 }
 
 export enum TipoAtaque {
-    INFECCION_TROYANO = "Infección de troyano",
+  INFECCION_TROYANO = "Infección de troyano",
+}
+
+export enum TipoEvento {
+  ENVIO_ACTIVO = "Envío de activo",
+  TRAFICO_RED = "Tráfico de red",
+  CONEXION_VPN = "Conexión VPN",
+  NO_APLICA = "n/a", // Para compatibilidad (en el constructor) con los ataques, que también son eventos pero ya tienen su propia lógica
 }

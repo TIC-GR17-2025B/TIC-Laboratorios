@@ -18,22 +18,22 @@ export const MUEBLE_MODELS: Record<string, string> = {
  */
 export const DISPOSITIVO_MODELS: Record<string, string> = {
   [TipoDispositivo.WORKSTATION]: "/assets/models/computadora.gltf",
+  [TipoDispositivo.ROUTER]: "/assets/models/router.gltf",
+  [TipoDispositivo.VPN]: "/assets/models/vpn.gltf",
 };
 
 /**
  * Precarga todos los modelos 3D para mejorar el rendimiento
  * Llamar esta función al inicio de la aplicación
  */
-export const preloadAllModels = () => {
-  // Precargar modelos de muebles
-  Object.values(MUEBLE_MODELS).forEach((path) => {
-    if (path) preloadModel(path);
-  });
+export const preloadAllModels = async () => {
+  const allPaths = [
+    ...Object.values(MUEBLE_MODELS),
+    ...Object.values(DISPOSITIVO_MODELS),
+  ].filter((path) => path); // Filtrar paths vacíos
 
-  // Precargar modelos de dispositivos
-  Object.values(DISPOSITIVO_MODELS).forEach((path) => {
-    if (path) preloadModel(path);
-  });
+  // Precargar todos los modelos en paralelo
+  await Promise.all(allPaths.map((path) => preloadModel(path)));
 };
 
 /**
@@ -42,6 +42,8 @@ export const preloadAllModels = () => {
  */
 export const DISPOSITIVO_HEIGHTS: Record<string, number> = {
   [TipoDispositivo.WORKSTATION]: 0.71,
+  [TipoDispositivo.ROUTER]: 0.71,
+  [TipoDispositivo.VPN]: 0.71,
 };
 
 /**

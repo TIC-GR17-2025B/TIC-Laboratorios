@@ -1,0 +1,1 @@
+export { useDispositivos } from "./useDispositivos";

@@ -1,10 +1,16 @@
-import type { AtaqueComponent, FaseComponent } from "../ecs/components";
+import type {
+  AtaqueComponent,
+  EventoComponent,
+  FaseComponent,
+} from "../ecs/components";
 import type { Entidad } from "../ecs/core";
 import {
   EstadoAtaqueDispositivo,
   Mueble,
   TipoDispositivo,
+  TipoProteccionVPN,
 } from "./DeviceEnums";
+import type { TipoLogGeneral } from "./EventosEnums";
 
 export interface Escenario {
   id: number;
@@ -13,7 +19,9 @@ export interface Escenario {
   presupuestoInicial: number;
   zonas: Entidad[];
   ataques: AtaqueComponent[];
+  eventos: EventoComponent[];
   fases: FaseComponent[];
+  redes: Entidad[];
 }
 
 export interface Zona {
@@ -34,6 +42,27 @@ export interface Dispositivo {
   entidadId?: number;
   // Configuraciones del Workstation si aplica (las provee WorkstationComponent)
   configuraciones?: unknown;
+  activos: Activo[];
+  redes?: Array<{ nombre: string; color: string; entidadId: number }>;
+}
+
+export interface Activo {
+  nombre: string;
+  contenido: string;
+}
+
+export interface PerfilVPNGateway {
+  lanLocal: string;
+  hostLan: string;
+  proteccion: TipoProteccionVPN;
+  dominioRemoto: string;
+  hostRemoto: string;
+}
+
+export interface PerfilClienteVPN {
+  proteccion: TipoProteccionVPN;
+  dominioRemoto: string;
+  hostRemoto: string;
 }
 
 export interface Espacio {
@@ -48,4 +77,10 @@ export interface Oficina {
   nombre?: string;
   posicion?: { x: number; y: number; z: number };
   espacios: Espacio[];
+}
+
+export interface LogGeneral {
+  tipo: TipoLogGeneral;
+  mensaje: string;
+  pausarTiempo: boolean;
 }

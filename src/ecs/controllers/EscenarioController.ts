@@ -1,14 +1,26 @@
 import {
   AtaqueComponent,
   DispositivoComponent,
+  EscenarioComponent,
+  EventoComponent,
   PresupuestoComponent,
   TiempoComponent,
   WorkstationComponent,
 } from "../components";
 import { ECSManager, type Entidad } from "../core";
-import { SistemaAtaque, SistemaPresupuesto, SistemaTiempo } from "../systems";
+import {
+  SistemaEvento,
+  SistemaJerarquiaEscenario,
+  SistemaPresupuesto,
+  SistemaTiempo,
+} from "../systems";
 import { ScenarioBuilder } from "../utils/ScenarioBuilder";
-import type { Escenario } from "../../types/EscenarioTypes";
+import type { Escenario, LogGeneral } from "../../types/EscenarioTypes";
+import {
+  EventosInternos,
+  EventosPublicos,
+  TipoLogGeneral,
+} from "../../types/EventosEnums";
 
 export class EscenarioController {
   public escenario: Escenario;
@@ -18,8 +30,9 @@ export class EscenarioController {
   private entidadTiempo?: Entidad;
   private sistemaTiempo?: SistemaTiempo;
   private sistemaPresupuesto?: SistemaPresupuesto;
+  private sistemaJerarquiaEscenario?: SistemaJerarquiaEscenario;
   private entidadPresupuesto?: Entidad;
-  private sistemaAtaque?: SistemaAtaque;
+  private sistemaEvento?: SistemaEvento;
   private escenarioIniciado: boolean = false; // FLAG PARA EVITAR MÚLTIPLES INICIALIZACIONES
 
   private static instance: EscenarioController | null = null;
@@ -27,6 +40,9 @@ export class EscenarioController {
   private constructor(escenario: Escenario) {
     this.escenario = escenario;
     this.ecsManager = new ECSManager();
+
+    this.sistemaJerarquiaEscenario = new SistemaJerarquiaEscenario();
+    this.ecsManager.agregarSistema(this.sistemaJerarquiaEscenario);
   }
 
   // SINGLETON
@@ -53,51 +69,112 @@ export class EscenarioController {
     this.builder = new ScenarioBuilder(this.ecsManager);
     this.builder.construirDesdeArchivo(this.escenario);
 
-    if (!this.sistemaAtaque) {
-      this.sistemaAtaque = new SistemaAtaque();
-      this.ecsManager.agregarSistema(this.sistemaAtaque);
+    if (!this.sistemaEvento) {
+      this.sistemaEvento = new SistemaEvento();
+      this.ecsManager.agregarSistema(this.sistemaEvento);
     }
 
     // NO emitir el evento aquí - lo haremos después de que los sistemas se suscriban
-    this.ecsManager.on("tiempo:notificacionAtaque", (data: unknown) => {
-      const d = data as { descripcionAtaque: string };
-      console.log(d.descripcionAtaque);
-    });
+    this.ecsManager.on(
+      EventosPublicos.TIEMPO_NOTIFICACION_ATAQUE,
+      (data: unknown) => {
+        const d = data as { descripcionAtaque: string };
+        const log = {
+          tipo: TipoLogGeneral.ADVERTENCIA,
+          mensaje: d.descripcionAtaque,
+          pausarTiempo: true,
+        };
+        this.agregarLogGeneralEscenario(log);
+      }
+    );
 
-    this.ecsManager.on("tiempo:ejecucionAtaque", (data: unknown) => {
+    // Lo mismo que ariba pero para eventos generalizados
+    this.ecsManager.on(
+      EventosPublicos.TIEMPO_NOTIFICACION_EVENTO,
+      (data: unknown) => {
+        const d = data as { descripcionEvento: string };
+        const log = {
+          tipo: TipoLogGeneral.ADVERTENCIA,
+          mensaje: d.descripcionEvento,
+          pausarTiempo: true,
+        };
+        this.agregarLogGeneralEscenario(log);
+      }
+    );
+
+    this.ecsManager.on(
+      EventosInternos.TIEMPO_EJECUCION_ATAQUE,
+      (data: unknown) => {
+        const d = data as { ataque: AtaqueComponent };
+        this.ejecutarAtaque(d.ataque);
+      }
+    );
+
+    // Lo mismo que ariba pero para eventos generalizados
+    this.ecsManager.on(
+      EventosInternos.TIEMPO_EJECUCION_EVENTO,
+      (data: unknown) => {
+        const d = data as { evento: EventoComponent };
+        this.ejecutarEvento(d.evento);
+      }
+    );
+
+    this.ecsManager.on(EventosPublicos.ATAQUE_REALIZADO, (data: unknown) => {
       const d = data as { ataque: AtaqueComponent };
-      this.ejecutarAtaque(d.ataque);
+      const log = {
+        tipo: TipoLogGeneral.ATAQUE,
+        mensaje: `Se comprometió el dispositivo: ${d.ataque.dispositivoAAtacar}. Causa: ${d.ataque.tipoAtaque}`,
+        pausarTiempo: true,
+      };
+      this.agregarLogGeneralEscenario(log);
     });
 
-    this.ecsManager.on("ataque:ataqueRealizado", (data: unknown) => {
+    this.ecsManager.on(EventosPublicos.ATAQUE_MITIGADO, (data: unknown) => {
       const d = data as { ataque: AtaqueComponent };
-      console.log(
-        `Se comprometió el dispositivo: ${d.ataque.dispositivoAAtacar}. Causa: ${d.ataque.tipoAtaque}`
-      );
+      const log = {
+        tipo: TipoLogGeneral.COMPLETADO,
+        mensaje: `Se mitigó el ataque a: ${d.ataque.dispositivoAAtacar}. Ataque mitigado: ${d.ataque.tipoAtaque}`,
+        pausarTiempo: false,
+      };
+      this.agregarLogGeneralEscenario(log);
     });
 
-    this.ecsManager.on("ataque:ataqueMitigado", (data: unknown) => {
-      const d = data as { ataque: AtaqueComponent };
-      console.log(
-        `Se mitigó el ataque a: ${d.ataque.dispositivoAAtacar}. Ataque mitigado: ${d.ataque.tipoAtaque}`
-      );
-    });
-
-    this.ecsManager.on("presupuesto:agotado", () => {
+    this.ecsManager.on(EventosPublicos.PRESUPUESTO_AGOTADO, () => {
       this.sistemaTiempo?.pausar(this.entidadTiempo!);
-      console.log("Se agotó el presupuesto, fin de la partida.");
+      const log = {
+        tipo: TipoLogGeneral.ADVERTENCIA,
+        mensaje: "Se agotó el presupuesto, fin de la partida.",
+        pausarTiempo: true,
+      };
+      this.agregarLogGeneralEscenario(log);
     });
 
     this.escenarioIniciado = true;
   }
 
-  public cargarAtaquesEnSistema(): void {
+  private agregarLogGeneralEscenario(log: LogGeneral): void {
+    for (const [entidad, container] of this.ecsManager.getEntidades()) {
+      if (container.tiene(EscenarioComponent)) {
+        this.ecsManager
+          .getComponentes(entidad)
+          ?.get(EscenarioComponent)
+          ?.logsGenerales.push(log);
+        break;
+      }
+    }
+    this.ecsManager.emit(
+      EventosPublicos.LOGS_GENERALES_ACTUALIZADOS,
+      log.pausarTiempo
+    );
+  }
+
+  public cargarEventosEnSistema(): void {
     if (!this.sistemaTiempo) {
       console.error("SistemaTiempo no existe aún");
       return;
     }
-    const ataques = this.getAtaques();
-    this.sistemaTiempo.ataquesEscenario = ataques;
+    const eventos = this.getEventos();
+    this.sistemaTiempo.eventosEscenario = eventos;
   }
 
   public ejecutarTiempo(): void {
@@ -219,8 +296,12 @@ export class EscenarioController {
     );
 
     if (entidadDispConSuNombre.length > 0) {
-      this.sistemaAtaque?.ejecutarAtaque(entidadDispConSuNombre[0][0], ataque);
+      this.sistemaEvento?.ejecutarAtaque(entidadDispConSuNombre[0][0], ataque);
     }
+  }
+
+  public ejecutarEvento(evento: EventoComponent) {
+    this.sistemaEvento?.ejecutarEvento(evento);
   }
 
   public getPresupuestoActual(): number {
@@ -234,17 +315,21 @@ export class EscenarioController {
     return presupuesto?.monto ?? 0;
   }
 
-  public getAtaques(): AtaqueComponent[] {
-    const ataques: AtaqueComponent[] = [];
+  public getEventos(): EventoComponent[] {
+    const eventos: EventoComponent[] = [];
 
     for (const [, container] of this.builder.getEntidades()) {
+      if (container.tiene(EventoComponent)) {
+        const a = container.get(EventoComponent);
+        if (a) eventos.push(a);
+      }
       if (container.tiene(AtaqueComponent)) {
         const a = container.get(AtaqueComponent);
-        if (a) ataques.push(a);
+        if (a) eventos.push(a);
       }
     }
 
-    return ataques;
+    return eventos;
   }
 
   public getWorkstationsYServers(): Entidad[] {

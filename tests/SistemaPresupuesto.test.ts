@@ -23,7 +23,7 @@ describe('PresupuestoComponent y SistemaPresupuesto', () => {
 
         // Simular activación de una configuración
         const entidadWorkstation = em.agregarEntidad();
-        em.agregarComponente(entidadWorkstation, new DispositivoComponent("dispo", "so", "hw", TipoDispositivo.WORKSTATION, EstadoAtaqueDispositivo.NORMAL));
+        em.agregarComponente(entidadWorkstation, new DispositivoComponent("dispo", "so", "hw", TipoDispositivo.WORKSTATION, EstadoAtaqueDispositivo.NORMAL, []));
         em.agregarComponente(entidadWorkstation, new WorkstationComponent());
         sistema.toggleConfiguracionWorkstation(entidadPresupuesto, entidadWorkstation, configuracion)
         expect(presupuesto.monto).toBeLessThan(presupuestoInicial);
@@ -56,7 +56,7 @@ describe('PresupuestoComponent y SistemaPresupuesto', () => {
 
         // Simular activación de una configuración con presupuesto insuficiente
         const entidadWorkstation = em.agregarEntidad();
-        em.agregarComponente(entidadWorkstation, new DispositivoComponent("dispo", "so", "hw", TipoDispositivo.WORKSTATION, EstadoAtaqueDispositivo.NORMAL));
+        em.agregarComponente(entidadWorkstation, new DispositivoComponent("dispo", "so", "hw", TipoDispositivo.WORKSTATION, EstadoAtaqueDispositivo.NORMAL, []));
         em.agregarComponente(entidadWorkstation, new WorkstationComponent());
         sistema.toggleConfiguracionWorkstation(entidadPresupuesto, entidadWorkstation, configuracion)
         expect(presupuesto.monto).toEqual(presupuestoInicial);

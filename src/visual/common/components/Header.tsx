@@ -7,6 +7,7 @@ import { useEscenarioActual } from '../contexts/EscenarioContext';
 import { formatearTiempo } from '../utils/formatearTiempo';
 import { useECSSceneContext } from '../../features/escenarios-simulados/context/ECSSceneContext';
 import ChatLauncher from '../../features/chat/components/ChatLauncher';
+import RedesIcon from '../icons/RedesIcon';
 
 const Header: React.FC = () => {
     const escenario = useEscenarioActual();
@@ -39,6 +40,7 @@ const Header: React.FC = () => {
             <nav className={styles.nav}>
                 <NavigationLink icon={<OfficeIcon />} label="Oficina" to="/" />
                 <NavigationLink icon={<DevicesIcon />} label="Dispositivos" to="/dispositivos" />
+                <NavigationLink icon={<RedesIcon />} label="Redes" to="/redes" />
             </nav>
         </header >
     );

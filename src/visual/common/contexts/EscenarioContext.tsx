@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { Dispositivo, Escenario } from '../../../types/EscenarioTypes';
@@ -105,6 +104,7 @@ export function EscenarioProvider({ children, initialEscenario = escenarioBase a
                     software: dc.software as string | undefined,
                     posicion,
                     estadoAtaque: dc.estadoAtaque as unknown as EstadoAtaqueDispositivo,
+                    activos: [],
                 };
 
                 // Añadir configuraciones desde WorkstationComponent si existe

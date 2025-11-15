@@ -7,7 +7,6 @@ interface RadialMenuProps {
         label: string;
         icon?: React.ReactNode;
         onClick: () => void;
-        color?: string;
         to?: string; // Ruta opcional para navegación
     }>;
     onNavigate?: (path: string) => void; // Callback opcional para navegación
@@ -79,14 +78,18 @@ const RadialMenu: React.FC<RadialMenuProps> = ({ onClose, options, onNavigate })
                             className="radial-menu-button"
                             style={{
                                 transform: `translate(-50%, -50%) translate(${translateX}px, ${translateY}px)`,
-                                animationDelay: `${index * 0.05}s`,
-                                ['--hover-color' as string]: option.color || '#0088ff',
-                                ['--hover-shadow' as string]: `0 0 20px ${option.color || '#0088ff'}80`,
+                                animationDelay: `${index * 0.05}s`
                             }}
-                            onClick={() => {
-                                option.onClick();
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+
+                                // Si tiene ruta 'to', navegar a esa ruta
                                 if (option.to && onNavigate) {
                                     onNavigate(option.to);
+                                } else {
+                                    // Si no tiene 'to', ejecutar la función onClick
+                                    option.onClick();
                                 }
                                 onClose();
                             }}

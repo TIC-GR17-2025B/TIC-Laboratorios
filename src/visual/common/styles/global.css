@@ -1,5 +1,6 @@
 :root {
   --text-primary: #ffffff;
+  --text-muted: #a0a0a0;
   --text-secondary: #606060;
   --surface-primary: #212121;
   --surface-secondary: #292929;
@@ -249,4 +250,18 @@ body.context-mode-active [data-context]:hover::after {
 .botonIa:hover::before,
 .IaActivo::before {
   animation: shimmerSlide 2.5s ease-in-out infinite;
+}
+.react-flow__node-group {
+  background-color: var(--surface-secondary) !important;
+  border: 1px solid var(--border-primary) !important;
+  border-radius: 8px !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: normal;
 }

@@ -10,22 +10,52 @@ import {
     DEFAULT_CONTROLS_CONFIG,
     DEFAULT_ENVIRONMENT_CONFIG,
 } from '../config/scene3DConfig';
-import { preloadAllModels } from '../config/modelConfig';
 import ECSSceneRenderer from './ECSSceneRenderer';
+import ZoneToast from './ZoneToast';
+import Controles3D from './Controles3D';
+import { useECSSceneContext } from '../context/ECSSceneContext';
+import { useModelsReady } from '../../../common/components/ModelPreloader';
 
 /**
  * Componente principal de la escena 3D
  * Orquesta la visualización 3D del escenario usando ECS con luces y controles 
  */
 const Escena3D: React.FC = () => {
-    // Precargar todos los modelos al montar el componente
+    const {
+        zonasDisponibles,
+        zonaActual,
+        showZoneToast,
+        zoneToastName,
+        hideZoneToast
+    } = useECSSceneContext();
+
+    const modelsReady = useModelsReady();
+    const [isReady, setIsReady] = React.useState(false);
+
+    // Activar fade-in cuando los modelos estén listos
     useEffect(() => {
-        preloadAllModels();
-    }, []);
+        if (modelsReady) {
+            // Pequeño delay para transición suave
+            setTimeout(() => setIsReady(true), 150);
+        }
+    }, [modelsReady]);
 
     return (
-        <section className={styles.vista3D} aria-label="Vista 3D de la escena">
-            <Scene3DCanvas className={styles.canvas}>
+        <section
+            className={styles.vista3D}
+            aria-label="Vista 3D de la escena"
+        >
+            {zonasDisponibles.length > 1 && zonaActual !== null && (
+                <>
+                    <ZoneToast
+                        zoneName={zoneToastName}
+                        show={showZoneToast}
+                        onHide={hideZoneToast}
+                    />
+                    <Controles3D />
+                </>
+            )}
+            <Scene3DCanvas className={`${styles.canvas} ${isReady ? styles.ready : ''}`}>
                 <ResizeHandler />
                 <Lights
                     ambientIntensity={DEFAULT_LIGHT_CONFIG.ambientIntensity}

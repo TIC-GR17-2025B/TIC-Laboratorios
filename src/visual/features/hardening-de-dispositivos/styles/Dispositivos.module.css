@@ -4,7 +4,9 @@
   flex: 1 1 auto;
   min-height: 0;
 }
-
+.comboBoxDispositivo {
+  width: 290px;
+}
 .contenidoDispositivo {
   margin-top: 8px;
   display: flex;
@@ -19,20 +21,35 @@
   padding: 12px 0;
   border-bottom: 1px solid var(--border-primary);
 }
+
+.itemLista {
+  gap: 8px;
+  align-items: start;
+}
+
+.itemListaDetalle {
+  width: 100%;
+  margin-bottom: 0.75rem;
+}
+.itemLista:last-child {
+  border-bottom: none;
+}
 .etiqueta {
   display: flex;
   align-items: center;
   gap: 8px;
+  user-select: none;
   color: var(--text-secondary);
 }
 
 .imagenDispositivo {
   margin-right: 16px;
-  background-color: var(--border-primary);
   min-width: 260px;
   height: 260px !important;
   width: 260px !important;
   border-radius: var(--border-radius);
+  overflow: hidden;
+  user-select: none;
 }
 .descripcion {
   width: 100%;
@@ -43,4 +60,13 @@
 .configuraciones {
   margin-left: 16px;
   min-width: 450px;
+}
+
+.parteSuperior {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.parteSuperior > button {
+  border: 1px solid var(--border-primary);
 }
