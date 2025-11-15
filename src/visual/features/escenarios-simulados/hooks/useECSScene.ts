@@ -5,9 +5,11 @@ import { getDispositivoHeight } from "../config/modelConfig";
 import { useEscenarioActual } from "../../../common/contexts/EscenarioContext";
 import { EscenarioController } from "../../../../ecs/controllers/EscenarioController";
 import {
-  EventosPublicos
+  EventosPublicos,
+  TipoLogGeneral,
 } from "../../../../types/EventosEnums";
 import { RedController } from "../../../../ecs/controllers/RedController";
+import { EscenarioComponent } from "../../../../ecs/components";
 
 export interface ECSSceneEntity {
   entidadId: Entidad;
@@ -150,60 +152,52 @@ export function useECSScene() {
     escenarioController.iniciarTiempo();
     tiempoIniciadoRef.current = true;
 
-    const unsubscribeActivoNoEnviado = escenarioController.on(
-      EventosPublicos.RED_ACTIVO_NO_ENVIADO,
+    const unsubscribeLogsGeneralesActualizados = escenarioController.on(
+      EventosPublicos.LOGS_GENERALES_ACTUALIZADOS,
       (data: unknown) => {
-        const d = data as { descripcion: string };
-        setMostrarNuevoLog(true);
-        setMensajeLog(d.descripcion);
-        setTiempoLog(escenarioController.tiempoTranscurrido);
-        setTipoLog("advertencia");
-        agregarLog(d.descripcion, "ADVERTENCIA");
-      }
-    );
+        const pausarTiempo = data as boolean;
 
-    const unsubscribeActivoEnviado = escenarioController.on(
-      EventosPublicos.RED_ACTIVO_ENVIADO,
-      (data: unknown) => {
-        const d = data as {
-          nombreActivo: string;
-          d1: string;
-          d2: string;
-        };
-        setMostrarNuevoLog(true);
-        setMensajeLog(
-          `Se ha enviado ${d.nombreActivo} desde ${d.d1} hacia ${d.d2}`
-        );
-        setTiempoLog(escenarioController.tiempoTranscurrido);
-        setTipoLog("completado");
-        agregarLog(
-          `Se ha enviado ${d.nombreActivo} desde ${d.d1} hacia ${d.d2}`,
-          "INFO"
-        );
-      }
-    );
+        // Obtener el último log del EscenarioComponent
+        for (const [
+          ,
+          container,
+        ] of escenarioController.ecsManager.getEntidades()) {
+          if (container.tiene(EscenarioComponent)) {
+            const escenarioComp = container.get(EscenarioComponent);
+            const logsGenerales = escenarioComp?.logsGenerales || [];
 
-    const unsubscribeNotificacionEvento = escenarioController.on(
-      EventosPublicos.TIEMPO_NOTIFICACION_EVENTO,
-      (data: unknown) => {
-        const d = data as { descripcionEvento: string };
-        setMostrarNuevoLog(true);
-        setMensajeLog(d.descripcionEvento);
-        setTiempoLog(escenarioController.tiempoTranscurrido);
-        setTipoLog("advertencia");
-        agregarLog(d.descripcionEvento, "ADVERTENCIA");
-      }
-    );
+            if (logsGenerales.length > 0) {
+              const ultimoLog = logsGenerales[logsGenerales.length - 1];
 
-    const unsubscribeBloqueoFirewall = escenarioController.on(
-      EventosPublicos.TRAFICO_BLOQUEADO,
-      (data: unknown) => {
-        const d = data as { descripcion: string };
-        setMostrarNuevoLog(true);
-        setMensajeLog(d.descripcion);
-        setTiempoLog(escenarioController.tiempoTranscurrido);
-        setTipoLog("advertencia");
-        agregarLog(d.descripcion, "ADVERTENCIA");
+              // Mostrar el nuevo log en la UI
+              setMostrarNuevoLog(true);
+              setMensajeLog(ultimoLog.mensaje);
+              setTiempoLog(escenarioController.tiempoTranscurrido);
+
+              // Determinar el tipo de log según el tipo del log general
+              let tipoLogUI: "ataque" | "advertencia" | "completado" =
+                "advertencia";
+              let categoria = "ADVERTENCIA";
+
+              if (ultimoLog.tipo === TipoLogGeneral.ATAQUE) {
+                tipoLogUI = "ataque";
+                categoria = "ATAQUE";
+              } else if (ultimoLog.tipo === TipoLogGeneral.COMPLETADO) {
+                tipoLogUI = "completado";
+                categoria = "INFO";
+              }
+
+              setTipoLog(tipoLogUI);
+              agregarLog(ultimoLog.mensaje, categoria);
+            }
+            break;
+          }
+        }
+
+        // Pausar el tiempo si es necesario
+        if (pausarTiempo) {
+          pause();
+        }
       }
     );
 
@@ -212,18 +206,6 @@ export function useECSScene() {
       (data: unknown) => {
         const d = data as { presupuesto: number };
         setPresupuesto(d.presupuesto);
-      }
-    );
-    const unsubscribeNotificacionAtaque = escenarioController.on(
-      EventosPublicos.TIEMPO_NOTIFICACION_ATAQUE,
-      (data: unknown) => {
-        const d = data as { descripcionAtaque: string };
-        setMostrarNuevoLog(true);
-        setMensajeLog(d.descripcionAtaque);
-        setTiempoLog(escenarioController.tiempoTranscurrido);
-        setTipoLog("advertencia");
-        agregarLog(d.descripcionAtaque, "ADVERTENCIA");
-        pause();
       }
     );
 
@@ -244,60 +226,6 @@ export function useECSScene() {
       }
     );
 
-    const unsubscribeAtaqueRealizado = escenarioController.on(
-      EventosPublicos.ATAQUE_REALIZADO,
-      (data: unknown) => {
-        const ataque = (data as unknown as { ataque?: { tipoAtaque?: string } })
-          .ataque;
-        const mensaje = `${ataque?.tipoAtaque ?? ""}`;
-        setMostrarNuevoLog(true);
-        setMensajeLog(mensaje);
-        setTiempoLog(escenarioController.tiempoTranscurrido);
-        setTipoLog("ataque");
-        agregarLog(mensaje, "ATAQUE");
-        pause();
-      }
-    );
-
-    const unsubscribeVPNEstablecida = escenarioController.on(
-      EventosPublicos.VPN_CONEXION_ESTABLECIDA,
-      (data: unknown) => {
-        const d = data as string;
-        setMostrarNuevoLog(true);
-        setMensajeLog(d);
-        setTiempoLog(escenarioController.tiempoTranscurrido);
-        setTipoLog("completado");
-        agregarLog(d, "INFO");
-      }
-    );
-
-    const unsubscribeVPNRechazada = escenarioController.on(
-      EventosPublicos.VPN_CONEXION_RECHAZADA,
-      (data: unknown) => {
-        const d = data as string;
-        setMostrarNuevoLog(true);
-        setMensajeLog(d);
-        setTiempoLog(escenarioController.tiempoTranscurrido);
-        setTipoLog("advertencia");
-        agregarLog(d, "ADVERTENCIA");
-      }
-    );
-
-    const unsubscribeAtaqueMitigado = escenarioController.on(
-      EventosPublicos.ATAQUE_MITIGADO,
-      (data: unknown) => {
-        const ataque = (data as unknown as { ataque?: { tipoAtaque?: string } })
-          .ataque;
-        const mensaje = `Ataque mitigado: ${ataque?.tipoAtaque ?? ""}`;
-        setMostrarNuevoLog(true);
-        setMensajeLog(mensaje);
-        setTiempoLog(escenarioController.tiempoTranscurrido);
-        setTipoLog("completado");
-        agregarLog(mensaje, "INFO");
-        pause();
-      }
-    );
-
     const unsubscribeReanudado = escenarioController.on(
       EventosPublicos.TIEMPO_REANUDADO,
       (data: unknown) => {
@@ -308,19 +236,11 @@ export function useECSScene() {
     );
 
     return () => {
-      unsubscribeVPNRechazada();
+      unsubscribeLogsGeneralesActualizados();
       unsubscribePresupuesto();
-      unsubscribeVPNEstablecida();
       unsubscribeActualizado();
       unsubscribePausado();
-      unsubscribeNotificacionEvento();
       unsubscribeReanudado();
-      unsubscribeActivoNoEnviado();
-      unsubscribeAtaqueRealizado();
-      unsubscribeAtaqueMitigado();
-      unsubscribeNotificacionAtaque();
-      unsubscribeBloqueoFirewall();
-      unsubscribeActivoEnviado();
     };
   }, []); // Sin dependencias - solo se ejecuta una vez
 

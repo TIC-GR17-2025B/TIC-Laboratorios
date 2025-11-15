@@ -141,9 +141,8 @@ export function useTopologiaData() {
 
   // Suscripción a eventos de red para refrescar la vista
   useEffect(() => {
-    /*const incrementarRefresh = () => setRefreshKey((prev) => prev + 1);
+    const incrementarRefresh = () => setRefreshKey((prev) => prev + 1);
 
-    
     const unsubscribeAsignada = ecsManager.on(
       EventosPublicos.RED_ASIGNADA,
       incrementarRefresh
@@ -152,12 +151,11 @@ export function useTopologiaData() {
       EventosPublicos.RED_REMOVIDA,
       incrementarRefresh
     );
-    
 
     return () => {
       unsubscribeAsignada();
       unsubscribeRemovida();
-    };*/
+    };
   }, [ecsManager]);
 
   // Construcción de la topología completa

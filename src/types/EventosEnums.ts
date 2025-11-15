@@ -7,6 +7,8 @@ export enum EventosInternos {
 }
 
 export enum EventosPublicos {
+  RED_ASIGNADA = "red:asignada",
+  RED_REMOVIDA = "red:removida",
   ATAQUE_REALIZADO = "ataque:ataqueRealizado",
   ATAQUE_MITIGADO = "ataque:ataqueMitigado",
   TIEMPO_NOTIFICACION_ATAQUE = "tiempo:notificacionAtaque",

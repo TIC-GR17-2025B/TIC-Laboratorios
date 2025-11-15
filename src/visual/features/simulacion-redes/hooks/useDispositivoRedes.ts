@@ -25,21 +25,24 @@ export function useDispositivoRedes(
 
   /* Eventos del ECS */
   useEffect(() => {
-    /*
-    const unsubscribeAsignada = ecsManager.on(EventosPublicos.RED_ASIGNADA, () => {
-      setRefreshKey((prev) => prev + 1);
-    });
+    const unsubscribeAsignada = ecsManager.on(
+      EventosPublicos.RED_ASIGNADA,
+      () => {
+        setRefreshKey((prev) => prev + 1);
+      }
+    );
 
-    const unsubscribeRemovida = ecsManager.on(EventosPublicos.RED_REMOVIDA, () => {
-      setRefreshKey((prev) => prev + 1);
-    });
+    const unsubscribeRemovida = ecsManager.on(
+      EventosPublicos.RED_REMOVIDA,
+      () => {
+        setRefreshKey((prev) => prev + 1);
+      }
+    );
 
-
-     return () => {
+    return () => {
       unsubscribeAsignada();
       unsubscribeRemovida();
     };
-    */
   }, [ecsManager]);
 
   const dispositivo = useMemo(() => {

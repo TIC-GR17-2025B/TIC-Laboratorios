@@ -1,16 +1,31 @@
 import { TipoDispositivo } from "../../types/DeviceEnums";
-import type { LogGeneral, PerfilClienteVPN, PerfilVPNGateway } from "../../types/EscenarioTypes";
-import { EventosInternos, EventosPublicos, TipoLogGeneral } from "../../types/EventosEnums";
-import { AccionFirewall } from "../../types/FirewallTypes";
 import type {
-  DireccionTrafico,
-  Reglas,
-} from "../../types/FirewallTypes";
+  LogGeneral,
+  PerfilClienteVPN,
+  PerfilVPNGateway,
+} from "../../types/EscenarioTypes";
+import {
+  EventosInternos,
+  EventosPublicos,
+  TipoLogGeneral,
+} from "../../types/EventosEnums";
+import { AccionFirewall } from "../../types/FirewallTypes";
+import type { DireccionTrafico, Reglas } from "../../types/FirewallTypes";
 import { TipoProtocolo } from "../../types/TrafficEnums";
-import { ClienteVPNComponent, DispositivoComponent, EscenarioComponent, RouterComponent, VPNGatewayComponent } from "../components";
+import {
+  ClienteVPNComponent,
+  DispositivoComponent,
+  EscenarioComponent,
+  RouterComponent,
+  VPNGatewayComponent,
+} from "../components";
 import type { ECSManager } from "../core";
 import type { Entidad } from "../core/Componente";
-import { SistemaEvento, SistemaJerarquiaEscenario, SistemaRed } from "../systems";
+import {
+  SistemaEvento,
+  SistemaJerarquiaEscenario,
+  SistemaRed,
+} from "../systems";
 import { RedDisponibilidadService, TransferenciaService } from "../systems/red";
 
 export class RedController {
@@ -62,7 +77,9 @@ export class RedController {
     }
 
     if (!this.redDisponibilidadService) {
-      this.redDisponibilidadService = new RedDisponibilidadService(this.ecsManager);
+      this.redDisponibilidadService = new RedDisponibilidadService(
+        this.ecsManager
+      );
     }
 
     this.ecsManager.on(EventosInternos.RED_ENVIAR_ACTIVO, (data: unknown) => {
@@ -83,18 +100,26 @@ export class RedController {
 
     this.ecsManager.on(EventosPublicos.RED_ACTIVO_ENVIADO, (data: unknown) => {
       const d = data as { nombreActivo: string; d1: string; d2: string };
-      const log = { 
-        tipo: TipoLogGeneral.COMPLETADO, 
-        mensaje: `Se envió un activo: ${d.nombreActivo}. Desde ${d.d1} hacia ${d.d2}.`
+      const log = {
+        tipo: TipoLogGeneral.COMPLETADO,
+        mensaje: `Se envió un activo: ${d.nombreActivo}. Desde ${d.d1} hacia ${d.d2}.`,
+        pausarTiempo: false,
       };
       this.agregarLogGeneralEscenario(log);
     });
 
-    this.ecsManager.on(EventosPublicos.RED_ACTIVO_NO_ENVIADO, (data: unknown) => {
-      const mensaje = data as string;
-      const log = { tipo: TipoLogGeneral.ADVERTENCIA, mensaje: mensaje };
-      this.agregarLogGeneralEscenario(log);
-    });
+    this.ecsManager.on(
+      EventosPublicos.RED_ACTIVO_NO_ENVIADO,
+      (data: unknown) => {
+        const mensaje = data as string;
+        const log = {
+          tipo: TipoLogGeneral.ADVERTENCIA,
+          mensaje: mensaje,
+          pausarTiempo: false,
+        };
+        this.agregarLogGeneralEscenario(log);
+      }
+    );
 
     this.ecsManager.on(EventosInternos.RED_TRAFICO, (data: unknown) => {
       const d = data as {
@@ -117,112 +142,139 @@ export class RedController {
       console.log("Tráfico enviado desde el controlador de red", resultado);
     });
 
-    this.ecsManager.on(EventosInternos.VPN_SOLICITUD_CONEXION, (data: unknown) => {
-      const d = data as {
-        permisosConEntidades: {
-          entidadOrigen: Entidad;
-          entidadDestino: Entidad;
-          permisos: unknown;
+    this.ecsManager.on(
+      EventosInternos.VPN_SOLICITUD_CONEXION,
+      (data: unknown) => {
+        const d = data as {
+          permisosConEntidades: {
+            entidadOrigen: Entidad;
+            entidadDestino: Entidad;
+            permisos: unknown;
+          };
         };
-      };
 
-      this.sistemaRed?.enviarTrafico(
-        d.permisosConEntidades.entidadOrigen,
-        d.permisosConEntidades.entidadDestino,
-        TipoProtocolo.VPN_GATEWAY,
-        d.permisosConEntidades.permisos
-      ); 
-    });
+        this.sistemaRed?.enviarTrafico(
+          d.permisosConEntidades.entidadOrigen,
+          d.permisosConEntidades.entidadDestino,
+          TipoProtocolo.VPN_GATEWAY,
+          d.permisosConEntidades.permisos
+        );
+      }
+    );
 
-    this.ecsManager.on(EventosPublicos.VPN_CONEXION_RECHAZADA, (data: unknown) => {
-      const mensaje = data as string;
-      const log = { 
-        tipo: TipoLogGeneral.ADVERTENCIA,
-        mensaje: mensaje, 
-        pausarTiempo: 
-      };
-      this.agregarLogGeneralEscenario(log);
-    });
+    this.ecsManager.on(
+      EventosPublicos.VPN_CONEXION_RECHAZADA,
+      (data: unknown) => {
+        const mensaje = data as string;
+        const log = {
+          tipo: TipoLogGeneral.ATAQUE,
+          mensaje: mensaje,
+          pausarTiempo: true,
+        };
+        this.agregarLogGeneralEscenario(log);
+      }
+    );
 
-    this.ecsManager.on(EventosPublicos.VPN_CONEXION_ESTABLECIDA, (data: unknown) => {
-      const mensaje = data as string;
-      const log = { 
-        tipo: TipoLogGeneral.COMPLETADO,
-        mensaje: mensaje, 
-        pausarTiempo: 
-      };
-      this.agregarLogGeneralEscenario(log);
-    });
+    this.ecsManager.on(
+      EventosPublicos.VPN_CONEXION_ESTABLECIDA,
+      (data: unknown) => {
+        const mensaje = data as string;
+        const log = {
+          tipo: TipoLogGeneral.COMPLETADO,
+          mensaje: mensaje,
+          pausarTiempo: false,
+        };
+        this.agregarLogGeneralEscenario(log);
+      }
+    );
 
-    this.ecsManager.on(EventosPublicos.VPN_CLIENTE_PERFIL_AGREGADO, (data: unknown) => {
-      const mensaje = data as string;
-      const log = { 
-        tipo: TipoLogGeneral.ADVERTENCIA,
-        mensaje: mensaje, 
-        pausarTiempo: 
-      };
-      this.agregarLogGeneralEscenario(log);
-    });
+    this.ecsManager.on(
+      EventosPublicos.VPN_CLIENTE_PERFIL_AGREGADO,
+      (data: unknown) => {
+        const mensaje = data as string;
+        const log = {
+          tipo: TipoLogGeneral.COMPLETADO,
+          mensaje: mensaje,
+          pausarTiempo: false,
+        };
+        this.agregarLogGeneralEscenario(log);
+      }
+    );
 
-    this.ecsManager.on(EventosPublicos.VPN_CLIENTE_PERFIL_ELIMINADO, (data: unknown) => {
-      const mensaje = data as string;
-      const log = { 
-        tipo: TipoLogGeneral.ADVERTENCIA,
-        mensaje: mensaje, 
-        pausarTiempo: 
-      };
-      this.agregarLogGeneralEscenario(log);
-    });
+    this.ecsManager.on(
+      EventosPublicos.VPN_CLIENTE_PERFIL_ELIMINADO,
+      (data: unknown) => {
+        const mensaje = data as string;
+        const log = {
+          tipo: TipoLogGeneral.ADVERTENCIA,
+          mensaje: mensaje,
+          pausarTiempo: false,
+        };
+        this.agregarLogGeneralEscenario(log);
+      }
+    );
 
-    this.ecsManager.on(EventosPublicos.VPN_GATEWAY_PERFIL_AGREGADO, (data: unknown) => {
-      const mensaje = data as string;
-      const log = { 
-        tipo: TipoLogGeneral.ADVERTENCIA,
-        mensaje: mensaje, 
-        pausarTiempo: 
-      };
-      this.agregarLogGeneralEscenario(log);
-    });
+    this.ecsManager.on(
+      EventosPublicos.VPN_GATEWAY_PERFIL_AGREGADO,
+      (data: unknown) => {
+        const mensaje = data as string;
+        const log = {
+          tipo: TipoLogGeneral.COMPLETADO,
+          mensaje: mensaje,
+          pausarTiempo: false,
+        };
+        this.agregarLogGeneralEscenario(log);
+      }
+    );
 
-    this.ecsManager.on(EventosPublicos.VPN_GATEWAY_PERFIL_ELIMINADO, (data: unknown) => {
-      const mensaje = data as string;
-      const log = { 
-        tipo: TipoLogGeneral.ADVERTENCIA,
-        mensaje: mensaje, 
-        pausarTiempo: 
-      };
-      this.agregarLogGeneralEscenario(log);
-    });
+    this.ecsManager.on(
+      EventosPublicos.VPN_GATEWAY_PERFIL_ELIMINADO,
+      (data: unknown) => {
+        const mensaje = data as string;
+        const log = {
+          tipo: TipoLogGeneral.ADVERTENCIA,
+          mensaje: mensaje,
+          pausarTiempo: false,
+        };
+        this.agregarLogGeneralEscenario(log);
+      }
+    );
 
     this.ecsManager.on(EventosPublicos.TRAFICO_PERMITIDO, (data: unknown) => {
       const d = data as { mensaje: string };
-      const log = { 
+      const log = {
         tipo: TipoLogGeneral.COMPLETADO,
-        mensaje: d.mensaje, 
-        pausarTiempo: 
+        mensaje: d.mensaje,
+        pausarTiempo: false,
       };
       this.agregarLogGeneralEscenario(log);
     });
 
     this.ecsManager.on(EventosPublicos.TRAFICO_BLOQUEADO, (data: unknown) => {
-      const d = data as { mensaje: string};
-      const log = { 
+      const d = data as { mensaje: string };
+      const log = {
         tipo: TipoLogGeneral.COMPLETADO,
         mensaje: d.mensaje,
-        pausarTiempo: 
+        pausarTiempo: true,
       };
       this.agregarLogGeneralEscenario(log);
     });
   }
 
   private agregarLogGeneralEscenario(log: LogGeneral): void {
-    for (const [entidad,container] of this.ecsManager.getEntidades()) {
+    for (const [entidad, container] of this.ecsManager.getEntidades()) {
       if (container.tiene(EscenarioComponent)) {
-        this.ecsManager.getComponentes(entidad)?.get(EscenarioComponent)?.logsGenerales.push(log);
+        this.ecsManager
+          .getComponentes(entidad)
+          ?.get(EscenarioComponent)
+          ?.logsGenerales.push(log);
         break;
       }
     }
-    this.ecsManager.emit(EventosPublicos.LOGS_GENERALES_ACTUALIZADOS, log.pausarTiempo);
+    this.ecsManager.emit(
+      EventosPublicos.LOGS_GENERALES_ACTUALIZADOS,
+      log.pausarTiempo
+    );
   }
 
   public asignarRed(entidadDisp: Entidad, entidadRed: Entidad): void {
@@ -232,7 +284,12 @@ export class RedController {
     }
 
     // Validar si el dispositivo puede conectarse a esta red
-    if (!this.redDisponibilidadService.puedeConectarseARed(entidadDisp, entidadRed)) {
+    if (
+      !this.redDisponibilidadService.puedeConectarseARed(
+        entidadDisp,
+        entidadRed
+      )
+    ) {
       return;
     }
 
@@ -274,7 +331,6 @@ export class RedController {
     );
   }
 
-
   public bloquearProtocolosEnRed(
     entidadRouter: Entidad,
     entidadRed: Entidad,
@@ -311,15 +367,16 @@ export class RedController {
     );
   }
 
-
-  public obtenerReglasDeRed(entidadRouter: Entidad, entidadRed: Entidad): Reglas[] {
+  public obtenerReglasDeRed(
+    entidadRouter: Entidad,
+    entidadRed: Entidad
+  ): Reglas[] {
     if (!this.sistemaRed) {
       console.error("Sistema de red no inicializado");
       return [];
     }
     return this.sistemaRed.obtenerReglasDeRed(entidadRouter, entidadRed);
   }
-
 
   public eliminarReglaFirewall(
     entidadRouter: Entidad,
@@ -339,24 +396,25 @@ export class RedController {
     );
   }
 
- estaProtocoloBloqueadoEnRed(
+  estaProtocoloBloqueadoEnRed(
     entidadRouter: Entidad,
     entidadRed: Entidad,
     protocolo: TipoProtocolo,
     direccion: DireccionTrafico
   ): boolean {
-    const configuracionFirewall = this.obtenerReglasDeRed(entidadRouter, entidadRed);
-    
+    const configuracionFirewall = this.obtenerReglasDeRed(
+      entidadRouter,
+      entidadRed
+    );
+
     if (!configuracionFirewall) {
       return false;
     }
 
-    const reglaEncontrada = configuracionFirewall.find(regla => 
-      regla.protocolo === protocolo && 
-      regla.direccion === direccion
+    const reglaEncontrada = configuracionFirewall.find(
+      (regla) => regla.protocolo === protocolo && regla.direccion === direccion
     );
-    
-    
+
     return !!reglaEncontrada;
   }
 
@@ -397,9 +455,16 @@ export class RedController {
 
   getDispositivosPorZona(entidadZona: Entidad): Entidad[] | undefined {
     let worksYServersDeZona: Entidad[] = [];
-    for (const entidadDispositivo of this.sistemaJerarquia?.obtenerDispositivosDeZona(entidadZona)!) {
-      const tipoDispositivo = this.ecsManager.getComponentes(entidadDispositivo)?.get(DispositivoComponent)?.tipo;
-      if (tipoDispositivo === TipoDispositivo.WORKSTATION || tipoDispositivo === TipoDispositivo.SERVER)
+    for (const entidadDispositivo of this.sistemaJerarquia?.obtenerDispositivosDeZona(
+      entidadZona
+    )!) {
+      const tipoDispositivo = this.ecsManager
+        .getComponentes(entidadDispositivo)
+        ?.get(DispositivoComponent)?.tipo;
+      if (
+        tipoDispositivo === TipoDispositivo.WORKSTATION ||
+        tipoDispositivo === TipoDispositivo.SERVER
+      )
         worksYServersDeZona.push(entidadDispositivo);
     }
     return worksYServersDeZona;

@@ -133,10 +133,10 @@ export class SistemaRed extends Sistema {
 
     dispositivo?.redes.push(entidadRed);
 
-    // this.ecsManager.emit(EventosRed.RED_ASIGNADA, {
-    //   entidadDispositivo: entidadDisp,
-    //   entidadRed: entidadRed,
-    // });
+    this.ecsManager.emit(EventosPublicos.RED_ASIGNADA, {
+      entidadDispositivo: entidadDisp,
+      entidadRed: entidadRed,
+    });
   }
 
   // Remueve un dispositivo de una red específica
@@ -151,10 +151,10 @@ export class SistemaRed extends Sistema {
     if (index > -1) {
       dispositivo.redes.splice(index, 1);
 
-      // this.ecsManager.emit(EventosRed.RED_REMOVIDA, {
-      //   entidadDispositivo: entidadDisp,
-      //   entidadRed: entidadRed,
-      // });
+      this.ecsManager.emit(EventosPublicos.RED_REMOVIDA, {
+        entidadDispositivo: entidadDisp,
+        entidadRed: entidadRed,
+      });
     }
   }
 
@@ -199,7 +199,7 @@ export class SistemaRed extends Sistema {
       console.log(
         `❌ SistemaRed.enviarTrafico: Tráfico BLOQUEADO por firewall`
       );
-      
+
       // Emitir evento de bloqueo
       this.getEventoService().emitirEventoBloqueado(
         dispOrigen.nombre,
@@ -207,12 +207,12 @@ export class SistemaRed extends Sistema {
         protocolo,
         resultadoFirewall.entidadRouter
       );
-      
+
       return;
     }
 
     console.log(`✅ SistemaRed.enviarTrafico: Firewall PERMITIÓ el tráfico`);
-    
+
     // Emitir evento de tráfico permitido
     this.getEventoService().emitirEventoPermitido(
       dispOrigen.nombre,
@@ -301,8 +301,14 @@ export class SistemaRed extends Sistema {
     );
   }
 
-  public obtenerReglasDeRed(entidadRouter: Entidad, entidadRed: Entidad): Reglas[] {
-    return this.getFirewallConfigService().obtenerReglasDeRed(entidadRouter, entidadRed);
+  public obtenerReglasDeRed(
+    entidadRouter: Entidad,
+    entidadRed: Entidad
+  ): Reglas[] {
+    return this.getFirewallConfigService().obtenerReglasDeRed(
+      entidadRouter,
+      entidadRed
+    );
   }
 
   public eliminarReglaFirewall(
@@ -311,7 +317,12 @@ export class SistemaRed extends Sistema {
     protocolo: TipoProtocolo,
     direccion: DireccionTrafico
   ): void {
-    this.getFirewallConfigService().eliminarRegla(entidadRouter, entidadRed, protocolo, direccion);
+    this.getFirewallConfigService().eliminarRegla(
+      entidadRouter,
+      entidadRed,
+      protocolo,
+      direccion
+    );
   }
 
   public obtenerRedesDeRouter(entidadRouter: Entidad): Entidad[] {
@@ -320,7 +331,6 @@ export class SistemaRed extends Sistema {
       ?.get(DispositivoComponent);
     return dispositivo?.redes || [];
   }
-
 
   public obtenerDispositivosPorRed(entidadRed: Entidad): Entidad[] {
     const dispositivos: Entidad[] = [];
@@ -353,11 +363,12 @@ export class SistemaRed extends Sistema {
       ?.perfilesVPNGateway.push(perfil);
 
     const nombreVPN = this.ecsManager
-                      .getComponentes(entidadVpnGateway)
-                      ?.get(DispositivoComponent)?.nombre;
-      
-    this.ecsManager.emit(EventosPublicos.VPN_GATEWAY_PERFIL_AGREGADO,
-      `Se agregó correctamente un nuevo perfil de conexión VPN en ${nombreVPN}`    
+      .getComponentes(entidadVpnGateway)
+      ?.get(DispositivoComponent)?.nombre;
+
+    this.ecsManager.emit(
+      EventosPublicos.VPN_GATEWAY_PERFIL_AGREGADO,
+      `Se agregó correctamente un nuevo perfil de conexión VPN en ${nombreVPN}`
     );
   }
 
@@ -373,11 +384,12 @@ export class SistemaRed extends Sistema {
     actualesPerfilesGateway = actualesPerfilesGateway?.splice(indexEnTabla, 1);
 
     const nombreVPN = this.ecsManager
-                      .getComponentes(entidadVpnGateway)
-                      ?.get(DispositivoComponent)?.nombre;
-      
-    this.ecsManager.emit(EventosPublicos.VPN_GATEWAY_PERFIL_ELIMINADO,
-      `Se eliminó correctamente un perfil de conexión VPN en ${nombreVPN}`    
+      .getComponentes(entidadVpnGateway)
+      ?.get(DispositivoComponent)?.nombre;
+
+    this.ecsManager.emit(
+      EventosPublicos.VPN_GATEWAY_PERFIL_ELIMINADO,
+      `Se eliminó correctamente un perfil de conexión VPN en ${nombreVPN}`
     );
   }
 
@@ -391,11 +403,12 @@ export class SistemaRed extends Sistema {
       ?.perfilesClienteVPN.push(perfil);
 
     const nombreCliente = this.ecsManager
-                      .getComponentes(entidadClienteVpn)
-                      ?.get(DispositivoComponent)?.nombre;
-      
-    this.ecsManager.emit(EventosPublicos.VPN_CLIENTE_PERFIL_AGREGADO,
-      `Se agregó correctamente un nuevo perfil de conexión VPN en ${nombreCliente}`    
+      .getComponentes(entidadClienteVpn)
+      ?.get(DispositivoComponent)?.nombre;
+
+    this.ecsManager.emit(
+      EventosPublicos.VPN_CLIENTE_PERFIL_AGREGADO,
+      `Se agregó correctamente un nuevo perfil de conexión VPN en ${nombreCliente}`
     );
   }
 
@@ -409,11 +422,12 @@ export class SistemaRed extends Sistema {
     actualesPerfilesCliente = actualesPerfilesCliente?.splice(indexEnTabla, 1);
 
     const nombreCliente = this.ecsManager
-                      .getComponentes(entidadClienteVpn)
-                      ?.get(DispositivoComponent)?.nombre;
-      
-    this.ecsManager.emit(EventosPublicos.VPN_GATEWAY_PERFIL_ELIMINADO,
-      `Se eliminó correctamente un perfil de conexión VPN en ${nombreCliente}`    
+      .getComponentes(entidadClienteVpn)
+      ?.get(DispositivoComponent)?.nombre;
+
+    this.ecsManager.emit(
+      EventosPublicos.VPN_GATEWAY_PERFIL_ELIMINADO,
+      `Se eliminó correctamente un perfil de conexión VPN en ${nombreCliente}`
     );
   }
 }

@@ -79,10 +79,10 @@ export class EscenarioController {
       EventosPublicos.TIEMPO_NOTIFICACION_ATAQUE,
       (data: unknown) => {
         const d = data as { descripcionAtaque: string };
-        const log = { 
+        const log = {
           tipo: TipoLogGeneral.ADVERTENCIA,
           mensaje: d.descripcionAtaque,
-          pausarTiempo: 
+          pausarTiempo: true,
         };
         this.agregarLogGeneralEscenario(log);
       }
@@ -93,10 +93,10 @@ export class EscenarioController {
       EventosPublicos.TIEMPO_NOTIFICACION_EVENTO,
       (data: unknown) => {
         const d = data as { descripcionEvento: string };
-        const log = { 
+        const log = {
           tipo: TipoLogGeneral.ADVERTENCIA,
-          mensaje: d.descripcionEvento, 
-          pausarTiempo: 
+          mensaje: d.descripcionEvento,
+          pausarTiempo: false,
         };
         this.agregarLogGeneralEscenario(log);
       }
@@ -124,7 +124,7 @@ export class EscenarioController {
       const log = {
         tipo: TipoLogGeneral.ATAQUE,
         mensaje: `Se comprometió el dispositivo: ${d.ataque.dispositivoAAtacar}. Causa: ${d.ataque.tipoAtaque}`,
-        pausarTiempo: 
+        pausarTiempo: true,
       };
       this.agregarLogGeneralEscenario(log);
     });
@@ -134,7 +134,7 @@ export class EscenarioController {
       const log = {
         tipo: TipoLogGeneral.COMPLETADO,
         mensaje: `Se mitigó el ataque a: ${d.ataque.dispositivoAAtacar}. Ataque mitigado: ${d.ataque.tipoAtaque}`,
-        pausarTiempo: 
+        pausarTiempo: false,
       };
       this.agregarLogGeneralEscenario(log);
     });
@@ -144,7 +144,7 @@ export class EscenarioController {
       const log = {
         tipo: TipoLogGeneral.ADVERTENCIA,
         mensaje: "Se agotó el presupuesto, fin de la partida.",
-        pausarTiempo: 
+        pausarTiempo: true,
       };
       this.agregarLogGeneralEscenario(log);
     });
@@ -153,13 +153,19 @@ export class EscenarioController {
   }
 
   private agregarLogGeneralEscenario(log: LogGeneral): void {
-    for (const [entidad,container] of this.ecsManager.getEntidades()) {
+    for (const [entidad, container] of this.ecsManager.getEntidades()) {
       if (container.tiene(EscenarioComponent)) {
-        this.ecsManager.getComponentes(entidad)?.get(EscenarioComponent)?.logsGenerales.push(log);
+        this.ecsManager
+          .getComponentes(entidad)
+          ?.get(EscenarioComponent)
+          ?.logsGenerales.push(log);
         break;
       }
     }
-    this.ecsManager.emit(EventosPublicos.LOGS_GENERALES_ACTUALIZADOS, log.pausarTiempo);
+    this.ecsManager.emit(
+      EventosPublicos.LOGS_GENERALES_ACTUALIZADOS,
+      log.pausarTiempo
+    );
   }
 
   public cargarEventosEnSistema(): void {

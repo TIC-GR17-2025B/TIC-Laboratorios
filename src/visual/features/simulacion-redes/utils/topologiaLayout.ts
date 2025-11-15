@@ -219,7 +219,27 @@ export function generarAristas(topologia: Topologia): Edge[] {
           n.tipo !== TipoDispositivo.ROUTER && n.tipo !== TipoDispositivo.VPN
       );
 
-      // para conectar routers entre sí por arriba
+      // Si es la red "Internet", conectar routers a Internet por abajo
+      if (nombreRed === "Internet") {
+        routersEnRed.forEach((router) => {
+          edges.push({
+            id: `${router.id}-internet-${zona.id}`,
+            source: router.id,
+            sourceHandle: "bottom",
+            target: `internet-${zona.id}`,
+            type: "step",
+            className: "network-edge",
+            style: {
+              stroke: grupoRed.color,
+              strokeWidth: 3,
+            },
+            data: { red: nombreRed, color: grupoRed.color },
+          } as Edge);
+        });
+        return; // No procesar más para la red Internet
+      }
+
+      // para conectar routers entre sí por arriba (excepto Internet)
       for (let i = 0; i < routersEnRed.length; i++) {
         for (let j = i + 1; j < routersEnRed.length; j++) {
           edges.push({
@@ -279,23 +299,6 @@ export function generarAristas(topologia: Topologia): Edge[] {
           } as Edge);
         }
       }
-    });
-
-    // Conectar routers a Internet (siempre con rojo, desde el handler inferior)
-    routers.forEach((router) => {
-      edges.push({
-        id: `${router.id}-internet-${zona.id}`,
-        source: router.id,
-        sourceHandle: "bottom",
-        target: `internet-${zona.id}`,
-        type: "step",
-        className: "network-edge",
-        style: {
-          stroke: ColoresRed.ROJO,
-          strokeWidth: 3,
-        },
-        data: { red: "internet", color: ColoresRed.ROJO },
-      } as Edge);
     });
   });
 

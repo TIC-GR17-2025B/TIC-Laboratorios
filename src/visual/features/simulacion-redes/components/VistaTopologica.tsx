@@ -7,6 +7,7 @@ import { useTopologiaLayout, useTopologiaData, useDispositivoRedes } from '../ho
 import getIconoNodo from "../utils/getIconoNodo";
 import { useState, useEffect } from "react";
 import RedChip from "./RedChip";
+import { ColoresRed } from "../../../../data/colores";
 
 function DeviceNode({ data }: any) {
     const isWorkstation = data.tipo === TipoDispositivo.WORKSTATION;
@@ -77,6 +78,15 @@ function DeviceNode({ data }: any) {
                                 title={red.nombre}
                             />
                         ))}
+                    </div>
+                )}
+                {isInternet && (
+                    <div className={styles.networkBadges}>
+                        <div
+                            className={styles.networkBadge}
+                            style={{ backgroundColor: ColoresRed.ROJO }}
+                            title="Internet"
+                        />
                     </div>
                 )}
             </div>
