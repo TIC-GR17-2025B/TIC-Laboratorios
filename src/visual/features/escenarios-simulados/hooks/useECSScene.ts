@@ -165,7 +165,7 @@ export function useECSScene() {
           if (container.tiene(EscenarioComponent)) {
             const escenarioComp = container.get(EscenarioComponent);
             const logsGenerales = escenarioComp?.logsGenerales || [];
-
+            console.log("Logs generales actualizados:", logsGenerales);
             if (logsGenerales.length > 0) {
               const ultimoLog = logsGenerales[logsGenerales.length - 1];
 

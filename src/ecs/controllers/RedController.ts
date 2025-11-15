@@ -131,7 +131,6 @@ export class RedController {
           };
         };
       };
-
       // Enviar tráfico directamente con el protocolo del evento
       const resultado = this.sistemaRed?.enviarTrafico(
         d.evento.infoAdicional.entidadOrigen,
