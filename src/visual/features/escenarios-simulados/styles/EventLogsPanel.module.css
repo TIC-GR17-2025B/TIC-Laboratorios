@@ -37,6 +37,7 @@
   min-height: 0;
   padding: 0 16px 8px;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .emptyState {
@@ -70,7 +71,6 @@
 
 .logItem {
   padding: 12px;
-  width: 317px !important;
   margin-bottom: 8px;
   background-color: var(--surface-secondary);
   border-radius: 4px;
