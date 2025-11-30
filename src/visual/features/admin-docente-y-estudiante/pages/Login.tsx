@@ -2,25 +2,28 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router';
 import { motion } from 'framer-motion';
 import styles from '../styles/Auth.module.css';
+import { useAuth } from '../hooks/useAuth';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
     const [isExiting, setIsExiting] = useState(false);
     const navigate = useNavigate();
+    const { login, loading, error } = useAuth();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError('');
 
-        try {
+        const result = await login({
+            correo_electronico: email,
+            contrasenia: password,
+        });
+
+        if (result?.success) {
             setIsExiting(true);
             setTimeout(() => {
                 navigate('/');
             }, 700);
-        } catch (err) {
-            setError('Error al iniciar sesión. Verifique sus credenciales.');
         }
     };
 
@@ -98,8 +101,12 @@ const Login = () => {
 
                         {error && <div className={styles.error}>{error}</div>}
 
-                        <button type="submit" className={styles.submitButton}>
-                            Iniciar Sesión
+                        <button
+                            type="submit"
+                            className={styles.submitButton}
+                            disabled={loading}
+                        >
+                            {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
                         </button>
                     </form>
 

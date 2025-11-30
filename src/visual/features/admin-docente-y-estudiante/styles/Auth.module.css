@@ -100,10 +100,18 @@
   transition: all 0.1s ease;
   margin-top: 4px;
   letter-spacing: 0.8px;
+  cursor: pointer;
 }
 
-.submitButton:hover {
+.submitButton:hover:not(:disabled) {
   background: var(--blue-lighter) !important;
+}
+
+.submitButton:disabled {
+  background: var(--border-primary);
+  color: var(--text-secondary);
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .footer {

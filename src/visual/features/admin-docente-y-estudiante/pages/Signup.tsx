@@ -2,17 +2,23 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router';
 import { motion } from 'framer-motion';
 import styles from '../styles/Auth.module.css';
+import { useAuth } from '../hooks/useAuth';
 
 const Signup = () => {
     const [formData, setFormData] = useState({
-        name: '',
+        primerNombre: '',
+        segundoNombre: '',
+        primerApellido: '',
+        segundoApellido: '',
+        codigoUnico: '',
         email: '',
         password: '',
         confirmPassword: ''
     });
-    const [error, setError] = useState('');
+    const [localError, setLocalError] = useState('');
     const [isExiting, setIsExiting] = useState(false);
     const navigate = useNavigate();
+    const { registerEstudiante, loading, error } = useAuth();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({
@@ -23,25 +29,33 @@ const Signup = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError('');
+        setLocalError('');
 
         if (formData.password !== formData.confirmPassword) {
-            setError('Las contraseñas no coinciden');
+            setLocalError('Las contraseñas no coinciden');
             return;
         }
 
         if (formData.password.length < 6) {
-            setError('La contraseña debe tener al menos 6 caracteres');
+            setLocalError('La contraseña debe tener al menos 6 caracteres');
             return;
         }
 
-        try {
+        const result = await registerEstudiante({
+            primernombre: formData.primerNombre,
+            segundo_nombre: formData.segundoNombre,
+            primer_apellido: formData.primerApellido,
+            segundo_apellido: formData.segundoApellido,
+            codigo_unico: parseInt(formData.codigoUnico),
+            correo_electronico: formData.email,
+            contrasenia: formData.password,
+        });
+
+        if (result?.success) {
             setIsExiting(true);
             setTimeout(() => {
-                navigate('/');
+                navigate('/login');
             }, 700);
-        } catch (err) {
-            setError('Error al crear la cuenta. Intente nuevamente.');
         }
     };
 
@@ -73,24 +87,119 @@ const Signup = () => {
                     <h1 className={styles.title}>Registrarse</h1>
 
                     <form onSubmit={handleSubmit} className={styles.form}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                            <div className={styles.inputGroup}>
+                                <label htmlFor="primerNombre" className={styles.label}>
+                                    Primer Nombre
+                                </label>
+                                <div className={styles.inputWrapper}>
+                                    <span className={styles.inputIcon}>
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                                        </svg>
+                                    </span>
+                                    <input
+                                        type="text"
+                                        id="primerNombre"
+                                        name="primerNombre"
+                                        value={formData.primerNombre}
+                                        onChange={handleChange}
+                                        className={styles.input}
+                                        placeholder="Juan"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className={styles.inputGroup}>
+                                <label htmlFor="segundoNombre" className={styles.label}>
+                                    Segundo Nombre
+                                </label>
+                                <div className={styles.inputWrapper}>
+                                    <span className={styles.inputIcon}>
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                                        </svg>
+                                    </span>
+                                    <input
+                                        type="text"
+                                        id="segundoNombre"
+                                        name="segundoNombre"
+                                        value={formData.segundoNombre}
+                                        onChange={handleChange}
+                                        className={styles.input}
+                                        placeholder="Carlos"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                            <div className={styles.inputGroup}>
+                                <label htmlFor="primerApellido" className={styles.label}>
+                                    Primer Apellido
+                                </label>
+                                <div className={styles.inputWrapper}>
+                                    <span className={styles.inputIcon}>
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                                        </svg>
+                                    </span>
+                                    <input
+                                        type="text"
+                                        id="primerApellido"
+                                        name="primerApellido"
+                                        value={formData.primerApellido}
+                                        onChange={handleChange}
+                                        className={styles.input}
+                                        placeholder="Pérez"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className={styles.inputGroup}>
+                                <label htmlFor="segundoApellido" className={styles.label}>
+                                    Segundo Apellido
+                                </label>
+                                <div className={styles.inputWrapper}>
+                                    <span className={styles.inputIcon}>
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                                        </svg>
+                                    </span>
+                                    <input
+                                        type="text"
+                                        id="segundoApellido"
+                                        name="segundoApellido"
+                                        value={formData.segundoApellido}
+                                        onChange={handleChange}
+                                        className={styles.input}
+                                        placeholder="González"
+                                        required
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
                         <div className={styles.inputGroup}>
-                            <label htmlFor="name" className={styles.label}>
-                                Nombre Completo
+                            <label htmlFor="codigoUnico" className={styles.label}>
+                                Código Único
                             </label>
                             <div className={styles.inputWrapper}>
                                 <span className={styles.inputIcon}>
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" />
                                     </svg>
                                 </span>
                                 <input
-                                    type="text"
-                                    id="name"
-                                    name="name"
-                                    value={formData.name}
+                                    type="number"
+                                    id="codigoUnico"
+                                    name="codigoUnico"
+                                    value={formData.codigoUnico}
                                     onChange={handleChange}
                                     className={styles.input}
-                                    placeholder="Juan Pérez"
+                                    placeholder="12345678"
                                     required
                                 />
                             </div>
@@ -165,10 +274,14 @@ const Signup = () => {
                             </div>
                         </div>
 
-                        {error && <div className={styles.error}>{error}</div>}
+                        {(localError || error) && <div className={styles.error}>{localError || error}</div>}
 
-                        <button type="submit" className={styles.submitButton}>
-                            Registrarse
+                        <button
+                            type="submit"
+                            className={styles.submitButton}
+                            disabled={loading}
+                        >
+                            {loading ? 'Registrando...' : 'Registrarse'}
                         </button>
                     </form>
 
