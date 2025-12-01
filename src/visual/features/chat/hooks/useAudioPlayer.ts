@@ -11,7 +11,6 @@ export interface AudioPlayerState {
 export const useAudioPlayer = (): AudioPlayerState => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentAudioId, setCurrentAudioId] = useState<string | null>(null);
-    const [currentAudioSource, setCurrentAudioSource] = useState<string | null>(null);
     const audioRef = useRef<HTMLAudioElement | null>(null);
 
     const base64ToBlob = useCallback((base64: string): Blob => {
@@ -56,7 +55,6 @@ export const useAudioPlayer = (): AudioPlayerState => {
             audioRef.current = null;
             setIsPlaying(false);
             setCurrentAudioId(null);
-            setCurrentAudioSource(null);
         }
 
         try {
@@ -67,7 +65,6 @@ export const useAudioPlayer = (): AudioPlayerState => {
 
             const audio = new Audio(audioUrl);
             audioRef.current = audio;
-            setCurrentAudioSource(base64Audio);
             setCurrentAudioId(audioId);
 
             audio.onplay = () => setIsPlaying(true);
@@ -79,7 +76,6 @@ export const useAudioPlayer = (): AudioPlayerState => {
                 console.error('Error al reproducir el audio');
                 setIsPlaying(false);
                 audioRef.current = null;
-                setCurrentAudioSource(null);
                 setCurrentAudioId(null);
             };
 
