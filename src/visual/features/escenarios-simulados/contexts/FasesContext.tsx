@@ -2,7 +2,9 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { EscenarioController } from '../../../../ecs/controllers/EscenarioController';
 import type { FaseComponent } from '../../../../ecs/components/FaseComponent';
-import { EventosPublicos } from '../../../../types/EventosEnums';
+import { EventosPublicos, MensajesGenerales } from '../../../../types/EventosEnums';
+import { useModal } from '../../../common/contexts/ModalContext';
+import ModalResultadoFase from '../components/ModalResultadoFase';
 
 export interface Objetivo {
     descripcion: string;
@@ -41,6 +43,7 @@ interface FasesProviderProps {
 export const FasesProvider = ({ children }: FasesProviderProps) => {
     const [fases, setFases] = useState<Fase[]>([]);
     const [faseActualIndex, setFaseActualIndex] = useState(0);
+    const { openModal } = useModal();
 
     const convertirFaseComponentAFase = (faseComponent: FaseComponent): Fase => {
         return {
@@ -82,10 +85,6 @@ export const FasesProvider = ({ children }: FasesProviderProps) => {
         try {
             const controller = EscenarioController.getInstance();
             
-            const unsubscribeAtaqueMitigado = controller.on(EventosPublicos.ATAQUE_MITIGADO, () => {
-                setTimeout(() => actualizarFases(), 100);
-            });
-
             const unsubscribeFaseCompletada = controller.on(EventosPublicos.FASE_COMPLETADA, () => {
                 setTimeout(() => actualizarFases(), 100);
             });
@@ -94,16 +93,35 @@ export const FasesProvider = ({ children }: FasesProviderProps) => {
                 setTimeout(() => actualizarFases(), 100);
             });
 
-            const unsubscribeFaseNoCompletada = controller.on(EventosPublicos.FASE_NO_COMPLETADA, () => {
-                setTimeout(() => actualizarFases(), 100);
+            // Cuando una fase no se completa, directamente "pierde"
+            const unsubscribeFaseNoCompletada = controller.on(EventosPublicos.FASE_NO_COMPLETADA, (data: unknown) => {
+                setTimeout(() => {
+                    actualizarFases();
+                    const mensaje = (data as string) || MensajesGenerales.MSJ_FASE_NO_COMPLETADA;
+                    openModal(
+                        <ModalResultadoFase tipo="fallo" mensaje={mensaje} />,
+                        undefined,
+                        false,
+                        false
+                    );
+                }, 100);
             });
 
-            const unsubscribeEscenarioCompletado = controller.on(EventosPublicos.ESCENARIO_COMPLETADO, () => {
-                setTimeout(() => actualizarFases(), 100);
+            // Cuando "gana"
+            const unsubscribeEscenarioCompletado = controller.on(EventosPublicos.ESCENARIO_COMPLETADO, (data: unknown) => {
+                setTimeout(() => {
+                    actualizarFases();
+                    const mensaje = (data as string) || '¡Has completado exitosamente todos los objetivos del escenario! Excelente trabajo en la configuración y seguridad de la red.';
+                    openModal(
+                        <ModalResultadoFase tipo="exito" mensaje={mensaje} />,
+                        undefined,
+                        false,
+                        false
+                    );
+                }, 100);
             });
 
             return () => {
-                unsubscribeAtaqueMitigado();
                 unsubscribeFaseCompletada();
                 unsubscribeObjetivoCompletado();
                 unsubscribeFaseNoCompletada();
@@ -112,7 +130,7 @@ export const FasesProvider = ({ children }: FasesProviderProps) => {
         } catch (error) {
             console.error('Error al suscribirse a eventos del controlador:', error);
         }
-    }, []);
+    }, [openModal]);
 
     return (
         <FasesContext.Provider

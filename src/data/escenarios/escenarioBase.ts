@@ -32,53 +32,16 @@ export const escenarioBase: unknown = {
       },
     },
     {
-      nombreEvento: "Asegurar LAN1 (Firewall)",
-      tipoEvento: TipoEvento.TRAFICO_RED,
-      tiempoNotificacion: 20, // Segundo reto
-      descripcion:
-        "Se intentará una conexión SSH no autorizada desde la red externa (WWW) a la LAN1. Configura el firewall del 'Router Principal' para bloquear todo el tráfico SSH entrante a LAN1.",
-      fase: 1,
-      infoAdicional: {
-        dispositivoOrigen: "Servidor Web Externo",
-        dispositivoDestino: "Computadora Administrativa",
-        protocolo: TipoProtocolo.SSH,
-        esObjetivo: true,
-        debeSerBloqueado: true,
-      },
-    },
-    {
-      nombreEvento: "Conexión VPN (Teletrabajo)",
-      tipoEvento: TipoEvento.CONEXION_VPN,
-      tiempoNotificacion: 35, // Tercer reto
-      descripcion:
-        "Lisa (Off-site) intentará conectarse a la 'Computadora Jacob' (LAN2) vía VPN. Configura el 'VPN Gateway' y el cliente de Lisa para permitirlo.",
-      fase: 1,
-      infoAdicional: {
-        gateway: {
-          lanLocal: "LAN2",
-          hostLan: "Computadora Jacob",
-          proteccion: TipoProteccionVPN.EA,
-          dominioRemoto: "Off-site",
-          hostRemoto: "Computadora Lisa",
-        },
-        cliente: {
-          proteccion: TipoProteccionVPN.EA,
-          dominioRemoto: "Corporación",
-          hostRemoto: "Computadora Jacob",
-        },
-      },
-    },
-    {
       nombreEvento: "Completación Fase 1",
       tipoEvento: TipoEvento.COMPLETACION_FASE,
-      tiempoNotificacion: 50, // Este es un caso especial. Aquí se ejecutará directamente en el tiempo de notificación
+      tiempoNotificacion: 17, // Este es un caso especial. Aquí se ejecutará directamente en el tiempo de notificación
       descripcion: "¡Has completado todos los objetivos de la Fase 1! Asegúrate de revisar la pestaña de Partida para conocer los objetivos de la siguiente fase.",
       fase: 1,
     },
     {
       nombreEvento: "Reto 1",
       tipoEvento: TipoEvento.CONEXION_VPN,
-      tiempoNotificacion: 60,
+      tiempoNotificacion: 19,
       descripcion:
         "Lisa (Off-site) intentará conectarse a la 'Computadora Jacob' (LAN2) vía VPN. Configura el 'VPN Gateway' y el cliente de Lisa para permitirlo.",
       fase: 2,
@@ -92,50 +55,6 @@ export const escenarioBase: unknown = {
         },
         cliente: {
           proteccion: TipoProteccionVPN.A,
-          dominioRemoto: "Corporación",
-          hostRemoto: "Computadora Jacob",
-        },
-      },
-    },
-    {
-      nombreEvento: "Reto 2",
-      tipoEvento: TipoEvento.CONEXION_VPN,
-      tiempoNotificacion: 75,
-      descripcion:
-        "Lisa (Off-site) intentará conectarse a la 'Computadora Jacob' (LAN2) vía VPN. Configura el 'VPN Gateway' y el cliente de Lisa para permitirlo.",
-      fase: 2,
-      infoAdicional: {
-        gateway: {
-          lanLocal: "LAN2",
-          hostLan: "Computadora Jacob",
-          proteccion: TipoProteccionVPN.B,
-          dominioRemoto: "Off-site",
-          hostRemoto: "Computadora Lisa",
-        },
-        cliente: {
-          proteccion: TipoProteccionVPN.B,
-          dominioRemoto: "Corporación",
-          hostRemoto: "Computadora Jacob",
-        },
-      },
-    },
-    {
-      nombreEvento: "Reto 3",
-      tipoEvento: TipoEvento.CONEXION_VPN,
-      tiempoNotificacion: 90,
-      descripcion:
-        "Lisa (Off-site) intentará conectarse a la 'Computadora Jacob' (LAN2) vía VPN. Configura el 'VPN Gateway' y el cliente de Lisa para permitirlo.",
-      fase: 2,
-      infoAdicional: {
-        gateway: {
-          lanLocal: "LAN2",
-          hostLan: "Computadora Jacob",
-          proteccion: TipoProteccionVPN.N,
-          dominioRemoto: "Off-site",
-          hostRemoto: "Computadora Lisa",
-        },
-        cliente: {
-          proteccion: TipoProteccionVPN.N,
           dominioRemoto: "Corporación",
           hostRemoto: "Computadora Jacob",
         },
@@ -144,7 +63,7 @@ export const escenarioBase: unknown = {
     {
       nombreEvento: "Completación Escenario",
       tipoEvento: TipoEvento.COMPLETACION_ESCENARIO,
-      tiempoNotificacion: 105, // Este es un caso especial. Aquí se ejecutará directamente en el tiempo de notificación
+      tiempoNotificacion: 32, // Este es un caso especial. Aquí se ejecutará directamente en el tiempo de notificación
       descripcion: "¡Felicidades, has completado el escenario de este nivel!",
       fase: 2,
     },
@@ -164,15 +83,7 @@ export const escenarioBase: unknown = {
         {
           descripcion: "Falla de Conectividad IDS",
           completado: false,
-        },
-        {
-          descripcion: "Asegurar LAN1 (Firewall)",
-          completado: false,
-        },
-        {
-          descripcion: "Conexión VPN (Teletrabajo)",
-          completado: false,
-        },
+        }
       ],
     },
     {
@@ -186,15 +97,7 @@ export const escenarioBase: unknown = {
         {
           descripcion: "Reto 1",
           completado: false,
-        },
-        {
-          descripcion: "Reto 2",
-          completado: false,
-        },
-        {
-          descripcion: "Reto 3",
-          completado: false,
-        },
+        }
       ],
     },
   ],
