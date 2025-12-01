@@ -10,5 +10,5 @@ export interface Estudiante {
   contrasenia: string
 }
 
-export type EstudianteInput = Omit<Estudiante, 'id_estudiante'>
+export type EstudianteInput = Omit<Estudiante, 'id_estudiante' | 'id_profesor'> & { id_profesor?: number }
 export type EstudiantePublic = Omit<Estudiante, 'contrasenia'>

@@ -13,6 +13,8 @@ import Modal from './common/components/Modal.tsx'
 import ModelPreloader from './common/components/ModelPreloader.tsx'
 import Login from './features/admin-docente-y-estudiante/pages/Login.tsx'
 import Signup from './features/admin-docente-y-estudiante/pages/Signup.tsx'
+import NotFound from './features/admin-docente-y-estudiante/pages/NotFound.tsx'
+import ProtectedRoute from './features/admin-docente-y-estudiante/components/ProtectedRoute.tsx'
 import { AnimatePresence } from 'framer-motion'
 
 const shouldRedirect = sessionStorage.getItem('redirect-on-reload');
@@ -37,27 +39,67 @@ function AnimatedRoutes() {
         <Route path='/login' element={<Login />} />
         <Route path='/signup' element={<Signup />} />
 
-        <Route path='/*' element={
-          <EscenarioProvider>
-            <ModalProvider>
-              <ChatProvider>
-                <ECSSceneProvider>
-                  <ModelPreloader />
-                  <Header />
-                  <div className="content">
-                    <Routes>
-                      <Route path='/' element={<VistaOficina />} />
-                      <Route path='/dispositivos' element={<Dispositivos />} />
-                      <Route path='/redes' element={<Redes />} />
-                    </Routes>
-                    <TarjetaLogNuevo />
-                  </div>
-                  <Modal />
-                </ECSSceneProvider>
-              </ChatProvider>
-            </ModalProvider>
-          </EscenarioProvider>
+        <Route path='/' element={
+          <ProtectedRoute>
+            <EscenarioProvider>
+              <ModalProvider>
+                <ChatProvider>
+                  <ECSSceneProvider>
+                    <ModelPreloader />
+                    <Header />
+                    <div className="content">
+                      <VistaOficina />
+                      <TarjetaLogNuevo />
+                    </div>
+                    <Modal />
+                  </ECSSceneProvider>
+                </ChatProvider>
+              </ModalProvider>
+            </EscenarioProvider>
+          </ProtectedRoute>
         } />
+
+        <Route path='/dispositivos' element={
+          <ProtectedRoute>
+            <EscenarioProvider>
+              <ModalProvider>
+                <ChatProvider>
+                  <ECSSceneProvider>
+                    <ModelPreloader />
+                    <Header />
+                    <div className="content">
+                      <Dispositivos />
+                      <TarjetaLogNuevo />
+                    </div>
+                    <Modal />
+                  </ECSSceneProvider>
+                </ChatProvider>
+              </ModalProvider>
+            </EscenarioProvider>
+          </ProtectedRoute>
+        } />
+
+        <Route path='/redes' element={
+          <ProtectedRoute>
+            <EscenarioProvider>
+              <ModalProvider>
+                <ChatProvider>
+                  <ECSSceneProvider>
+                    <ModelPreloader />
+                    <Header />
+                    <div className="content">
+                      <Redes />
+                      <TarjetaLogNuevo />
+                    </div>
+                    <Modal />
+                  </ECSSceneProvider>
+                </ChatProvider>
+              </ModalProvider>
+            </EscenarioProvider>
+          </ProtectedRoute>
+        } />
+
+        <Route path='*' element={<NotFound />} />
       </Routes>
     </AnimatePresence>
   );

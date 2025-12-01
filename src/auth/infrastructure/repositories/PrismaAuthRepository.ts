@@ -7,7 +7,7 @@ export class PrismaAuthRepository implements IAuthRepository {
   async createEstudiante(e: Omit<Estudiante, 'id_estudiante'>) {
     const created = await prisma.estudiante.create({
       data: {
-        id_profesor: e.id_profesor,
+        id_profesor: e.id_profesor || 1,
         codigo_unico: e.codigo_unico,
         primernombre: e.primernombre,
         segundo_nombre: e.segundo_nombre,

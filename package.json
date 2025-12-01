@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently \"npm run dev:server\" \"vite\"",
+    "dev:client": "vite",
     "dev:server": "nodemon --watch src --exec tsx src/server.ts",
     "start:server": "node dist/server/server.js",
     "build": "tsc -p && vite build",
