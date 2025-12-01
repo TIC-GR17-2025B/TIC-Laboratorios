@@ -3,12 +3,14 @@ import { useState, useRef, useCallback } from 'react';
 
 export interface AudioPlayerState {
     isPlaying: boolean;
-    play: (base64Audio: string) => void;
+    currentAudioId: string | null;
+    play: (base64Audio: string, audioId: string) => void;
     stop: () => void;
 }
 
 export const useAudioPlayer = (): AudioPlayerState => {
     const [isPlaying, setIsPlaying] = useState(false);
+    const [currentAudioId, setCurrentAudioId] = useState<string | null>(null);
     const [currentAudioSource, setCurrentAudioSource] = useState<string | null>(null);
     const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -26,14 +28,14 @@ export const useAudioPlayer = (): AudioPlayerState => {
         return new Blob([byteArray], { type: 'audio/mpeg' });
     }, []);
 
-    const play = useCallback((base64Audio: string) => {
+    const play = useCallback((base64Audio: string, audioId: string) => {
         if (!base64Audio) {
             console.warn('No hay audio disponible');
             return;
         }
 
-        // Lógica de Toggle (Play/Pause)
-        if (currentAudioSource === base64Audio && audioRef.current) {
+        // Lógica de Toggle (Play/Pause) - Si es el mismo audio
+        if (currentAudioId === audioId && audioRef.current) {
             if (isPlaying) {
                 audioRef.current.pause();
                 setIsPlaying(false);
@@ -47,10 +49,14 @@ export const useAudioPlayer = (): AudioPlayerState => {
             return;
         }
 
+        // Si hay un audio reproduciéndose, detenerlo antes de iniciar el nuevo
         if (audioRef.current) {
             audioRef.current.pause();
+            audioRef.current.currentTime = 0;
             audioRef.current = null;
             setIsPlaying(false);
+            setCurrentAudioId(null);
+            setCurrentAudioSource(null);
         }
 
         try {
@@ -62,16 +68,19 @@ export const useAudioPlayer = (): AudioPlayerState => {
             const audio = new Audio(audioUrl);
             audioRef.current = audio;
             setCurrentAudioSource(base64Audio);
+            setCurrentAudioId(audioId);
 
             audio.onplay = () => setIsPlaying(true);
             audio.onended = () => {
                 setIsPlaying(false);
+                setCurrentAudioId(null);
             };
             audio.onerror = () => {
                 console.error('Error al reproducir el audio');
                 setIsPlaying(false);
                 audioRef.current = null;
                 setCurrentAudioSource(null);
+                setCurrentAudioId(null);
             };
 
             audio.play();
@@ -79,15 +88,16 @@ export const useAudioPlayer = (): AudioPlayerState => {
             console.error('Error procesando el audio:', error);
             setIsPlaying(false);
         }
-    }, [base64ToBlob, currentAudioSource, isPlaying]);
+    }, [base64ToBlob, currentAudioId, isPlaying]);
 
     const stop = useCallback(() => {
         if (audioRef.current) {
             audioRef.current.pause();
             audioRef.current.currentTime = 0; 
             setIsPlaying(false);
+            setCurrentAudioId(null);
         }
     }, []);
 
-    return { isPlaying, play, stop };
+    return { isPlaying, currentAudioId, play, stop };
 };

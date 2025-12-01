@@ -28,7 +28,6 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
         disabled={viewModel.isTyping}
         isContextMode={viewModel.isContextMode}
         onToggleContextMode={viewModel.toggleContextMode}
-        messages={viewModel.messages}
       />
     </div>
   );

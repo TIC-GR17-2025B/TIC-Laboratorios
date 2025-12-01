@@ -29,7 +29,7 @@ export class SendContextUseCase {
         context,
       });
 
-      const botMessage = Message.createBotMessage(response.message);
+      const botMessage = Message.createBotMessage(response.message, response.audio);
       session.addMessage(botMessage);
 
       return botMessage;
