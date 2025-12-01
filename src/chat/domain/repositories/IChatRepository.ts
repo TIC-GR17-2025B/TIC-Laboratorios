@@ -10,6 +10,7 @@ export interface ChatMessagePayload {
 export interface ChatResponse {
   message: string;
   success?: boolean;
+  audio?: string; // Base64 audio desde n8n
 }
 
 /**
