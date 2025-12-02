@@ -26,7 +26,7 @@ router.post('/', async (req, res) => {
 
     const progreso = await guardarProgreso.execute(req.body)
     res.status(201).json({ success: true, data: progreso })
-  } catch (err: any) {
+  } catch (err: unknown) {
     res.status(400).json({ success: false, error: err.message })
   }
 })
@@ -54,7 +54,7 @@ router.get('/estudiante/:idEstudiante/escenario/:idEscenario', async (req, res) 
     }
 
     res.json({ success: true, data: progreso })
-  } catch (err: any) {
+  } catch (err: unknown) {
     res.status(500).json({ success: false, error: err.message })
   }
 })
@@ -73,7 +73,7 @@ router.get('/estudiante/:idEstudiante', async (req, res) => {
 
     const progresos = await obtenerTodosProgresos.execute(idEstudiante)
     res.json({ success: true, data: progresos })
-  } catch (err: any) {
+  } catch (err: unknown) {
     res.status(500).json({ success: false, error: err.message })
   }
 })

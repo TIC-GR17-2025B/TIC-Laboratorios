@@ -25,7 +25,7 @@ export class LoginUseCase {
       if (match) {
 
         // convertir a tipo public
-        const { contrasenia: _, ...publicProfesor } = profesor
+        const { ...publicProfesor } = profesor
 
         const token = jwt.sign(
           { id: profesor.id_profesor, role: "profesor" },
@@ -47,7 +47,7 @@ export class LoginUseCase {
       const match = await bcrypt.compare(contrasenia, estudiante.contrasenia)
       if (match) {
 
-        const { contrasenia: _, ...publicEstudiante } = estudiante
+        const { ...publicEstudiante } = estudiante
 
         const token = jwt.sign(
           { id: estudiante.id_estudiante, role: "estudiante" },

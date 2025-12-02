@@ -21,7 +21,7 @@ router.post('/register/estudiante', async (req, res) => {
   try {
     const created = await registerEstudiante.execute(req.body)
     res.status(201).json({ success: true, data: created })
-  } catch (err: any) {
+  } catch (err: unknown) {
     res.status(400).json({ success: false, error: err.message })
   }
 })
@@ -31,7 +31,7 @@ router.post('/register/profesor', async (req, res) => {
   try {
     const created = await registerProfesor.execute(req.body)
     res.status(201).json({ success: true, data: created })
-  } catch (err: any) {
+  } catch (err: unknown) {
     res.status(400).json({ success: false, error: err.message })
   }
 })
@@ -59,7 +59,7 @@ router.post('/login', async (req, res) => {
 
     res.json({ success: true, data: result })
 
-  } catch (err: any) {
+  } catch (err: unknown) {
     res.status(500).json({ success: false, error: err.message })
   }
 })

@@ -12,7 +12,7 @@ export class RegisterProfesorUseCase {
     const hashed = await bcrypt.hash(payload.contrasenia, 10)
     const created = await this.repo.createProfesor({ ...payload, contrasenia: hashed })
 
-    const { contrasenia, ...publicData } = created
+    const { ...publicData } = created
     return publicData
   }
 }

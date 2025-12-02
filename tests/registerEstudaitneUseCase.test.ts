@@ -17,7 +17,7 @@ describe("RegisterEstudianteUseCase", () => {
       contrasenia: "hashed"
     })
 
-    const usecase = new RegisterEstudianteUseCase(mockRepo as any)
+    const usecase = new RegisterEstudianteUseCase(mockRepo as unknown)
 
     const result = await usecase.execute({
       primernombre: "Juan",
@@ -36,7 +36,7 @@ describe("RegisterEstudianteUseCase", () => {
   it("debe fallar si email ya existe", async () => {
     mockRepo.findEstudianteByEmail.mockResolvedValue({})
 
-    const usecase = new RegisterEstudianteUseCase(mockRepo as any)
+    const usecase = new RegisterEstudianteUseCase(mockRepo as unknown)
 
     await expect(usecase.execute({
       primernombre: "Juan",

@@ -27,7 +27,7 @@ describe("LoginUseCase", () => {
     mockRepo.findEstudianteByEmail.mockResolvedValue(estudianteMock)
     mockRepo.findProfesorByEmail.mockResolvedValue(null)
 
-    const usecase = new LoginUseCase(mockRepo as any, jwtSecret)
+    const usecase = new LoginUseCase(mockRepo as unknown, jwtSecret)
 
     const result = await usecase.execute("test@asd.com", "1234")
 
@@ -45,7 +45,7 @@ describe("LoginUseCase", () => {
 
     mockRepo.findProfesorByEmail.mockResolvedValue(null)
 
-    const usecase = new LoginUseCase(mockRepo as any, jwtSecret)
+    const usecase = new LoginUseCase(mockRepo as unknown, jwtSecret)
 
     const result = await usecase.execute("test@asd.com", "1234")
 

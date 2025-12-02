@@ -34,7 +34,7 @@ app.use((req, res) => {
 })
 
 // Manejo de errores global
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use((err: unknown, req: express.Request, res: express.Response /*, next: express.NextFunction*/) => {
   console.error('Error no manejado:', err)
   res.status(500).json({ 
     success: false, 
