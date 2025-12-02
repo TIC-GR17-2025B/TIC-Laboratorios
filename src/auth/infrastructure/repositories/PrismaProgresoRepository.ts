@@ -17,14 +17,31 @@ export class PrismaProgresoRepository implements IProgresoRepository {
     }
 
     // Obtener el progreso de un estudiante en un escenario específico
-    async getProgresoEstudiante(idEstudiante: number, idEscenario: number): Promise<Progreso | null> {
-        const progreso = await prisma.progreso.findFirst({
+    async getProgresoEstudiante(idEstudiante: number, idEscenario: number): Promise<{terminado: boolean; intentos: number;} | null> {
+        const intentos = await prisma.progreso.count({
             where: {
                 id_estudiante: idEstudiante,
                 id_escenario: idEscenario,
             },
         });
-        return progreso as Progreso | null;
+
+        const terminado = await prisma.progreso.findFirst({
+            where: {
+                id_estudiante: idEstudiante,
+                id_escenario: idEscenario,
+                terminado: true,
+            },
+            select: {
+                terminado: true,
+            },
+        });
+
+        const progreso = {
+            terminado: terminado?.terminado ?? false,
+            intentos: intentos ?? 0
+        }; 
+
+        return progreso;
     }
 
     // Obtener todos los progresos de un estudiante en todos los escenarios ordenados por escenario
