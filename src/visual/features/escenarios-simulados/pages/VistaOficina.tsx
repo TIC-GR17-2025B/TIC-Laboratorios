@@ -4,6 +4,7 @@ import TarjetaEntidadSeleccionada from "../components/TarjetaEntidadSeleccionada
 import { useEscenario } from "../../../common/contexts";
 import EventLogsPanel from "../components/EventLogsPanel";
 import { useEffect } from "react";
+import PageTransition from "../../../common/components/PageTransition";
 
 function VistaOficina() {
   const { dispositivoSeleccionado, setDispositivoSeleccionado } = useEscenario();
@@ -13,11 +14,13 @@ function VistaOficina() {
   }, []);
 
   return (
-    <div className={styles.contenedor}>
-      <Escena3D />
-      <TarjetaEntidadSeleccionada visible={!!dispositivoSeleccionado} />
-      <EventLogsPanel />
-    </div>
+    <PageTransition>
+      <div className={styles.contenedor}>
+        <Escena3D />
+        <TarjetaEntidadSeleccionada visible={!!dispositivoSeleccionado} />
+        <EventLogsPanel />
+      </div>
+    </PageTransition>
   )
 }
 
