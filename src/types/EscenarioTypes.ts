@@ -24,6 +24,12 @@ export interface Escenario {
   redes: Entidad[];
 }
 
+export interface EscenarioPreview {
+  id: number;
+  titulo: string;
+  descripcion: string;
+}
+
 export interface Zona {
   id: number;
   nombre: string;
