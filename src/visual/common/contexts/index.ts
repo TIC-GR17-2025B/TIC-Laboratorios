@@ -5,3 +5,8 @@ export {
 } from "./EscenarioContext";
 
 export { ModalProvider, useModal } from "./ModalContext";
+
+export {
+  SelectedLevelProvider,
+  useSelectedLevel,
+} from "./SelectedLevelContext";

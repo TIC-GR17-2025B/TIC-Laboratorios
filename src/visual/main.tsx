@@ -18,6 +18,7 @@ import ProtectedRoute from './features/admin-docente-y-estudiante/components/Pro
 import { AnimatePresence } from 'framer-motion'
 import VistaFasesPartida from './features/escenarios-simulados/pages/VistaFasesPartida.tsx'
 import { FasesProvider } from './features/escenarios-simulados/contexts/FasesContext.tsx'
+import VistaSeleccionNiveles from './features/escenarios-simulados/pages/VistaSeleccionNiveles.tsx'
 
 const shouldRedirect = sessionStorage.getItem('redirect-on-reload');
 if (shouldRedirect === 'true') {
@@ -40,7 +41,7 @@ function AnimatedRoutes() {
       <Routes location={location} key={location.pathname}>
         <Route path='/login' element={<Login />} />
         <Route path='/signup' element={<Signup />} />
-
+        <Route path='/seleccion-niveles' element={<VistaSeleccionNiveles />} />
         <Route path='/' element={
           <ProtectedRoute>
             <EscenarioProvider>

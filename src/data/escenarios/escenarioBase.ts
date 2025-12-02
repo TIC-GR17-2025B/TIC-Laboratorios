@@ -11,6 +11,7 @@ import { ColoresRed } from "../colores";
 export const escenarioBase: unknown = {
   id: 6,
   titulo: "Demo: Asignar Red, Firewall y VPN",
+  imagenPreview: "/redFirewallVPN.webp",
   descripcion:
     "Un escenario con 3 retos: 1) Asignar una red existente, 2) Configurar un firewall, 3) Configurar una VPN.",
   presupuestoInicial: 1000,
