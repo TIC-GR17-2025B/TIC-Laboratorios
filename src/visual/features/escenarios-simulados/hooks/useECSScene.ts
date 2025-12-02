@@ -66,7 +66,7 @@ export function useECSScene() {
 
   const redController = useMemo(
     () => RedController.getInstance(escenarioController.ecsManager),
-    [escenario]
+    [escenarioController]
   );
 
   // Función helper para formatear tiempo
@@ -240,7 +240,7 @@ export function useECSScene() {
       unsubscribePausado();
       unsubscribeReanudado();
     };
-  }, []); // Sin dependencias - solo se ejecuta una vez
+  }, [escenarioController, agregarLog, logsPanelOpen]);
 
   /**
    * Devuelve un array de entidades listo para render 3D
