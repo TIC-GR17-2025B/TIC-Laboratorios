@@ -3,6 +3,7 @@ import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import authRouter from './auth/infrastructure/controllers/AuthController'
+import progresoRouter from './auth/infrastructure/controllers/ProgresoController'
 
 // Cargar variables de entorno
 dotenv.config()
@@ -22,6 +23,7 @@ app.get('/health', (req, res) => {
 
 // Montar rutas de autenticación
 app.use('/auth', authRouter)
+app.use('/progreso', progresoRouter)
 
 // Manejo de rutas no encontradas
 app.use((req, res) => {
@@ -47,6 +49,10 @@ app.listen(PORT, () => {
   console.log(`POST http://localhost:${PORT}/auth/register/estudiante`)
   console.log(`POST http://localhost:${PORT}/auth/register/profesor`)
   console.log(`POST http://localhost:${PORT}/auth/login`)
+  console.log(`   Progreso:`)
+  console.log(`     POST http://localhost:${PORT}/progreso`)
+  console.log(`     GET  http://localhost:${PORT}/progreso/estudiante/:idEstudiante`)
+  console.log(`     GET  http://localhost:${PORT}/progreso/estudiante/:idEstudiante/escenario/:idEscenario`)
 })
 
 export default app
