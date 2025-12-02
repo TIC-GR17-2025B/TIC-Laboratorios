@@ -1,0 +1,74 @@
+.barraProgreso {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 20px 0;
+}
+
+.faseItem {
+    display: flex;
+    align-items: center;
+}
+
+.circulo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid;
+    position: relative;
+    z-index: 2;
+    transition: all 0.2s ease;
+}
+
+.completada {
+    border-color: transparent;
+}
+
+.actual {
+    background-color: transparent;
+    border-color: #52ab7b;
+    box-shadow: 0 0 0 4px rgba(82, 171, 123, 0.2);
+}
+
+.futura {
+    background-color: #3a3a3a;
+    border-color: #3a3a3a;
+}
+
+.navegable {
+    cursor: pointer;
+}
+
+.navegable:hover {
+    transform: scale(1.1);
+}
+
+.bloqueada {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.linea {
+    width: 80px;
+    height: 2px;
+    position: relative;
+    z-index: 1;
+}
+
+.lineaCompletada {
+    background-color: #52ab7b;
+}
+
+.lineaIncompleta {
+    background: repeating-linear-gradient(
+        to right,
+        #52ab7b 0,
+        #52ab7b 6px,
+        transparent 6px,
+        transparent 12px
+    );
+}

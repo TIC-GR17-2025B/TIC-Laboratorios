@@ -84,3 +84,8 @@ export interface LogGeneral {
   mensaje: string;
   pausarTiempo: boolean;
 }
+
+export interface ObjetivoFase {
+    descripcion: string;
+    completado: boolean;
+}

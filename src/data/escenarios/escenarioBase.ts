@@ -17,7 +17,7 @@ export const escenarioBase: unknown = {
   ataques: [],
   eventos: [
     {
-      nombreEvento: "Reto 1: Falla de Conectividad IDS",
+      nombreEvento: "Falla de Conectividad IDS",
       tipoEvento: TipoEvento.TRAFICO_RED,
       tiempoNotificacion: 5, // Es el primer reto
       descripcion:
@@ -27,42 +27,45 @@ export const escenarioBase: unknown = {
         dispositivoOrigen: "Computadora Jacob",
         dispositivoDestino: "Computadora Administrativa",
         protocolo: TipoProtocolo.MANAGEMENT,
+        esObjetivo: true,
+        debeSerBloqueado: false,
       },
     },
     {
-      nombreEvento: "Reto 2: Asegurar LAN1 (Firewall)",
-      tipoEvento: TipoEvento.TRAFICO_RED,
-      tiempoNotificacion: 20, // Segundo reto
-      descripcion:
-        "Se intentará una conexión SSH no autorizada desde la red externa (WWW) a la LAN1. Configura el firewall del 'Router Principal' para bloquear todo el tráfico SSH entrante a LAN1.",
+      nombreEvento: "Completación Fase 1",
+      tipoEvento: TipoEvento.COMPLETACION_FASE,
+      tiempoNotificacion: 17, // Este es un caso especial. Aquí se ejecutará directamente en el tiempo de notificación
+      descripcion: "¡Has completado todos los objetivos de la Fase 1! Asegúrate de revisar la pestaña de Partida para conocer los objetivos de la siguiente fase.",
       fase: 1,
-      infoAdicional: {
-        dispositivoOrigen: "Servidor Web Externo",
-        dispositivoDestino: "Computadora Administrativa",
-        protocolo: TipoProtocolo.SSH,
-      },
     },
     {
-      nombreEvento: "Reto 3: Conexión VPN (Teletrabajo)",
+      nombreEvento: "Reto 1",
       tipoEvento: TipoEvento.CONEXION_VPN,
-      tiempoNotificacion: 35, // Tercer reto
+      tiempoNotificacion: 19,
       descripcion:
         "Lisa (Off-site) intentará conectarse a la 'Computadora Jacob' (LAN2) vía VPN. Configura el 'VPN Gateway' y el cliente de Lisa para permitirlo.",
-      fase: 1,
+      fase: 2,
       infoAdicional: {
         gateway: {
           lanLocal: "LAN2",
           hostLan: "Computadora Jacob",
-          proteccion: TipoProteccionVPN.EA,
+          proteccion: TipoProteccionVPN.A,
           dominioRemoto: "Off-site",
           hostRemoto: "Computadora Lisa",
         },
         cliente: {
-          proteccion: TipoProteccionVPN.EA,
+          proteccion: TipoProteccionVPN.A,
           dominioRemoto: "Corporación",
           hostRemoto: "Computadora Jacob",
         },
       },
+    },
+    {
+      nombreEvento: "Completación Escenario",
+      tipoEvento: TipoEvento.COMPLETACION_ESCENARIO,
+      tiempoNotificacion: 32, // Este es un caso especial. Aquí se ejecutará directamente en el tiempo de notificación
+      descripcion: "¡Felicidades, has completado el escenario de este nivel!",
+      fase: 2,
     },
   ],
   fases: [
@@ -72,6 +75,30 @@ export const escenarioBase: unknown = {
       descripcion:
         "Completar los 3 retos de asignación de red, firewall y VPN.",
       faseActual: true,
+      completada: false,
+      objetivos: [ // Cada uno de estos objetivos deben corresponderse (los nombres deben ser los mismos)
+                   // con los eventos/ataques que el jugador debe manejar, y que se hayan definido en 
+                   // sus arrays corrspondientes de eventos o ataques en este json. Importante: Deben 
+                   // definirse en el mismo orden en el que se supone que el jugador debe completarlos.
+        {
+          descripcion: "Falla de Conectividad IDS",
+          completado: false,
+        }
+      ],
+    },
+    {
+      id: 2,
+      nombre: "Fase 2: Otros retos",
+      descripcion:
+        "Completar otros retos de la simulación.",
+      faseActual: false,
+      completada: false,
+      objetivos: [
+        {
+          descripcion: "Reto 1",
+          completado: false,
+        }
+      ],
     },
   ],
   zonas: [

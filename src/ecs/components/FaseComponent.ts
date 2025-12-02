@@ -1,3 +1,4 @@
+import type { ObjetivoFase } from "../../types/EscenarioTypes";
 import { Componente } from "../core";
 
 export class FaseComponent extends Componente {
@@ -5,7 +6,9 @@ export class FaseComponent extends Componente {
         public id: number,
         public nombre: string,
         public descripcion: string,
-        public faseActual: boolean
+        public faseActual: boolean,
+        public completada: boolean,
+        public objetivos: ObjetivoFase[] = []
     ){
         super();
     }

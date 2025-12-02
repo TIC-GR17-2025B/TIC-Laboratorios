@@ -11,6 +11,8 @@ import { ChatProvider } from './features/chat/context/ChatContext.tsx'
 import Redes from './features/simulacion-redes/pages/Redes.tsx'
 import Modal from './common/components/Modal.tsx'
 import ModelPreloader from './common/components/ModelPreloader.tsx'
+import VistaFasesPartida from './features/escenarios-simulados/pages/VistaFasesPartida.tsx'
+import { FasesProvider } from './features/escenarios-simulados/contexts/FasesContext.tsx'
 
 const shouldRedirect = sessionStorage.getItem('redirect-on-reload');
 if (shouldRedirect === 'true') {
@@ -29,6 +31,7 @@ createRoot(document.getElementById('root')!).render(
   <EscenarioProvider>
     <ModalProvider>
       <ChatProvider>
+        <FasesProvider>
         <ECSSceneProvider>
           <BrowserRouter>
             <ModelPreloader />
@@ -38,12 +41,14 @@ createRoot(document.getElementById('root')!).render(
                 <Route path='/' element={<VistaOficina />} />
                 <Route path='/dispositivos' element={<Dispositivos />} />
                 <Route path='/redes' element={<Redes />} />
+                <Route path='/fases-partida' element={<VistaFasesPartida />} />
               </Routes>
               <TarjetaLogNuevo />
             </div>
             <Modal />
           </BrowserRouter>
         </ECSSceneProvider>
+        </FasesProvider>
       </ChatProvider>
     </ModalProvider>
   </EscenarioProvider>,
