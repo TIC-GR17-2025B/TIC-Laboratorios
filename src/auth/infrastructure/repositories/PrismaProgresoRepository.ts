@@ -3,12 +3,12 @@ import type { IProgresoRepository } from "../../domain/repositories/IProgresoRep
 import { prisma } from "../db/prisma"
 
 export class PrismaProgresoRepository implements IProgresoRepository {
+    
     async guardarProgresoEstudiante(p: ProgresoInput): Promise<Progreso> {
         const created = await prisma.progreso.create({
             data: {
                 id_estudiante: p.id_estudiante,
                 id_escenario: p.id_escenario,
-                intentos: p.intentos,
                 terminado: p.terminado,
                 tiempo: p.tiempo,
             },
@@ -40,12 +40,12 @@ export class PrismaProgresoRepository implements IProgresoRepository {
         return progresos as Progreso[];
     }
 
-    // Actualizar el progreso de un estudiante en un escenario específico
+    /* Actualizar el progreso de un estudiante en un escenario específico
     async actualizarProgreso(id_progreso: number, data: Partial<ProgresoInput>): Promise<Progreso> {
         const updated = await prisma.progreso.update({
             where: { id_progreso },
             data,
         });
         return updated as Progreso;
-    }
+    }*/
 }

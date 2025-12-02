@@ -7,15 +7,10 @@ datasource db {
   provider = "postgresql"
 }
 
-model profesor {
-  id_profesor        Int          @id @default(autoincrement())
-  primernombre       String       @db.VarChar(50)
-  segundo_nombre     String       @db.VarChar(50)
-  primer_apellido    String       @db.VarChar(50)
-  segundo_apellido   String       @db.VarChar(50)
-  correo_electronico String       @unique @db.VarChar(100)
-  contrasenia        String       @db.VarChar(128)
-  estudiante         estudiante[]
+model escenario {
+  id_escenario Int        @id @default(autoincrement())
+  nombre       String     @db.VarChar(100)
+  progreso     progreso[]
 }
 
 model estudiante {
@@ -32,17 +27,21 @@ model estudiante {
   progreso           progreso[]
 }
 
-model escenario {
-  id_escenario Int        @id @default(autoincrement())
-  nombre       String     @db.VarChar(100)
-  progreso     progreso[]
+model profesor {
+  id_profesor        Int          @id @default(autoincrement())
+  primernombre       String       @db.VarChar(50)
+  segundo_nombre     String       @db.VarChar(50)
+  primer_apellido    String       @db.VarChar(50)
+  segundo_apellido   String       @db.VarChar(50)
+  correo_electronico String       @unique @db.VarChar(100)
+  contrasenia        String       @db.VarChar(128)
+  estudiante         estudiante[]
 }
 
 model progreso {
   id_progreso   Int        @id @default(autoincrement())
   id_estudiante Int
   id_escenario  Int
-  intentos      Int?       @default(0)
   terminado     Boolean?   @default(false)
   tiempo        Float?
   escenario     escenario  @relation(fields: [id_escenario], references: [id_escenario], map: "fk_progreso_escenario")

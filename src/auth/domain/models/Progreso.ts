@@ -2,7 +2,6 @@ export interface Progreso {
     id_progreso: number;
     id_estudiante: number;
     id_escenario: number;
-    intentos: number;
     terminado: boolean;
     tiempo: number;
 }

@@ -14,13 +14,13 @@ const obtenerTodosProgresos = new ObtenerTodosProgresosUseCase(repo);
 // POST /progreso - Guardar progreso de un estudiante
 router.post('/', async (req, res) => {
   try {
-    const { id_estudiante, id_escenario, intentos, terminado, tiempo } = req.body
+    const { id_estudiante, id_escenario, terminado, tiempo } = req.body
 
     // Validación de campos requeridos
-    if (!id_estudiante || !id_escenario || intentos === undefined || terminado === undefined || tiempo === undefined) {
+    if (!id_estudiante || !id_escenario || terminado === undefined || tiempo === undefined) {
       return res.status(400).json({
         success: false,
-        error: 'Faltan campos requeridos: id_estudiante, id_escenario, intentos, terminado'
+        error: 'Faltan campos requeridos: id_estudiante, id_escenario, terminado'
       })
     }
 
