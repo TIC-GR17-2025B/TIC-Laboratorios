@@ -4,7 +4,7 @@ import VistaOficina from './features/escenarios-simulados/pages/VistaOficina.tsx
 import Dispositivos from './features/hardening-de-dispositivos/pages/Dispositivos.tsx'
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router'
 import Header from './common/components/Header.tsx'
-import { EscenarioProvider, ModalProvider, SelectedLevelProvider } from './common/contexts'
+import { EscenarioProvider, ModalProvider } from './common/contexts'
 import { ECSSceneProvider } from './features/escenarios-simulados/context/ECSSceneContext.tsx'
 import TarjetaLogNuevo from './features/escenarios-simulados/components/TarjetaLogNuevo.tsx'
 import { ChatProvider } from './features/chat/context/ChatContext.tsx'
@@ -137,4 +137,7 @@ function AnimatedRoutes() {
 }
 
 createRoot(document.getElementById('root')!).render(
+  <BrowserRouter>
+    <AnimatedRoutes />
+  </BrowserRouter>,
 )
