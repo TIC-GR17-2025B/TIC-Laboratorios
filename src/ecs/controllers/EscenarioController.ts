@@ -3,6 +3,7 @@ import {
   DispositivoComponent,
   EscenarioComponent,
   EventoComponent,
+  FaseComponent,
   PresupuestoComponent,
   TiempoComponent,
   WorkstationComponent,
@@ -10,6 +11,7 @@ import {
 import { ECSManager, type Entidad } from "../core";
 import {
   SistemaEvento,
+  SistemaFase,
   SistemaJerarquiaEscenario,
   SistemaPresupuesto,
   SistemaTiempo,
@@ -19,6 +21,7 @@ import type { Escenario, LogGeneral } from "../../types/EscenarioTypes";
 import {
   EventosInternos,
   EventosPublicos,
+  MensajesGenerales,
   TipoLogGeneral,
 } from "../../types/EventosEnums";
 
@@ -33,6 +36,7 @@ export class EscenarioController {
   private sistemaJerarquiaEscenario?: SistemaJerarquiaEscenario;
   private entidadPresupuesto?: Entidad;
   private sistemaEvento?: SistemaEvento;
+  private sistemaFase?: SistemaFase;
   private escenarioIniciado: boolean = false; // FLAG PARA EVITAR MÚLTIPLES INICIALIZACIONES
 
   private static instance: EscenarioController | null = null;
@@ -72,6 +76,12 @@ export class EscenarioController {
     if (!this.sistemaEvento) {
       this.sistemaEvento = new SistemaEvento();
       this.ecsManager.agregarSistema(this.sistemaEvento);
+    }
+
+    if (!this.sistemaFase) {
+      this.sistemaFase = new SistemaFase();
+      this.ecsManager.agregarSistema(this.sistemaFase);
+      this.sistemaFase.iniciarEscuchaDeEvento();
     }
 
     // NO emitir el evento aquí - lo haremos después de que los sistemas se suscriban
@@ -127,6 +137,9 @@ export class EscenarioController {
         pausarTiempo: true,
       };
       this.agregarLogGeneralEscenario(log);
+      this.ecsManager.emit(EventosPublicos.FASE_NO_COMPLETADA,
+                           MensajesGenerales.MSJ_FASE_NO_COMPLETADA);
+      this.sistemaTiempo?.destruir();
     });
 
     this.ecsManager.on(EventosPublicos.ATAQUE_MITIGADO, (data: unknown) => {
@@ -136,6 +149,7 @@ export class EscenarioController {
         mensaje: `Se mitigó el ataque a: ${d.ataque.dispositivoAAtacar}. Ataque mitigado: ${d.ataque.tipoAtaque}`,
         pausarTiempo: false,
       };
+      this.ecsManager.emit(EventosInternos.OBJETIVO_COMPLETADO);
       this.agregarLogGeneralEscenario(log);
     });
 
@@ -147,6 +161,34 @@ export class EscenarioController {
         pausarTiempo: true,
       };
       this.agregarLogGeneralEscenario(log);
+      this.ecsManager.emit(EventosPublicos.FASE_NO_COMPLETADA,
+                           MensajesGenerales.MSJ_FASE_NO_COMPLETADA);
+      this.sistemaTiempo?.destruir();
+    });
+
+    this.ecsManager.on(EventosPublicos.FASE_COMPLETADA, (data: unknown) => {
+      const descripcion = data as string;
+      const log = {
+        tipo: TipoLogGeneral.COMPLETADO,
+        mensaje: descripcion,
+        pausarTiempo: true,
+      };
+      this.ecsManager.emit(EventosInternos.OBJETIVO_COMPLETADO);
+      console.log("EscenarioController: on de FASE_COMPLETADA:",this.ecsManager.getEntidades());
+      this.agregarLogGeneralEscenario(log);
+    });
+
+    // Oyentes de prueba que en realidad se colocan en el front, borrar luego
+    this.ecsManager.on(EventosPublicos.FASE_NO_COMPLETADA, (data: unknown) => {
+        const d = data as string;
+        console.log(d);
+        this.sistemaTiempo?.destruir();
+    });
+
+    this.ecsManager.on(EventosPublicos.ESCENARIO_COMPLETADO, (data: unknown) => {
+        const d = data as string;
+        console.log(d);
+        this.sistemaTiempo?.destruir();
     });
 
     this.escenarioIniciado = true;
@@ -173,8 +215,13 @@ export class EscenarioController {
       console.error("SistemaTiempo no existe aún");
       return;
     }
+    if (!this.sistemaFase) {
+      console.error("SistemaFase no existe aún");
+      return;
+    }
     const eventos = this.getEventos();
     this.sistemaTiempo.eventosEscenario = eventos;
+    this.sistemaFase.eventosEscenario = eventos.sort((a,b) => a.tiempoNotificacion - b.tiempoNotificacion);
   }
 
   public ejecutarTiempo(): void {
@@ -358,6 +405,14 @@ export class EscenarioController {
     }
 
     return dispositivosTodos;
+  }
+
+  public getFasesConObjetivos(): FaseComponent[] | undefined{
+    for (const [,container] of this.ecsManager.getEntidades()) {
+      if (container.tiene(EscenarioComponent)) {
+        return container.get(EscenarioComponent)?.fases;
+      }
+    }
   }
 
   // MÉTODO PARA RESETEAR EL SINGLETON (útil para desarrollo/testing)

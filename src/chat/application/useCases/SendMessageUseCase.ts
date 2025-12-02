@@ -6,7 +6,7 @@ import { Message } from "../../domain/models/Message";
 import { ChatSession } from "../../domain/models/ChatSession";
 
 export class SendMessageUseCase {
-  constructor(private readonly chatRepository: IChatRepository) {}
+  constructor(private readonly chatRepository: IChatRepository) { }
 
   async execute(
     messageText: string,
@@ -31,7 +31,7 @@ export class SendMessageUseCase {
         timestamp: new Date().toISOString(),
       });
 
-      const botMessage = Message.createBotMessage(response.message);
+      const botMessage = Message.createBotMessage(response.message, response.audio);
       session.addMessage(botMessage);
 
       return botMessage;

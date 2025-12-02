@@ -21,7 +21,7 @@ import type {
   PerfilClienteVPN,
   PerfilVPNGateway,
 } from "../../types/EscenarioTypes";
-import { EventosPublicos } from "../../types/EventosEnums";
+import { EventosPublicos, MensajesGenerales } from "../../types/EventosEnums";
 
 // Sistema encargado de gestionar redes, conectividad y firewalls
 export class SistemaRed extends Sistema {
@@ -157,7 +157,9 @@ export class SistemaRed extends Sistema {
     entidadOrigen: Entidad,
     entidadDestino: Entidad,
     protocolo: TipoProtocolo,
-    payload: unknown
+    payload: unknown,
+    esObjetivo?: boolean,
+    debeSerBloqueado?: boolean
   ): void {
     const dispOrigen = this.ecsManager
       .getComponentes(entidadOrigen)
@@ -178,6 +180,8 @@ export class SistemaRed extends Sistema {
       // console.log(
       //   `❌ SistemaRed.enviarTrafico: Dispositivos NO están conectados`
       // );
+      this.ecsManager.emit(EventosPublicos.FASE_NO_COMPLETADA,
+                             MensajesGenerales.MSJ_FASE_NO_COMPLETADA);
       return;
     }
 
@@ -199,7 +203,9 @@ export class SistemaRed extends Sistema {
         dispOrigen.nombre,
         dispDestino.nombre,
         protocolo,
-        resultadoFirewall.entidadRouter
+        resultadoFirewall.entidadRouter,
+        esObjetivo ?? false,
+        debeSerBloqueado ?? true
       );
 
       return;
@@ -210,7 +216,9 @@ export class SistemaRed extends Sistema {
     // Emitir evento de tráfico permitido
     this.getEventoService().emitirEventoPermitido(
       dispOrigen.nombre,
-      dispDestino.nombre
+      dispDestino.nombre,
+      esObjetivo ?? false,
+      debeSerBloqueado ?? false
     );
 
     switch (protocolo) {

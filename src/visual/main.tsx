@@ -16,6 +16,8 @@ import Signup from './features/admin-docente-y-estudiante/pages/Signup.tsx'
 import NotFound from './features/admin-docente-y-estudiante/pages/NotFound.tsx'
 import ProtectedRoute from './features/admin-docente-y-estudiante/components/ProtectedRoute.tsx'
 import { AnimatePresence } from 'framer-motion'
+import VistaFasesPartida from './features/escenarios-simulados/pages/VistaFasesPartida.tsx'
+import { FasesProvider } from './features/escenarios-simulados/contexts/FasesContext.tsx'
 
 const shouldRedirect = sessionStorage.getItem('redirect-on-reload');
 if (shouldRedirect === 'true') {
@@ -44,15 +46,17 @@ function AnimatedRoutes() {
             <EscenarioProvider>
               <ModalProvider>
                 <ChatProvider>
-                  <ECSSceneProvider>
-                    <ModelPreloader />
-                    <Header />
-                    <div className="content">
-                      <VistaOficina />
-                      <TarjetaLogNuevo />
-                    </div>
-                    <Modal />
-                  </ECSSceneProvider>
+                  <FasesProvider>
+                    <ECSSceneProvider>
+                      <ModelPreloader />
+                      <Header />
+                      <div className="content">
+                        <VistaOficina />
+                        <TarjetaLogNuevo />
+                      </div>
+                      <Modal />
+                    </ECSSceneProvider>
+                  </FasesProvider>
                 </ChatProvider>
               </ModalProvider>
             </EscenarioProvider>
@@ -64,6 +68,7 @@ function AnimatedRoutes() {
             <EscenarioProvider>
               <ModalProvider>
                 <ChatProvider>
+                  <FasesProvider>
                   <ECSSceneProvider>
                     <ModelPreloader />
                     <Header />
@@ -73,6 +78,7 @@ function AnimatedRoutes() {
                     </div>
                     <Modal />
                   </ECSSceneProvider>
+                  </FasesProvider>
                 </ChatProvider>
               </ModalProvider>
             </EscenarioProvider>
@@ -84,6 +90,7 @@ function AnimatedRoutes() {
             <EscenarioProvider>
               <ModalProvider>
                 <ChatProvider>
+                  <FasesProvider>
                   <ECSSceneProvider>
                     <ModelPreloader />
                     <Header />
@@ -93,6 +100,29 @@ function AnimatedRoutes() {
                     </div>
                     <Modal />
                   </ECSSceneProvider>
+                  </FasesProvider>
+                </ChatProvider>
+              </ModalProvider>
+            </EscenarioProvider>
+          </ProtectedRoute>
+        } />
+        
+        <Route path='/fases-partida' element={
+          <ProtectedRoute>
+            <EscenarioProvider>
+              <ModalProvider>
+                <ChatProvider>
+                  <FasesProvider>
+                  <ECSSceneProvider>
+                    <ModelPreloader />
+                    <Header />
+                    <div className="content">
+                      <VistaFasesPartida />
+                      <TarjetaLogNuevo />
+                    </div>
+                    <Modal />
+                  </ECSSceneProvider>
+                  </FasesProvider>
                 </ChatProvider>
               </ModalProvider>
             </EscenarioProvider>

@@ -5,7 +5,9 @@ interface ModalContextType {
     isOpen: boolean;
     modalContent: ReactNode | null;
     modalTitle: string | null;
-    openModal: (content: ReactNode, title?: string) => void;
+    dismissible: boolean;
+    showHeader: boolean;
+    openModal: (content: ReactNode, title?: string, dismissible?: boolean, showHeader?: boolean) => void;
     closeModal: () => void;
 }
 
@@ -22,10 +24,14 @@ export function ModalProvider({ children }: ModalProviderProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [modalContent, setModalContent] = useState<ReactNode | null>(null);
     const [modalTitle, setModalTitle] = useState<string | null>(null);
+    const [dismissible, setDismissible] = useState(true);
+    const [showHeader, setShowHeader] = useState(true);
 
-    const openModal = (content: ReactNode, title?: string) => {
+    const openModal = (content: ReactNode, title?: string, dismissible: boolean = true, showHeader: boolean = true) => {
         setModalContent(content);
         setModalTitle(title || null);
+        setDismissible(dismissible);
+        setShowHeader(showHeader);
         setIsOpen(true);
     };
 
@@ -35,11 +41,13 @@ export function ModalProvider({ children }: ModalProviderProps) {
         setTimeout(() => {
             setModalContent(null);
             setModalTitle(null);
+            setDismissible(true);
+            setShowHeader(true);
         }, 300);
     };
 
     return (
-        <ModalContext.Provider value={{ isOpen, modalContent, modalTitle, openModal, closeModal }}>
+        <ModalContext.Provider value={{ isOpen, modalContent, modalTitle, dismissible, showHeader, openModal, closeModal }}>
             {children}
         </ModalContext.Provider>
     );

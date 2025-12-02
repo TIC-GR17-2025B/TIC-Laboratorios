@@ -1,4 +1,4 @@
-import type { TipoEvento } from "../../types/DeviceEnums";
+import { TipoEvento } from "../../types/DeviceEnums";
 import { Componente } from "../core";
 
 // Componente generalizado para cualquier evento de la simulación.
@@ -20,5 +20,8 @@ export class EventoComponent extends Componente {
         public tiempoEnOcurrir: number = tiempoNotificacion + 10
     ) {
         super();
+        // Excepción: si el evento es una completación de fase entonces el tiempo en ocurrir es el mismo que de notificación
+        if(this.tipoEvento == TipoEvento.COMPLETACION_FASE || this.tipoEvento == TipoEvento.COMPLETACION_ESCENARIO)
+            this.tiempoEnOcurrir = this.tiempoNotificacion;
     }
 }

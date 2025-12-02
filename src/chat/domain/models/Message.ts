@@ -18,27 +18,30 @@ export class Message {
   readonly sender: MessageSender;
   readonly timestamp: Date;
   readonly context?: GameContext;
+  readonly audioContent?: string; // Base64 audio
 
   constructor(
     text: string,
     sender: MessageSender,
     context?: GameContext,
     id?: string,
-    timestamp?: Date
+    timestamp?: Date,
+    audioContent?: string
   ) {
     this.id = id || `${Date.now()}-${Math.random()}`;
     this.text = text;
     this.sender = sender;
     this.timestamp = timestamp || new Date();
     this.context = context;
+    this.audioContent = audioContent;
   }
 
   static createUserMessage(text: string, context?: GameContext): Message {
     return new Message(text, "user", context);
   }
 
-  static createBotMessage(text: string): Message {
-    return new Message(text, "bot");
+  static createBotMessage(text: string, audioContent?: string): Message {
+    return new Message(text, "bot", undefined, undefined, undefined, audioContent);
   }
 
   hasContext(): boolean {
@@ -56,6 +59,7 @@ export class Message {
       sender: this.sender,
       timestamp: this.timestamp.toISOString(),
       context: this.context,
+      audioContent: this.audioContent,
     };
   }
 }

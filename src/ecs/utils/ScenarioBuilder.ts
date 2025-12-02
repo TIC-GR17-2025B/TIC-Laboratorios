@@ -17,7 +17,7 @@ import {
   ClienteVPNComponent,
 } from "../components";
 import type { ComponenteContainer, Entidad } from "../core/Componente";
-import { type Activo, type Dispositivo, type Escenario } from "../../types/EscenarioTypes";
+import { type Activo, type Dispositivo, type Escenario, type ObjetivoFase } from "../../types/EscenarioTypes";
 import { SistemaJerarquiaEscenario } from "../systems/SistemaJerarquiaEscenario";
 import {
   TipoAtaque,
@@ -71,7 +71,7 @@ export class ScenarioBuilder {
     });
 
     escenario.fases.forEach((fase: unknown) => {
-      this.crearFase(fase);
+      this.crearFase(escenarioPadre, fase);
     });
 
     // Crear la red Internet UNA SOLA VEZ como red global
@@ -213,23 +213,29 @@ export class ScenarioBuilder {
     );
   }
 
-  crearFase(fase: unknown) {
+  crearFase(entidadEscenario: Entidad, fase: unknown) {
     const f = fase as {
       id: number;
       nombre: string;
       descripcion?: string;
-      faseActual?: boolean;
+      faseActual: boolean;
+      completada: boolean;
+      objetivos: ObjetivoFase[];
     };
-    const entidadFase = this.ecsManager.agregarEntidad();
-    this.ecsManager.agregarComponente(
-      entidadFase,
-      new FaseComponent(
+    const escenarioContainer = this.ecsManager.getEntidades().get(entidadEscenario);
+    //const entidadFase = this.ecsManager.agregarEntidad();
+    //this.ecsManager.agregarComponente(
+      //entidadFase,
+    const faseAAgregar = new FaseComponent(
         f.id,
         f.nombre,
         f.descripcion ?? "",
-        f.faseActual ?? false
-      )
-    );
+        f.faseActual ?? false,
+        f.completada,
+        f.objetivos ?? []
+      );
+    escenarioContainer?.get(EscenarioComponent)?.fases.push(faseAAgregar);
+    //);
   }
 
   crearZona(zona: unknown, escenarioEntidad?: Entidad): Entidad {
@@ -399,9 +405,15 @@ export class ScenarioBuilder {
   }
 
   crearActivos(entidadDispositivo: number, activos: Activo[]) {
-    const activoComponente = new ActivoComponent();
-    activoComponente.activos = activos;
-    this.ecsManager.agregarComponente(entidadDispositivo, activoComponente);
+    const tipoDispositivo = this.ecsManager
+                            .getComponentes(entidadDispositivo)
+                            ?.get(DispositivoComponent)?.tipo; 
+    if (tipoDispositivo === TipoDispositivo.WORKSTATION ||
+        tipoDispositivo === TipoDispositivo.SERVER) {
+      const activoComponente = new ActivoComponent();
+      activoComponente.activos = activos;
+      this.ecsManager.agregarComponente(entidadDispositivo, activoComponente);
+    }
   }
 
   public getEntidades(): Map<Entidad, ComponenteContainer> {
