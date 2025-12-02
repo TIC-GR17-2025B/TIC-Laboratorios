@@ -61,9 +61,6 @@ export class ProgresoController {
     try {
       const response = await fetch(`${this.API_URL}/progreso/estudiante/${id_estudiante}/escenario/${id_escenario}`, {
         method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
       });
 
       const contentType = response.headers.get("content-type");
