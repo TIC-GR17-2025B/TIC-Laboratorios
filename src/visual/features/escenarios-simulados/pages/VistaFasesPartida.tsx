@@ -24,9 +24,9 @@ export default function VistaFasesPartida() {
                 <h2 className={styles.faseNombre}>{faseActual.nombre}</h2>
 
                 <div className={styles.objetivosList}>
-                    {faseActual.objetivos.map((objetivo) => (
+                    {faseActual.objetivos.map((objetivo, index) => (
                         <ObjetivoItem
-                            key={objetivo.id}
+                            key={index}
                             descripcion={objetivo.descripcion}
                             completado={objetivo.completado}
                         />
