@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router';
 import type { ReactNode } from 'react';
 import type { Dispositivo, Escenario } from '../../../types/EscenarioTypes';
 import { EstadoAtaqueDispositivo, TipoDispositivo } from '../../../types/DeviceEnums';
@@ -34,6 +35,7 @@ interface EscenarioProviderProps {
  */
 export function EscenarioProvider({ children, initialEscenario }: EscenarioProviderProps) {
     const { selectedEscenario } = useSelectedLevel();
+    const navigate = useNavigate();
     const [escenario, setEscenarioState] = useState<Escenario | null>(selectedEscenario ?? initialEscenario ?? null);
     // Estado real
     const [dispositivoSeleccionado, setDispositivoSeleccionadoState] = useState<Dispositivo | null>(null);
@@ -45,6 +47,13 @@ export function EscenarioProvider({ children, initialEscenario }: EscenarioProvi
             setEscenarioState(selectedEscenario);
         }
     }, [selectedEscenario]);
+
+    // Redirigir a selección de niveles si no hay escenario
+    useEffect(() => {
+        if (!escenario) {
+            navigate('/seleccion-niveles');
+        }
+    }, [escenario, navigate]);
 
     const setEscenario = (nuevoEscenario: Escenario) => {
         setEscenarioState(nuevoEscenario);

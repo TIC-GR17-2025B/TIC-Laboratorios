@@ -2,9 +2,9 @@ import { createRoot } from 'react-dom/client'
 import "./common/styles/global.css"
 import VistaOficina from './features/escenarios-simulados/pages/VistaOficina.tsx'
 import Dispositivos from './features/hardening-de-dispositivos/pages/Dispositivos.tsx'
-import { BrowserRouter, Route, Routes, useLocation } from 'react-router'
+import { BrowserRouter, Route, Routes, useLocation, Outlet } from 'react-router'
 import Header from './common/components/Header.tsx'
-import { EscenarioProvider, ModalProvider } from './common/contexts'
+import { EscenarioProvider, ModalProvider, SelectedLevelProvider } from './common/contexts'
 import { ECSSceneProvider } from './features/escenarios-simulados/context/ECSSceneContext.tsx'
 import TarjetaLogNuevo from './features/escenarios-simulados/components/TarjetaLogNuevo.tsx'
 import { ChatProvider } from './features/chat/context/ChatContext.tsx'
@@ -33,102 +33,56 @@ window.addEventListener('beforeunload', () => {
   }
 });
 
+// Wrapper con todos los providers del juego
+function GameProvidersLayout() {
+  return (
+    <ProtectedRoute>
+      <EscenarioProvider>
+        <ModalProvider>
+          <ChatProvider>
+            <FasesProvider>
+              <ECSSceneProvider>
+                <ModelPreloader />
+                <Modal />
+                <Header />
+                <div className="content">
+                  <Outlet />
+                  <TarjetaLogNuevo />
+                </div>
+              </ECSSceneProvider>
+            </FasesProvider>
+          </ChatProvider>
+        </ModalProvider>
+      </EscenarioProvider>
+    </ProtectedRoute>
+  );
+}
+
 function AnimatedRoutes() {
   const location = useLocation();
 
   return (
     <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
+      <Routes location={location}>
         <Route path='/login' element={<Login />} />
         <Route path='/signup' element={<Signup />} />
-        <Route path='/seleccion-niveles' element={<VistaSeleccionNiveles />} />
-        <Route path='/' element={
+
+        <Route path='/seleccion-niveles' element={
           <ProtectedRoute>
-            <EscenarioProvider>
-              <ModalProvider>
-                <ChatProvider>
-                  <FasesProvider>
-                    <ECSSceneProvider>
-                      <ModelPreloader />
-                      <Header />
-                      <div className="content">
-                        <VistaOficina />
-                        <TarjetaLogNuevo />
-                      </div>
-                      <Modal />
-                    </ECSSceneProvider>
-                  </FasesProvider>
-                </ChatProvider>
-              </ModalProvider>
-            </EscenarioProvider>
+            <VistaSeleccionNiveles />
           </ProtectedRoute>
         } />
 
-        <Route path='/dispositivos' element={
-          <ProtectedRoute>
-            <EscenarioProvider>
-              <ModalProvider>
-                <ChatProvider>
-                  <FasesProvider>
-                  <ECSSceneProvider>
-                    <ModelPreloader />
-                    <Header />
-                    <div className="content">
-                      <Dispositivos />
-                      <TarjetaLogNuevo />
-                    </div>
-                    <Modal />
-                  </ECSSceneProvider>
-                  </FasesProvider>
-                </ChatProvider>
-              </ModalProvider>
-            </EscenarioProvider>
-          </ProtectedRoute>
-        } />
-
-        <Route path='/redes' element={
-          <ProtectedRoute>
-            <EscenarioProvider>
-              <ModalProvider>
-                <ChatProvider>
-                  <FasesProvider>
-                  <ECSSceneProvider>
-                    <ModelPreloader />
-                    <Header />
-                    <div className="content">
-                      <Redes />
-                      <TarjetaLogNuevo />
-                    </div>
-                    <Modal />
-                  </ECSSceneProvider>
-                  </FasesProvider>
-                </ChatProvider>
-              </ModalProvider>
-            </EscenarioProvider>
-          </ProtectedRoute>
-        } />
-        
-        <Route path='/fases-partida' element={
-          <ProtectedRoute>
-            <EscenarioProvider>
-              <ModalProvider>
-                <ChatProvider>
-                  <FasesProvider>
-                  <ECSSceneProvider>
-                    <ModelPreloader />
-                    <Header />
-                    <div className="content">
-                      <VistaFasesPartida />
-                      <TarjetaLogNuevo />
-                    </div>
-                    <Modal />
-                  </ECSSceneProvider>
-                  </FasesProvider>
-                </ChatProvider>
-              </ModalProvider>
-            </EscenarioProvider>
-          </ProtectedRoute>
-        } />
+        {/* 
+          Las rutas del juego comparten los mismos providers con Outlet
+          También les paso el Header, Modal y TarjetaLogNuevo 
+        */}
+        <Route element={<GameProvidersLayout />}>
+          <Route path='/' element={<VistaOficina />} />
+          <Route path='/dispositivos' element={<Dispositivos />} />
+          <Route path='/redes' element={<Redes />} />
+          <Route path='/fases-partida' element={<VistaFasesPartida />} />
+        </Route>
 
         <Route path='*' element={<NotFound />} />
       </Routes>
@@ -138,6 +92,8 @@ function AnimatedRoutes() {
 
 createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
-    <AnimatedRoutes />
+    <SelectedLevelProvider>
+      <AnimatedRoutes />
+    </SelectedLevelProvider>
   </BrowserRouter>,
 )

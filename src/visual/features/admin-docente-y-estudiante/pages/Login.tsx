@@ -22,7 +22,7 @@ const Login = () => {
         if (result?.success) {
             setIsExiting(true);
             setTimeout(() => {
-                navigate('/');
+                navigate('/seleccion-niveles');
             }, 700);
         }
     };

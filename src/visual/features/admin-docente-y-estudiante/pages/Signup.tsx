@@ -54,7 +54,7 @@ const Signup = () => {
         if (result?.success) {
             setIsExiting(true);
             setTimeout(() => {
-                navigate('/login');
+                navigate('/seleccion-niveles');
             }, 700);
         }
     };
