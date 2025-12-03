@@ -7,7 +7,7 @@
   user-select: none;
 }
 .header button {
-  height: 43px !important;
+  height: 43px ;
 }
 .titleContainer {
   display: flex;

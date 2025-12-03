@@ -158,6 +158,8 @@ export class SistemaEvento extends Sistema {
           dispositivoOrigen: string;
           dispositivoDestino: string;
           protocolo: unknown;
+          esObjetivo: boolean;
+          debeSerBloqueado: boolean;
         };
         const entidadOrigen = this.buscarDispositivoPorNombre(
           info.dispositivoOrigen
@@ -172,6 +174,8 @@ export class SistemaEvento extends Sistema {
             entidadOrigen,
             entidadDestino,
             protocolo: info.protocolo,
+            esObjetivo: info.esObjetivo,
+            debeSerBloqueado: info.debeSerBloqueado,
           },
         };
 
@@ -203,6 +207,15 @@ export class SistemaEvento extends Sistema {
         this.ecsManager.emit(EventosInternos.VPN_SOLICITUD_CONEXION, {
           permisosConEntidades,
         });
+        break;
+      }
+      case TipoEvento.COMPLETACION_FASE: {
+        this.ecsManager.emit(EventosPublicos.FASE_COMPLETADA, evento.descripcion);
+        break;
+      }
+      case TipoEvento.COMPLETACION_ESCENARIO: {
+        this.ecsManager.emit(EventosPublicos.ESCENARIO_COMPLETADO, evento.descripcion);
+        break;
       }
       // Próximamente para futuros eventos
     }

@@ -7,6 +7,7 @@ import type {
 import {
   EventosInternos,
   EventosPublicos,
+  MensajesGenerales,
   TipoLogGeneral,
 } from "../../types/EventosEnums";
 import { AccionFirewall } from "../../types/FirewallTypes";
@@ -25,6 +26,7 @@ import {
   SistemaEvento,
   SistemaJerarquiaEscenario,
   SistemaRed,
+  SistemaTiempo,
 } from "../systems";
 import { RedDisponibilidadService, TransferenciaService } from "../systems/red";
 
@@ -55,7 +57,11 @@ export class RedController {
         );
       }
       RedController.instance = new RedController(ecsManager);
+    } else if (ecsManager && ecsManager !== RedController.instance.ecsManager) {
+      // Si es un ECSManager diferente, crear una nueva instancia
+      RedController.instance = new RedController(ecsManager);
     } else if (ecsManager) {
+      // Si es el mismo ECSManager, solo actualizar la referencia
       RedController.instance.ecsManager = ecsManager;
     }
     return RedController.instance;
@@ -105,6 +111,7 @@ export class RedController {
         mensaje: `Se envió un activo: ${d.nombreActivo}. Desde ${d.d1} hacia ${d.d2}.`,
         pausarTiempo: false,
       };
+      this.ecsManager.emit(EventosInternos.OBJETIVO_COMPLETADO);
       this.agregarLogGeneralEscenario(log);
     });
 
@@ -118,6 +125,9 @@ export class RedController {
           pausarTiempo: false,
         };
         this.agregarLogGeneralEscenario(log);
+        this.ecsManager.emit(EventosPublicos.FASE_NO_COMPLETADA,
+                             MensajesGenerales.MSJ_FASE_NO_COMPLETADA);
+        this.ecsManager.getSistema(SistemaTiempo)?.destruir();
       }
     );
 
@@ -128,6 +138,8 @@ export class RedController {
             entidadOrigen: Entidad;
             entidadDestino: Entidad;
             protocolo: TipoProtocolo;
+            esObjetivo: boolean;
+            debeSerBloqueado: boolean;
           };
         };
       };
@@ -136,7 +148,9 @@ export class RedController {
         d.evento.infoAdicional.entidadOrigen,
         d.evento.infoAdicional.entidadDestino,
         d.evento.infoAdicional.protocolo,
-        null
+        null,
+        d.evento.infoAdicional.esObjetivo,
+        d.evento.infoAdicional.debeSerBloqueado
       );
       //console.log("Tráfico enviado desde el controlador de red", resultado);
     });
@@ -171,6 +185,9 @@ export class RedController {
           pausarTiempo: true,
         };
         this.agregarLogGeneralEscenario(log);
+        this.ecsManager.emit(EventosPublicos.FASE_NO_COMPLETADA,
+                             MensajesGenerales.MSJ_FASE_NO_COMPLETADA);
+        this.ecsManager.getSistema(SistemaTiempo)?.destruir();
       }
     );
 
@@ -183,6 +200,7 @@ export class RedController {
           mensaje: mensaje,
           pausarTiempo: false,
         };
+        this.ecsManager.emit(EventosInternos.OBJETIVO_COMPLETADO);
         this.agregarLogGeneralEscenario(log);
       }
     );
@@ -246,6 +264,7 @@ export class RedController {
         mensaje: d.mensaje,
         pausarTiempo: false,
       };
+      this.ecsManager.emit(EventosInternos.OBJETIVO_COMPLETADO);
       this.agregarLogGeneralEscenario(log);
     });
 
@@ -256,6 +275,7 @@ export class RedController {
         mensaje: d.mensaje,
         pausarTiempo: true,
       };
+      this.ecsManager.emit(EventosInternos.OBJETIVO_COMPLETADO);
       this.agregarLogGeneralEscenario(log);
     });
   }

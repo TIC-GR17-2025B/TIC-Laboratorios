@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model escenario {
+  id_escenario Int        @id @default(autoincrement())
+  nombre       String     @db.VarChar(100)
+  progreso     progreso[]
+}
+
+model estudiante {
+  id_estudiante      Int        @id @default(autoincrement())
+  id_profesor        Int
+  codigo_unico       Int        @unique
+  primernombre       String     @db.VarChar(50)
+  segundo_nombre     String     @db.VarChar(50)
+  primer_apellido    String     @db.VarChar(50)
+  segundo_apellido   String     @db.VarChar(50)
+  correo_electronico String     @unique @db.VarChar(100)
+  contrasenia        String     @db.VarChar(128)
+  profesor           profesor   @relation(fields: [id_profesor], references: [id_profesor], map: "fk_estudiante_profesor")
+  progreso           progreso[]
+}
+
+model profesor {
+  id_profesor        Int          @id @default(autoincrement())
+  primernombre       String       @db.VarChar(50)
+  segundo_nombre     String       @db.VarChar(50)
+  primer_apellido    String       @db.VarChar(50)
+  segundo_apellido   String       @db.VarChar(50)
+  correo_electronico String       @unique @db.VarChar(100)
+  contrasenia        String       @db.VarChar(128)
+  estudiante         estudiante[]
+}
+
+model progreso {
+  id_progreso   Int        @id @default(autoincrement())
+  id_estudiante Int
+  id_escenario  Int
+  terminado     Boolean?   @default(false)
+  tiempo        Float?
+  escenario     escenario  @relation(fields: [id_escenario], references: [id_escenario], map: "fk_progreso_escenario")
+  estudiante    estudiante @relation(fields: [id_estudiante], references: [id_estudiante], onDelete: Cascade, map: "fk_progreso_estudiante")
+}

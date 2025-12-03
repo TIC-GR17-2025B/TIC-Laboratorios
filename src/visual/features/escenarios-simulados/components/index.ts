@@ -6,6 +6,7 @@ export { default as CameraControls } from "./CameraControls";
 export { default as Lights } from "./Lights";
 export { default as Environment } from "./Environment";
 export { default as Controles3D } from "./Controles3D";
+export { default as ModalResultadoFase } from "./ModalResultadoFase";
 
 export {
   DEFAULT_MODEL_CONFIG,

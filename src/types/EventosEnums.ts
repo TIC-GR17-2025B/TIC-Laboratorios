@@ -4,6 +4,7 @@ export enum EventosInternos {
   RED_ENVIAR_ACTIVO = "red:enviarActivo",
   RED_TRAFICO = "red:trafico",
   VPN_SOLICITUD_CONEXION = "vpn:solicitudConexion",
+  OBJETIVO_COMPLETADO = "objetivo:completado",
 }
 
 export enum EventosPublicos {
@@ -27,7 +28,10 @@ export enum EventosPublicos {
   TIEMPO_REANUDADO = "tiempo:reanudado",
   TIEMPO_ACTUALIZADO = "tiempo:actualizado",
   PRESUPUESTO_ACTUALIZADO = "presupuesto:actualizado",
-  PRESUPUESTO_AGOTADO = "presupuesto:agotado",
+  PRESUPUESTO_AGOTADO = "presupuesto:agotado", 
+  FASE_COMPLETADA = "fase:completada",
+  FASE_NO_COMPLETADA = "fase:noCompletada",
+  ESCENARIO_COMPLETADO = "escenario:completado",
 
   LOGS_GENERALES_ACTUALIZADOS = "logsGenerales:actualizados",
 }
@@ -36,4 +40,9 @@ export enum TipoLogGeneral {
   ATAQUE = "ataque",
   ADVERTENCIA = "advertencia",
   COMPLETADO = "completado",
+  INFORMACION = "informacion",
+}
+
+export enum MensajesGenerales {
+  MSJ_FASE_NO_COMPLETADA = "Parece que fallaste en cumplir un objetivo. Asegúrate de revisar los objetivos que tienes por realizar y vuelve a intentarlo.",
 }

@@ -3,6 +3,7 @@ import {
   DispositivoComponent,
   EscenarioComponent,
   EventoComponent,
+  FaseComponent,
   PresupuestoComponent,
   TiempoComponent,
   WorkstationComponent,
@@ -10,6 +11,7 @@ import {
 import { ECSManager, type Entidad } from "../core";
 import {
   SistemaEvento,
+  SistemaFase,
   SistemaJerarquiaEscenario,
   SistemaPresupuesto,
   SistemaTiempo,
@@ -19,8 +21,10 @@ import type { Escenario, LogGeneral } from "../../types/EscenarioTypes";
 import {
   EventosInternos,
   EventosPublicos,
+  MensajesGenerales,
   TipoLogGeneral,
 } from "../../types/EventosEnums";
+import { ProgresoController } from "./ProgresoController";
 
 export class EscenarioController {
   public escenario: Escenario;
@@ -28,11 +32,14 @@ export class EscenarioController {
   public builder!: ScenarioBuilder;
 
   private entidadTiempo?: Entidad;
+  private entidadTiempoTotal?: Entidad;
   private sistemaTiempo?: SistemaTiempo;
   private sistemaPresupuesto?: SistemaPresupuesto;
   private sistemaJerarquiaEscenario?: SistemaJerarquiaEscenario;
   private entidadPresupuesto?: Entidad;
   private sistemaEvento?: SistemaEvento;
+  private sistemaFase?: SistemaFase;
+  private progresoController?: ProgresoController;
   private escenarioIniciado: boolean = false; // FLAG PARA EVITAR MÚLTIPLES INICIALIZACIONES
 
   private static instance: EscenarioController | null = null;
@@ -54,7 +61,11 @@ export class EscenarioController {
         );
       }
       EscenarioController.instance = new EscenarioController(escenario);
+    } else if (escenario && escenario.id !== EscenarioController.instance.escenario.id) {
+      // Si es un escenario diferente, resetear completamente la instancia
+      EscenarioController.instance = new EscenarioController(escenario);
     } else if (escenario) {
+      // Si es el mismo escenario, solo actualizar la referencia
       EscenarioController.instance.escenario = escenario;
     }
     return EscenarioController.instance;
@@ -72,6 +83,16 @@ export class EscenarioController {
     if (!this.sistemaEvento) {
       this.sistemaEvento = new SistemaEvento();
       this.ecsManager.agregarSistema(this.sistemaEvento);
+    }
+
+    if (!this.sistemaFase) {
+      this.sistemaFase = new SistemaFase();
+      this.ecsManager.agregarSistema(this.sistemaFase);
+      this.sistemaFase.iniciarEscuchaDeEvento();
+    }
+
+    if (!this.progresoController) {
+      this.progresoController = ProgresoController.getInstance();
     }
 
     // NO emitir el evento aquí - lo haremos después de que los sistemas se suscriban
@@ -127,6 +148,9 @@ export class EscenarioController {
         pausarTiempo: true,
       };
       this.agregarLogGeneralEscenario(log);
+      this.ecsManager.emit(EventosPublicos.FASE_NO_COMPLETADA,
+                           MensajesGenerales.MSJ_FASE_NO_COMPLETADA);
+      this.sistemaTiempo?.destruir();
     });
 
     this.ecsManager.on(EventosPublicos.ATAQUE_MITIGADO, (data: unknown) => {
@@ -136,6 +160,7 @@ export class EscenarioController {
         mensaje: `Se mitigó el ataque a: ${d.ataque.dispositivoAAtacar}. Ataque mitigado: ${d.ataque.tipoAtaque}`,
         pausarTiempo: false,
       };
+      this.ecsManager.emit(EventosInternos.OBJETIVO_COMPLETADO);
       this.agregarLogGeneralEscenario(log);
     });
 
@@ -147,6 +172,32 @@ export class EscenarioController {
         pausarTiempo: true,
       };
       this.agregarLogGeneralEscenario(log);
+      this.ecsManager.emit(EventosPublicos.FASE_NO_COMPLETADA,
+                           MensajesGenerales.MSJ_FASE_NO_COMPLETADA);
+      this.sistemaTiempo?.destruir();
+    });
+
+    this.ecsManager.on(EventosPublicos.FASE_COMPLETADA, (data: unknown) => {
+      const descripcion = data as string;
+      const log = {
+        tipo: TipoLogGeneral.COMPLETADO,
+        mensaje: descripcion,
+        pausarTiempo: true,
+      };
+      this.ecsManager.emit(EventosInternos.OBJETIVO_COMPLETADO);
+      console.log("EscenarioController: on de FASE_COMPLETADA:",this.ecsManager.getEntidades());
+      this.agregarLogGeneralEscenario(log);
+    });
+
+    // Oyentes para guardar el progreso
+    this.ecsManager.on(EventosPublicos.FASE_NO_COMPLETADA, () => {
+        this.progresoController?.guardarProgresoEstudiante(false, this.getTiempoTotalTranscurrido()); 
+        this.sistemaTiempo?.destruir();
+    });
+
+    this.ecsManager.on(EventosPublicos.ESCENARIO_COMPLETADO, () => {
+        this.progresoController?.guardarProgresoEstudiante(true, this.getTiempoTotalTranscurrido()); 
+        this.sistemaTiempo?.destruir();
     });
 
     this.escenarioIniciado = true;
@@ -173,15 +224,26 @@ export class EscenarioController {
       console.error("SistemaTiempo no existe aún");
       return;
     }
+    if (!this.sistemaFase) {
+      console.error("SistemaFase no existe aún");
+      return;
+    }
     const eventos = this.getEventos();
     this.sistemaTiempo.eventosEscenario = eventos;
+    this.sistemaFase.eventosEscenario = eventos.sort((a,b) => a.tiempoNotificacion - b.tiempoNotificacion);
   }
 
   public ejecutarTiempo(): void {
-    if (!this.entidadTiempo) {
+    if (!this.entidadTiempo || !this.entidadTiempoTotal) {
       this.entidadTiempo = this.ecsManager.agregarEntidad();
       this.ecsManager.agregarComponente(
         this.entidadTiempo,
+        new TiempoComponent()
+      );
+
+      this.entidadTiempoTotal = this.ecsManager.agregarEntidad();
+      this.ecsManager.agregarComponente(
+        this.entidadTiempoTotal,
         new TiempoComponent()
       );
 
@@ -190,11 +252,12 @@ export class EscenarioController {
     }
   }
   public iniciarTiempo(): void {
-    if (!this.sistemaTiempo || !this.entidadTiempo) {
+    if (!this.sistemaTiempo || !this.entidadTiempo || !this.entidadTiempoTotal) {
       console.error("Sistema de tiempo no inicializado");
       return;
     }
     this.sistemaTiempo.iniciar(this.entidadTiempo);
+    this.sistemaTiempo.iniciarTiempoTotal(this.entidadTiempoTotal);
   }
 
   public pausarTiempo(): void {
@@ -232,6 +295,18 @@ export class EscenarioController {
     }
 
     const cont = this.ecsManager.getComponentes(this.entidadTiempo);
+    if (!cont) return 0;
+
+    const tiempo = cont.get(TiempoComponent);
+    return tiempo?.transcurrido ?? 0;
+  }
+
+  private getTiempoTotalTranscurrido(): number {
+    if (!this.ecsManager || !this.entidadTiempoTotal) {
+      return 0;
+    }
+
+    const cont = this.ecsManager.getComponentes(this.entidadTiempoTotal);
     if (!cont) return 0;
 
     const tiempo = cont.get(TiempoComponent);
@@ -358,6 +433,14 @@ export class EscenarioController {
     }
 
     return dispositivosTodos;
+  }
+
+  public getFasesConObjetivos(): FaseComponent[] | undefined{
+    for (const [,container] of this.ecsManager.getEntidades()) {
+      if (container.tiene(EscenarioComponent)) {
+        return container.get(EscenarioComponent)?.fases;
+      }
+    }
   }
 
   // MÉTODO PARA RESETEAR EL SINGLETON (útil para desarrollo/testing)

@@ -12,6 +12,10 @@ jobs:
     name: Ejecutar Validación de Calidad
     runs-on: ubuntu-latest
 
+    env:
+      DIRECT_URL: ${{ secrets.DIRECT_URL }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      
     steps:
       - name: Checkout de la rama del PR
         uses: actions/checkout@v4

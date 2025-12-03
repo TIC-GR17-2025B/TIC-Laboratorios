@@ -1,16 +1,17 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router';
 import type { ReactNode } from 'react';
 import type { Dispositivo, Escenario } from '../../../types/EscenarioTypes';
 import { EstadoAtaqueDispositivo, TipoDispositivo } from '../../../types/DeviceEnums';
-import { escenarioBase } from '../../../data/escenarios/escenarioBase';
 import {
     DispositivoComponent,
     WorkstationComponent,
     Transform,
 } from '../../../ecs/components';
+import { useSelectedLevel } from './SelectedLevelContext';
 
 interface EscenarioContextType {
-    escenario: Escenario;
+    escenario: Escenario | null;
     setEscenario: (escenario: Escenario) => void;
     dispositivoSeleccionado: Dispositivo | null;
     // Acepta un Dispositivo ya normalizado, null, o una entidad/objeto proveniente del ECS
@@ -32,12 +33,38 @@ interface EscenarioProviderProps {
 /**
  * Envuelve la aplicación y proporciona el estado del escenario
  */
-export function EscenarioProvider({ children, initialEscenario = escenarioBase as unknown as Escenario }: EscenarioProviderProps) {
-    const [escenario, setEscenario] = useState<Escenario>(initialEscenario);
+export function EscenarioProvider({ children, initialEscenario }: EscenarioProviderProps) {
+    const { selectedEscenario } = useSelectedLevel();
+    const navigate = useNavigate();
+    const [escenario, setEscenarioState] = useState<Escenario | null>(selectedEscenario ?? initialEscenario ?? null);
     // Estado real
     const [dispositivoSeleccionado, setDispositivoSeleccionadoState] = useState<Dispositivo | null>(null);
     // ID de la entidad seleccionada (dispositivo o espacio)
     const [entidadSeleccionadaId, setEntidadSeleccionadaId] = useState<number | null>(null);
+
+    useEffect(() => {
+        if (selectedEscenario) {
+            setEscenarioState(selectedEscenario);
+            // Resetear dispositivo seleccionado al cambiar de escenario
+            setDispositivoSeleccionadoState(null);
+            setEntidadSeleccionadaId(null);
+        }
+    }, [selectedEscenario]);
+
+    // Redirigir a selección de niveles si no hay escenario
+    useEffect(() => {
+        if (!escenario) {
+            navigate('/seleccion-niveles');
+        }
+    }, [escenario, navigate]);
+
+    const setEscenario = (nuevoEscenario: Escenario) => {
+        setEscenarioState(nuevoEscenario);
+    };
+
+    if (!escenario) {
+        return null;
+    }
 
     // Helper: normaliza distintos shapes que pueden venir al seleccionar una entidad 3D
     const mapEntityToDispositivo = (input: unknown): Dispositivo | null => {
@@ -200,5 +227,8 @@ export function useEscenario(): EscenarioContextType {
 
 export function useEscenarioActual(): Escenario {
     const { escenario } = useEscenario();
+    if (!escenario) {
+        throw new Error('No hay escenario cargado. Asegúrate de seleccionar un nivel primero.');
+    }
     return escenario;
 }

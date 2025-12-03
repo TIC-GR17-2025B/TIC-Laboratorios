@@ -1,0 +1,223 @@
+.container {
+    min-height: 100vh;
+    background-color: var(--surface-primary);
+    color: var(--text-primary);
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 24px;
+    border-bottom: 1px solid var(--border-primary);
+}
+
+.header h1 {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.backButton {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-primary);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    line-height: 0;
+}
+
+.content {
+    padding: 24px;
+}
+
+.loadingText,
+.errorText {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    text-align: center;
+    padding: 2rem;
+}
+
+.errorText {
+    color: #ff6b6b;
+}
+
+.escenariosSection {
+    background: var(--surface-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+}
+
+.escenariosSection h2 {
+    color: var(--text-primary);
+    margin: 0 0 1rem 0;
+    font-weight: 500;
+}
+
+.escenariosList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.escenarioCard {
+    border: 1px solid var(--border-primary);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    transition: all 0.2s ease;
+    background: var(--surface-primary);
+}
+
+.escenarioHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.escenarioHeader:hover {
+    background: var(--surface-secondary);
+}
+
+.escenarioInfo {
+    flex: 1;
+    min-width: 0;
+}
+
+.escenarioInfo h3 {
+    margin: 0 0 0.75rem 0;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.escenarioDescripcion {
+    margin: 0;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+.escenarioStatus {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-shrink: 0;
+}
+
+.badgeCompletado,
+.badgeIntentado,
+.badgeNoIntentado {
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+}
+
+.badgeCompletado {
+    background: rgba(76, 175, 80, 0.2);
+    color: #4caf50;
+}
+
+.badgeIntentado {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+}
+
+.badgeNoIntentado {
+    background: var(--surface-secondary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-primary);
+}
+
+.expandIcon {
+    color: var(--text-secondary);
+    transition: transform 0.2s ease;
+}
+
+.expandIcon.expanded {
+    transform: rotate(180deg);
+}
+
+.escenarioDetails {
+    padding: 1rem;
+    border-top: 1px solid var(--border-primary);
+}
+
+.escenarioDetails h4 {
+    margin: 0 0 0.75rem 0;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.intentosList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.intentoItem {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: var(--surface-primary);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-primary);
+}
+
+.intentoNumero {
+    width: 75px !important;
+}
+
+.intentoInfo {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.intentoTiempo {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--text-muted);
+}
+
+.intentoExito {
+    color: #4caf50;
+    font-size: 0.75rem;
+}
+
+.intentoFallo {
+    color: #ff6b6b;
+    font-size: 0.75rem;
+}
+
+.intentoFecha {
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+}
+
+@media (max-width: 768px) {
+    .intentoItem {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+
+    .escenarioHeader {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .escenarioStatus {
+        width: 100%;
+        justify-content: space-between;
+    }
+}

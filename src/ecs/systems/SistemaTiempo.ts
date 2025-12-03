@@ -10,6 +10,7 @@ import { EventosInternos, EventosPublicos } from "../../types/EventosEnums";
 export class SistemaTiempo extends Sistema {
   public componentesRequeridos = new Set([TiempoComponent]);
   public intervalo: ReturnType<typeof setInterval> | null = null;
+  public intervaloTiempoTotal: ReturnType<typeof setInterval> | null = null;
   public eventosEscenario: EventoComponent[] = [];
 
   public on(eventName: string, callback: (data: unknown) => void): () => void {
@@ -67,6 +68,19 @@ export class SistemaTiempo extends Sistema {
     this.iniciarIntervalo(tiempo);
   }
 
+  public iniciarTiempoTotal(entidad: Entidad) {
+    const container = this.ecsManager.getComponentes(entidad);
+    if (!container) return;
+
+    const tiempo = container.get(TiempoComponent);
+    if (!tiempo) return;
+
+    // Evitar múltiples intervalos
+    if (this.intervaloTiempoTotal) return;
+
+    this.iniciarIntervaloTiempoTotal(tiempo);
+  }
+
   private iniciarIntervalo(tiempo: TiempoComponent) {
     this.intervalo = setInterval(() => {
       tiempo.transcurrido += 1;
@@ -106,6 +120,12 @@ export class SistemaTiempo extends Sistema {
       }
 
       //console.log(`Tiempo transcurrido: ${tiempo.transcurrido}s`);
+    }, 1000);
+  }
+
+  private iniciarIntervaloTiempoTotal(tiempo: TiempoComponent) {
+    this.intervaloTiempoTotal = setInterval(() => {
+      tiempo.transcurrido += 1;
     }, 1000);
   }
 
