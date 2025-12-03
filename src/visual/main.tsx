@@ -15,6 +15,9 @@ import Login from './features/admin-docente-y-estudiante/pages/Login.tsx'
 import Signup from './features/admin-docente-y-estudiante/pages/Signup.tsx'
 import NotFound from './features/admin-docente-y-estudiante/pages/NotFound.tsx'
 import ProtectedRoute from './features/admin-docente-y-estudiante/components/ProtectedRoute.tsx'
+import ProtectedRouteByRole from './features/admin-docente-y-estudiante/components/ProtectedRouteByRole.tsx'
+import VistaDocente from './features/admin-docente-y-estudiante/pages/VistaDocente.tsx'
+import VistaDetalleEstudiante from './features/admin-docente-y-estudiante/pages/VistaDetalleEstudiante.tsx'
 import { AnimatePresence } from 'framer-motion'
 import VistaFasesPartida from './features/escenarios-simulados/pages/VistaFasesPartida.tsx'
 import { FasesProvider } from './features/escenarios-simulados/contexts/FasesContext.tsx'
@@ -67,10 +70,22 @@ function AnimatedRoutes() {
         <Route path='/login' element={<Login />} />
         <Route path='/signup' element={<Signup />} />
 
+        <Route path='/docente' element={
+          <ProtectedRouteByRole requiredRole="profesor">
+            <VistaDocente />
+          </ProtectedRouteByRole>
+        } />
+
+        <Route path='/docente/estudiante/:idEstudiante' element={
+          <ProtectedRouteByRole requiredRole="profesor">
+            <VistaDetalleEstudiante />
+          </ProtectedRouteByRole>
+        } />
+
         <Route path='/seleccion-niveles' element={
-          <ProtectedRoute>
+          <ProtectedRouteByRole requiredRole="estudiante">
             <VistaSeleccionNiveles />
-          </ProtectedRoute>
+          </ProtectedRouteByRole>
         } />
 
         {/* 

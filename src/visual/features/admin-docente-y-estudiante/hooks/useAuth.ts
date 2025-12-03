@@ -29,6 +29,7 @@ interface AuthResponse {
   success: boolean;
   data?: {
     token: string;
+    role: 'estudiante' | 'profesor';
     user: {
       id: string;
       nombre_completo: string;
@@ -144,9 +145,10 @@ export const useAuth = () => {
         return null;
       }
 
-      // Guardar token en localStorage
+      // Guardar token, rol y usuario en localStorage
       if (result.data?.token) {
         localStorage.setItem("authToken", result.data.token);
+        localStorage.setItem("userRole", result.data.role);
         localStorage.setItem("user", JSON.stringify(result.data.user));
       }
 
@@ -163,6 +165,7 @@ export const useAuth = () => {
 
   const logout = () => {
     localStorage.removeItem("authToken");
+    localStorage.removeItem("userRole");
     localStorage.removeItem("user");
   };
 
@@ -175,6 +178,10 @@ export const useAuth = () => {
     return userStr ? JSON.parse(userStr) : null;
   };
 
+  const getUserRole = (): 'estudiante' | 'profesor' | null => {
+    return localStorage.getItem("userRole") as 'estudiante' | 'profesor' | null;
+  };
+
   return {
     loading,
     error,
@@ -184,5 +191,6 @@ export const useAuth = () => {
     logout,
     isAuthenticated,
     getUser,
+    getUserRole,
   };
 };

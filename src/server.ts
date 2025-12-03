@@ -4,6 +4,7 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import authRouter from './auth/infrastructure/controllers/AuthController'
 import progresoRouter from './auth/infrastructure/controllers/ProgresoController'
+import escenariosRouter from './ecs/controllers/EscenariosController'
 
 // Cargar variables de entorno
 dotenv.config()
@@ -41,6 +42,7 @@ app.get('/', (req, res) => {
     endpoints: {
       auth: '/auth',
       progreso: '/progreso',
+      escenarios: '/escenarios',
       health: '/health'
     }
   })
@@ -49,6 +51,7 @@ app.get('/', (req, res) => {
 // Montar rutas de autenticación
 app.use('/auth', authRouter)
 app.use('/progreso', progresoRouter)
+app.use('/escenarios', escenariosRouter)
 
 // Manejo de rutas no encontradas
 app.use((req, res) => {
