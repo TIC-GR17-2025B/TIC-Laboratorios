@@ -30,7 +30,7 @@ export class LoginUseCase {
         const token = jwt.sign(
           { id: profesor.id_profesor, role: "profesor" },
           this.jwtSecret,
-          { expiresIn: "7d" }
+          { expiresIn: "1h" }
         )
 
         return {
@@ -52,7 +52,7 @@ export class LoginUseCase {
         const token = jwt.sign(
           { id: estudiante.id_estudiante, role: "estudiante" },
           this.jwtSecret,
-          { expiresIn: "7d" }
+          { expiresIn: "1h" }
         )
 
         return {
