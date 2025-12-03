@@ -1,5 +1,5 @@
-import type { Estudiante, EstudianteInput, EstudiantePublic } from "../models/Estudiante"
-import type { Profesor, ProfesorInput } from "../models/Profesor"
+import type { Estudiante, EstudianteInput, EstudiantePublic } from "../models/Estudiante.js"
+import type { Profesor, ProfesorInput } from "../models/Profesor.js"
 
 export interface IAuthRepository {
   createEstudiante(data: EstudianteInput): Promise<Estudiante>

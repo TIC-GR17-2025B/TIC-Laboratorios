@@ -1,7 +1,7 @@
-import type { IAuthRepository } from "../../domain/repositories/IAuthRepository"
-import type { Estudiante, EstudiantePublic  } from "../../domain/models/Estudiante"
-import type { Profesor } from "../../domain/models/Profesor"
-import { prisma } from "../db/prisma"
+import type { IAuthRepository } from "../../domain/repositories/IAuthRepository.js"
+import type { Estudiante, EstudiantePublic  } from "../../domain/models/Estudiante.js"
+import type { Profesor } from "../../domain/models/Profesor.js"
+import { prisma } from "../db/prisma.js"
 
 export class PrismaAuthRepository implements IAuthRepository {
   async createEstudiante(e: Omit<Estudiante, 'id_estudiante'>) {
@@ -53,7 +53,7 @@ export class PrismaAuthRepository implements IAuthRepository {
         primer_apellido: 'asc'
       }
     })
-    return estudiantes.map(({ contrasenia, ...publicData }) => publicData) as EstudiantePublic[]
+    return estudiantes.map(({ ...publicData }) => publicData) as EstudiantePublic[]
   }
 
   async findEstudianteById(id_estudiante: number): Promise<Estudiante | null> {

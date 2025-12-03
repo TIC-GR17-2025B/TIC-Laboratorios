@@ -1,8 +1,8 @@
 import express from "express"
-import { PrismaProgresoRepository } from "../repositories/PrismaProgresoRepository"
-import { GuardarProgresoUseCase } from "../../application/useCases/GuardarProgresoUseCase"
-import { ObtenerProgresoUseCase } from "../../application/useCases/ObtenerProgresoUseCase"
-import { ObtenerTodosProgresosUseCase } from "../../application/useCases/ObtenerTodosProgresosUseCase"
+import { PrismaProgresoRepository } from "../repositories/PrismaProgresoRepository.js"
+import { GuardarProgresoUseCase } from "../../application/useCases/GuardarProgresoUseCase.js"
+import { ObtenerProgresoUseCase } from "../../application/useCases/ObtenerProgresoUseCase.js"
+import { ObtenerTodosProgresosUseCase } from "../../application/useCases/ObtenerTodosProgresosUseCase.js"
 
 const router = express.Router()
 const repo = new PrismaProgresoRepository()
@@ -26,8 +26,10 @@ router.post('/', async (req, res) => {
 
     const progreso = await guardarProgreso.execute(req.body)
     res.status(201).json({ success: true, data: progreso })
-  } catch (err: unknown) {
+  } catch (err) {
+    if (err instanceof Error) {
     res.status(400).json({ success: false, error: err.message })
+    }
   }
 })
 
@@ -54,8 +56,10 @@ router.get('/estudiante/:idEstudiante/escenario/:idEscenario', async (req, res) 
     }
 
     res.json({ success: true, data: progreso })
-  } catch (err: unknown) {
-    res.status(500).json({ success: false, error: err.message })
+  } catch (err) {
+    if (err instanceof Error) {
+      res.status(500).json({ success: false, error: err.message })
+    }
   }
 })
 
@@ -73,8 +77,10 @@ router.get('/estudiante/:idEstudiante', async (req, res) => {
 
     const progresos = await obtenerTodosProgresos.execute(idEstudiante)
     res.json({ success: true, data: progresos })
-  } catch (err: unknown) {
-    res.status(500).json({ success: false, error: err.message })
+  } catch (err) {
+    if (err instanceof Error) {
+      res.status(500).json({ success: false, error: err.message })
+    }
   }
 })
 

@@ -1,4 +1,4 @@
-import type { Progreso, ProgresoInput, ProgresoConNombreEscenario} from "../models/Progreso"
+import type { Progreso, ProgresoInput, ProgresoConNombreEscenario} from "../models/Progreso.js"
 
 export interface IProgresoRepository {
   guardarProgresoEstudiante(data: ProgresoInput): Promise<Progreso>

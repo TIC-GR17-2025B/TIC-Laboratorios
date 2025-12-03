@@ -2,8 +2,8 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
-import authRouter from './auth/infrastructure/controllers/AuthController'
-import progresoRouter from './auth/infrastructure/controllers/ProgresoController'
+import authRouter from './auth/infrastructure/controllers/AuthController.js'
+import progresoRouter from './auth/infrastructure/controllers/ProgresoController.js'
 import escenariosRouter from './ecs/controllers/EscenariosController'
 
 // Cargar variables de entorno

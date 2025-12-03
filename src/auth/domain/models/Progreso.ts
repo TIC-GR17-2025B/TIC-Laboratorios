@@ -15,3 +15,8 @@ export interface ProgresoConNombreEscenario {
     terminado: boolean;
     tiempo: number | null;
 }
+
+export interface ProgresoResumen {
+    terminado: boolean;
+    intentos: number;
+}

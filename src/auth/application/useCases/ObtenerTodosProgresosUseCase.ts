@@ -1,5 +1,5 @@
-import type { IProgresoRepository } from "../../domain/repositories/IProgresoRepository"
-import type { ProgresoConNombreEscenario } from "../../domain/models/Progreso"
+import type { IProgresoRepository } from "../../domain/repositories/IProgresoRepository.js"
+import type { ProgresoConNombreEscenario } from "../../domain/models/Progreso.js"
 
 export class ObtenerTodosProgresosUseCase {
   constructor(private repo: IProgresoRepository) {}

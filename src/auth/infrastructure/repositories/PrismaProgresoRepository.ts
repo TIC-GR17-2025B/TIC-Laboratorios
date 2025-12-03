@@ -1,6 +1,6 @@
-import type { Progreso, ProgresoInput, ProgresoConNombreEscenario } from "../../domain/models/Progreso";
-import type { IProgresoRepository } from "../../domain/repositories/IProgresoRepository";
-import { prisma } from "../db/prisma"
+import type { Progreso, ProgresoInput, ProgresoConNombreEscenario } from "../../domain/models/Progreso.js";
+import type { IProgresoRepository } from "../../domain/repositories/IProgresoRepository.js";
+import { prisma } from "../db/prisma.js"
 
 export class PrismaProgresoRepository implements IProgresoRepository {
     

@@ -1,5 +1,5 @@
-import type { IAuthRepository } from "../../domain/repositories/IAuthRepository"
-import type { EstudianteInput, EstudiantePublic } from "../../domain/models/Estudiante"
+import type { IAuthRepository } from "../../domain/repositories/IAuthRepository.js"
+import type { EstudianteInput, EstudiantePublic } from "../../domain/models/Estudiante.js"
 import bcrypt from "bcrypt"
 
 export class RegisterEstudianteUseCase {

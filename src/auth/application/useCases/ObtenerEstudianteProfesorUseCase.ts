@@ -1,5 +1,5 @@
-import type { IAuthRepository } from "../../domain/repositories/IAuthRepository"
-import type { EstudiantePublic } from "../../domain/models/Estudiante"
+import type { IAuthRepository } from "../../domain/repositories/IAuthRepository.js"
+import type { EstudiantePublic } from "../../domain/models/Estudiante.js"
 
 export class ObtenerEstudianteProfesorUseCase {
   constructor(private repo: IAuthRepository) {}

@@ -1,9 +1,9 @@
 import express from "express"
-import { PrismaAuthRepository } from "../repositories/PrismaAuthRepository"
-import { RegisterEstudianteUseCase } from "../../application/useCases/RegisterEstudianteUseCase"
-import { RegisterProfesorUseCase } from "../../application/useCases/RegisterProfesorUseCase"
-import { LoginUseCase } from "../../application/useCases/LoginUseCase"
-import { ObtenerEstudianteProfesorUseCase } from "../../application/useCases/ObtenerEstudianteProfesorUseCase"
+import { PrismaAuthRepository } from "../repositories/PrismaAuthRepository.js"
+import { RegisterEstudianteUseCase } from "../../application/useCases/RegisterEstudianteUseCase.js"
+import { RegisterProfesorUseCase } from "../../application/useCases/RegisterProfesorUseCase.js"
+import { LoginUseCase } from "../../application/useCases/LoginUseCase.js"
+import { ObtenerEstudianteProfesorUseCase } from "../../application/useCases/ObtenerEstudianteProfesorUseCase.js"
 
 const router = express.Router()
 const repo = new PrismaAuthRepository()
@@ -23,8 +23,10 @@ router.post('/register/estudiante', async (req, res) => {
   try {
     const created = await registerEstudiante.execute(req.body)
     res.status(201).json({ success: true, data: created })
-  } catch (err: unknown) {
-    res.status(400).json({ success: false, error: err.message })
+  } catch (err) {
+    if (err instanceof Error) {
+      res.status(400).json({ success: false, error: err.message })
+    }
   }
 })
 
@@ -33,8 +35,10 @@ router.post('/register/profesor', async (req, res) => {
   try {
     const created = await registerProfesor.execute(req.body)
     res.status(201).json({ success: true, data: created })
-  } catch (err: unknown) {
-    res.status(400).json({ success: false, error: err.message })
+  } catch (err) {
+    if (err instanceof Error) {
+      res.status(400).json({ success: false, error: err.message })
+    }
   }
 })
 
@@ -61,8 +65,10 @@ router.post('/login', async (req, res) => {
 
     res.json({ success: true, data: result })
 
-  } catch (err: unknown) {
-    res.status(500).json({ success: false, error: err.message })
+  } catch (err) {
+    if (err instanceof Error) {
+      res.status(500).json({ success: false, error: err.message })
+    }
   }
 })
 
@@ -93,9 +99,10 @@ router.get('/profesor/:id/estudiantes', async (req, res) => {
       total: estudiantes.length
     })
 
-  } catch (err: unknown) {
-    console.error('AuthController - Error:', err)
-    res.status(500).json({ success: false, error: err.message })
+  } catch (err) {
+    if (err instanceof Error) {
+      res.status(500).json({ success: false, error: err.message })
+    }
   }
 })
 

@@ -1,5 +1,5 @@
-import type { ProgresoInput, Progreso} from "../../domain/models/Progreso"
-import type { IProgresoRepository } from "../../domain/repositories/IProgresoRepository"
+import type { ProgresoInput, Progreso} from "../../domain/models/Progreso.js"
+import type { IProgresoRepository } from "../../domain/repositories/IProgresoRepository.js"
 
 export class GuardarProgresoUseCase {
   constructor(
