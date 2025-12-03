@@ -20,9 +20,9 @@ export const escenarioBase: unknown = {
     {
       nombreEvento: "Falla de Conectividad IDS",
       tipoEvento: TipoEvento.TRAFICO_RED,
-      tiempoNotificacion: 5, // Es el primer reto
+      tiempoNotificacion: 10, // Es el primer reto
       descripcion:
-        "La 'Computadora Jacob' (en LAN2) no puede contactar el servicio 'MANAGEMENT' de la 'Computadora Administrativa' (en LAN1). Asigna 'Computadora Jacob' a la 'LAN1' para permitir la comunicación.",
+        "La 'Computadora Jacob' (en LAN2) no puede contactar el servicio 'MANAGEMENT' de la 'Computadora Administrativa' (en LAN1). Asigna 'Computadora Administrativa' a la 'LAN1' para permitir la comunicación.",
       fase: 1,
       infoAdicional: {
         dispositivoOrigen: "Computadora Jacob",
@@ -33,29 +33,44 @@ export const escenarioBase: unknown = {
       },
     },
     {
+      nombreEvento: "Asegurar LAN1 (Firewall)",
+      tipoEvento: TipoEvento.TRAFICO_RED,
+      tiempoNotificacion: 25, // Segundo reto
+      descripcion:
+        "Se intentará una conexión SSH no autorizada desde la red externa (WWW) a la LAN1. Configura el firewall del 'Router Principal' para bloquear todo el tráfico SSH entrante a LAN1.",
+      fase: 1,
+      infoAdicional: {
+        dispositivoOrigen: "Servidor Web Externo",
+        dispositivoDestino: "Computadora Administrativa",
+        protocolo: TipoProtocolo.SSH,
+        esObjetivo: true,
+        debeSerBloqueado: true,
+      },
+    },
+    {
       nombreEvento: "Completación Fase 1",
       tipoEvento: TipoEvento.COMPLETACION_FASE,
-      tiempoNotificacion: 17, // Este es un caso especial. Aquí se ejecutará directamente en el tiempo de notificación
+      tiempoNotificacion: 40, // Este es un caso especial. Aquí se ejecutará directamente en el tiempo de notificación
       descripcion: "¡Has completado todos los objetivos de la Fase 1! Asegúrate de revisar la pestaña de Partida para conocer los objetivos de la siguiente fase.",
       fase: 1,
     },
     {
-      nombreEvento: "Reto 1",
+      nombreEvento: "Conexión VPN (Teletrabajo)",
       tipoEvento: TipoEvento.CONEXION_VPN,
-      tiempoNotificacion: 19,
+      tiempoNotificacion: 45, // Tercer reto
       descripcion:
-        "Lisa (Off-site) intentará conectarse a la 'Computadora Jacob' (LAN2) vía VPN. Configura el 'VPN Gateway' y el cliente de Lisa para permitirlo.",
+        "Lisa intentará conectarse a la 'Computadora Jacob' vía VPN. Configura el 'VPN Gateway' y el cliente de Lisa para permitirlo. Se requiere que la conexión sea Encriptada y Autenticada (EA)",
       fase: 2,
       infoAdicional: {
         gateway: {
           lanLocal: "LAN2",
           hostLan: "Computadora Jacob",
-          proteccion: TipoProteccionVPN.A,
+          proteccion: TipoProteccionVPN.EA,
           dominioRemoto: "Off-site",
           hostRemoto: "Computadora Lisa",
         },
         cliente: {
-          proteccion: TipoProteccionVPN.A,
+          proteccion: TipoProteccionVPN.EA,
           dominioRemoto: "Corporación",
           hostRemoto: "Computadora Jacob",
         },
@@ -64,7 +79,7 @@ export const escenarioBase: unknown = {
     {
       nombreEvento: "Completación Escenario",
       tipoEvento: TipoEvento.COMPLETACION_ESCENARIO,
-      tiempoNotificacion: 32, // Este es un caso especial. Aquí se ejecutará directamente en el tiempo de notificación
+      tiempoNotificacion: 60, // Este es un caso especial. Aquí se ejecutará directamente en el tiempo de notificación
       descripcion: "¡Felicidades, has completado el escenario de este nivel!",
       fase: 2,
     },
@@ -74,7 +89,7 @@ export const escenarioBase: unknown = {
       id: 1,
       nombre: "Fase 1: Retos de Configuración de Red",
       descripcion:
-        "Completar los 3 retos de asignación de red, firewall y VPN.",
+        "Completar los 3 retos de asignación de red y firewall.",
       faseActual: true,
       completada: false,
       objetivos: [ // Cada uno de estos objetivos deben corresponderse (los nombres deben ser los mismos)
@@ -84,21 +99,25 @@ export const escenarioBase: unknown = {
         {
           descripcion: "Falla de Conectividad IDS",
           completado: false,
-        }
+        },
+        {
+          descripcion: "Asegurar LAN1 (Firewall)",
+          completado: false,
+        },
       ],
     },
     {
       id: 2,
-      nombre: "Fase 2: Otros retos",
+      nombre: "Fase 2: Conexión remota de trabajador.",
       descripcion:
-        "Completar otros retos de la simulación.",
+        "Permitir una conexión segura para que un empleado pueda trabajar desde su casa.",
       faseActual: false,
       completada: false,
       objetivos: [
         {
-          descripcion: "Reto 1",
+          descripcion: "Permitir que Lisa se pueda conectar vía VPN a la red corporativa.",
           completado: false,
-        }
+        },
       ],
     },
   ],
