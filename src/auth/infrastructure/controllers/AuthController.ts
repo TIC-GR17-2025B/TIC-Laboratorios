@@ -3,6 +3,7 @@ import { PrismaAuthRepository } from "../repositories/PrismaAuthRepository"
 import { RegisterEstudianteUseCase } from "../../application/useCases/RegisterEstudianteUseCase"
 import { RegisterProfesorUseCase } from "../../application/useCases/RegisterProfesorUseCase"
 import { LoginUseCase } from "../../application/useCases/LoginUseCase"
+import { ObtenerEstudianteProfesorUseCase } from "../../application/useCases/ObtenerEstudianteProfesorUseCase"
 
 const router = express.Router()
 const repo = new PrismaAuthRepository()
@@ -15,6 +16,7 @@ if (!jwtSecret) {
 const registerEstudiante = new RegisterEstudianteUseCase(repo)
 const registerProfesor = new RegisterProfesorUseCase(repo)
 const loginUseCase = new LoginUseCase(repo, jwtSecret)
+const obtenerEstudianteProfesor = new ObtenerEstudianteProfesorUseCase(repo)
 
 // POST /auth/register/estudiante
 router.post('/register/estudiante', async (req, res) => {
@@ -63,5 +65,31 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ success: false, error: err.message })
   }
 })
+
+// GET /auth/profesor/:id/estudiantes
+router.get('/profesor/:id/estudiantes', async (req, res) => {
+  try {
+    const id_profesor = parseInt(req.params.id)
+
+    if (isNaN(id_profesor)) {
+      return res.status(400).json({
+        success: false,
+        error: 'ID de profesor inválido'
+      })
+    }
+
+    const estudiantes = await obtenerEstudianteProfesor.execute(id_profesor)
+    
+    res.json({ 
+      success: true, 
+      data: estudiantes,
+      total: estudiantes.length
+    })
+
+  } catch (err: unknown) {
+    res.status(500).json({ success: false, error: err.message })
+  }
+})
+
 
 export default router

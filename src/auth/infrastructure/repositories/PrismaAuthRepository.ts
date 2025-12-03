@@ -1,5 +1,5 @@
 import type { IAuthRepository } from "../../domain/repositories/IAuthRepository"
-import type { Estudiante } from "../../domain/models/Estudiante"
+import type { Estudiante, EstudiantePublic  } from "../../domain/models/Estudiante"
 import type { Profesor } from "../../domain/models/Profesor"
 import { prisma } from "../db/prisma"
 
@@ -42,5 +42,24 @@ export class PrismaAuthRepository implements IAuthRepository {
   async findProfesorByEmail(correo_electronico: string) {
     const found = await prisma.profesor.findUnique({ where: { correo_electronico } })
     return found as Profesor | null
+  }
+
+  async findEstudiantesByProfesor(id_profesor: number): Promise<EstudiantePublic[]> {
+    const estudiantes = await prisma.estudiante.findMany({
+      where: { 
+        id_profesor 
+      },
+      orderBy: {
+        primer_apellido: 'asc'
+      }
+    })
+    return estudiantes.map(({ contrasenia, ...publicData }) => publicData) as EstudiantePublic[]
+  }
+
+  async findEstudianteById(id_estudiante: number): Promise<Estudiante | null> {
+    const found = await prisma.estudiante.findUnique({ 
+      where: { id_estudiante } 
+    })
+    return found as Estudiante | null
   }
 }
