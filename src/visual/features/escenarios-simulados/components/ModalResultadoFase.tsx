@@ -43,7 +43,7 @@ export default function ModalResultadoFase({ tipo, mensaje }: ModalResultadoFase
 
             <div className={styles.botonesContainer}>
                 <button className={styles.btnReintentar} onClick={handleReintentar}>
-                    {tipo === 'exito' ? 'Volver a Jugar' : 'Reintentar'}
+                    {tipo === 'exito' ? 'Jugar otro nivel' : 'Reintentar'}
                 </button>
             </div>
         </div>

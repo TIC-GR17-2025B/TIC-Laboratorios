@@ -101,7 +101,7 @@ export function useECSScene() {
         setHasNewLog(true);
       }
     },
-    [escenarioController, logsPanelOpen]
+    [escenarioController]
   );
 
   // Función para abrir/cerrar el panel de logs
@@ -254,7 +254,7 @@ export function useECSScene() {
       unsubscribePausado();
       unsubscribeReanudado();
     };
-  }, [escenarioController, agregarLog, logsPanelOpen]);
+  }, [escenarioController, agregarLog]);
 
   /**
    * Devuelve un array de entidades listo para render 3D
