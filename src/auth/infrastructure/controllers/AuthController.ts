@@ -1,4 +1,5 @@
 import express from "express"
+import type { Request, Response } from "express";
 import { PrismaAuthRepository } from "../repositories/PrismaAuthRepository.js"
 import { RegisterEstudianteUseCase } from "../../application/useCases/RegisterEstudianteUseCase.js"
 import { RegisterProfesorUseCase } from "../../application/useCases/RegisterProfesorUseCase.js"
@@ -19,7 +20,7 @@ const loginUseCase = new LoginUseCase(repo, jwtSecret)
 const obtenerEstudianteProfesor = new ObtenerEstudianteProfesorUseCase(repo)
 
 // POST /auth/register/estudiante
-router.post('/register/estudiante', async (req, res) => {
+router.post('/register/estudiante', async (req: Request , res: Response) => {
   try {
     const created = await registerEstudiante.execute(req.body)
     res.status(201).json({ success: true, data: created })
@@ -31,7 +32,7 @@ router.post('/register/estudiante', async (req, res) => {
 })
 
 // POST /auth/register/profesor
-router.post('/register/profesor', async (req, res) => {
+router.post('/register/profesor', async (req: Request , res: Response) => {
   try {
     const created = await registerProfesor.execute(req.body)
     res.status(201).json({ success: true, data: created })
@@ -43,7 +44,7 @@ router.post('/register/profesor', async (req, res) => {
 })
 
 // POST /auth/login
-router.post('/login', async (req, res) => {
+router.post('/login', async (req: Request , res: Response) => {
   try {
     const { correo_electronico, contrasenia } = req.body
 
@@ -73,7 +74,7 @@ router.post('/login', async (req, res) => {
 })
 
 // GET /auth/profesor/:id/estudiantes
-router.get('/profesor/:id/estudiantes', async (req, res) => {
+router.get('/profesor/:id/estudiantes', async (req: Request , res: Response) => {
   try {
     console.log('AuthController - GET /profesor/:id/estudiantes')
     console.log('AuthController - Params:', req.params)
