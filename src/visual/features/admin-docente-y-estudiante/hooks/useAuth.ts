@@ -1,6 +1,7 @@
 import { useState } from "react";
 
-const API_URL = "/api";
+// En producción usa la URL de Render, en desarrollo usa el proxy de Vite
+const API_URL = import.meta.env.VITE_BACKEND_URL || "";
 
 interface RegisterEstudianteData {
   primernombre: string;
