@@ -4,19 +4,18 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"npm run dev:server\" \"vite\"",
-    "dev:client": "vite",
+    "dev": "vite",
+    "dev:full": "concurrently \"npm run dev:server\" \"vite\"",
     "dev:server": "nodemon --watch src --exec tsx src/server.ts",
     "start": "node dist/server/server.js",
-    "build": "npm run build:render",
-    "build:render": "tsc --project tsconfig.server.json",
-    "build:client": "vite build",
+    "build": "vite build",
+    "build:server": "tsc --project tsconfig.server.json",
     "postinstall": "prisma generate",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest",
     "coverage": "vitest run --coverage",
-    "render-build": "npm install --include=dev && npm run build"
+    "render-build": "npm install --include=dev && npm run build:server"
   },
   "engines": {
     "node": ">=18.0.0",

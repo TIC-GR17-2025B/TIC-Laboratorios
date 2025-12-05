@@ -12,18 +12,10 @@ dotenv.config()
 const app = express()
 const PORT = Number(process.env.PORT) || 3000 // Azure asigna puerto dinámico
 
-// Middlewares - CORS configurado para producción
-const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  'http://localhost:5173',
-  'http://localhost:3000'
-].filter(Boolean) as string[]
-
+// Middlewares - CORS configurado para permitir cualquier origen
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production'
-    ? allowedOrigins
-    : '*',
-  credentials: true
+  origin: '*',
+  credentials: false
 }))
 
 app.use(express.json())
