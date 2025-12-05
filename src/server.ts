@@ -1,5 +1,6 @@
 // src/server.ts
 import express from 'express'
+import type { Request, Response } from "express";
 import cors from 'cors'
 import dotenv from 'dotenv'
 import authRouter from './auth/infrastructure/controllers/AuthController.js'
@@ -9,7 +10,7 @@ import progresoRouter from './auth/infrastructure/controllers/ProgresoController
 dotenv.config()
 
 const app = express()
-const PORT = process.env.PORT || 3000 // Azure asigna puerto dinámico
+const PORT = Number(process.env.PORT) || 3000 // Azure asigna puerto dinámico
 
 // Middlewares - CORS configurado para producción
 const allowedOrigins = [
@@ -29,12 +30,12 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 // Health check
-app.get('/health', (_req, res) => {
+app.get('/health', (_req: Request, res: Response) => {
   res.json({ status: 'ok', message: 'Server is running' })
 })
 
 // Root endpoint
-app.get('/', (_req, res) => {
+app.get('/', (_req: Request, res: Response) => {
   res.json({ 
     message: 'API de CiberSeguridad Game',
     version: '1.0.0',
@@ -51,7 +52,7 @@ app.use('/auth', authRouter)
 app.use('/progreso', progresoRouter)
 
 // Manejo de rutas no encontradas
-app.use((_req, res) => {
+app.use((_req: Request, res: Response) => {
   res.status(404).json({ 
     success: false, 
     error: 'Ruta no encontrada' 
@@ -68,7 +69,7 @@ app.use((err: unknown, _req: express.Request, res: express.Response) => {
 })
 
 // Iniciar servidor
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0',() => {
   console.log(`Servidor corriendo en puerto ${PORT}`)
   console.log(`Ambiente: ${process.env.NODE_ENV || 'development'}`)
 })

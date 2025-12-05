@@ -3,6 +3,11 @@ generator client {
   output   = "../src/generated/prisma"
 }
 
+generator client_render {
+  provider = "prisma-client-js"
+  output   = "../dist/server/generated/prisma" // para Render
+}
+
 datasource db {
   provider = "postgresql"
 }
