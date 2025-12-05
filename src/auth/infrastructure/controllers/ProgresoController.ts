@@ -1,4 +1,5 @@
 import express from "express"
+import type { Request, Response } from "express";
 import { PrismaProgresoRepository } from "../repositories/PrismaProgresoRepository.js"
 import { GuardarProgresoUseCase } from "../../application/useCases/GuardarProgresoUseCase.js"
 import { ObtenerProgresoUseCase } from "../../application/useCases/ObtenerProgresoUseCase.js"
@@ -12,7 +13,7 @@ const obtenerProgreso = new ObtenerProgresoUseCase(repo);
 const obtenerTodosProgresos = new ObtenerTodosProgresosUseCase(repo);
 
 // POST /progreso - Guardar progreso de un estudiante
-router.post('/', async (req, res) => {
+router.post('/', async (req: Request , res: Response) => {
   try {
     const { id_estudiante, id_escenario, terminado, tiempo } = req.body
 
@@ -34,7 +35,7 @@ router.post('/', async (req, res) => {
 })
 
 // GET /progreso/estudiante/10/escenario/3 - Obtener progreso específico
-router.get('/estudiante/:idEstudiante/escenario/:idEscenario', async (req, res) => {
+router.get('/estudiante/:idEstudiante/escenario/:idEscenario', async (req: Request , res: Response) => {
   try {
     const idEstudiante = parseInt(req.params.idEstudiante)
     const idEscenario = parseInt(req.params.idEscenario)
@@ -64,7 +65,7 @@ router.get('/estudiante/:idEstudiante/escenario/:idEscenario', async (req, res) 
 })
 
 // GET /progreso/estudiante/10 - Obtener todos los progresos de un estudiante
-router.get('/estudiante/:idEstudiante', async (req, res) => {
+router.get('/estudiante/:idEstudiante', async (req: Request , res: Response) => {
   try {
     const idEstudiante = parseInt(req.params.idEstudiante)
 
@@ -85,4 +86,3 @@ router.get('/estudiante/:idEstudiante', async (req, res) => {
 })
 
 export default router
-
