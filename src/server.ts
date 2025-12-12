@@ -5,6 +5,7 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import authRouter from './auth/infrastructure/controllers/AuthController.js'
 import progresoRouter from './auth/infrastructure/controllers/ProgresoController.js'
+import groupsRouter from './groups/insfrastructure/controller/GroupsController.js'
 
 // Cargar variables de entorno
 dotenv.config()
@@ -42,6 +43,7 @@ app.get('/', (_req: Request, res: Response) => {
 // Montar rutas de autenticación
 app.use('/auth', authRouter)
 app.use('/progreso', progresoRouter)
+app.use('/groups', groupsRouter)
 
 // Manejo de rutas no encontradas
 app.use((_req: Request, res: Response) => {
