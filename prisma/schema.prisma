@@ -5,7 +5,7 @@ generator client {
 
 generator client_render {
   provider = "prisma-client-js"
-  output   = "../dist/server/generated/prisma" // para Render
+  output   = "../dist/server/generated/prisma"
 }
 
 datasource db {
@@ -14,33 +14,32 @@ datasource db {
 
 model escenario {
   id_escenario Int        @id @default(autoincrement())
-  nombre       String     @db.VarChar(100)
+  nombre       String     @db.VarChar
   progreso     progreso[]
 }
 
 model estudiante {
-  id_estudiante      Int        @id @default(autoincrement())
-  id_profesor        Int
-  codigo_unico       Int        @unique
-  primernombre       String     @db.VarChar(50)
-  segundo_nombre     String     @db.VarChar(50)
-  primer_apellido    String     @db.VarChar(50)
-  segundo_apellido   String     @db.VarChar(50)
-  correo_electronico String     @unique @db.VarChar(100)
-  contrasenia        String     @db.VarChar(128)
-  profesor           profesor   @relation(fields: [id_profesor], references: [id_profesor], map: "fk_estudiante_profesor")
+  id_estudiante      Int         @id @default(autoincrement())
+  codigo_unico       Int         @unique
+  primernombre       String      @db.VarChar
+  segundo_nombre     String      @db.VarChar
+  primer_apellido    String      @db.VarChar
+  segundo_apellido   String      @db.VarChar
+  correo_electronico String      @unique @db.VarChar
+  contrasenia        String      @db.VarChar
+  matricula          matricula[]
   progreso           progreso[]
 }
 
 model profesor {
-  id_profesor        Int          @id @default(autoincrement())
-  primernombre       String       @db.VarChar(50)
-  segundo_nombre     String       @db.VarChar(50)
-  primer_apellido    String       @db.VarChar(50)
-  segundo_apellido   String       @db.VarChar(50)
-  correo_electronico String       @unique @db.VarChar(100)
-  contrasenia        String       @db.VarChar(128)
-  estudiante         estudiante[]
+  id_profesor        Int     @id @default(autoincrement())
+  primernombre       String  @db.VarChar
+  segundo_nombre     String  @db.VarChar
+  primer_apellido    String  @db.VarChar
+  segundo_apellido   String  @db.VarChar
+  correo_electronico String  @unique @db.VarChar
+  contrasenia        String  @db.VarChar
+  curso              curso[]
 }
 
 model progreso {
@@ -49,6 +48,23 @@ model progreso {
   id_escenario  Int
   terminado     Boolean?   @default(false)
   tiempo        Float?
-  escenario     escenario  @relation(fields: [id_escenario], references: [id_escenario], map: "fk_progreso_escenario")
-  estudiante    estudiante @relation(fields: [id_estudiante], references: [id_estudiante], onDelete: Cascade, map: "fk_progreso_estudiante")
+  escenario     escenario  @relation(fields: [id_escenario], references: [id_escenario], onDelete: NoAction, onUpdate: NoAction, map: "fk_progreso_escenario")
+  estudiante    estudiante @relation(fields: [id_estudiante], references: [id_estudiante], onDelete: NoAction, onUpdate: NoAction, map: "fk_progreso_estudiante")
+}
+
+model curso {
+  id_curso    Int         @id @default(autoincrement())
+  id_profesor Int
+  nombre      String      @db.VarChar
+  profesor    profesor    @relation(fields: [id_profesor], references: [id_profesor], onDelete: NoAction, onUpdate: NoAction, map: "fk_curso_profesor")
+  matricula   matricula[]
+}
+
+model matricula {
+  id_matricula  Int        @id @default(autoincrement())
+  id_curso      Int
+  id_estudiante Int
+  fecha         DateTime   @default(dbgenerated("CURRENT_DATE")) @db.Date
+  curso         curso      @relation(fields: [id_curso], references: [id_curso], onDelete: NoAction, onUpdate: NoAction, map: "fk_matricula_curso")
+  estudiante    estudiante @relation(fields: [id_estudiante], references: [id_estudiante], onDelete: NoAction, onUpdate: NoAction, map: "fk_matricula_estudiante")
 }
