@@ -31,4 +31,42 @@ router.post('/', async (req: Request , res: Response) => {
     }
 })
 
+// PUT /groups/edit/:id - Editar curso
+router.put('/edit/:id', async (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+
+    if (isNaN(id)) {
+      return res.status(400).json({ success: false, error: "ID inválido" });
+    }
+
+    const updated = await createCurso.updateCurso(id, req.body);
+    res.json({ success: true, data: updated });
+
+  } catch (err) {
+    if (err instanceof Error) {
+      res.status(400).json({ success: false, error: err.message });
+    }
+  }
+});
+
+// DELETE /groups/delete/:id - Eliminar curso
+router.delete('/delete/:id', async (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+
+    if (isNaN(id)) {
+      return res.status(400).json({ success: false, error: "ID inválido" });
+    }
+
+    const result = await createCurso.deleteCurso(id);
+    res.json(result);
+
+  } catch (err) {
+    if (err instanceof Error) {
+      res.status(400).json({ success: false, error: err.message });
+    }
+  }
+});
+
 export default router
