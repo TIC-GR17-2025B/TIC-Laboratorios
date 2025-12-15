@@ -1,4 +1,5 @@
 import {
+    ActivoComponent,
   AtaqueComponent,
   DispositivoComponent,
   EscenarioComponent,
@@ -17,7 +18,7 @@ import {
   SistemaTiempo,
 } from "../systems";
 import { ScenarioBuilder } from "../utils/ScenarioBuilder";
-import type { Escenario, LogGeneral } from "../../types/EscenarioTypes";
+import type { Activo, Escenario, LogGeneral } from "../../types/EscenarioTypes";
 import {
   EventosInternos,
   EventosPublicos,
@@ -439,6 +440,24 @@ export class EscenarioController {
     for (const [,container] of this.ecsManager.getEntidades()) {
       if (container.tiene(EscenarioComponent)) {
         return container.get(EscenarioComponent)?.fases;
+      }
+    }
+  }
+
+  public getActivosDeDispositivo(entidadDispositivo: Entidad): Activo[] | undefined {
+    return this.ecsManager.getComponentes(entidadDispositivo)?.get(ActivoComponent)?.activos;
+  }
+
+  public eliminarActivoDeDispositivo(entidadDispositivo: Entidad, nombreActivo: string) {
+    const activosDispActual = this.ecsManager.getComponentes(entidadDispositivo)
+                                       ?.get(ActivoComponent);
+
+    const activos = (activosDispActual?.activos ?? []);
+
+    for (let i = 0; i < activos.length; i++) {
+      if (activos.at(i)?.nombre == nombreActivo) {
+        activosDispActual?.activos?.splice(i, 1);
+        break;
       }
     }
   }
