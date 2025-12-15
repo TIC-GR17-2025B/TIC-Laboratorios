@@ -1,12 +1,15 @@
 import express from "express"
 import type { Request, Response } from "express";
-import { PrismaGroupsRepository } from "../repositories/PrismaGroupsRepository.js"
-import { GroupsUseCase } from "../../application/GroupsUseCase.js"
+import { PrismaGroupsRepository } from "../repositories/PrismaGroupsRepository.js";
+import { GroupsUseCase } from "../../application/GroupsUseCase.js";
+import { JoinGroupsUseCase } from "../../application/JoinGroupsUseCase.js";
+import { GenerateGroupCodeUseCase } from "../../application/GenerateGroupCodeUseCase.js";
 
-const router = express.Router()
-const repo = new PrismaGroupsRepository()
-
+const router = express.Router();
+const repo = new PrismaGroupsRepository();
 const createCurso = new GroupsUseCase(repo);
+const joinGroups = new JoinGroupsUseCase(repo);
+const generateCode = new GenerateGroupCodeUseCase(repo);
 
 // POST /groups - Crear un nuevo curso
 router.post('/', async (req: Request , res: Response) => {
@@ -66,6 +69,47 @@ router.delete('/delete/:id', async (req: Request, res: Response) => {
     if (err instanceof Error) {
       res.status(400).json({ success: false, error: err.message });
     }
+  }
+});
+
+router.post('/join', async (req: Request, res: Response) => {
+  try {
+    const { codigo_acceso, id_estudiante } = req.body;
+
+    if (!codigo_acceso || !id_estudiante) {
+      return res.status(400).json({
+        success: false,
+        error: "codigo_acceso e id_estudiante son obligatorios",
+      });
+    }
+
+    const matricula = await joinGroups.execute({
+      codigo_acceso,
+      id_estudiante,
+    });
+
+    res.status(201).json({ success: true, data: matricula });
+
+  } catch (err) {
+    if (err instanceof Error) {
+      res.status(400).json({ success: false, error: err.message });
+    }
+  }
+});
+
+router.post('/:id/generate-code', async (req: Request , res: Response) => {
+  try {
+    const id = Number(req.params.id);
+
+    if (isNaN(id)) {
+      return res.status(400).json({ error: "ID inválido" });
+    }
+
+    const curso = await generateCode.execute(id);
+    res.json({ success: true, data: curso });
+
+  } catch (err) {
+    res.status(400).json({ error: (err as Error).message });
   }
 });
 

@@ -1,12 +1,11 @@
-import type { Curso, CursoInput, CursoUpdate, DeleteResult} from "../domain/models/Curso";
-import type { IGroupsRepository } from "../domain/repositories/IGroupsRepository";
+import type { Curso, CursoCreateInput, CursoUpdate, DeleteResult} from "../domain/models/Curso.js";
+import type { IGroupsRepository } from "../domain/repositories/IGroupsRepository.js";
 
 export class GroupsUseCase {
     constructor(private repo: IGroupsRepository) {}
 
-    async createCurso(payload: CursoInput): Promise<Curso>{
-        const created = await this.repo.createCurso(payload)
-        return created
+    async createCurso(payload: CursoCreateInput): Promise<Curso>{
+        return await this.repo.createCurso(payload)
     }
 
     async updateCurso(id: number, payload: CursoUpdate): Promise<Curso> {

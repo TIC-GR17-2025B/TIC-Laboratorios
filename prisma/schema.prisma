@@ -53,11 +53,13 @@ model progreso {
 }
 
 model curso {
-  id_curso    Int         @id @default(autoincrement())
-  id_profesor Int
-  nombre      String      @db.VarChar
-  profesor    profesor    @relation(fields: [id_profesor], references: [id_profesor], onDelete: NoAction, onUpdate: NoAction, map: "fk_curso_profesor")
-  matricula   matricula[]
+  id_curso      Int         @id @default(autoincrement())
+  id_profesor   Int
+  nombre        String      @db.VarChar
+  codigo_acceso String?     @unique @db.VarChar
+  codigo_expira DateTime?   @db.Timestamp(6)
+  profesor      profesor    @relation(fields: [id_profesor], references: [id_profesor], onDelete: NoAction, onUpdate: NoAction, map: "fk_curso_profesor")
+  matricula     matricula[]
 }
 
 model matricula {
