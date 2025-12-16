@@ -38,3 +38,10 @@ export enum TipoEvento {
   COMPLETACION_FASE = "Completación de fase",
   COMPLETACION_ESCENARIO = "Completación de escenario",
 }
+
+export enum TipoActivo {
+  GENERICO = "generico",
+  DOCUMENTO = "doc",
+  FIRMA_DIGITAL = "firma digital",
+  CLAVE_PUBLICA = "clave publica",
+}

@@ -1,6 +1,7 @@
 import {
   EstadoAtaqueDispositivo,
   Mueble,
+  TipoActivo,
   TipoDispositivo,
   TipoEvento,
   TipoProteccionVPN,
@@ -165,6 +166,29 @@ export const escenarioBase: unknown = {
                     {
                       nombre: "Activo1",
                       contenido: "La contraseña secreta es 123",
+                      tipo: TipoActivo.DOCUMENTO,
+                      firma: "Firma Activo1"
+                    },
+                    {
+                      nombre: "Firma Activo1",
+                      contenido: "La contraseña secreta es 123",
+                      tipo: TipoActivo.FIRMA_DIGITAL,
+                      propietario: "Jacob"
+                    },
+                    {
+                      nombre: "Clave_Publica_Jacob",
+                      tipo: TipoActivo.CLAVE_PUBLICA,
+                      propietario: "Jacob"
+                    },
+                    {
+                      nombre: "Activo genérico",
+                      contenido: "a",
+                      tipo: TipoActivo.GENERICO
+                    },
+                    {
+                      nombre: "Activo genérico 2",
+                      contenido: "abcdefg",
+                      tipo: TipoActivo.DOCUMENTO
                     },
                   ],
                   // --- ESTADO INICIAL: ninguna ---
