@@ -114,6 +114,7 @@ export class SistemaPresupuesto extends Sistema {
   ) {
     const dispositivo = this.ecsManager.getComponentes(entidadDispoitivo)
                                        ?.get(DispositivoComponent);
+    
     let escenario;
     for (const [,c] of this.ecsManager.getEntidades()) {
       if (c.tiene(EscenarioComponent)) {
@@ -127,13 +128,22 @@ export class SistemaPresupuesto extends Sistema {
     for (const app of appsEscenario ?? []) {
       if (app.nombre == nombreApp) {
 
-        if (this.hayPresupuestoSuficiente(entidadPresupuesto, app.precio)) { 
-            dispositivo?.apps?.push(app);
+        if (this.hayPresupuestoSuficiente(entidadPresupuesto, app.precio)) {
+            // Inicializar el array de apps si no existe
+            if (!dispositivo) break;
+            if (!dispositivo.apps) {
+              dispositivo.apps = [];
+            }
+            
+            dispositivo.apps.push(app);
             const presupuestoComp = this.ecsManager
                 .getComponentes(entidadPresupuesto)
                 ?.get(PresupuestoComponent);
             if (presupuestoComp) {
               presupuestoComp.monto -= app.precio;
+              this.ecsManager.emit(EventosPublicos.PRESUPUESTO_ACTUALIZADO, {
+                presupuesto: presupuestoComp.monto,
+              });
               this.notificarPresupuestoAgotado(entidadPresupuesto);
             }
         } else break;
@@ -141,7 +151,6 @@ export class SistemaPresupuesto extends Sistema {
         break;
       }
     }
-
   }
 
   public desinstalarApp(
@@ -162,6 +171,9 @@ export class SistemaPresupuesto extends Sistema {
             ?.get(PresupuestoComponent);
         if (presupuestoComp) {
           presupuestoComp.monto += appsDispositivo.at(i)!.precio * 0.5;
+          this.ecsManager.emit(EventosPublicos.PRESUPUESTO_ACTUALIZADO, {
+            presupuesto: presupuestoComp.monto,
+          });
         }
         break;
       }
