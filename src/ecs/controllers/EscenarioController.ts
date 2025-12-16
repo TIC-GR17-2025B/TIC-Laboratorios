@@ -10,6 +10,7 @@ import {
 } from "../components";
 import { ECSManager, type Entidad } from "../core";
 import {
+    SistemaActivo,
   SistemaEvento,
   SistemaFase,
   SistemaJerarquiaEscenario,
@@ -39,6 +40,7 @@ export class EscenarioController {
   private entidadPresupuesto?: Entidad;
   private sistemaEvento?: SistemaEvento;
   private sistemaFase?: SistemaFase;
+  private sistemaActivo?: SistemaActivo;
   private progresoController?: ProgresoController;
   private escenarioIniciado: boolean = false; // FLAG PARA EVITAR MÚLTIPLES INICIALIZACIONES
 
@@ -89,6 +91,11 @@ export class EscenarioController {
       this.sistemaFase = new SistemaFase();
       this.ecsManager.agregarSistema(this.sistemaFase);
       this.sistemaFase.iniciarEscuchaDeEvento();
+    }
+
+    if (!this.sistemaActivo) {
+      this.sistemaActivo = new SistemaActivo();
+      this.ecsManager.agregarSistema(this.sistemaActivo);
     }
 
     if (!this.progresoController) {
@@ -441,6 +448,10 @@ export class EscenarioController {
         return container.get(EscenarioComponent)?.fases;
       }
     }
+  }
+
+  public getHashDocumento(contenido: string): string | undefined {
+    return this.sistemaActivo?.calcularHashDocumento(contenido);
   }
 
   // MÉTODO PARA RESETEAR EL SINGLETON (útil para desarrollo/testing)
