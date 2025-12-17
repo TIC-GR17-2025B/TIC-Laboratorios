@@ -13,6 +13,8 @@ import { useDispositivos } from "../hooks";
 import VPNIcon from "../../../common/icons/VPNIcon";
 import ModalVPNCliente from "../../simulacion-redes/components/ModalVPNCliente";
 import PageTransition from "../../../common/components/PageTransition";
+import ShieldCheckIcon from "../../../common/icons/ShieldCheckIcon";
+import ModalVerificacionFirma from "../components/ModalVerificacionFirma";
 
 function Dispositivos() {
     const { setDispositivoSeleccionado, dispositivoSeleccionado, entidadSeleccionadaId } = useEscenario();
@@ -53,9 +55,14 @@ function Dispositivos() {
                         icon={<DevicesIcon size={16} />}
                     />
                 </div>
-                <button onClick={() => openModal(<ModalVPNCliente />, 'Configuración de VPN Cliente')}>
-                    <VPNIcon />Configurar VPN
-                </button>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                    <button onClick={() => openModal(<ModalVerificacionFirma />, 'Verificación de Firma Digital')}>
+                        <ShieldCheckIcon />Verificar Firma
+                    </button>
+                    <button onClick={() => openModal(<ModalVPNCliente />, 'Configuración de VPN Cliente')}>
+                        <VPNIcon />Configurar VPN
+                    </button>
+                </div>
             </div>
             <div className={styles.contenidoDispositivo}>
                 <img draggable={false} className={styles.imagenDispositivo} src="/assets/models_picture/workstation.webp" alt="Imagen de Estación de trabajo" />
