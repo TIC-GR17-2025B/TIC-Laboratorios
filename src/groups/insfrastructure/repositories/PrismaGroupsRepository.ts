@@ -1,6 +1,14 @@
 import type { IGroupsRepository } from "../../domain/repositories/IGroupsRepository.js";
-import type { Curso, CursoCreateInput, CursoUpdate, DeleteResult } from "../../domain/models/Curso.js";
-import type { MatriculaInput, Matricula } from "../../domain/models/Matricula.js";
+import type {
+  Curso,
+  CursoCreateInput,
+  CursoUpdate,
+  DeleteResult,
+} from "../../domain/models/Curso.js";
+import type {
+  MatriculaInput,
+  Matricula,
+} from "../../domain/models/Matricula.js";
 import { prisma } from "../../../auth/infrastructure/db/prisma.js";
 
 export class PrismaGroupsRepository implements IGroupsRepository {
@@ -12,15 +20,15 @@ export class PrismaGroupsRepository implements IGroupsRepository {
         codigo_acceso: null,
         codigo_expira: null,
       },
-    })
-    return created as Curso
+    });
+    return created as Curso;
   }
 
   async updateCurso(id: number, data: CursoUpdate): Promise<Curso> {
-    return await prisma.curso.update({
+    return (await prisma.curso.update({
       where: { id_curso: id },
       data,
-    }) as Curso;
+    })) as Curso;
   }
 
   async deleteCurso(id: number): Promise<DeleteResult> {
@@ -48,17 +56,24 @@ export class PrismaGroupsRepository implements IGroupsRepository {
   }
 
   async createMatricula(data: MatriculaInput): Promise<Matricula> {
-    return await prisma.matricula.create({ data }) as Matricula;
+    return (await prisma.matricula.create({ data })) as Matricula;
   }
 
-  async updateCursoCodigo(id_curso: number, codigo_acceso: string, codigo_expira: Date): Promise<Curso> {
-    return await prisma.curso.update({
+  async updateCursoCodigo(
+    id_curso: number,
+    codigo_acceso: string,
+    codigo_expira: Date
+  ): Promise<Curso> {
+    return (await prisma.curso.update({
       where: { id_curso },
       data: { codigo_acceso, codigo_expira },
-    }) as Curso;
+    })) as Curso;
   }
 
-  async deleteMatricula(id_curso: number, id_estudiante: number): Promise<DeleteResult> {
+  async deleteMatricula(
+    id_curso: number,
+    id_estudiante: number
+  ): Promise<DeleteResult> {
     const deleted = await prisma.matricula.deleteMany({
       where: { id_curso, id_estudiante },
     });
@@ -77,5 +92,23 @@ export class PrismaGroupsRepository implements IGroupsRepository {
     return await prisma.curso.findUnique({
       where: { id_curso },
     });
+  }
+
+  async findCursosByProfesor(id_profesor: number): Promise<Curso[]> {
+    return (await prisma.curso.findMany({
+      where: { id_profesor },
+      orderBy: { id_curso: "desc" },
+    })) as Curso[];
+  }
+
+  async findEstudiantesByCurso(id_curso: number): Promise<any[]> {
+    const matriculas = await prisma.matricula.findMany({
+      where: { id_curso },
+      include: {
+        estudiante: true,
+      },
+    });
+
+    return matriculas.map((m) => m.estudiante);
   }
 }
