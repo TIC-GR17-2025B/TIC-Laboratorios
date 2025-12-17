@@ -15,6 +15,8 @@ import ModalVPNCliente from "../../simulacion-redes/components/ModalVPNCliente";
 import PageTransition from "../../../common/components/PageTransition";
 import ShieldCheckIcon from "../../../common/icons/ShieldCheckIcon";
 import ModalVerificacionFirma from "../components/ModalVerificacionFirma";
+import SoftwareIcon from "../../../common/icons/SoftwareIcon";
+import ModalApps from "../components/ModalApps";
 
 function Dispositivos() {
     const { setDispositivoSeleccionado, dispositivoSeleccionado, entidadSeleccionadaId } = useEscenario();
@@ -58,6 +60,9 @@ function Dispositivos() {
                 <div style={{ display: 'flex', gap: '8px' }}>
                     <button onClick={() => openModal(<ModalVerificacionFirma />, 'Verificación de Firma Digital')}>
                         <ShieldCheckIcon />Verificar Firma
+                <div className={styles.botonesAccion}>
+                    <button onClick={() => openModal(<ModalApps />, 'Gestionar Aplicaciones')}>
+                        <SoftwareIcon />Gestionar Apps
                     </button>
                     <button onClick={() => openModal(<ModalVPNCliente />, 'Configuración de VPN Cliente')}>
                         <VPNIcon />Configurar VPN

@@ -5,12 +5,17 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import authRouter from './auth/infrastructure/controllers/AuthController.js'
 import progresoRouter from './auth/infrastructure/controllers/ProgresoController.js'
+import groupsRouter from './groups/insfrastructure/controller/GroupsController.js'
+import feedbackRouter from './feedback/infrastructure/controllers/FeedbackController.js'
+import { InMemoryFeedbackStateRepository } from './feedback/infrastructure/repositories/InMemoryFeedbackStateRepository.js'
 
 // Cargar variables de entorno
 dotenv.config()
 
 const app = express()
 const PORT = Number(process.env.PORT) || 3000 // Azure asigna puerto dinámico
+
+const feedbackStateRepository = new InMemoryFeedbackStateRepository();
 
 // Middlewares - CORS configurado para permitir cualquier origen
 app.use(cors({
@@ -28,7 +33,7 @@ app.get('/health', (_req: Request, res: Response) => {
 
 // Root endpoint
 app.get('/', (_req: Request, res: Response) => {
-  res.json({ 
+  res.json({
     message: 'API de CiberSeguridad Game',
     version: '1.0.0',
     endpoints: {
@@ -39,29 +44,35 @@ app.get('/', (_req: Request, res: Response) => {
   })
 })
 
+
+import { initializeFeedbackController } from './feedback/infrastructure/controllers/FeedbackController.js';
+initializeFeedbackController(feedbackStateRepository);
+
 // Montar rutas de autenticación
 app.use('/auth', authRouter)
 app.use('/progreso', progresoRouter)
+app.use('/groups', groupsRouter)
+app.use('/feedback', feedbackRouter)
 
 // Manejo de rutas no encontradas
 app.use((_req: Request, res: Response) => {
-  res.status(404).json({ 
-    success: false, 
-    error: 'Ruta no encontrada' 
+  res.status(404).json({
+    success: false,
+    error: 'Ruta no encontrada'
   })
 })
 
 // Manejo de errores global
 app.use((err: unknown, _req: express.Request, res: express.Response) => {
   console.error('Error no manejado:', err)
-  res.status(500).json({ 
-    success: false, 
-    error: 'Error interno del servidor' 
+  res.status(500).json({
+    success: false,
+    error: 'Error interno del servidor'
   })
 })
 
 // Iniciar servidor
-app.listen(PORT, '0.0.0.0',() => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Servidor corriendo en puerto ${PORT}`)
   console.log(`Ambiente: ${process.env.NODE_ENV || 'development'}`)
 })

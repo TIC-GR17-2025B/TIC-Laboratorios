@@ -17,6 +17,23 @@ export const escenarioBase: unknown = {
     "Un escenario con 3 retos: 1) Asignar una red existente, 2) Configurar un firewall, 3) Configurar una VPN.",
   presupuestoInicial: 1000,
   ataques: [],
+  apps: [
+    {
+      nombre: "App 1",
+      descripcion: "Desc 1",
+      precio: "20",
+    },
+    {
+      nombre: "App 2",
+      descripcion: "Desc 2",
+      precio: "15",
+    },
+    {
+      nombre: "App 3",
+      descripcion: "Desc 3",
+      precio: "30",
+    },
+  ],
   eventos: [
     {
       nombreEvento: "Verificación de firma",
