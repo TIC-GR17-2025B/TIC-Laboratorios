@@ -396,6 +396,7 @@ export function useECSScene() {
     toggleLogsPanel,
     setMostrarNuevoLog,
     setMensajeLog,
+    escenarioController,
     redController,
     ecsManager: escenarioController.ecsManager,
     builder: escenarioController.builder,

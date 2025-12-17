@@ -13,6 +13,8 @@ import { useDispositivos } from "../hooks";
 import VPNIcon from "../../../common/icons/VPNIcon";
 import ModalVPNCliente from "../../simulacion-redes/components/ModalVPNCliente";
 import PageTransition from "../../../common/components/PageTransition";
+import ActivosIcon from "../../../common/icons/ActivosIcon";
+import ModalExploradorArchivos from "../components/ModalExploradorArchivos";
 
 function Dispositivos() {
     const { setDispositivoSeleccionado, dispositivoSeleccionado, entidadSeleccionadaId } = useEscenario();
@@ -53,9 +55,14 @@ function Dispositivos() {
                         icon={<DevicesIcon size={16} />}
                     />
                 </div>
-                <button onClick={() => openModal(<ModalVPNCliente />, 'Configuración de VPN Cliente')}>
-                    <VPNIcon />Configurar VPN
-                </button>
+                <div className={styles.botones}>
+                    <button onClick={() => openModal(<ModalExploradorArchivos />, 'Explorador de Archivos')}>
+                        <ActivosIcon size={16} />Explorar Archivos
+                    </button>
+                    <button onClick={() => openModal(<ModalVPNCliente />, 'Configuración de VPN Cliente')}>
+                        <VPNIcon />Configurar VPN
+                    </button>
+                </div>
             </div>
             <div className={styles.contenidoDispositivo}>
                 <img draggable={false} className={styles.imagenDispositivo} src="/assets/models_picture/workstation.webp" alt="Imagen de Estación de trabajo" />
