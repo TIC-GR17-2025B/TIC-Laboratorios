@@ -68,7 +68,8 @@ export const escenarioBase: unknown = {
       nombreEvento: "Completación Fase 1",
       tipoEvento: TipoEvento.COMPLETACION_FASE,
       tiempoNotificacion: 40, // Este es un caso especial. Aquí se ejecutará directamente en el tiempo de notificación
-      descripcion: "¡Has completado todos los objetivos de la Fase 1! Asegúrate de revisar la pestaña de Partida para conocer los objetivos de la siguiente fase.",
+      descripcion:
+        "¡Has completado todos los objetivos de la Fase 1! Asegúrate de revisar la pestaña de Partida para conocer los objetivos de la siguiente fase.",
       fase: 1,
     },
     {
@@ -105,14 +106,14 @@ export const escenarioBase: unknown = {
     {
       id: 1,
       nombre: "Fase 1: Retos de Configuración de Red",
-      descripcion:
-        "Completar los 3 retos de asignación de red y firewall.",
+      descripcion: "Completar los 3 retos de asignación de red y firewall.",
       faseActual: true,
       completada: false,
-      objetivos: [ // Cada uno de estos objetivos deben corresponderse (los nombres deben ser los mismos)
-                   // con los eventos/ataques que el jugador debe manejar, y que se hayan definido en 
-                   // sus arrays corrspondientes de eventos o ataques en este json. Importante: Deben 
-                   // definirse en el mismo orden en el que se supone que el jugador debe completarlos.
+      objetivos: [
+        // Cada uno de estos objetivos deben corresponderse (los nombres deben ser los mismos)
+        // con los eventos/ataques que el jugador debe manejar, y que se hayan definido en
+        // sus arrays corrspondientes de eventos o ataques en este json. Importante: Deben
+        // definirse en el mismo orden en el que se supone que el jugador debe completarlos.
         {
           descripcion: "Falla de Conectividad IDS",
           completado: false,
@@ -132,7 +133,8 @@ export const escenarioBase: unknown = {
       completada: false,
       objetivos: [
         {
-          descripcion: "Permitir que Lisa se pueda conectar vía VPN a la red corporativa.",
+          descripcion:
+            "Permitir que Lisa se pueda conectar vía VPN a la red corporativa.",
           completado: false,
         },
       ],
@@ -182,6 +184,10 @@ export const escenarioBase: unknown = {
                     {
                       nombre: "Activo1",
                       contenido: "La contraseña secreta es 123",
+                    },
+                    {
+                      nombre: "Activo2",
+                      contenido: "Bienvenido",
                     },
                   ],
                   // --- ESTADO INICIAL: ninguna ---

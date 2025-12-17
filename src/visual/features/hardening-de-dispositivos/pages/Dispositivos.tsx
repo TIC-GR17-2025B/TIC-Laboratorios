@@ -13,6 +13,8 @@ import { useDispositivos } from "../hooks";
 import VPNIcon from "../../../common/icons/VPNIcon";
 import ModalVPNCliente from "../../simulacion-redes/components/ModalVPNCliente";
 import PageTransition from "../../../common/components/PageTransition";
+import ActivosIcon from "../../../common/icons/ActivosIcon";
+import ModalExploradorArchivos from "../components/ModalExploradorArchivos";
 import SoftwareIcon from "../../../common/icons/SoftwareIcon";
 import ModalApps from "../components/ModalApps";
 
@@ -54,6 +56,11 @@ function Dispositivos() {
                         getLabel={(d) => d.nombre ?? "Dispositivo sin nombre"}
                         icon={<DevicesIcon size={16} />}
                     />
+                </div>
+                <div className={styles.botones}>
+                    <button onClick={() => openModal(<ModalExploradorArchivos />, 'Explorador de Archivos')}>
+                        <ActivosIcon size={16} />Explorar Archivos
+                    </button>
                 </div>
                 <div className={styles.botonesAccion}>
                     <button onClick={() => openModal(<ModalApps />, 'Gestionar Aplicaciones')}>
