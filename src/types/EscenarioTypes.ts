@@ -22,6 +22,7 @@ export interface Escenario {
   eventos: EventoComponent[];
   fases: FaseComponent[];
   redes: Entidad[];
+  apps: SoftwareApp[];
 }
 
 export interface EscenarioPreview {
@@ -56,6 +57,12 @@ export interface Dispositivo {
 export interface Activo {
   nombre: string;
   contenido: string;
+}
+
+export interface SoftwareApp {
+  nombre: string;
+  descripcion: string;
+  precio: number;
 }
 
 export interface PerfilVPNGateway {

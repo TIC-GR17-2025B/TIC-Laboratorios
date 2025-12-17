@@ -15,6 +15,8 @@ import ModalVPNCliente from "../../simulacion-redes/components/ModalVPNCliente";
 import PageTransition from "../../../common/components/PageTransition";
 import ActivosIcon from "../../../common/icons/ActivosIcon";
 import ModalExploradorArchivos from "../components/ModalExploradorArchivos";
+import SoftwareIcon from "../../../common/icons/SoftwareIcon";
+import ModalApps from "../components/ModalApps";
 
 function Dispositivos() {
     const { setDispositivoSeleccionado, dispositivoSeleccionado, entidadSeleccionadaId } = useEscenario();
@@ -58,6 +60,10 @@ function Dispositivos() {
                 <div className={styles.botones}>
                     <button onClick={() => openModal(<ModalExploradorArchivos />, 'Explorador de Archivos')}>
                         <ActivosIcon size={16} />Explorar Archivos
+                </div>
+                <div className={styles.botonesAccion}>
+                    <button onClick={() => openModal(<ModalApps />, 'Gestionar Aplicaciones')}>
+                        <SoftwareIcon />Gestionar Apps
                     </button>
                     <button onClick={() => openModal(<ModalVPNCliente />, 'Configuración de VPN Cliente')}>
                         <VPNIcon />Configurar VPN

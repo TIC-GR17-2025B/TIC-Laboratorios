@@ -18,7 +18,7 @@ import {
   SistemaTiempo,
 } from "../systems";
 import { ScenarioBuilder } from "../utils/ScenarioBuilder";
-import type { Activo, Escenario, LogGeneral } from "../../types/EscenarioTypes";
+import type { Activo, Escenario, LogGeneral, SoftwareApp } from "../../types/EscenarioTypes";
 import {
   EventosInternos,
   EventosPublicos,
@@ -460,6 +460,51 @@ export class EscenarioController {
         break;
       }
     }
+  public comprarApp(entidadDispositivo: Entidad, nombreApp: string): void {
+    if (!this.sistemaPresupuesto || !this.entidadPresupuesto) {
+      console.error("Sistema de presupuesto no inicializado");
+      return;
+    }
+    this.sistemaPresupuesto?.comprarApp(
+      this.entidadPresupuesto,
+      entidadDispositivo,
+      nombreApp
+    );
+  }
+
+  public desinstalarApp(entidadDispositivo: Entidad, nombreApp: string): void {
+    if (!this.sistemaPresupuesto || !this.entidadPresupuesto) {
+      console.error("Sistema de presupuesto no inicializado");
+      return;
+    }
+    this.sistemaPresupuesto?.desinstalarApp(
+      this.entidadPresupuesto,
+      entidadDispositivo,
+      nombreApp
+    );
+  }
+
+  public getTodasAppsDisponibles(): SoftwareApp[] | undefined {
+    for (const [,c] of this.ecsManager.getEntidades()) {
+      if (c.tiene(EscenarioComponent))
+        return c.get(EscenarioComponent)?.apps;
+    }
+  }
+
+  // Devuelve todas las apps que NO están instaladas (compradas) en el dispositivo actual
+  public getAppsDisponiblesPorDispositivo(entidadDispositivo: Entidad)
+  : SoftwareApp[] | undefined {
+    const todasAppsDisponibles = this.getTodasAppsDisponibles();
+    const appsInstaladasDispositivoActual = this.ecsManager.getComponentes(entidadDispositivo)
+                                                    ?.get(DispositivoComponent)?.apps;
+    const appsDisponiblesParaDispositivoActual = [];
+
+    for (const app of todasAppsDisponibles ?? []) {
+      if (!appsInstaladasDispositivoActual?.includes(app))
+        appsDisponiblesParaDispositivoActual.push(app);
+    }
+   
+    return appsDisponiblesParaDispositivoActual;
   }
 
   // MÉTODO PARA RESETEAR EL SINGLETON (útil para desarrollo/testing)

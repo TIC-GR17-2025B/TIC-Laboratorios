@@ -9,6 +9,7 @@ import type { Escenario } from "../../../../types/EscenarioTypes";
 interface Progreso {
     id_progreso: number;
     id_estudiante: number;
+    id_escenario: number;
     nombre_escenario: string;
     terminado: boolean;
     tiempo: number | null;
@@ -57,20 +58,20 @@ export default function LevelSelectionMenuList() {
         // Buscar progresos que coincidan con el escenario
         const progresosEscenario = progresos.filter(p => {
             return p.nombre_escenario === escenarioTitulo ||
-                   p.nombre_escenario.toLowerCase() === escenarioTitulo.toLowerCase() ||
-                   p.nombre_escenario.toLowerCase().includes(escenarioTitulo.toLowerCase()) ||
-                   escenarioTitulo.toLowerCase().includes(p.nombre_escenario.toLowerCase());
+                p.nombre_escenario.toLowerCase() === escenarioTitulo.toLowerCase() ||
+                p.nombre_escenario.toLowerCase().includes(escenarioTitulo.toLowerCase()) ||
+                escenarioTitulo.toLowerCase().includes(p.nombre_escenario.toLowerCase());
         });
-        
+
         // Está completado si hay al menos un progreso con terminado === true
         return progresosEscenario.some(p => p.terminado);
     };
-
     return <div className={styles.menuList}>
         {escenarios.map((escenario) => {
             const completado = isEscenarioCompletado(escenario.titulo);
+
             return (
-                <LevelSelectionMenuItem 
+                <LevelSelectionMenuItem
                     key={escenario.id}
                     escenario={escenario}
                     imagen={escenario.imagenPreview || "https://i.pinimg.com/1200x/53/14/cd/5314cd391bb3df2875d5f9b0d8818586.jpg"}
@@ -90,7 +91,6 @@ interface LevelSelectionMenuItemProps {
 }
 
 function LevelSelectionMenuItem({ escenario, imagen, completado, onSelect }: LevelSelectionMenuItemProps) {
-    
     return <div className={styles.menuItem} onClick={onSelect}>
         <img src={imagen} className={styles.backgroundImage} alt={escenario.titulo} />
         <div className={styles.gradient}></div>

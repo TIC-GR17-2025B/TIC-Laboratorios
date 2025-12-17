@@ -1,112 +1,130 @@
 .container {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    padding: 2rem;
-    min-height: 100vh;
-    background-color: var(--surface-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 2rem;
+  min-height: 100vh;
+  background-color: var(--surface-primary);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: var(--text-primary);
 }
 
 .title {
-    margin: 0;
-    padding: 0 0 1rem 0;
-    font-size: 2rem;
-    font-weight: 300;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: var(--text-primary);
-    border-bottom: 1px solid var(--border-primary);
+  margin: 0;
+  padding: 0 0 1rem 0;
+  font-size: 2rem;
+  font-weight: 300;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-primary);
 }
 
 .menuList {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
 }
 
 .menuItem {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    height: 70vh;
-    border-radius: var(--border-radius);
-    overflow: hidden;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    border: 1px solid var(--border-primary);
-    background-color: var(--surface-secondary);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 70vh;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid var(--border-primary);
+  background-color: var(--surface-secondary);
 }
 
 .menuItem:hover {
-    border-color: var(--blue);
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  border-color: var(--blue);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 
 .backgroundImage {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    z-index: 0;
-    transition: transform 0.3s ease;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  transition: transform 0.3s ease;
 }
 
 .menuItem:hover .backgroundImage {
-    transform: scale(1.05);
+  transform: scale(1.05);
 }
 
 .gradient {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0.9) 100%);
-    z-index: 1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.4) 50%,
+    rgba(0, 0, 0, 0.9) 100%
+  );
+  z-index: 1;
 }
 
 .content {
-    position: relative;
-    z-index: 2;
-    padding: 2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    color: var(--text-primary);
+  position: relative;
+  z-index: 2;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  color: var(--text-primary);
 }
 
 .content h2 {
-    margin: 0;
-    font-size: 1.4rem;
-    font-weight: 400;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .description {
-    font-size: 0.9rem;
-    line-height: 1.5;
-    color: var(--text-muted);
-    margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+  margin: 0;
 }
 
 .statusBadge {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.85rem;
-    color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
 }
 
 .locked {
-    color: var(--text-secondary);
-    font-style: italic;
+  color: var(--text-secondary);
+  font-style: italic;
 }
 
 .unlocked {
-    color: var(--blue-lighter);
+  color: var(--blue-lighter);
 }

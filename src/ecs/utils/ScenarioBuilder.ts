@@ -17,7 +17,7 @@ import {
   ClienteVPNComponent,
 } from "../components";
 import type { ComponenteContainer, Entidad } from "../core/Componente";
-import { type Activo, type Dispositivo, type Escenario, type ObjetivoFase } from "../../types/EscenarioTypes";
+import { type Activo, type Dispositivo, type Escenario, type ObjetivoFase, type SoftwareApp } from "../../types/EscenarioTypes";
 import { SistemaJerarquiaEscenario } from "../systems/SistemaJerarquiaEscenario";
 import {
   TipoAtaque,
@@ -72,6 +72,10 @@ export class ScenarioBuilder {
 
     escenario.fases.forEach((fase: unknown) => {
       this.crearFase(escenarioPadre, fase);
+    });
+
+    escenario.apps.forEach((app: unknown) => {
+      this.crearApp(escenarioPadre, app);
     });
 
     // Crear la red Internet UNA SOLA VEZ como red global
@@ -223,9 +227,6 @@ export class ScenarioBuilder {
       objetivos: ObjetivoFase[];
     };
     const escenarioContainer = this.ecsManager.getEntidades().get(entidadEscenario);
-    //const entidadFase = this.ecsManager.agregarEntidad();
-    //this.ecsManager.agregarComponente(
-      //entidadFase,
     const faseAAgregar = new FaseComponent(
         f.id,
         f.nombre,
@@ -235,7 +236,14 @@ export class ScenarioBuilder {
         f.objetivos ?? []
       );
     escenarioContainer?.get(EscenarioComponent)?.fases.push(faseAAgregar);
-    //);
+  }
+
+  crearApp(entidadEscenario: Entidad, app: unknown) {
+    const a = app as SoftwareApp;
+
+    const escenarioContainer = this.ecsManager.getEntidades().get(entidadEscenario);
+
+    escenarioContainer?.get(EscenarioComponent)?.apps.push(a);
   }
 
   crearZona(zona: unknown, escenarioEntidad?: Entidad): Entidad {
@@ -326,6 +334,7 @@ export class ScenarioBuilder {
       estadoAtaque?: unknown;
       posicion?: { x: number; y: number; z: number; rotacionY?: number };
       redes?: string[];
+      apps?: SoftwareApp[];
     };
 
     // Extraer entidades de redes
@@ -345,7 +354,8 @@ export class ScenarioBuilder {
         d.hardware ?? "",
         d.tipo as unknown as TipoDispositivo,
         d.estadoAtaque as EstadoAtaqueDispositivo,
-        entidadesRedesDispActual
+        entidadesRedesDispActual,
+        d.apps
       )
     );
 

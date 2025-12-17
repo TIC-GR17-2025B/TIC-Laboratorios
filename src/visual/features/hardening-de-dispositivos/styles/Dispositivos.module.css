@@ -68,11 +68,11 @@
   justify-content: space-between;
 }
 
-.botones {
+.botonesAccion {
   display: flex;
   gap: 8px;
 }
 
-.parteSuperior button {
+.botonesAccion > button {
   border: 1px solid var(--border-primary);
 }
