@@ -18,7 +18,7 @@ import {
   SistemaTiempo,
 } from "../systems";
 import { ScenarioBuilder } from "../utils/ScenarioBuilder";
-import type { Escenario, LogGeneral } from "../../types/EscenarioTypes";
+import type { Activo, Escenario, LogGeneral } from "../../types/EscenarioTypes";
 import {
   EventosInternos,
   EventosPublicos,
@@ -452,6 +452,10 @@ export class EscenarioController {
 
   public getHashDocumento(contenido: string): string | undefined {
     return this.sistemaActivo?.calcularHashDocumento(contenido);
+  }
+
+  public getHashFirma(firma: Activo, clave: Activo): string | undefined {
+    return this.sistemaActivo?.calcularHashFirma(firma, clave);
   }
 
   // MÉTODO PARA RESETEAR EL SINGLETON (útil para desarrollo/testing)
