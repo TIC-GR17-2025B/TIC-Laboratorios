@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState } from "react";
+import { API_BASE_URL } from "../../../common/utils/apiConfig";
 
 export interface FeedbackResponse {
   analisis: string;
@@ -22,10 +23,10 @@ export const useGenerateFeedback = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/feedback/generate', {
-        method: 'POST',
+      const response = await fetch(`${API_BASE_URL}/api/feedback/generate`, {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           id_estudiante: idEstudiante,
@@ -34,20 +35,20 @@ export const useGenerateFeedback = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Error al generar retroalimentación');
+        throw new Error("Error al generar retroalimentación");
       }
 
       const result: FeedbackAPIResponse = await response.json();
 
       if (!result.success) {
-        throw new Error('Error al generar retroalimentación');
+        throw new Error("Error al generar retroalimentación");
       }
 
       return {
-        feedback: result.data
+        feedback: result.data,
       };
     } catch (err) {
-      console.error('Error al generar feedback:', err);
+      console.error("Error al generar feedback:", err);
       return null;
     } finally {
       setLoading(false);

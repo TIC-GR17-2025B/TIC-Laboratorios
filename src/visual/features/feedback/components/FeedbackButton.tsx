@@ -2,13 +2,21 @@ import { useGenerateFeedback } from '../hooks/useGenerateFeedback';
 import { useFeedback } from '../hooks/useFeedback';
 import styles from './FeedbackButton.module.css';
 
+interface FeedbackData {
+    analisis: string;
+    fortaleza: string;
+    area_mejora: string;
+    consejo: string;
+}
+
 interface FeedbackButtonProps {
     idEstudiante: number;
     idEscenario: number;
     disabled?: boolean;
+    onFeedbackGenerated?: (feedback: FeedbackData) => void;
 }
 
-export function FeedbackButton({ idEstudiante, idEscenario, disabled }: FeedbackButtonProps) {
+export function FeedbackButton({ idEstudiante, idEscenario, disabled, onFeedbackGenerated }: FeedbackButtonProps) {
     const { generateFeedback, loading } = useGenerateFeedback();
     const { habilitado, loading: checkingStatus, refetch } = useFeedback(idEstudiante, idEscenario);
 
@@ -17,16 +25,14 @@ export function FeedbackButton({ idEstudiante, idEscenario, disabled }: Feedback
 
         const response = await generateFeedback(idEstudiante, idEscenario);
 
-        if (response) {
+        if (response && response.feedback) {
             // Consultar backend para obtener estado actualizado
             await refetch();
 
-            // Esta es la info que necesitas no se si lo hagas aca JEFE
-            // response.feedback.analisis
-            // response.feedback.fortaleza
-            // response.feedback.area_mejora
-            // response.feedback.consejo
-            console.log('Retroalimentación recibida:', response.feedback);
+            // Llamar al callback con el feedback
+            if (onFeedbackGenerated) {
+                onFeedbackGenerated(response.feedback);
+            }
         }
     };
 
@@ -46,7 +52,6 @@ export function FeedbackButton({ idEstudiante, idEscenario, disabled }: Feedback
             {loading ? (
                 <>
                     <span className={styles.spinner}></span>
-                    Generando...
                 </>
             ) : (
                 <>
@@ -64,7 +69,6 @@ export function FeedbackButton({ idEstudiante, idEscenario, disabled }: Feedback
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                         <path d="M8 10h.01M12 10h.01M16 10h.01" />
                     </svg>
-                    Generar Retroalimentación
                 </>
             )}
         </button>

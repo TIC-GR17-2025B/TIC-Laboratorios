@@ -1,0 +1,364 @@
+.container {
+  min-height: 100vh;
+  background-color: var(--surface-primary);
+  color: var(--text-primary);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 24px;
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.header h1 {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.backButton {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: 1px solid var(--border-primary);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  line-height: 0;
+  color: var(--text-primary);
+}
+
+.backButton:hover {
+  border-color: var(--blue);
+  background: var(--surface-secondary);
+}
+
+.content {
+  padding: 24px;
+}
+
+.profileHeader {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2rem;
+  background: var(--surface-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  margin-bottom: 2rem;
+}
+
+.avatarLarge {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--blue) 0%, var(--blue-lighter) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 32px;
+  color: white;
+  flex-shrink: 0;
+}
+
+.profileInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.profileName {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.profileEmail {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.profileCode {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-muted);
+  font-family: monospace;
+}
+
+.statsSection {
+  margin-bottom: 2rem;
+}
+
+.sectionTitle {
+  margin: 0 0 1rem 0;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.statCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: var(--surface-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  text-align: center;
+}
+
+.statValue {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--blue);
+}
+
+.statLabel {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+.progressSection {
+  margin-bottom: 2rem;
+}
+
+.loadingState {
+  padding: 3rem;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  background: var(--surface-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  text-align: center;
+  gap: 1rem;
+}
+
+.emptyState svg {
+  color: var(--text-muted);
+  opacity: 0.5;
+}
+
+.emptyState p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.emptyState button {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, var(--blue) 0%, var(--blue-lighter) 100%);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.emptyState button:hover {
+  transform: translateY(-2px);
+}
+
+.escenariosList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.escenarioCard {
+  border: 1px solid var(--border-primary);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  transition: all 0.2s ease;
+  background: var(--surface-primary);
+}
+
+.escenarioHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  gap: 1rem;
+}
+
+.escenarioClickArea {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  min-width: 0;
+}
+
+.escenarioClickArea:hover {
+  opacity: 0.8;
+}
+
+.escenarioInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.escenarioInfo h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-weight: 500;
+  font-size: 1.1rem;
+}
+
+.escenarioStatus {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.badgeCompletado,
+.badgeIntentado,
+.badgeNoIntentado {
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.badgeCompletado {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4caf50;
+}
+
+.badgeIntentado {
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+}
+
+.badgeNoIntentado {
+  background: var(--surface-secondary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-primary);
+}
+
+.expandIcon {
+  color: var(--text-secondary);
+  transition: transform 0.2s ease;
+}
+
+.expandIcon.expanded {
+  transform: rotate(180deg);
+}
+
+.feedbackButtonWrapper {
+  flex-shrink: 0;
+}
+
+.escenarioDetails {
+  padding: 1rem;
+  border-top: 1px solid var(--border-primary);
+}
+
+.intentosList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.intentoItem {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: var(--surface-primary);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-primary);
+}
+
+.intentoNumero {
+  width: 75px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.intentoInfo {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.intentoTiempo {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.intentoFecha {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  text-align: right;
+}
+
+.intentoExito {
+  color: #4caf50;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.intentoFallo {
+  color: #ff6b6b;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .escenarioHeader {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .escenarioClickArea {
+    width: 100%;
+  }
+
+  .feedbackButtonWrapper {
+    width: 100%;
+  }
+
+  .intentoItem {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .escenarioStatus {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+}

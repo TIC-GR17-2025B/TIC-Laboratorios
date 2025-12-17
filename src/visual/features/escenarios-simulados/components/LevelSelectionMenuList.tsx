@@ -5,7 +5,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useSelectedLevel } from "../../../common/contexts/SelectedLevelContext";
 import type { Escenario } from "../../../../types/EscenarioTypes";
-import { FeedbackButton } from "../../feedback/components/FeedbackButton";
 
 interface Progreso {
     id_progreso: number;
@@ -59,31 +58,24 @@ export default function LevelSelectionMenuList() {
         // Buscar progresos que coincidan con el escenario
         const progresosEscenario = progresos.filter(p => {
             return p.nombre_escenario === escenarioTitulo ||
-                   p.nombre_escenario.toLowerCase() === escenarioTitulo.toLowerCase() ||
-                   p.nombre_escenario.toLowerCase().includes(escenarioTitulo.toLowerCase()) ||
-                   escenarioTitulo.toLowerCase().includes(p.nombre_escenario.toLowerCase());
+                p.nombre_escenario.toLowerCase() === escenarioTitulo.toLowerCase() ||
+                p.nombre_escenario.toLowerCase().includes(escenarioTitulo.toLowerCase()) ||
+                escenarioTitulo.toLowerCase().includes(p.nombre_escenario.toLowerCase());
         });
-        
+
         // Está completado si hay al menos un progreso con terminado === true
         return progresosEscenario.some(p => p.terminado);
     };
     return <div className={styles.menuList}>
         {escenarios.map((escenario) => {
             const completado = isEscenarioCompletado(escenario.titulo);
-            const progresosEscenario = progresos.filter(p => {
-                return p.nombre_escenario === escenario.titulo ||
-                       p.nombre_escenario.toLowerCase() === escenario.titulo.toLowerCase() ||
-                       p.nombre_escenario.toLowerCase().includes(escenario.titulo.toLowerCase()) ||
-                       escenario.titulo.toLowerCase().includes(p.nombre_escenario.toLowerCase());
-            });
-            
+
             return (
-                <LevelSelectionMenuItem 
+                <LevelSelectionMenuItem
                     key={escenario.id}
                     escenario={escenario}
                     imagen={escenario.imagenPreview || "https://i.pinimg.com/1200x/53/14/cd/5314cd391bb3df2875d5f9b0d8818586.jpg"}
                     completado={completado}
-                    progresos={progresosEscenario}
                     onSelect={() => handleSelectLevel(escenario.id)}
                 />
             );
@@ -95,20 +87,10 @@ interface LevelSelectionMenuItemProps {
     escenario: EscenarioPreview;
     imagen: string;
     completado: boolean;
-    progresos: Progreso[];
     onSelect: () => void;
 }
 
-function LevelSelectionMenuItem({ escenario, imagen, completado, progresos, onSelect }: LevelSelectionMenuItemProps) {
-    // Obtener id_estudiante del usuario actual
-    const userStr = localStorage.getItem('user');
-    const user = userStr ? JSON.parse(userStr) : null;
-    const idEstudiante = user?.id_estudiante;
-    
-    // Obtener id_escenario real desde los progresos
-    const idEscenario = progresos.length > 0 ? progresos[0].id_escenario : null;
-    const tieneIntentos = progresos.length > 0;
-    
+function LevelSelectionMenuItem({ escenario, imagen, completado, onSelect }: LevelSelectionMenuItemProps) {
     return <div className={styles.menuItem} onClick={onSelect}>
         <img src={imagen} className={styles.backgroundImage} alt={escenario.titulo} />
         <div className={styles.gradient}></div>
@@ -124,13 +106,6 @@ function LevelSelectionMenuItem({ escenario, imagen, completado, progresos, onSe
                     </>
                 )}
             </div>
-            
-            {tieneIntentos && idEstudiante && idEscenario && (
-                <FeedbackButton 
-                    idEstudiante={idEstudiante}
-                    idEscenario={idEscenario}
-                />
-            )}
         </div>
     </div>
 };

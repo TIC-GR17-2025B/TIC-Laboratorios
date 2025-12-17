@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from "react";
+import { API_BASE_URL } from "../../../common/utils/apiConfig";
 
 interface FeedbackStatusResponse {
   success: boolean;
@@ -6,7 +7,6 @@ interface FeedbackStatusResponse {
   intentos_actuales: number;
   intentos_al_generar: number | null;
 }
-
 
 export function useFeedback(
   idEstudiante: number | null,
@@ -26,7 +26,7 @@ export function useFeedback(
 
     try {
       const response = await fetch(
-        `/api/feedback/check-status?id_estudiante=${idEstudiante}&id_escenario=${idEscenario}`
+        `${API_BASE_URL}/api/feedback/check-status?id_estudiante=${idEstudiante}&id_escenario=${idEscenario}`
       );
 
       if (response.ok) {
@@ -36,7 +36,7 @@ export function useFeedback(
         setHabilitado(true);
       }
     } catch (error) {
-      console.error('Error al verificar estado de feedback:', error);
+      console.error("Error al verificar estado de feedback:", error);
       setHabilitado(true);
     } finally {
       setLoading(false);
@@ -44,13 +44,12 @@ export function useFeedback(
   }, [idEstudiante, idEscenario]);
 
   useEffect(() => {
-
     checkStatus();
   }, [checkStatus]);
 
   return {
     habilitado,
     loading,
-    refetch: checkStatus
+    refetch: checkStatus,
   };
 }
