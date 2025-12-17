@@ -60,6 +60,7 @@ function Dispositivos() {
                 <div className={styles.botones}>
                     <button onClick={() => openModal(<ModalExploradorArchivos />, 'Explorador de Archivos')}>
                         <ActivosIcon size={16} />Explorar Archivos
+                    </button>
                 </div>
                 <div className={styles.botonesAccion}>
                     <button onClick={() => openModal(<ModalApps />, 'Gestionar Aplicaciones')}>
