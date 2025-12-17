@@ -234,7 +234,7 @@ export class SistemaEvento extends Sistema {
         if(busquedaVeredicto)
           this.ecsManager.emit(EventosPublicos.VERIFICACION_FIRMA_CORRECTA, `Verificación correcta de documento firmado para ${info.nombreDocumento}`);
         else this.ecsManager.emit(EventosPublicos.FASE_NO_COMPLETADA, MensajesGenerales.MSJ_FASE_NO_COMPLETADA);
-
+        break;
       }
       // Próximamente para futuros eventos
     }
