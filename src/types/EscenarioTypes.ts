@@ -62,6 +62,13 @@ export interface Activo {
   propietario?: string;
 }
 
+export interface RegistroVeredictoFirma {
+  nombreDocumento: string;
+  nombreFirma: string;
+  nombreClave: string;
+  veredicto: boolean;
+}
+
 export interface PerfilVPNGateway {
   lanLocal: string;
   hostLan: string;

@@ -18,7 +18,7 @@ import {
   SistemaTiempo,
 } from "../systems";
 import { ScenarioBuilder } from "../utils/ScenarioBuilder";
-import type { Activo, Escenario, LogGeneral } from "../../types/EscenarioTypes";
+import type { Activo, Escenario, LogGeneral, RegistroVeredictoFirma } from "../../types/EscenarioTypes";
 import {
   EventosInternos,
   EventosPublicos,
@@ -193,6 +193,17 @@ export class EscenarioController {
       };
       this.ecsManager.emit(EventosInternos.OBJETIVO_COMPLETADO);
       console.log("EscenarioController: on de FASE_COMPLETADA:",this.ecsManager.getEntidades());
+      this.agregarLogGeneralEscenario(log);
+    });
+
+    this.ecsManager.on(EventosPublicos.VERIFICACION_FIRMA_CORRECTA, (data: unknown) => {
+      const descripcion = data as string;
+      const log = {
+        tipo: TipoLogGeneral.COMPLETADO,
+        mensaje: descripcion,
+        pausarTiempo: false,
+      };
+      this.ecsManager.emit(EventosInternos.OBJETIVO_COMPLETADO);
       this.agregarLogGeneralEscenario(log);
     });
 
@@ -450,12 +461,16 @@ export class EscenarioController {
     }
   }
 
-  public getHashDocumento(contenido: string): string | undefined {
+  public async getHashDocumento(contenido: string) {
     return this.sistemaActivo?.calcularHashDocumento(contenido);
   }
 
-  public getHashFirma(firma: Activo, clave: Activo): string | undefined {
+  public async getHashFirma(firma: Activo, clave: Activo) {
     return this.sistemaActivo?.calcularHashFirma(firma, clave);
+  }
+
+  public registrarVeredictoFirma(registro: RegistroVeredictoFirma) {
+    this.sistemaActivo?.registrarVeredictoFirma(registro);
   }
 
   // MÉTODO PARA RESETEAR EL SINGLETON (útil para desarrollo/testing)

@@ -5,9 +5,9 @@ import { TipoActivo } from "../src/types/DeviceEnums";
 import { Activo } from "../src/types/EscenarioTypes";
 
 describe("SistemaActivo", () => {
-    test("verifica la firma de un documento junto con la clave pública", () => {
+    test("verifica la firma de un documento junto con la clave pública", async () => {
         const em = new ECSManager();
-        
+
         const sistemaActivo = new SistemaActivo();
         em.agregarSistema(sistemaActivo);
 
@@ -28,14 +28,14 @@ describe("SistemaActivo", () => {
             tipo: TipoActivo.CLAVE_PUBLICA,
             propietario: "Jacob"
         };
-        
-        const hashDocumento = sistemaActivo.calcularHashDocumento(documentoFirmado.contenido!);
-        const hashFirma = sistemaActivo.calcularHashFirma(firma, clavePublica);
+
+        const hashDocumento = await sistemaActivo.calcularHashDocumento(documentoFirmado.contenido!);
+        const hashFirma = await sistemaActivo.calcularHashFirma(firma, clavePublica);
 
         expect(hashDocumento).toEqual(hashFirma);
     });
 
-    test("resultado incorrecto entre la firma de un documento y una clave pública diferente", () => {
+    test("resultado incorrecto entre la firma de un documento y una clave pública diferente", async () => {
         const em = new ECSManager();
         
         const sistemaActivo = new SistemaActivo();
@@ -59,8 +59,8 @@ describe("SistemaActivo", () => {
             propietario: "Lisa"
         };
         
-        const hashDocumento = sistemaActivo.calcularHashDocumento(documentoFirmado.contenido!);
-        const hashFirma = sistemaActivo.calcularHashFirma(firma, clavePublica);
+        const hashDocumento = await sistemaActivo.calcularHashDocumento(documentoFirmado.contenido!);
+        const hashFirma = await sistemaActivo.calcularHashFirma(firma, clavePublica);
 
         expect(hashDocumento).not.toEqual(hashFirma);
     });

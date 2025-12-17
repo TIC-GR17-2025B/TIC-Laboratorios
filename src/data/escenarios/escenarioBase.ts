@@ -19,6 +19,19 @@ export const escenarioBase: unknown = {
   ataques: [],
   eventos: [
     {
+      nombreEvento: "Verificación de firma",
+      tipoEvento: TipoEvento.VERIFICACION_FIRMA,
+      tiempoNotificacion: 5,
+      descripción: "Jacob ha enviado un documento firmado a Computadora Administrativa. Asegúrate de verificar la firma del documento junto con la clave pública de Jacob para evitar posibles archivos maliciosos.",
+      fase: 1,
+      infoAdicional: {
+        nombreDocumento: "Documento Jacob",
+        nombreFirma: "Firma Documento Jacob",
+        nombreClave: "Clave_Publica_Jacob",
+        veredicto: true,
+      },
+    },
+    {
       nombreEvento: "Falla de Conectividad IDS",
       tipoEvento: TipoEvento.TRAFICO_RED,
       tiempoNotificacion: 10, // Es el primer reto
@@ -164,13 +177,13 @@ export const escenarioBase: unknown = {
                   estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
                   activos: [
                     {
-                      nombre: "Activo1",
+                      nombre: "Documento Jacob",
                       contenido: "La contraseña secreta es 123",
                       tipo: TipoActivo.DOCUMENTO,
-                      firma: "Firma Activo1"
+                      firma: "Firma Documento Jacob"
                     },
                     {
-                      nombre: "Firma Activo1",
+                      nombre: "Firma Documento Jacob",
                       contenido: "La contraseña secreta es 123",
                       tipo: TipoActivo.FIRMA_DIGITAL,
                       propietario: "Jacob"
