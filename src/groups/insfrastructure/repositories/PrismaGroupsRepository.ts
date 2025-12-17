@@ -10,6 +10,7 @@ import type {
   Matricula,
 } from "../../domain/models/Matricula.js";
 import { prisma } from "../../../auth/infrastructure/db/prisma.js";
+import type { EstudiantePublic } from "../../../auth/domain/models/Estudiante.js";
 
 export class PrismaGroupsRepository implements IGroupsRepository {
   async createCurso(data: CursoCreateInput): Promise<Curso> {
@@ -101,11 +102,23 @@ export class PrismaGroupsRepository implements IGroupsRepository {
     })) as Curso[];
   }
 
-  async findEstudiantesByCurso(id_curso: number): Promise<any[]> {
+  async findEstudiantesByCurso(
+    id_curso: number
+  ): Promise<EstudiantePublic[]> {
     const matriculas = await prisma.matricula.findMany({
       where: { id_curso },
       include: {
-        estudiante: true,
+        estudiante: {
+          select: {
+            id_estudiante: true,
+            codigo_unico: true,
+            primernombre: true,
+            segundo_nombre: true,
+            primer_apellido: true,
+            segundo_apellido: true,
+            correo_electronico: true,
+          },
+        },
       },
     });
 

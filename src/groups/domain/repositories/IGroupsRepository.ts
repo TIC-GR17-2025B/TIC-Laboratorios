@@ -5,6 +5,7 @@ import type {
   DeleteResult,
 } from "../models/Curso.js";
 import type { MatriculaInput, Matricula } from "../models/Matricula.js";
+import type { EstudiantePublic } from "../../../auth/domain/models/Estudiante.js";
 
 export interface IGroupsRepository {
   createCurso(data: CursoCreateInput): Promise<Curso>;
@@ -25,5 +26,5 @@ export interface IGroupsRepository {
   ): Promise<DeleteResult>;
   findCursoById(id_curso: number): Promise<Curso | null>;
   findCursosByProfesor(id_profesor: number): Promise<Curso[]>;
-  findEstudiantesByCurso(id_curso: number): Promise<any[]>;
+  findEstudiantesByCurso(id_curso: number): Promise<EstudiantePublic[]>;
 }
