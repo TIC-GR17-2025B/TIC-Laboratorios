@@ -7,7 +7,6 @@ export class PrismaAuthRepository implements IAuthRepository {
   async createEstudiante(e: Omit<Estudiante, 'id_estudiante'>) {
     const created = await prisma.estudiante.create({
       data: {
-        id_profesor: e.id_profesor || 1,
         codigo_unico: e.codigo_unico,
         primernombre: e.primernombre,
         segundo_nombre: e.segundo_nombre,
@@ -45,16 +44,24 @@ export class PrismaAuthRepository implements IAuthRepository {
   }
 
   async findEstudiantesByProfesor(id_profesor: number): Promise<EstudiantePublic[]> {
-    const estudiantes = await prisma.estudiante.findMany({
-      where: { 
-        id_profesor 
-      },
-      orderBy: {
-        primer_apellido: 'asc'
+  const estudiantes = await prisma.estudiante.findMany({
+    where: {
+      matricula: {
+        some: {
+          curso: {
+            id_profesor: id_profesor
+          }
+        }
       }
-    })
-    return estudiantes.map(({ ...publicData }) => publicData) as EstudiantePublic[]
-  }
+    },
+    orderBy: {
+      primer_apellido: 'asc'
+    }
+  })
+
+  return estudiantes.map(e => e) as EstudiantePublic[]
+}
+
 
   async findEstudianteById(id_estudiante: number): Promise<Estudiante | null> {
     const found = await prisma.estudiante.findUnique({ 

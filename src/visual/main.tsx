@@ -17,6 +17,7 @@ import NotFound from './features/admin-docente-y-estudiante/pages/NotFound.tsx'
 import ProtectedRoute from './features/admin-docente-y-estudiante/components/ProtectedRoute.tsx'
 import ProtectedRouteByRole from './features/admin-docente-y-estudiante/components/ProtectedRouteByRole.tsx'
 import VistaDocente from './features/admin-docente-y-estudiante/pages/VistaDocente.tsx'
+import DetalleGrupo from './features/admin-docente-y-estudiante/pages/DetalleGrupo.tsx'
 import VistaDetalleEstudiante from './features/admin-docente-y-estudiante/pages/VistaDetalleEstudiante.tsx'
 import VistaPerfil from './features/admin-docente-y-estudiante/pages/VistaPerfil.tsx'
 import { AnimatePresence } from 'framer-motion'
@@ -74,6 +75,12 @@ function AnimatedRoutes() {
         <Route path='/docente' element={
           <ProtectedRouteByRole requiredRole="profesor">
             <VistaDocente />
+          </ProtectedRouteByRole>
+        } />
+
+        <Route path='/docente/grupo/:id' element={
+          <ProtectedRouteByRole requiredRole="profesor">
+            <DetalleGrupo />
           </ProtectedRouteByRole>
         } />
 

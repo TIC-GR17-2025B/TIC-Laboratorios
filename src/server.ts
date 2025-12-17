@@ -5,6 +5,7 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import authRouter from './auth/infrastructure/controllers/AuthController.js'
 import progresoRouter from './auth/infrastructure/controllers/ProgresoController.js'
+import groupsRouter from './groups/insfrastructure/controller/GroupsController.js'
 import feedbackRouter from './feedback/infrastructure/controllers/FeedbackController.js'
 import { InMemoryFeedbackStateRepository } from './feedback/infrastructure/repositories/InMemoryFeedbackStateRepository.js'
 
@@ -50,6 +51,7 @@ initializeFeedbackController(feedbackStateRepository);
 // Montar rutas de autenticación
 app.use('/auth', authRouter)
 app.use('/progreso', progresoRouter)
+app.use('/groups', groupsRouter)
 app.use('/feedback', feedbackRouter)
 
 // Manejo de rutas no encontradas
