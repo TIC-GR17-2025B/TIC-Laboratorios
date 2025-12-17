@@ -15,6 +15,8 @@ import ModalVPNCliente from "../../simulacion-redes/components/ModalVPNCliente";
 import PageTransition from "../../../common/components/PageTransition";
 import ShieldCheckIcon from "../../../common/icons/ShieldCheckIcon";
 import ModalVerificacionFirma from "../components/ModalVerificacionFirma";
+import ActivosIcon from "../../../common/icons/ActivosIcon";
+import ModalExploradorArchivos from "../components/ModalExploradorArchivos";
 import SoftwareIcon from "../../../common/icons/SoftwareIcon";
 import ModalApps from "../components/ModalApps";
 
@@ -61,6 +63,13 @@ function Dispositivos() {
                     <button onClick={() => openModal(<ModalVerificacionFirma />, 'Verificación de Firma Digital')}>
                         <ShieldCheckIcon />Verificar Firma
                     </button>
+                </div>
+                <div className={styles.botones}>
+                    <button onClick={() => openModal(<ModalExploradorArchivos />, 'Explorador de Archivos')}>
+                        <ActivosIcon size={16} />Explorar Archivos
+                    </button>
+                </div>
+                <div className={styles.botonesAccion}>
                     <button onClick={() => openModal(<ModalApps />, 'Gestionar Aplicaciones')}>
                         <SoftwareIcon />Gestionar Apps
                     </button>

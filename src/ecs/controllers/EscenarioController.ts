@@ -1,4 +1,5 @@
 import {
+    ActivoComponent,
   AtaqueComponent,
   DispositivoComponent,
   EscenarioComponent,
@@ -18,11 +19,7 @@ import {
   SistemaTiempo,
 } from "../systems";
 import { ScenarioBuilder } from "../utils/ScenarioBuilder";
-
-import type { Activo, Escenario, LogGeneral, RegistroVeredictoFirma } from "../../types/EscenarioTypes";
-
-import type { Escenario, LogGeneral, SoftwareApp } from "../../types/EscenarioTypes";
-
+import type { Activo, Escenario, LogGeneral, SoftwareApp, RegistroVeredictoFirma } from "../../types/EscenarioTypes";
 import {
   EventosInternos,
   EventosPublicos,
@@ -476,6 +473,25 @@ export class EscenarioController {
   public registrarVeredictoFirma(registro: RegistroVeredictoFirma) {
     this.sistemaActivo?.registrarVeredictoFirma(registro);
   }
+
+  public getActivosDeDispositivo(entidadDispositivo: Entidad): Activo[] | undefined {
+    return this.ecsManager.getComponentes(entidadDispositivo)?.get(ActivoComponent)?.activos;
+  }
+
+  public eliminarActivoDeDispositivo(entidadDispositivo: Entidad, nombreActivo: string) {
+    const activosDispActual = this.ecsManager.getComponentes(entidadDispositivo)
+                                       ?.get(ActivoComponent);
+
+    const activos = (activosDispActual?.activos ?? []);
+
+    for (let i = 0; i < activos.length; i++) {
+      if (activos.at(i)?.nombre == nombreActivo) {
+        activosDispActual?.activos?.splice(i, 1);
+        break;
+      }
+    }
+  }
+
   public comprarApp(entidadDispositivo: Entidad, nombreApp: string): void {
     if (!this.sistemaPresupuesto || !this.entidadPresupuesto) {
       console.error("Sistema de presupuesto no inicializado");
