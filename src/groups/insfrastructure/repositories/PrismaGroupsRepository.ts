@@ -57,4 +57,25 @@ export class PrismaGroupsRepository implements IGroupsRepository {
       data: { codigo_acceso, codigo_expira },
     }) as Curso;
   }
+
+  async deleteMatricula(id_curso: number, id_estudiante: number): Promise<DeleteResult> {
+    const deleted = await prisma.matricula.deleteMany({
+      where: { id_curso, id_estudiante },
+    });
+
+    if (deleted.count === 0) {
+      throw new Error("El estudiante no está matriculado en este curso");
+    }
+
+    return {
+      success: true,
+      message: "Matrícula eliminada correctamente",
+    };
+  }
+
+  async findCursoById(id_curso: number): Promise<Curso | null> {
+    return await prisma.curso.findUnique({
+      where: { id_curso },
+    });
+  }
 }

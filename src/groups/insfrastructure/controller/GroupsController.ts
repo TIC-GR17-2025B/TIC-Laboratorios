@@ -4,37 +4,41 @@ import { PrismaGroupsRepository } from "../repositories/PrismaGroupsRepository.j
 import { GroupsUseCase } from "../../application/GroupsUseCase.js";
 import { JoinGroupsUseCase } from "../../application/JoinGroupsUseCase.js";
 import { GenerateGroupCodeUseCase } from "../../application/GenerateGroupCodeUseCase.js";
+import { RemoveStudentGroupUseCase } from "../../application/RemoveStudentGroupUseCase.js";
+import { LeaveGroupUseCase } from "../../application/LeaveGroupUseCase.js";
 
 const router = express.Router();
 const repo = new PrismaGroupsRepository();
 const createCurso = new GroupsUseCase(repo);
 const joinGroups = new JoinGroupsUseCase(repo);
 const generateCode = new GenerateGroupCodeUseCase(repo);
+const removeStudent = new RemoveStudentGroupUseCase(repo);
+const leaveGroup = new LeaveGroupUseCase(repo);
 
-// POST /groups - Crear un nuevo curso
-router.post('/', async (req: Request , res: Response) => {
-    try {
-        const { id_profesor, nombre } = req.body
+// POST /groups - Crear un nuevo grupo
+router.post('/', async (req: Request, res: Response) => {
+  try {
+    const { id_profesor, nombre } = req.body
 
-        // Validación de campos requeridos
-        if (!id_profesor || !nombre) {
-            return res.status(400).json({
-                success: false,
-                error: 'Faltan campos requeridos: id_profesor, nombre'
-            })
-        }
-
-        const curso = await createCurso.createCurso(req.body)
-        res.status(201).json({ success: true, data: curso })
-
-    } catch (err) {
-        if (err instanceof Error) {
-        res.status(400).json({ success: false, error: err.message })
-        }
+    // Validación de campos requeridos
+    if (!id_profesor || !nombre) {
+      return res.status(400).json({
+        success: false,
+        error: 'Faltan campos requeridos: id_profesor, nombre'
+      })
     }
+
+    const curso = await createCurso.createCurso(req.body)
+    res.status(201).json({ success: true, data: curso })
+
+  } catch (err) {
+    if (err instanceof Error) {
+      res.status(400).json({ success: false, error: err.message })
+    }
+  }
 })
 
-// PUT /groups/edit/:id - Editar curso
+// PUT /groups/edit/:id - Editar grupo existente
 router.put('/edit/:id', async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
@@ -53,7 +57,7 @@ router.put('/edit/:id', async (req: Request, res: Response) => {
   }
 });
 
-// DELETE /groups/delete/:id - Eliminar curso
+// DELETE /groups/delete/:id - Eliminar grupo
 router.delete('/delete/:id', async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
@@ -72,6 +76,7 @@ router.delete('/delete/:id', async (req: Request, res: Response) => {
   }
 });
 
+// POST /groups/join - Unirse a un grupo mediante código de acceso
 router.post('/join', async (req: Request, res: Response) => {
   try {
     const { codigo_acceso, id_estudiante } = req.body;
@@ -97,7 +102,8 @@ router.post('/join', async (req: Request, res: Response) => {
   }
 });
 
-router.post('/:id/generate-code', async (req: Request , res: Response) => {
+// POST /groups/:id/generate-code - Generar un nuevo código de acceso para un grupo
+router.post('/:id/generate-code', async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
 
@@ -112,5 +118,37 @@ router.post('/:id/generate-code', async (req: Request , res: Response) => {
     res.status(400).json({ error: (err as Error).message });
   }
 });
+
+// DELETE /groups/:id_curso/remove-student/:id_estudiante - Eliminar un estudiante de un grupo -> Lo hace el profesor
+router.delete("/:id_curso/remove-student/:id_estudiante", async (req: Request, res: Response) => {
+  try {
+    const id_profesor = Number(req.body.id_profesor);
+    const id_curso = Number(req.params.id_curso);
+    const id_estudiante = Number(req.params.id_estudiante);
+
+    const result = await removeStudent.execute(
+      id_profesor,
+      id_curso,
+      id_estudiante
+    );
+    res.json(result);
+  } catch (err) {
+    res.status(400).json({ error: (err as Error).message });
+  }
+});
+
+// DELETE /groups/leave/:id_curso/:id_estudiante - Estudiante se sale del grupo
+router.delete("/leave/:id_curso/:id_estudiante", async (req: Request, res: Response) => {
+    try {
+      const id_curso = Number(req.params.id_curso);
+      const id_estudiante = Number(req.params.id_estudiante);
+
+      const result = await leaveGroup.execute(id_curso, id_estudiante);
+      res.json(result);
+
+    } catch (err) {
+      res.status(400).json({ error: (err as Error).message });
+    }
+  });
 
 export default router

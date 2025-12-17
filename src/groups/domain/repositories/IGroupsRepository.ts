@@ -10,4 +10,6 @@ export interface IGroupsRepository {
     existsMatricula(id_curso: number, id_estudiante: number): Promise<boolean>;
     createMatricula(data: MatriculaInput): Promise<Matricula>;
     updateCursoCodigo(id_curso: number, codigo_acceso:string, codigo_expira:Date): Promise<Curso>;
+    deleteMatricula(id_curso: number, id_estudiante: number): Promise<DeleteResult>;
+    findCursoById(id_curso: number): Promise<Curso | null>;
 }

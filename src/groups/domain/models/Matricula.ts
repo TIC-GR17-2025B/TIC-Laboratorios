@@ -11,3 +11,8 @@ export interface JoinCursoInput {
   codigo_acceso: string
   id_estudiante: number
 }
+
+export interface RemoveMatriculaInput {
+  id_curso: number
+  id_estudiante: number
+}
