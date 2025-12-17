@@ -460,6 +460,8 @@ export class EscenarioController {
         break;
       }
     }
+  }
+
   public comprarApp(entidadDispositivo: Entidad, nombreApp: string): void {
     if (!this.sistemaPresupuesto || !this.entidadPresupuesto) {
       console.error("Sistema de presupuesto no inicializado");
