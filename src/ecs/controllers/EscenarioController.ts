@@ -480,7 +480,7 @@ export class EscenarioController {
     const todasAppsDisponibles = this.getTodasAppsDisponibles();
     const appsInstaladasDispositivoActual = this.ecsManager.getComponentes(entidadDispositivo)
                                                     ?.get(DispositivoComponent)?.apps;
-    let appsDisponiblesParaDispositivoActual = [];
+    const appsDisponiblesParaDispositivoActual = [];
 
     for (const app of todasAppsDisponibles ?? []) {
       if (!appsInstaladasDispositivoActual?.includes(app))
