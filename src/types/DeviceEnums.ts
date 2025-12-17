@@ -37,4 +37,12 @@ export enum TipoEvento {
   NO_APLICA = "n/a", // Para compatibilidad (en el constructor) con los ataques, que también son eventos pero ya tienen su propia lógica
   COMPLETACION_FASE = "Completación de fase",
   COMPLETACION_ESCENARIO = "Completación de escenario",
+  VERIFICACION_FIRMA = "Verificación de firma",
+}
+
+export enum TipoActivo {
+  GENERICO = "generico",
+  DOCUMENTO = "doc",
+  FIRMA_DIGITAL = "firma digital",
+  CLAVE_PUBLICA = "clave publica",
 }

@@ -3,8 +3,9 @@ import { EstadoAtaqueDispositivo, TipoEvento } from "../../types/DeviceEnums";
 import type {
   PerfilClienteVPN,
   PerfilVPNGateway,
+  RegistroVeredictoFirma,
 } from "../../types/EscenarioTypes";
-import { EventosPublicos, EventosInternos } from "../../types/EventosEnums";
+import { EventosPublicos, EventosInternos, MensajesGenerales } from "../../types/EventosEnums";
 import type {
   AccionFirewall,
   DireccionTrafico,
@@ -19,6 +20,7 @@ import {
 } from "../components";
 import { Sistema, type Entidad } from "../core";
 import type { ClaseComponente } from "../core/Componente";
+import { SistemaActivo } from "./SistemaActivo";
 
 export class SistemaEvento extends Sistema {
   public componentesRequeridos: Set<ClaseComponente> = new Set([
@@ -215,6 +217,23 @@ export class SistemaEvento extends Sistema {
       }
       case TipoEvento.COMPLETACION_ESCENARIO: {
         this.ecsManager.emit(EventosPublicos.ESCENARIO_COMPLETADO, evento.descripcion);
+        break;
+      }
+      case TipoEvento.VERIFICACION_FIRMA: {
+        const info = evento.infoAdicional as RegistroVeredictoFirma;
+
+        const registrosVeredictos = this.ecsManager.getSistema(SistemaActivo)?.registroVeredictosFirmas;
+
+        const busquedaVeredicto = registrosVeredictos?.find((registro) => 
+          registro.nombreDocumento === info.nombreDocumento &&
+          registro.nombreFirma === info.nombreFirma &&
+          registro.nombreClave === info.nombreClave &&
+          registro.veredicto === info.veredicto
+        );
+
+        if(busquedaVeredicto)
+          this.ecsManager.emit(EventosPublicos.VERIFICACION_FIRMA_CORRECTA, `Verificación correcta de documento firmado para ${info.nombreDocumento}`);
+        else this.ecsManager.emit(EventosPublicos.FASE_NO_COMPLETADA, MensajesGenerales.MSJ_FASE_NO_COMPLETADA);
         break;
       }
       // Próximamente para futuros eventos

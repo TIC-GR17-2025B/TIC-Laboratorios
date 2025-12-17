@@ -11,6 +11,7 @@ import {
 } from "../components";
 import { ECSManager, type Entidad } from "../core";
 import {
+    SistemaActivo,
   SistemaEvento,
   SistemaFase,
   SistemaJerarquiaEscenario,
@@ -18,7 +19,7 @@ import {
   SistemaTiempo,
 } from "../systems";
 import { ScenarioBuilder } from "../utils/ScenarioBuilder";
-import type { Activo, Escenario, LogGeneral, SoftwareApp } from "../../types/EscenarioTypes";
+import type { Activo, Escenario, LogGeneral, SoftwareApp, RegistroVeredictoFirma } from "../../types/EscenarioTypes";
 import {
   EventosInternos,
   EventosPublicos,
@@ -40,6 +41,7 @@ export class EscenarioController {
   private entidadPresupuesto?: Entidad;
   private sistemaEvento?: SistemaEvento;
   private sistemaFase?: SistemaFase;
+  private sistemaActivo?: SistemaActivo;
   private progresoController?: ProgresoController;
   private escenarioIniciado: boolean = false; // FLAG PARA EVITAR MÚLTIPLES INICIALIZACIONES
 
@@ -90,6 +92,11 @@ export class EscenarioController {
       this.sistemaFase = new SistemaFase();
       this.ecsManager.agregarSistema(this.sistemaFase);
       this.sistemaFase.iniciarEscuchaDeEvento();
+    }
+
+    if (!this.sistemaActivo) {
+      this.sistemaActivo = new SistemaActivo();
+      this.ecsManager.agregarSistema(this.sistemaActivo);
     }
 
     if (!this.progresoController) {
@@ -187,6 +194,17 @@ export class EscenarioController {
       };
       this.ecsManager.emit(EventosInternos.OBJETIVO_COMPLETADO);
       console.log("EscenarioController: on de FASE_COMPLETADA:",this.ecsManager.getEntidades());
+      this.agregarLogGeneralEscenario(log);
+    });
+
+    this.ecsManager.on(EventosPublicos.VERIFICACION_FIRMA_CORRECTA, (data: unknown) => {
+      const descripcion = data as string;
+      const log = {
+        tipo: TipoLogGeneral.COMPLETADO,
+        mensaje: descripcion,
+        pausarTiempo: false,
+      };
+      this.ecsManager.emit(EventosInternos.OBJETIVO_COMPLETADO);
       this.agregarLogGeneralEscenario(log);
     });
 
@@ -442,6 +460,18 @@ export class EscenarioController {
         return container.get(EscenarioComponent)?.fases;
       }
     }
+  }
+
+  public async getHashDocumento(contenido: string) {
+    return this.sistemaActivo?.calcularHashDocumento(contenido);
+  }
+
+  public async getHashFirma(firma: Activo, clave: Activo) {
+    return this.sistemaActivo?.calcularHashFirma(firma, clave);
+  }
+
+  public registrarVeredictoFirma(registro: RegistroVeredictoFirma) {
+    this.sistemaActivo?.registrarVeredictoFirma(registro);
   }
 
   public getActivosDeDispositivo(entidadDispositivo: Entidad): Activo[] | undefined {

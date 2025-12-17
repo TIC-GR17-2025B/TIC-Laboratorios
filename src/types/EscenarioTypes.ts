@@ -7,6 +7,7 @@ import type { Entidad } from "../ecs/core";
 import {
   EstadoAtaqueDispositivo,
   Mueble,
+  TipoActivo,
   TipoDispositivo,
   TipoProteccionVPN,
 } from "./DeviceEnums";
@@ -56,7 +57,17 @@ export interface Dispositivo {
 
 export interface Activo {
   nombre: string;
-  contenido: string;
+  contenido?: string;
+  tipo: TipoActivo;
+  firma?: string; // En caso de que sea un documento firmado, se coloca el nombre de la firma
+  propietario?: string;
+}
+
+export interface RegistroVeredictoFirma {
+  nombreDocumento: string;
+  nombreFirma: string;
+  nombreClave: string;
+  veredicto: boolean;
 }
 
 export interface SoftwareApp {

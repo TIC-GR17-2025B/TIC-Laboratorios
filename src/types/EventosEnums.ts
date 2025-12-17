@@ -32,6 +32,7 @@ export enum EventosPublicos {
   FASE_COMPLETADA = "fase:completada",
   FASE_NO_COMPLETADA = "fase:noCompletada",
   ESCENARIO_COMPLETADO = "escenario:completado",
+  VERIFICACION_FIRMA_CORRECTA = "verificacionFirma:correcta",
 
   LOGS_GENERALES_ACTUALIZADOS = "logsGenerales:actualizados",
 }

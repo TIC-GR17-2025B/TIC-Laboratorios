@@ -13,6 +13,8 @@ import { useDispositivos } from "../hooks";
 import VPNIcon from "../../../common/icons/VPNIcon";
 import ModalVPNCliente from "../../simulacion-redes/components/ModalVPNCliente";
 import PageTransition from "../../../common/components/PageTransition";
+import ShieldCheckIcon from "../../../common/icons/ShieldCheckIcon";
+import ModalVerificacionFirma from "../components/ModalVerificacionFirma";
 import ActivosIcon from "../../../common/icons/ActivosIcon";
 import ModalExploradorArchivos from "../components/ModalExploradorArchivos";
 import SoftwareIcon from "../../../common/icons/SoftwareIcon";
@@ -56,6 +58,11 @@ function Dispositivos() {
                         getLabel={(d) => d.nombre ?? "Dispositivo sin nombre"}
                         icon={<DevicesIcon size={16} />}
                     />
+                </div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                    <button onClick={() => openModal(<ModalVerificacionFirma />, 'Verificación de Firma Digital')}>
+                        <ShieldCheckIcon />Verificar Firma
+                    </button>
                 </div>
                 <div className={styles.botones}>
                     <button onClick={() => openModal(<ModalExploradorArchivos />, 'Explorador de Archivos')}>

@@ -1,6 +1,7 @@
 import {
   EstadoAtaqueDispositivo,
   Mueble,
+  TipoActivo,
   TipoDispositivo,
   TipoEvento,
   TipoProteccionVPN,
@@ -34,6 +35,19 @@ export const escenarioBase: unknown = {
     },
   ],
   eventos: [
+    {
+      nombreEvento: "Verificación de firma",
+      tipoEvento: TipoEvento.VERIFICACION_FIRMA,
+      tiempoNotificacion: 5,
+      descripción: "Jacob ha enviado un documento firmado a Computadora Administrativa. Asegúrate de verificar la firma del documento junto con la clave pública de Jacob para evitar posibles archivos maliciosos.",
+      fase: 1,
+      infoAdicional: {
+        nombreDocumento: "Documento Jacob",
+        nombreFirma: "Firma Documento Jacob",
+        nombreClave: "Clave_Publica_Jacob",
+        veredicto: true,
+      },
+    },
     {
       nombreEvento: "Falla de Conectividad IDS",
       tipoEvento: TipoEvento.TRAFICO_RED,
@@ -106,7 +120,8 @@ export const escenarioBase: unknown = {
     {
       id: 1,
       nombre: "Fase 1: Retos de Configuración de Red",
-      descripcion: "Completar los 3 retos de asignación de red y firewall.",
+      descripcion:
+        "Completar los 4 retos de asignación de red y firewall.",
       faseActual: true,
       completada: false,
       objetivos: [
@@ -114,6 +129,10 @@ export const escenarioBase: unknown = {
         // con los eventos/ataques que el jugador debe manejar, y que se hayan definido en
         // sus arrays corrspondientes de eventos o ataques en este json. Importante: Deben
         // definirse en el mismo orden en el que se supone que el jugador debe completarlos.
+        {
+          descripcion: "Verificación de firma",
+          completado: false,
+        },
         {
           descripcion: "Falla de Conectividad IDS",
           completado: false,
@@ -182,8 +201,31 @@ export const escenarioBase: unknown = {
                   estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
                   activos: [
                     {
-                      nombre: "Activo1",
+                      nombre: "Documento Jacob",
                       contenido: "La contraseña secreta es 123",
+                      tipo: TipoActivo.DOCUMENTO,
+                      firma: "Firma Documento Jacob"
+                    },
+                    {
+                      nombre: "Firma Documento Jacob",
+                      contenido: "La contraseña secreta es 123",
+                      tipo: TipoActivo.FIRMA_DIGITAL,
+                      propietario: "Jacob"
+                    },
+                    {
+                      nombre: "Clave_Publica_Jacob",
+                      tipo: TipoActivo.CLAVE_PUBLICA,
+                      propietario: "Jacob"
+                    },
+                    {
+                      nombre: "Activo genérico",
+                      contenido: "a",
+                      tipo: TipoActivo.GENERICO
+                    },
+                    {
+                      nombre: "Activo genérico 2",
+                      contenido: "abcdefg",
+                      tipo: TipoActivo.DOCUMENTO
                     },
                     {
                       nombre: "Activo2",
