@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { useAuth } from "../../admin-docente-y-estudiante/hooks/useAuth";
 import ModalUnirseGrupo from "../../admin-docente-y-estudiante/components/ModalUnirseGrupo";
 import LevelSelectionMenuList from "../components/LevelSelectionMenuList";
+import UserMenu from "../../admin-docente-y-estudiante/components/UserMenu";
 import styles from "../styles/VistaSeleccionNiveles.module.css";
 
 const API_URL = "/api";

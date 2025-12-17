@@ -19,6 +19,7 @@ import ProtectedRouteByRole from './features/admin-docente-y-estudiante/componen
 import VistaDocente from './features/admin-docente-y-estudiante/pages/VistaDocente.tsx'
 import DetalleGrupo from './features/admin-docente-y-estudiante/pages/DetalleGrupo.tsx'
 import VistaDetalleEstudiante from './features/admin-docente-y-estudiante/pages/VistaDetalleEstudiante.tsx'
+import VistaPerfil from './features/admin-docente-y-estudiante/pages/VistaPerfil.tsx'
 import { AnimatePresence } from 'framer-motion'
 import VistaFasesPartida from './features/escenarios-simulados/pages/VistaFasesPartida.tsx'
 import { FasesProvider } from './features/escenarios-simulados/contexts/FasesContext.tsx'
@@ -92,6 +93,12 @@ function AnimatedRoutes() {
         <Route path='/seleccion-niveles' element={
           <ProtectedRouteByRole requiredRole="estudiante">
             <VistaSeleccionNiveles />
+          </ProtectedRouteByRole>
+        } />
+
+        <Route path='/perfil' element={
+          <ProtectedRouteByRole requiredRole="estudiante">
+            <VistaPerfil />
           </ProtectedRouteByRole>
         } />
 
