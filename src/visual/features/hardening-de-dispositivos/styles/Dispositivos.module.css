@@ -67,6 +67,12 @@
   align-items: center;
   justify-content: space-between;
 }
-.parteSuperior > button {
+
+.botonesAccion {
+  display: flex;
+  gap: 8px;
+}
+
+.botonesAccion > button {
   border: 1px solid var(--border-primary);
 }

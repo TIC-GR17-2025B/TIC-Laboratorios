@@ -1,4 +1,5 @@
 import type { EstadoAtaqueDispositivo, TipoDispositivo } from "../../types/DeviceEnums";
+import type { SoftwareApp } from "../../types/EscenarioTypes";
 import { Componente, type Entidad } from "../core/Componente";
 
 export class DispositivoComponent extends Componente {
@@ -8,7 +9,8 @@ export class DispositivoComponent extends Componente {
     public hardware: string = "",
     public tipo: TipoDispositivo,
     public estadoAtaque: EstadoAtaqueDispositivo,
-    public redes: Entidad[] = []
+    public redes: Entidad[] = [],
+    public apps?: SoftwareApp[]
   ) {
     super();
   }

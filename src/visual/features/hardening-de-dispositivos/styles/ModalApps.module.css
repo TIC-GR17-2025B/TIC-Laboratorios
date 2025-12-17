@@ -1,0 +1,244 @@
+/* Container */
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 540px;
+  max-width: 100%;
+}
+
+/* Search Bar */
+.searchBar {
+  padding: 16px 20px 12px;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--surface-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.searchInput:focus {
+  border-color: #10b981;
+}
+
+.searchInput::placeholder {
+  color: var(--text-muted);
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  padding: 0 20px;
+  gap: 8px;
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.tab {
+  user-select: none;
+  padding: 14px 16px;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  background: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 0;
+}
+
+.tab:hover {
+  background-color: var(--surface-primary) !important;
+  color: var(--text-secondary);
+  border-bottom: 2px solid var(--border-primary) !important;
+}
+
+.tab.active {
+  color: var(--text-primary);
+  border-bottom-color: var(--blue);
+}
+
+.count {
+  background: var(--surface-secondary);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  height: 20px;
+  width: 20px;
+  font-size: 12px;
+}
+
+.tab.active .count {
+  background: var(--blue);
+  color: var(--text-primary);
+}
+
+/* Content */
+.content {
+  padding: 16px 20px 20px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.content::-webkit-scrollbar-thumb {
+  background: var(--border-primary);
+  border-radius: 3px;
+}
+
+.content::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* App List */
+.appList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Empty state */
+.emptyState {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+/* App Card */
+.appCard {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  background: var(--surface-secondary);
+  border-radius: 12px;
+  transition: background 0.2s;
+}
+
+/* App Icon */
+.appIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: #fff;
+  font-size: 14px;
+  margin-right: 14px;
+  flex-shrink: 0;
+}
+
+.appIcon.green {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.appIcon.purple {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+}
+
+.appIcon.blue {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.appIcon.orange {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+/* App Info */
+.appInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.appName {
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 500;
+  margin-bottom: 3px;
+}
+
+.appDesc {
+  color: var(--text-muted);
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* App Action */
+.appAction {
+  margin-left: 12px;
+}
+
+/* Buttons */
+.btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.btnInstall {
+  background: var(--blue);
+  color: var(--text-primary);
+}
+
+.btnInstall:hover {
+  background: var(--blue-lighter) !important;
+}
+
+.btnRemove {
+  background: transparent;
+  background-color: #ef444410;
+  color: #ef4444;
+  border: 1px solid #ef4444;
+}
+
+.btnRemove:hover {
+  background: #ef444415 !important;
+}
+
+/* Responsive */
+@media (max-width: 560px) {
+  .container {
+    width: 100%;
+  }
+
+  .content {
+    max-height: 320px;
+  }
+
+  .appCard {
+    padding: 12px;
+  }
+
+  .appIcon {
+    width: 38px;
+    height: 38px;
+    font-size: 12px;
+  }
+}
