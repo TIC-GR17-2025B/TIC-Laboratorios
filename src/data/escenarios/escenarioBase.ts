@@ -103,13 +103,17 @@ export const escenarioBase: unknown = {
       id: 1,
       nombre: "Fase 1: Retos de Configuración de Red",
       descripcion:
-        "Completar los 3 retos de asignación de red y firewall.",
+        "Completar los 4 retos de asignación de red y firewall.",
       faseActual: true,
       completada: false,
       objetivos: [ // Cada uno de estos objetivos deben corresponderse (los nombres deben ser los mismos)
                    // con los eventos/ataques que el jugador debe manejar, y que se hayan definido en 
                    // sus arrays corrspondientes de eventos o ataques en este json. Importante: Deben 
                    // definirse en el mismo orden en el que se supone que el jugador debe completarlos.
+        {
+          descripcion: "Verificación de firma",
+          completado: false,
+        },
         {
           descripcion: "Falla de Conectividad IDS",
           completado: false,
