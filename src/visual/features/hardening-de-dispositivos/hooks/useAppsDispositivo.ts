@@ -6,100 +6,111 @@ import type { Entidad } from "../../../../ecs/core/Componente";
 import { EventosPublicos } from "../../../../types/EventosEnums";
 
 export function useAppsDispositivo(entidadDispositivo: Entidad | undefined) {
-    const [appsInstaladas, setAppsInstaladas] = useState<SoftwareApp[]>([]);
-    const [appsDisponibles, setAppsDisponibles] = useState<SoftwareApp[]>([]);
-    const [presupuestoActual, setPresupuestoActual] = useState<number>(0);
-    const [version, setVersion] = useState(0);
+  const [appsInstaladas, setAppsInstaladas] = useState<SoftwareApp[]>([]);
+  const [appsDisponibles, setAppsDisponibles] = useState<SoftwareApp[]>([]);
+  const [presupuestoActual, setPresupuestoActual] = useState<number>(0);
+  const [, forceUpdate] = useState({});
 
-    const escenarioController = useMemo(() => {
-        return EscenarioController.getInstance();
-    }, []);
+  const escenarioController = useMemo(() => {
+    return EscenarioController.getInstance();
+  }, []);
 
-    // Función para actualizar el estado desde el ECS
-    const actualizarEstado = useCallback(() => {
-        if (!entidadDispositivo) {
-            setAppsInstaladas([]);
-            setAppsDisponibles([]);
-            setPresupuestoActual(0);
-            return;
-        }
+  // Función para leer el estado actual del ECS
+  const leerEstadoECS = useCallback(() => {
+    if (!entidadDispositivo) {
+      return { apps: [], disponibles: [], presupuesto: 0 };
+    }
 
-        // Obtener apps instaladas del dispositivo
-        const dispositivo = escenarioController.ecsManager.getComponentes(entidadDispositivo);
-        const apps = dispositivo?.get(DispositivoComponent)?.apps || [];
-        setAppsInstaladas([...apps]);
+    const dispositivo =
+      escenarioController.ecsManager.getComponentes(entidadDispositivo);
+    const apps = dispositivo?.get(DispositivoComponent)?.apps || [];
+    const disponibles =
+      escenarioController.getAppsDisponiblesPorDispositivo(
+        entidadDispositivo
+      ) || [];
+    const presupuesto = escenarioController.getPresupuestoActual();
 
-        // Obtener apps disponibles para el dispositivo
-        const disponibles = escenarioController.getAppsDisponiblesPorDispositivo(entidadDispositivo) || [];
-        setAppsDisponibles([...disponibles]);
+    return { apps: [...apps], disponibles: [...disponibles], presupuesto };
+  }, [entidadDispositivo, escenarioController]);
 
-        // Obtener presupuesto actual
-        const presupuesto = escenarioController.getPresupuestoActual();
-        setPresupuestoActual(presupuesto);
-    }, [entidadDispositivo, escenarioController]);
+  // Actualizar estado desde ECS
+  const actualizarEstado = useCallback(() => {
+    const { apps, disponibles, presupuesto } = leerEstadoECS();
+    setAppsInstaladas(apps);
+    setAppsDisponibles(disponibles);
+    setPresupuestoActual(presupuesto);
+  }, [leerEstadoECS]);
 
-    // Efecto inicial para cargar datos
-    useEffect(() => {
+  // Efecto inicial para cargar datos
+  useEffect(() => {
+    actualizarEstado();
+  }, [actualizarEstado]);
+
+  // Suscribirse a eventos de presupuesto para actualizar la UI
+  useEffect(() => {
+    const unsubscribePresupuesto = escenarioController.on(
+      EventosPublicos.PRESUPUESTO_ACTUALIZADO,
+      () => {
         actualizarEstado();
-    }, [actualizarEstado, version]);
-
-    // Suscribirse a eventos de presupuesto para actualizar la UI
-    useEffect(() => {
-        const unsubscribePresupuesto = escenarioController.on(
-            EventosPublicos.PRESUPUESTO_ACTUALIZADO,
-            () => {
-                setVersion((prev) => prev + 1);
-            }
-        );
-
-        return () => {
-            unsubscribePresupuesto();
-        };
-    }, [escenarioController]);
-
-    const comprarApp = useCallback(
-        (nombreApp: string) => {
-            if (!entidadDispositivo) return;
-
-            try {
-                escenarioController.comprarApp(entidadDispositivo, nombreApp);
-                // Forzar actualización inmediata
-                setVersion((prev) => prev + 1);
-            } catch (error) {
-                console.error("Error al comprar app:", error);
-            }
-        },
-        [entidadDispositivo, escenarioController]
+      }
     );
 
-    const desinstalarApp = useCallback(
-        (nombreApp: string) => {
-            if (!entidadDispositivo) return;
-
-            try {
-                escenarioController.desinstalarApp(entidadDispositivo, nombreApp);
-                // Forzar actualización inmediata
-                setVersion((prev) => prev + 1);
-            } catch (error) {
-                console.error("Error al desinstalar app:", error);
-            }
-        },
-        [entidadDispositivo, escenarioController]
-    );
-
-    const puedeComprar = useCallback(
-        (precio: number): boolean => {
-            return presupuestoActual >= precio;
-        },
-        [presupuestoActual]
-    );
-
-    return {
-        appsInstaladas,
-        appsDisponibles,
-        presupuestoActual,
-        comprarApp,
-        desinstalarApp,
-        puedeComprar,
+    return () => {
+      unsubscribePresupuesto();
     };
+  }, [escenarioController, actualizarEstado]);
+
+  const comprarApp = useCallback(
+    (nombreApp: string) => {
+      if (!entidadDispositivo) return;
+
+      try {
+        escenarioController.comprarApp(entidadDispositivo, nombreApp);
+        // Leer estado fresco y actualizar
+        const { apps, disponibles, presupuesto } = leerEstadoECS();
+        setAppsInstaladas(apps);
+        setAppsDisponibles(disponibles);
+        setPresupuestoActual(presupuesto);
+      } catch (error) {
+        console.error("Error al comprar app:", error);
+      }
+    },
+    [entidadDispositivo, escenarioController, leerEstadoECS]
+  );
+
+  const desinstalarApp = useCallback(
+    (nombreApp: string) => {
+      if (!entidadDispositivo) return;
+
+      try {
+        escenarioController.desinstalarApp(entidadDispositivo, nombreApp);
+        // Leer estado fresco y actualizar inmediatamente
+        const { apps, disponibles, presupuesto } = leerEstadoECS();
+        setAppsInstaladas(apps);
+        setAppsDisponibles(disponibles);
+        setPresupuestoActual(presupuesto);
+        // Forzar re-render
+        forceUpdate({});
+      } catch (error) {
+        console.error("Error al desinstalar app:", error);
+      }
+    },
+    [entidadDispositivo, escenarioController, leerEstadoECS]
+  );
+
+  const puedeComprar = useCallback(
+    (precio: number): boolean => {
+      return presupuestoActual >= precio;
+    },
+    [presupuestoActual]
+  );
+
+  return {
+    appsInstaladas,
+    appsDisponibles,
+    presupuestoActual,
+    comprarApp,
+    desinstalarApp,
+    puedeComprar,
+  };
 }

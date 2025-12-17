@@ -1,101 +1,118 @@
+import { useState, useMemo } from "react";
 import styles from "../styles/ModalApps.module.css";
 import { useEscenario } from "../../../common/contexts";
-import SoftwareIcon from "../../../common/icons/SoftwareIcon";
-import CarritoIcon from "../../../common/icons/CarritoIcon";
-import TrashIcon from "../../../common/icons/TrashIcon";
 import { useAppsDispositivo } from "../hooks";
+
+type Tab = 'repositorio' | 'instaladas';
+
+const ICON_COLORS = ['green', 'purple', 'blue', 'orange'] as const;
 
 export default function ModalApps() {
     const { dispositivoSeleccionado } = useEscenario();
-    
+    const [activeTab, setActiveTab] = useState<Tab>('repositorio');
+    const [searchQuery, setSearchQuery] = useState('');
+
     const {
         appsInstaladas,
         appsDisponibles,
-        presupuestoActual,
         comprarApp,
         desinstalarApp,
-        puedeComprar,
     } = useAppsDispositivo(dispositivoSeleccionado?.entidadId);
 
-    return (
-        <div className={styles.modalAppsContainer}>
-            <div className={styles.seccionesContainer}>
-                {/* Sección de apps disponibles para comprar */}
-                <section className={styles.seccion}>
-                    <h3 className={styles.tituloSeccion}>
-                        <CarritoIcon size={18} />
-                        Apps Disponibles
-                    </h3>
-                    <div className={styles.listaApps}>
-                        {appsDisponibles.length === 0 ? (
-                            <div className={styles.emptyState}>
-                                <p>No hay aplicaciones disponibles para instalar</p>
-                            </div>
-                        ) : (
-                            appsDisponibles.map((app) => (
-                                <div key={app.nombre} className={styles.appItem}>
-                                    <div className={styles.appIconContainer}>
-                                        <SoftwareIcon size={24} />
-                                    </div>
-                                    <div className={styles.appDetalles}>
-                                        <div className={styles.appNombre}>{app.nombre}</div>
-                                        <div className={styles.appDescripcion}>{app.descripcion}</div>
-                                        <div className={styles.appPrecio}>${app.precio.toLocaleString()}</div>
-                                    </div>
-                                    <button
-                                        className={`${styles.botonAccion} ${styles.botonComprar}`}
-                                        onClick={() => comprarApp(app.nombre)}
-                                        disabled={!puedeComprar(app.precio)}
-                                        title={puedeComprar(app.precio) ? "Comprar e instalar" : "Presupuesto insuficiente"}
-                                    >
-                                        <CarritoIcon size={16} />
-                                        Comprar
-                                    </button>
-                                </div>
-                            ))
-                        )}
-                    </div>
-                </section>
+    // Filtrar apps por búsqueda
+    const filteredApps = useMemo(() => {
+        const query = searchQuery.toLowerCase();
+        const apps = activeTab === 'repositorio' ? appsDisponibles : appsInstaladas;
 
-                {/* Sección de apps instaladas */}
-                <section className={styles.seccion}>
-                    <h3 className={styles.tituloSeccion}>
-                        <SoftwareIcon size={18} />
-                        Apps Instaladas
-                    </h3>
-                    <div className={styles.listaApps}>
-                        {appsInstaladas.length === 0 ? (
-                            <div className={styles.emptyState}>
-                                <p>No hay aplicaciones instaladas</p>
-                            </div>
-                        ) : (
-                            appsInstaladas.map((app) => (
-                                <div key={app.nombre} className={styles.appItem}>
-                                    <div className={styles.appIconContainer}>
-                                        <SoftwareIcon size={24} />
-                                    </div>
-                                    <div className={styles.appDetalles}>
-                                        <div className={styles.appNombre}>{app.nombre}</div>
-                                        <div className={styles.appDescripcion}>{app.descripcion}</div>
-                                    </div>
-                                    <button
-                                        className={`${styles.botonAccion} ${styles.botonDesinstalar}`}
-                                        onClick={() => desinstalarApp(app.nombre)}
-                                        title="Desinstalar aplicación"
-                                    >
-                                        <TrashIcon size={16} />
-                                        Desinstalar
-                                    </button>
-                                </div>
-                            ))
-                        )}
-                    </div>
-                </section>
+        if (!query) return apps;
+        return apps.filter(app =>
+            app.nombre.toLowerCase().includes(query) ||
+            app.descripcion.toLowerCase().includes(query)
+        );
+    }, [activeTab, appsDisponibles, appsInstaladas, searchQuery]);
+
+    // Obtener iniciales para el icono
+    const getInitials = (nombre: string) => {
+        return nombre.slice(0, 2).toUpperCase();
+    };
+
+    // Obtener color basado en el nombre
+    const getIconColor = (nombre: string) => {
+        const index = nombre.charCodeAt(0) % ICON_COLORS.length;
+        return ICON_COLORS[index];
+    };
+
+    return (
+        <div className={styles.container}>
+            <div className={styles.searchBar}>
+                <input
+                    type="text"
+                    className={styles.searchInput}
+                    placeholder="Buscar aplicaciones..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                />
             </div>
 
-            <div className={styles.nota}>
-                <strong>Nota:</strong> Al comprar una aplicación, se instalará inmediatamente en el dispositivo y se descontará del presupuesto. 
-                Al desinstalar, la aplicación estará disponible para instalar nuevamente sin costo adicional.
+            <div className={styles.tabs}>
+                <button
+                    className={`${styles.tab} ${activeTab === 'repositorio' ? styles.active : ''}`}
+                    onClick={() => setActiveTab('repositorio')}
+                >
+                    Repositorio
+                    <span className={styles.count}>{appsDisponibles.length}</span>
+                </button>
+                <button
+                    className={`${styles.tab} ${activeTab === 'instaladas' ? styles.active : ''}`}
+                    onClick={() => setActiveTab('instaladas')}
+                >
+                    Instaladas
+                    <span className={styles.count}>{appsInstaladas.length}</span>
+                </button>
+            </div>
+
+            <div className={styles.content}>
+                {filteredApps.length === 0 ? (
+                    <div className={styles.emptyState}>
+                        {searchQuery
+                            ? 'No se encontraron aplicaciones'
+                            : activeTab === 'repositorio'
+                                ? 'No hay aplicaciones disponibles'
+                                : 'No hay aplicaciones instaladas'
+                        }
+                    </div>
+                ) : (
+                    <div className={styles.appList}>
+                        {filteredApps.map((app) => (
+                            <div key={app.nombre} className={styles.appCard}>
+                                <div className={`${styles.appIcon} ${styles[getIconColor(app.nombre)]}`}>
+                                    {getInitials(app.nombre)}
+                                </div>
+                                <div className={styles.appInfo}>
+                                    <div className={styles.appName}>{app.nombre}</div>
+                                    <div className={styles.appDesc}>{app.descripcion}</div>
+                                </div>
+                                <div className={styles.appAction}>
+                                    {activeTab === 'repositorio' ? (
+                                        <button
+                                            className={`${styles.btn} ${styles.btnInstall}`}
+                                            onClick={() => comprarApp(app.nombre)}
+                                        >
+                                            Instalar
+                                        </button>
+                                    ) : (
+                                        <button
+                                            className={`${styles.btn} ${styles.btnRemove}`}
+                                            onClick={() => desinstalarApp(app.nombre)}
+                                        >
+                                            Quitar
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );

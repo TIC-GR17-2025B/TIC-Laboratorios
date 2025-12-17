@@ -5,7 +5,10 @@ import {
   DispositivoComponent,
   EscenarioComponent,
 } from "../components";
-import { AccionesRealizables, ObjetosManejables } from "../../types/AccionesEnums";
+import {
+  AccionesRealizables,
+  ObjetosManejables,
+} from "../../types/AccionesEnums";
 import { EventosPublicos } from "../../types/EventosEnums";
 
 export class SistemaPresupuesto extends Sistema {
@@ -112,11 +115,12 @@ export class SistemaPresupuesto extends Sistema {
     entidadDispoitivo: Entidad,
     nombreApp: string
   ) {
-    const dispositivo = this.ecsManager.getComponentes(entidadDispoitivo)
-                                       ?.get(DispositivoComponent);
-    
+    const dispositivo = this.ecsManager
+      .getComponentes(entidadDispoitivo)
+      ?.get(DispositivoComponent);
+
     let escenario;
-    for (const [,c] of this.ecsManager.getEntidades()) {
+    for (const [, c] of this.ecsManager.getEntidades()) {
       if (c.tiene(EscenarioComponent)) {
         escenario = c.get(EscenarioComponent);
         break;
@@ -127,25 +131,24 @@ export class SistemaPresupuesto extends Sistema {
 
     for (const app of appsEscenario ?? []) {
       if (app.nombre == nombreApp) {
-
         if (this.hayPresupuestoSuficiente(entidadPresupuesto, app.precio)) {
-            // Inicializar el array de apps si no existe
-            if (!dispositivo) break;
-            if (!dispositivo.apps) {
-              dispositivo.apps = [];
-            }
-            
-            dispositivo.apps.push(app);
-            const presupuestoComp = this.ecsManager
-                .getComponentes(entidadPresupuesto)
-                ?.get(PresupuestoComponent);
-            if (presupuestoComp) {
-              presupuestoComp.monto -= app.precio;
-              this.ecsManager.emit(EventosPublicos.PRESUPUESTO_ACTUALIZADO, {
-                presupuesto: presupuestoComp.monto,
-              });
-              this.notificarPresupuestoAgotado(entidadPresupuesto);
-            }
+          // Inicializar el array de apps si no existe
+          if (!dispositivo) break;
+          if (!dispositivo.apps) {
+            dispositivo.apps = [];
+          }
+
+          dispositivo.apps.push(app);
+          const presupuestoComp = this.ecsManager
+            .getComponentes(entidadPresupuesto)
+            ?.get(PresupuestoComponent);
+          if (presupuestoComp) {
+            presupuestoComp.monto -= app.precio;
+            this.ecsManager.emit(EventosPublicos.PRESUPUESTO_ACTUALIZADO, {
+              presupuesto: presupuestoComp.monto,
+            });
+            this.notificarPresupuestoAgotado(entidadPresupuesto);
+          }
         } else break;
 
         break;
@@ -158,19 +161,24 @@ export class SistemaPresupuesto extends Sistema {
     entidadDispoitivo: Entidad,
     nombreApp: string
   ) {
-    const dispositivo = this.ecsManager.getComponentes(entidadDispoitivo)
-                                       ?.get(DispositivoComponent);
+    const dispositivo = this.ecsManager
+      .getComponentes(entidadDispoitivo)
+      ?.get(DispositivoComponent);
 
-    const appsDispositivo = (dispositivo?.apps ?? []);
+    const appsDispositivo = dispositivo?.apps ?? [];
 
     for (let i = 0; i < appsDispositivo.length; i++) {
-      if (appsDispositivo.at(i)?.nombre == nombreApp) {
+      const app = appsDispositivo[i];
+      if (app?.nombre == nombreApp) {
+        // Guardar precio antes de eliminar
+        const precioApp = app.precio;
         dispositivo?.apps?.splice(i, 1);
+
         const presupuestoComp = this.ecsManager
-            .getComponentes(entidadPresupuesto)
-            ?.get(PresupuestoComponent);
+          .getComponentes(entidadPresupuesto)
+          ?.get(PresupuestoComponent);
         if (presupuestoComp) {
-          presupuestoComp.monto += appsDispositivo.at(i)!.precio * 0.5;
+          presupuestoComp.monto += precioApp * 0.5;
           this.ecsManager.emit(EventosPublicos.PRESUPUESTO_ACTUALIZADO, {
             presupuesto: presupuestoComp.monto,
           });
