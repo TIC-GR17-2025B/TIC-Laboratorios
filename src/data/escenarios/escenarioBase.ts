@@ -39,7 +39,7 @@ export const escenarioBase: unknown = {
       nombreEvento: "Verificación de firma",
       tipoEvento: TipoEvento.VERIFICACION_FIRMA,
       tiempoNotificacion: 5,
-      descripción: "Jacob ha enviado un documento firmado a Computadora Administrativa. Asegúrate de verificar la firma del documento junto con la clave pública de Jacob para evitar posibles archivos maliciosos.",
+      descripcion: "Jacob ha enviado un documento firmado a Computadora Administrativa. Asegúrate de verificar la firma del documento junto con la clave pública de Jacob para evitar posibles archivos maliciosos.",
       fase: 1,
       infoAdicional: {
         nombreDocumento: "Documento Jacob",
