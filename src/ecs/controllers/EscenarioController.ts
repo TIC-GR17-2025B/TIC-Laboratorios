@@ -475,6 +475,7 @@ export class EscenarioController {
 
   public registrarVeredictoFirma(registro: RegistroVeredictoFirma) {
     this.sistemaActivo?.registrarVeredictoFirma(registro);
+  }
   public comprarApp(entidadDispositivo: Entidad, nombreApp: string): void {
     if (!this.sistemaPresupuesto || !this.entidadPresupuesto) {
       console.error("Sistema de presupuesto no inicializado");

@@ -60,7 +60,7 @@ function Dispositivos() {
                 <div style={{ display: 'flex', gap: '8px' }}>
                     <button onClick={() => openModal(<ModalVerificacionFirma />, 'Verificación de Firma Digital')}>
                         <ShieldCheckIcon />Verificar Firma
-                <div className={styles.botonesAccion}>
+                    </button>
                     <button onClick={() => openModal(<ModalApps />, 'Gestionar Aplicaciones')}>
                         <SoftwareIcon />Gestionar Apps
                     </button>
