@@ -2,21 +2,19 @@
 const BACKEND_FALLBACK = "https://tic-laboratorios-npgq.onrender.com";
 
 export const getApiBaseUrl = (): string => {
-  const isProd = import.meta.env.PROD;
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-  // Debug: mostrar valores en consola (remover después de verificar)
-  console.log("[apiConfig] PROD:", isProd, "VITE_BACKEND_URL:", backendUrl);
-
-  // En producción, usar la URL del backend
-  if (isProd) {
-    return backendUrl && backendUrl.trim() !== ""
-      ? backendUrl
-      : BACKEND_FALLBACK;
+  // Si hay una URL de backend configurada, usarla (producción)
+  if (backendUrl && backendUrl.trim() !== "") {
+    return backendUrl;
   }
 
-  // En desarrollo, usar el proxy de Vite (rutas /api/...)
-  return "/api";
+  // Si no hay URL configurada, usar proxy local (desarrollo) o fallback
+  if (import.meta.env.DEV) {
+    return "/api";
+  }
+
+  return BACKEND_FALLBACK;
 };
 
 export const API_BASE_URL = getApiBaseUrl();
