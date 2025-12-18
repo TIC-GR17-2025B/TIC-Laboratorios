@@ -87,7 +87,7 @@ export class ProgresoController {
 
   private async getDatosSesion(): Promise<{id_estudiante: number; id_escenario: number}> {
     const id_estudiante = JSON.parse(localStorage.getItem("user")!).id_estudiante;
-    // const id_escenario = JSON.parse(localStorage.getItem("user")!).id_escenario;
-    return { id_estudiante: id_estudiante, id_escenario: 6 };
+    const id_escenario = parseInt(localStorage.getItem("id_escenario_actual")!);
+    return { id_estudiante: id_estudiante, id_escenario: id_escenario };
   }
 }
