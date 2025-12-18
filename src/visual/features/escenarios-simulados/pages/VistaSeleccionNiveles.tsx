@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
 import { useAuth } from "../../admin-docente-y-estudiante/hooks/useAuth";
 import ModalUnirseGrupo from "../../admin-docente-y-estudiante/components/ModalUnirseGrupo";
+import UserMenu from "../../admin-docente-y-estudiante/components/UserMenu";
 import LevelSelectionMenuList from "../components/LevelSelectionMenuList";
 import styles from "../styles/VistaSeleccionNiveles.module.css";
 import { API_BASE_URL } from "../../../common/utils/apiConfig";
@@ -9,18 +9,12 @@ import { API_BASE_URL } from "../../../common/utils/apiConfig";
 const API_URL = API_BASE_URL;
 
 export default function VistaSeleccionNiveles() {
-    const navigate = useNavigate();
-    const { logout, getUser, getUserRole } = useAuth();
+    const { getUser, getUserRole } = useAuth();
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const user = getUser();
     const role = getUserRole();
     const idEstudiante = role === 'estudiante' && user ? (user as { id_estudiante: number }).id_estudiante : null;
-
-    const handleLogout = () => {
-        logout();
-        navigate('/login');
-    };
 
     const handleJoinGroup = async (codigo: string): Promise<{ success: boolean; error?: string }> => {
         if (!idEstudiante) {
@@ -59,7 +53,7 @@ export default function VistaSeleccionNiveles() {
     return <div className={styles.container}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <h1>Selección de Escenarios</h1>
-            <div style={{ display: "flex", gap: "0.75rem" }}>
+            <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
                 <button
                     style={{ display: "flex", alignItems: "center", gap: "0.5rem", border: "1px solid var(--border-primary)" }}
                     onClick={() => setIsModalOpen(true)}
@@ -69,11 +63,7 @@ export default function VistaSeleccionNiveles() {
                     </svg>
                     Unirse a Grupo
                 </button>
-                <button style={{ display: "flex", alignItems: "center", gap: "0.5rem", border: "1px solid var(--border-primary)" }} onClick={handleLogout}>
-                    Cerrar sesión
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1">
-                        <path d="M10 8V6a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-7a2 2 0 0 1-2-2v-2" /><path d="M15 12H3l3-3m0 6l-3-3" /></g></svg>
-                </button>
+                <UserMenu />
             </div>
         </div>
         <LevelSelectionMenuList />
