@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
 import { useAuth } from "../../admin-docente-y-estudiante/hooks/useAuth";
 import ModalUnirseGrupo from "../../admin-docente-y-estudiante/components/ModalUnirseGrupo";
 import UserMenu from "../../admin-docente-y-estudiante/components/UserMenu";
