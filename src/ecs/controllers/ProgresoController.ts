@@ -1,6 +1,8 @@
+import { API_BASE_URL } from "../../visual/common/utils/apiConfig";
+
 export class ProgresoController {
  
-  private API_URL = "/api";
+  private API_URL = API_BASE_URL;
 
   private static instance: ProgresoController | null = null;
 
