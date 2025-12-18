@@ -1,14 +1,20 @@
 // Configuración de la URL base del API según el entorno
+const BACKEND_FALLBACK = "https://tic-laboratorios-npgq.onrender.com";
+
 export const getApiBaseUrl = (): string => {
-  // En desarrollo, usar el proxy de Vite (rutas relativas)
-  if (import.meta.env.DEV) {
-    return "";
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
+  // Si hay una URL de backend configurada, usarla (producción)
+  if (backendUrl && backendUrl.trim() !== "") {
+    return backendUrl;
   }
 
-  // En producción, usar la URL del backend desde las variables de entorno
-  return (
-    import.meta.env.VITE_BACKEND_URL || "https://tic-laboratorios.onrender.com"
-  );
+  // Si no hay URL configurada, usar proxy local (desarrollo) o fallback
+  if (import.meta.env.DEV) {
+    return "/api";
+  }
+
+  return BACKEND_FALLBACK;
 };
 
 export const API_BASE_URL = getApiBaseUrl();

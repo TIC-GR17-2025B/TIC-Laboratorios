@@ -26,7 +26,7 @@ export function useFeedback(
 
     try {
       const response = await fetch(
-        `${API_BASE_URL}/api/feedback/check-status?id_estudiante=${idEstudiante}&id_escenario=${idEscenario}`
+        `${API_BASE_URL}/feedback/check-status?id_estudiante=${idEstudiante}&id_escenario=${idEscenario}`
       );
 
       if (response.ok) {

@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useSelectedLevel } from "../../../common/contexts/SelectedLevelContext";
 import type { Escenario } from "../../../../types/EscenarioTypes";
+import { API_BASE_URL } from "../../../common/utils/apiConfig";
 
 interface Progreso {
     id_progreso: number;
@@ -34,7 +35,7 @@ export default function LevelSelectionMenuList() {
             const user = JSON.parse(userStr);
             const idEstudiante = user.id_estudiante;
             if (idEstudiante) {
-                fetch(`/api/progreso/estudiante/${idEstudiante}`)
+                fetch(`${API_BASE_URL}/progreso/estudiante/${idEstudiante}`)
                     .then(res => res.json())
                     .then(result => {
                         if (result.success && result.data) {
