@@ -6,9 +6,10 @@ export const getApiBaseUrl = (): string => {
   }
 
   // En producción, usar la URL del backend desde las variables de entorno
-  return (
-    import.meta.env.VITE_BACKEND_URL || "https://tic-laboratorios-npgq.onrender.com"
-  );
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  return backendUrl && backendUrl.trim() !== ""
+    ? backendUrl
+    : "https://tic-laboratorios-npgq.onrender.com";
 };
 
 export const API_BASE_URL = getApiBaseUrl();
