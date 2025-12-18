@@ -1,7 +1,8 @@
 import { useState } from "react";
+import { API_BASE_URL } from "../../../common/utils/apiConfig";
 
-// En producción usa la URL de Render, en desarrollo usa el proxy de Vite
-const API_URL = import.meta.env.VITE_BACKEND_URL || "";
+// Usar la configuración centralizada de API
+const API_URL = API_BASE_URL;
 
 interface RegisterEstudianteData {
   primernombre: string;
@@ -30,7 +31,7 @@ interface AuthResponse {
   success: boolean;
   data?: {
     token: string;
-    role: 'estudiante' | 'profesor';
+    role: "estudiante" | "profesor";
     user: {
       id: string;
       nombre_completo: string;
@@ -179,8 +180,8 @@ export const useAuth = () => {
     return userStr ? JSON.parse(userStr) : null;
   };
 
-  const getUserRole = (): 'estudiante' | 'profesor' | null => {
-    return localStorage.getItem("userRole") as 'estudiante' | 'profesor' | null;
+  const getUserRole = (): "estudiante" | "profesor" | null => {
+    return localStorage.getItem("userRole") as "estudiante" | "profesor" | null;
   };
 
   return {

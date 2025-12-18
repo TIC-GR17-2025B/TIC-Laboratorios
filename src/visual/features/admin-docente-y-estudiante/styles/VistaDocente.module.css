@@ -1,141 +1,235 @@
 .container {
-    min-height: 100vh;
-    background-color: var(--surface-primary);
-    color: var(--text-primary);
+  min-height: 100vh;
+  background-color: var(--surface-primary);
+  color: var(--text-primary);
 }
 
 .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 24px;
-    border-bottom: 1px solid var(--border-primary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  border-bottom: 1px solid var(--border-primary);
 }
-
 
 .logoutButton {
-    background: var(--surface-primary);
-    border: 1px solid var(--border-primary);
-    border-radius: var(--border-radius);
-    color: var(--text-primary);
-    font-size: 0.875rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
+  background: var(--surface-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--border-radius);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-
 .content {
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.headerSection {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.headerSection h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+}
+
+.createButton {
+  background-color: var(--blue);
+  color: var(--text-primary);
+  border: 1px solid var(--blue);
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 1rem;
+}
+
+.createButton:hover {
+  background-color: var(--blue-lighter);
+  transform: translateY(-1px);
+}
+
+.emptyState {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: var(--surface-secondary);
+  border: 2px dashed var(--border-primary);
+  border-radius: var(--border-radius);
+}
+
+.emptySubtext {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
 }
 
 .welcomeCard {
-    background: var(--surface-secondary);
-    border: 1px solid var(--border-primary);
-    border-radius: var(--border-radius);
-    padding: 1.5rem;
+  background: var(--surface-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
 }
 
 .welcomeCard h2 {
-    color: var(--text-primary);
-    margin: 0 0 0.5rem 0;
-    font-size: 1.25rem;
-    font-weight: 500;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+  font-size: 1.25rem;
+  font-weight: 500;
 }
 
 .welcomeCard p {
-    color: var(--text-muted);
-    font-size: 0.875rem;
-    margin: 0;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin: 0;
 }
 
 .loadingText,
 .errorText,
 .emptyText {
-    color: var(--text-muted);
-    font-size: 0.875rem;
-    text-align: center;
-    padding: 2rem;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  text-align: center;
+  padding: 2rem;
 }
 
 .errorText {
-    color: #ff6b6b;
+  color: #ff6b6b;
 }
 
+.gruposList,
 .estudiantesList {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 0.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1rem;
 }
 
+.grupoCard,
 .estudianteCard {
-    display: flex;
-    align-items: center;
-    padding: 1rem;
-    background: var(--surface-primary);
-    border: 1px solid var(--border-primary);
-    border-radius: var(--border-radius);
-    cursor: pointer;
-    transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  padding: 1.25rem;
+  background: var(--surface-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
 }
 
+.grupoCard:hover,
 .estudianteCard:hover {
-    background: var(--surface-secondary);
-    border-color: var(--blue);
+  border-color: var(--blue);
+  box-shadow: 0 4px 12px rgba(65, 125, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.grupoIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--blue);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  flex-shrink: 0;
 }
 
 .estudianteAvatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: var(--blue);
-    color: var(--text-primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 500;
-    margin-right: 0.875rem;
-    flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--blue);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  margin-right: 0.875rem;
+  flex-shrink: 0;
 }
 
+.grupoInfo,
 .estudianteInfo {
-    flex: 1;
-    min-width: 0;
+  flex: 1;
+  min-width: 0;
 }
 
+.grupoInfo h4,
 .estudianteInfo h4 {
-    margin: 0 0 0.25rem 0;
-    color: var(--text-primary);
-    font-weight: 500;
-    font-size: 14px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  margin: 0 0 0.25rem 0;
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
+.grupoCodigo,
 .estudianteCodigo {
-    margin: 0.3rem 0;
-    color: var(--text-muted);
+  margin: 0.3rem 0;
+  color: var(--text-muted);
+  font-size: 0.875rem;
 }
 
 .estudianteCorreo {
-    margin: 0.3rem 0 0 0;
-    color: var(--text-secondary);
-    font-size: 14px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  margin: 0.3rem 0 0 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.grupoActions {
+  display: flex;
+  gap: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.editButton,
+.deleteButton {
+  background: var(--surface-primary);
+  border: 1px solid var(--border-primary);
+  cursor: pointer;
+  padding: 0.4rem;
+  border-radius: var(--border-radius);
+  transition: all 0.2s;
+  color: var(--text-muted);
+}
+
+.editButton:hover {
+  background-color: rgb(50, 50, 50);
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+.deleteButton:hover {
+  background-color: rgb(50, 50, 50);
+  border-color: #ff6b6b;
+  color: #ff6b6b;
 }
 
 .arrowIcon {
-    color: var(--text-secondary);
-    flex-shrink: 0;
-    transition: all 0.2s ease;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  transition: all 0.2s ease;
 }
 
+.grupoCard:hover .arrowIcon,
 .estudianteCard:hover .arrowIcon {
-    color: var(--blue);
-    transform: translateX(2px);
+  color: var(--blue);
+  transform: translateX(2px);
 }

@@ -13,6 +13,12 @@ import { useDispositivos } from "../hooks";
 import VPNIcon from "../../../common/icons/VPNIcon";
 import ModalVPNCliente from "../../simulacion-redes/components/ModalVPNCliente";
 import PageTransition from "../../../common/components/PageTransition";
+import ShieldCheckIcon from "../../../common/icons/ShieldCheckIcon";
+import ModalVerificacionFirma from "../components/ModalVerificacionFirma";
+import ActivosIcon from "../../../common/icons/ActivosIcon";
+import ModalExploradorArchivos from "../components/ModalExploradorArchivos";
+import SoftwareIcon from "../../../common/icons/SoftwareIcon";
+import ModalApps from "../components/ModalApps";
 
 function Dispositivos() {
     const { setDispositivoSeleccionado, dispositivoSeleccionado, entidadSeleccionadaId } = useEscenario();
@@ -53,9 +59,24 @@ function Dispositivos() {
                         icon={<DevicesIcon size={16} />}
                     />
                 </div>
-                <button onClick={() => openModal(<ModalVPNCliente />, 'Configuración de VPN Cliente')}>
-                    <VPNIcon />Configurar VPN
-                </button>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                    <button onClick={() => openModal(<ModalVerificacionFirma />, 'Verificación de Firma Digital')}>
+                        <ShieldCheckIcon />Verificar Firma
+                    </button>
+                </div>
+                <div className={styles.botones}>
+                    <button onClick={() => openModal(<ModalExploradorArchivos />, 'Explorador de Archivos')}>
+                        <ActivosIcon size={16} />Explorar Archivos
+                    </button>
+                </div>
+                <div className={styles.botonesAccion}>
+                    <button onClick={() => openModal(<ModalApps />, 'Gestionar Aplicaciones')}>
+                        <SoftwareIcon />Gestionar Apps
+                    </button>
+                    <button onClick={() => openModal(<ModalVPNCliente />, 'Configuración de VPN Cliente')}>
+                        <VPNIcon />Configurar VPN
+                    </button>
+                </div>
             </div>
             <div className={styles.contenidoDispositivo}>
                 <img draggable={false} className={styles.imagenDispositivo} src="/assets/models_picture/workstation.webp" alt="Imagen de Estación de trabajo" />

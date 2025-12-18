@@ -1,6 +1,7 @@
 import {
   EstadoAtaqueDispositivo,
   Mueble,
+  TipoActivo,
   TipoDispositivo,
   TipoEvento,
   TipoProteccionVPN,
@@ -9,14 +10,31 @@ import { TipoProtocolo } from "../../types/TrafficEnums";
 import { ColoresRed } from "../colores";
 
 export const escenarioBase: unknown = {
-  id: 6,
+  id: 1,
   titulo: "Demo: Asignar Red, Firewall y VPN",
   imagenPreview: "/redFirewallVPN.webp",
   descripcion:
     "Un escenario con 3 retos: 1) Asignar una red existente, 2) Configurar un firewall, 3) Configurar una VPN.",
   presupuestoInicial: 1000,
   ataques: [],
-  eventos: [
+  apps: [
+    {
+      nombre: "App 1",
+      descripcion: "Desc 1",
+      precio: "20",
+    },
+    {
+      nombre: "App 2",
+      descripcion: "Desc 2",
+      precio: "15",
+    },
+    {
+      nombre: "App 3",
+      descripcion: "Desc 3",
+      precio: "30",
+    },
+  ],
+  eventos: [ 
     {
       nombreEvento: "Falla de Conectividad IDS",
       tipoEvento: TipoEvento.TRAFICO_RED,
@@ -51,7 +69,8 @@ export const escenarioBase: unknown = {
       nombreEvento: "Completación Fase 1",
       tipoEvento: TipoEvento.COMPLETACION_FASE,
       tiempoNotificacion: 40, // Este es un caso especial. Aquí se ejecutará directamente en el tiempo de notificación
-      descripcion: "¡Has completado todos los objetivos de la Fase 1! Asegúrate de revisar la pestaña de Partida para conocer los objetivos de la siguiente fase.",
+      descripcion:
+        "¡Has completado todos los objetivos de la Fase 1! Asegúrate de revisar la pestaña de Partida para conocer los objetivos de la siguiente fase.",
       fase: 1,
     },
     {
@@ -89,13 +108,14 @@ export const escenarioBase: unknown = {
       id: 1,
       nombre: "Fase 1: Retos de Configuración de Red",
       descripcion:
-        "Completar los 3 retos de asignación de red y firewall.",
+        "Completar los 4 retos de asignación de red y firewall.",
       faseActual: true,
       completada: false,
-      objetivos: [ // Cada uno de estos objetivos deben corresponderse (los nombres deben ser los mismos)
-                   // con los eventos/ataques que el jugador debe manejar, y que se hayan definido en 
-                   // sus arrays corrspondientes de eventos o ataques en este json. Importante: Deben 
-                   // definirse en el mismo orden en el que se supone que el jugador debe completarlos.
+      objetivos: [
+        // Cada uno de estos objetivos deben corresponderse (los nombres deben ser los mismos)
+        // con los eventos/ataques que el jugador debe manejar, y que se hayan definido en
+        // sus arrays corrspondientes de eventos o ataques en este json. Importante: Deben
+        // definirse en el mismo orden en el que se supone que el jugador debe completarlos.
         {
           descripcion: "Falla de Conectividad IDS",
           completado: false,
@@ -115,7 +135,8 @@ export const escenarioBase: unknown = {
       completada: false,
       objetivos: [
         {
-          descripcion: "Permitir que Lisa se pueda conectar vía VPN a la red corporativa.",
+          descripcion:
+            "Permitir que Lisa se pueda conectar vía VPN a la red corporativa.",
           completado: false,
         },
       ],
@@ -163,8 +184,35 @@ export const escenarioBase: unknown = {
                   estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
                   activos: [
                     {
-                      nombre: "Activo1",
+                      nombre: "Documento Jacob",
                       contenido: "La contraseña secreta es 123",
+                      tipo: TipoActivo.DOCUMENTO,
+                      firma: "Firma Documento Jacob"
+                    },
+                    {
+                      nombre: "Firma Documento Jacob",
+                      contenido: "La contraseña secreta es 123",
+                      tipo: TipoActivo.FIRMA_DIGITAL,
+                      propietario: "Jacob"
+                    },
+                    {
+                      nombre: "Clave_Publica_Jacob",
+                      tipo: TipoActivo.CLAVE_PUBLICA,
+                      propietario: "Jacob"
+                    },
+                    {
+                      nombre: "Activo genérico",
+                      contenido: "a",
+                      tipo: TipoActivo.GENERICO
+                    },
+                    {
+                      nombre: "Activo genérico 2",
+                      contenido: "abcdefg",
+                      tipo: TipoActivo.DOCUMENTO
+                    },
+                    {
+                      nombre: "Activo2",
+                      contenido: "Bienvenido",
                     },
                   ],
                   // --- ESTADO INICIAL: ninguna ---

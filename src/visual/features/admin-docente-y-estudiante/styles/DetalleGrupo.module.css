@@ -1,0 +1,195 @@
+.container {
+  min-height: 100vh;
+  background-color: var(--surface-primary);
+  color: var(--text-primary);
+}
+
+.header {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.backButton {
+  background: var(--surface-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--border-radius);
+  padding: 0.5rem 1rem;
+  color: var(--text-primary);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.backButton:hover {
+  background-color: rgb(50, 50, 50);
+  border-color: var(--blue);
+}
+
+.content {
+  padding: 40px 24px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.grupoHeader {
+  margin-bottom: 1.5rem;
+}
+
+.grupoTitleSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.grupoTitle {
+  margin: 0;
+  font-size: 1.75rem;
+  color: var(--text-primary);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.grupoSubtitle {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.codigoSection {
+  margin-bottom: 2rem;
+}
+
+.estudiantesSection {
+  margin-top: 0;
+}
+
+.estudiantesSection h3 {
+  margin: 0 0 1rem 0;
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: var(--surface-primary);
+  border: 1px dashed var(--border-primary);
+  border-radius: var(--border-radius);
+}
+
+.emptyState p {
+  color: var(--text-muted);
+  margin: 0.5rem 0;
+}
+
+.emptySubtext {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.estudiantesList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.estudianteCard {
+  display: flex;
+  align-items: center;
+  padding: 0.875rem 1rem;
+  background: var(--surface-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--border-radius);
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.estudianteCard:hover {
+  border-color: var(--blue);
+  background: var(--surface-primary);
+}
+
+.estudianteClickable {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  min-width: 0;
+}
+
+.estudianteAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--blue);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  margin-right: 0.875rem;
+  flex-shrink: 0;
+  font-size: 0.9rem;
+}
+
+.estudianteInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.estudianteInfo h4 {
+  margin: 0 0 0.125rem 0;
+  color: var(--text-primary);
+  font-weight: 500;
+  font-size: 0.9375rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.estudianteCodigo {
+  margin: 0.125rem 0;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+}
+
+.estudianteCorreo {
+  margin: 0.125rem 0 0 0;
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.removeButton {
+  background: transparent;
+  border: 1px solid var(--border-primary);
+  cursor: pointer;
+  padding: 0.4rem 0.5rem;
+  border-radius: var(--border-radius);
+  transition: all 0.15s;
+  flex-shrink: 0;
+  margin-left: 0.5rem;
+  color: var(--text-muted);
+}
+
+.removeButton:hover {
+  background-color: var(--surface-primary);
+  border-color: #ff6b6b;
+  color: #ff6b6b;
+}
+
+.loadingText,
+.errorText {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+
+.errorText {
+  color: #ff6b6b;
+}

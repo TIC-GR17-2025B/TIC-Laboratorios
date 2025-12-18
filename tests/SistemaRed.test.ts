@@ -3,6 +3,7 @@ import { ECSManager } from "../src/ecs/core";
 import { SistemaRed } from "../src/ecs/systems";
 import {
   EstadoAtaqueDispositivo,
+  TipoActivo,
   TipoDispositivo,
 } from "../src/types/DeviceEnums";
 import {
@@ -36,6 +37,7 @@ describe("SistemaRed", () => {
     activoComponente.activos.push({
       nombre: "Activo1",
       contenido: "Infor importante",
+      tipo: TipoActivo.DOCUMENTO
     });
     em.agregarComponente(entidadDisp1, activoComponente);
 
