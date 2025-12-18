@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
+import { API_BASE_URL } from "../../../common/utils/apiConfig";
 
-const API_URL = "/api";
+const API_URL = API_BASE_URL;
 
 interface Estudiante {
   id_estudiante: number;

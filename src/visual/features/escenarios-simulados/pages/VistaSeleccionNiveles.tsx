@@ -4,8 +4,9 @@ import { useAuth } from "../../admin-docente-y-estudiante/hooks/useAuth";
 import ModalUnirseGrupo from "../../admin-docente-y-estudiante/components/ModalUnirseGrupo";
 import LevelSelectionMenuList from "../components/LevelSelectionMenuList";
 import styles from "../styles/VistaSeleccionNiveles.module.css";
+import { API_BASE_URL } from "../../../common/utils/apiConfig";
 
-const API_URL = "/api";
+const API_URL = API_BASE_URL;
 
 export default function VistaSeleccionNiveles() {
     const navigate = useNavigate();

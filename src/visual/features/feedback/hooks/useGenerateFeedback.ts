@@ -23,7 +23,7 @@ export const useGenerateFeedback = () => {
     setLoading(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/feedback/generate`, {
+      const response = await fetch(`${API_BASE_URL}/feedback/generate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
