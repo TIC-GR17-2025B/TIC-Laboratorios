@@ -50,6 +50,7 @@ export default function LevelSelectionMenuList() {
     const handleSelectLevel = (escenarioId: number) => {
         const escenarioCompleto = nivelController.cargarEscenario(escenarioId) as Escenario;
         if (escenarioCompleto) {
+            localStorage.setItem("id_escenario_actual", escenarioId.toString());
             setSelectedEscenario(escenarioCompleto);
             navigate('/');
         }
