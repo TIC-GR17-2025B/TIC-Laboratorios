@@ -2,7 +2,6 @@ import styles from "../styles/CheckableItem.module.css";
 
 type CheckableItemProps = {
     label: string;
-    price: number;
     checked?: boolean;
     onChange?: (checked: boolean) => void;
     disabled?: boolean;
@@ -11,7 +10,6 @@ type CheckableItemProps = {
 
 function CheckableItem({
     label,
-    price,
     checked = false,
     onChange,
     disabled = false,
@@ -51,7 +49,6 @@ function CheckableItem({
                 />
                 <div className={styles.label}>{label}</div>
             </div>
-            <span className={styles.price}>{checked ? `$${(price / 2).toFixed(2)}` : `$${price.toFixed(2)}`}</span>
         </div>
     );
 }

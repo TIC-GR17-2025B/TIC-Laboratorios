@@ -1,78 +1,279 @@
 .contenedor {
   display: flex;
-  flex-direction: column;
   flex: 1 1 auto;
   min-height: 0;
+  gap: 0;
 }
-.comboBoxDispositivo {
-  width: 290px;
-}
-.contenidoDispositivo {
-  margin-top: 8px;
+
+/* Panel lateral estilo VirtualBox */
+.panelLateral {
   display: flex;
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: hidden;
+  flex-direction: column;
+  width: 200px;
+  min-width: 200px;
+  background: var(--surface-primary);
+  border-right: 1px solid var(--border-primary);
 }
-.item {
+
+.panelHeader {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 12px 0;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
   border-bottom: 1px solid var(--border-primary);
 }
 
-.itemLista {
-  gap: 8px;
-  align-items: start;
+.listaDispositivos {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 4px;
 }
 
-.itemListaDetalle {
-  width: 100%;
-  margin-bottom: 0.75rem;
-}
-.itemLista:last-child {
-  border-bottom: none;
-}
-.etiqueta {
+.itemDispositivo {
   display: flex;
   align-items: center;
   gap: 8px;
-  user-select: none;
-  color: var(--text-secondary);
-}
-
-.imagenDispositivo {
-  margin-right: 16px;
-  min-width: 260px;
-  height: 260px !important;
-  width: 260px !important;
+  width: 100%;
+  padding: 6px 8px;
+  background: transparent;
+  border: 1px solid transparent;
   border-radius: var(--border-radius);
-  overflow: hidden;
-  user-select: none;
-}
-.descripcion {
-  width: 100%;
-  padding: 0 16px;
-  border-right: 1px solid var(--border-primary);
-  border-left: 1px solid var(--border-primary);
-}
-.configuraciones {
-  margin-left: 16px;
-  min-width: 450px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
 }
 
-.parteSuperior {
+.itemDispositivo:hover {
+  background: var(--surface-secondary);
+}
+
+.itemDispositivoActivo {
+  background: var(--surface-secondary);
+  border-color: var(--accent-primary);
+}
+
+.iconoDispositivo {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--surface-tertiary);
+  border-radius: 6px;
+  color: var(--text-primary);
+  flex-shrink: 0;
 }
 
-.botonesAccion {
+.iconoDispositivo svg {
+  width: 16px;
+  height: 16px;
+}
+
+.infoDispositivo {
   display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.nombreDispositivo {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+
+.tipoDispositivo {
+  font-size: 10px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+
+.estadoDispositivo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.indicadorEncendido {
+  width: 6px;
+  height: 6px;
+  background: #4ade80;
+  border-radius: 50%;
+  box-shadow: 0 0 4px rgba(74, 222, 128, 0.5);
+}
+
+/* OS-like desktop view */
+.escritorio {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  border-radius: 0;
+  overflow: hidden;
+}
+
+.areaEscritorio {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 16px;
+  overflow: hidden;
+}
+
+.barraTareas {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  padding: 0 8px;
   gap: 8px;
 }
 
-.botonesAccion > button {
-  border: 1px solid var(--border-primary);
+.botonInicio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 32px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  color: var(--text-primary);
+}
+
+.botonInicio:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.separadorTareas {
+  width: 1px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.appsTareas {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.bandejaSistema {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 8px;
+}
+
+.reloj {
+  font-size: 12px;
+  color: var(--text-primary);
+  user-select: none;
+}
+
+/* Desktop icons */
+.iconosEscritorio {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  align-content: flex-start;
+  gap: 8px;
+}
+
+.iconoApp {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 80px;
+  padding: 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  color: var(--text-primary);
+}
+
+.iconoApp:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.iconoApp:active {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.iconoAppImagen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: var(--text-primary);
+}
+
+.iconoAppNombre {
+  font-size: 11px;
+  text-align: center;
+  word-break: break-word;
+  line-height: 1.2;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* Taskbar apps */
+.appTarea {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 32px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  color: var(--text-primary);
+}
+
+.appTarea:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.appTarea:active {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.appTareaActiva {
+  background: rgba(255, 255, 255, 0.15);
+  position: relative;
+}
+
+.appTareaActiva::after {
+  content: "";
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 3px;
+  background: var(--accent-primary);
+  border-radius: 2px;
 }

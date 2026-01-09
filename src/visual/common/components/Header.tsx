@@ -12,14 +12,19 @@ import EstrellaPartidaIcon from '../icons/EstrellaPartidaIcon';
 
 const Header: React.FC = () => {
     const escenario = useEscenarioActual();
-    const { pause, resume, isPaused, tiempoTranscurrido, presupuesto } = useECSSceneContext();
+    const { pause, resume, isPaused, tiempoTranscurrido } = useECSSceneContext();
 
     return (
         <header className={styles.header}>
             <div className={styles.titleContainer}>
                 <h1 className={styles.title}>{escenario.titulo}</h1>
+                <nav className={styles.nav}>
+                    <NavigationLink icon={<OfficeIcon />} label="Oficina" to="/" />
+                    <NavigationLink icon={<DevicesIcon />} label="Dispositivos" to="/dispositivos" />
+                    <NavigationLink icon={<RedesIcon />} label="Redes" to="/redes" />
+                    <NavigationLink icon={<EstrellaPartidaIcon />} label="Partida" to="/fases-partida" />
+                </nav>
                 <div className={styles.rightSideSection}>
-                    <span>Presupuesto: ${presupuesto}</span>
                     <span aria-label='Estado de la animación'>
                         {formatearTiempo(tiempoTranscurrido)}
                     </span>
@@ -38,12 +43,7 @@ const Header: React.FC = () => {
                     <ChatLauncher />
                 </div>
             </div>
-            <nav className={styles.nav}>
-                <NavigationLink icon={<OfficeIcon />} label="Oficina" to="/" />
-                <NavigationLink icon={<DevicesIcon />} label="Dispositivos" to="/dispositivos" />
-                <NavigationLink icon={<RedesIcon />} label="Redes" to="/redes" />
-                <NavigationLink icon={<EstrellaPartidaIcon />} label="Partida" to="/fases-partida" />
-            </nav>
+           
         </header >
     );
 };

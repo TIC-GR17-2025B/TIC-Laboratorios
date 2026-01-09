@@ -1,0 +1,78 @@
+.container {
+    padding: 16px;
+    min-width: 400px;
+}
+
+.emptyState {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 32px;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-primary);
+    margin-bottom: 16px;
+}
+
+.headerInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.nombre {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.tipo {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    text-transform: capitalize;
+}
+
+.seccion {
+    margin-bottom: 20px;
+}
+
+.seccionTitulo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 12px 0;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.propiedades {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.propiedad {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: var(--surface-secondary);
+    border-radius: var(--border-radius);
+}
+
+.etiqueta {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.valor {
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    font-weight: 500;
+}

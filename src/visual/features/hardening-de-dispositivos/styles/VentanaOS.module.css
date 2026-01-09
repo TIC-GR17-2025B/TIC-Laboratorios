@@ -1,0 +1,105 @@
+.ventana {
+    position: absolute;
+    min-width: 400px;
+    max-width: 90%;
+    max-height: 80%;
+    display: flex;
+    flex-direction: column;
+    background: rgba(30, 30, 40, 0.95);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    overflow: hidden;
+    z-index: 10;
+    transition: border-radius 0.2s ease;
+}
+
+.ventanaMaximizada {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    min-width: unset;
+    max-width: unset;
+    max-height: unset;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+}
+
+.barraVentana {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 36px;
+    min-height: 36px;
+    padding: 0 12px;
+    background: rgba(0, 0, 0, 0.3);
+    cursor: grab;
+    user-select: none;
+}
+
+.ventanaMaximizada .barraVentana {
+    cursor: default;
+}
+
+.barraVentana:active {
+    cursor: grabbing;
+}
+
+.ventanaMaximizada .barraVentana:active {
+    cursor: default;
+}
+
+.tituloVentana {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.iconoVentana {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.8;
+}
+
+.botonesVentana {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.botonVentana {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 6px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.botonVentana:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--text-primary);
+}
+
+.botonCerrar:hover {
+    background: rgba(255, 80, 80, 0.8);
+    color: white;
+}
+
+.contenidoVentana {
+    flex: 1 1 auto;
+    overflow: auto;
+    min-height: 0;
+}
