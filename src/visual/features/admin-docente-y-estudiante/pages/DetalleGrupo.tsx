@@ -3,6 +3,9 @@ import { useParams, useNavigate } from 'react-router';
 import { useAuth } from '../hooks/useAuth';
 import { useGroups, type Estudiante, type Grupo } from '../hooks/useGroups';
 import CodigoInvitacion from '../components/CodigoInvitacion';
+import { CourseAnalysisButton } from '../../course-analysis/components/CourseAnalysisButton';
+import { CourseAnalysisModal } from '../../course-analysis/components/CourseAnalysisModal';
+import type { CourseAnalysisResponse } from '../../course-analysis/types/courseAnalysis.types';
 import styles from '../styles/DetalleGrupo.module.css';
 
 export default function DetalleGrupo() {
@@ -18,6 +21,13 @@ export default function DetalleGrupo() {
   const [grupo, setGrupo] = useState<Grupo | null>(null);
   const [estudiantes, setEstudiantes] = useState<Estudiante[]>([]);
   const [loading, setLoading] = useState(true);
+  const [analysisModal, setAnalysisModal] = useState<{
+    isOpen: boolean;
+    analysis: CourseAnalysisResponse | null;
+  }>({
+    isOpen: false,
+    analysis: null
+  });
 
   useEffect(() => {
     const loadGrupo = async () => {
@@ -100,6 +110,15 @@ export default function DetalleGrupo() {
               {estudiantes.length} {estudiantes.length === 1 ? 'estudiante' : 'estudiantes'} matriculado{estudiantes.length !== 1 ? 's' : ''}
             </p>
           </div>
+          <CourseAnalysisButton
+            idCurso={grupo.id_curso}
+            onAnalysisGenerated={(analysis) => {
+              setAnalysisModal({
+                isOpen: true,
+                analysis
+              });
+            }}
+          />
         </div>
 
         <div className={styles.codigoSection}>
@@ -161,6 +180,15 @@ export default function DetalleGrupo() {
           )}
         </div>
       </div>
+
+      {analysisModal.analysis && (
+        <CourseAnalysisModal
+          isOpen={analysisModal.isOpen}
+          onClose={() => setAnalysisModal({ ...analysisModal, isOpen: false })}
+          analysis={analysisModal.analysis}
+          cursoNombre={grupo.nombre}
+        />
+      )}
     </div>
   );
 }
