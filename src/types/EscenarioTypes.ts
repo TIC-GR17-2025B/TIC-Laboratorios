@@ -114,3 +114,8 @@ export interface ObjetivoFase {
     descripcion: string;
     completado: boolean;
 }
+
+export interface PlantillaCorreoPhishing {
+  asunto: string;
+  mensaje: string;
+}

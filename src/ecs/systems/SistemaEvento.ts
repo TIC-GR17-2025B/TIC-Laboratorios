@@ -1,4 +1,4 @@
-import { ObjetosManejables } from "../../types/AccionesEnums";
+import { AccionesRealizables, ObjetosManejables } from "../../types/AccionesEnums";
 import { EstadoAtaqueDispositivo, TipoEvento } from "../../types/DeviceEnums";
 import type {
   PerfilClienteVPN,
@@ -234,6 +234,40 @@ export class SistemaEvento extends Sistema {
         if(busquedaVeredicto)
           this.ecsManager.emit(EventosPublicos.VERIFICACION_FIRMA_CORRECTA, `Verificación correcta de documento firmado para ${info.nombreDocumento}`);
         else this.ecsManager.emit(EventosPublicos.FASE_NO_COMPLETADA, MensajesGenerales.MSJ_FASE_NO_COMPLETADA);
+        break;
+      }
+      case TipoEvento.VERIFICACION_ACCION_JUGADOR: {
+        const info = evento.infoAdicional as {
+          accion: string;
+          objeto: string;
+          tiempo: number;
+          val?: unknown;
+        };
+
+        const consultaAccion = this.ecsManager.consultarAccion(info.accion, info.objeto, info.tiempo, info.val);
+
+        if(!consultaAccion)
+          this.ecsManager.emit(EventosPublicos.FASE_NO_COMPLETADA, MensajesGenerales.MSJ_FASE_NO_COMPLETADA);
+
+        break;
+      }
+      case TipoEvento.ENVIO_CORREO: {
+        const info = evento.infoAdicional as {
+          dispositivoEmisor: string;
+          destinatario: string;
+          asunto: string;
+        };
+
+        const consultaEnvioCorreo = this.ecsManager.consultarAccion(
+          AccionesRealizables.ENVIO,
+          ObjetosManejables.CORREO,
+          0,
+          info
+        );
+
+        if (!consultaEnvioCorreo)
+          this.ecsManager.emit(EventosPublicos.FASE_NO_COMPLETADA, MensajesGenerales.MSJ_FASE_NO_COMPLETADA);
+
         break;
       }
       // Próximamente para futuros eventos
