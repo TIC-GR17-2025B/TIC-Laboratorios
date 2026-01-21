@@ -67,6 +67,13 @@ export class PrismaAuthRepository implements IAuthRepository {
     return found ? this.mapUsuarioAuthToModel(found) : null
   }
 
+  async findUsuarioAuthByRecoveryToken(token: string): Promise<UsuarioAuth | null> {
+    const found = await prisma.usuario_auth.findFirst({
+      where: { token_recuperacion: token }
+    })
+    return found ? this.mapUsuarioAuthToModel(found) : null
+  }
+
   async confirmUsuarioAuth(id_usuario_auth: number): Promise<void> {
     await prisma.usuario_auth.update({
       where: { id_usuario_auth },

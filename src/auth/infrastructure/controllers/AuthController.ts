@@ -4,11 +4,13 @@ import { PrismaAuthRepository } from "../repositories/PrismaAuthRepository.js"
 import { RegisterEstudianteUseCase } from "../../application/useCases/RegisterEstudianteUseCase.js"
 import { RegisterProfesorUseCase } from "../../application/useCases/RegisterProfesorUseCase.js"
 import { LoginUseCase } from "../../application/useCases/LoginUseCase.js"
-import { ConfirmarEmailUseCase } from "../../application/useCases/ConfirmarEmailUseCase.js"
+import { ConfirmarEmailUseCase} from "../../application/useCases/ConfirmarEmailUseCase.js"
 import { ReenviarConfirmacionEmailUseCase } from "../../application/useCases/ReenviarConfirmacionEmailUseCase.js"
 import { ObtenerEstudianteProfesorUseCase } from "../../application/useCases/ObtenerEstudianteProfesorUseCase.js"
 import { ResendEmailService } from "../../infrastructure/service/EmailService.js"
 import { authMiddleware, requireProfesor } from "../middlewares/authMiddleware.js"
+import { SolicitudCambioContraseniaUseCase } from "../../application/useCases/SolicitudCambioContraseniaUseCase.js"
+import { CambiarContraseniaUseCase } from "../../application/useCases/CambiarContraseniaUseCase.js"
 
 const router = express.Router()
 const repo = new PrismaAuthRepository()
@@ -45,6 +47,8 @@ const loginUseCase = new LoginUseCase(repo, jwtSecret)
 const confirmEmailUseCase = new ConfirmarEmailUseCase(repo)
 const resendConfirmationUseCase = new ReenviarConfirmacionEmailUseCase(repo, emailService)
 const obtenerEstudianteProfesor = new ObtenerEstudianteProfesorUseCase(repo)
+const solicitudCambioContraseniaUseCase = new SolicitudCambioContraseniaUseCase(repo, emailService)
+const cambiarContraseniaUseCase = new CambiarContraseniaUseCase(repo)
 
 // POST /auth/register/estudiante
 router.post('/register/estudiante', async (req: Request, res: Response) => {
@@ -191,6 +195,56 @@ router.get('/profesor/:id/estudiantes', authMiddleware, requireProfesor, async (
   } catch (err) {
     if (err instanceof Error) {
       res.status(500).json({ success: false, error: err.message })
+    }
+  }
+})
+
+// POST /auth/request-password-reset - Solicitar recuperación de contraseña
+router.post('/request-password-reset', async (req: Request, res: Response) => {
+  try {
+    const { correo_electronico } = req.body
+
+    if (!correo_electronico) {
+      return res.status(400).json({
+        success: false,
+        error: 'Correo electrónico requerido'
+      })
+    }
+
+    const result = await solicitudCambioContraseniaUseCase.execute(correo_electronico)
+
+    res.json({ success: true, data: result })
+
+  } catch (err) {
+    if (err instanceof Error) {
+      res.status(400).json({ success: false, error: err.message })
+    } else {
+      res.status(500).json({ success: false, error: 'Error interno del servidor' })
+    }
+  }
+})
+
+// POST /auth/reset-password - Restablecer contraseña con token
+router.post('/reset-password', async (req: Request, res: Response) => {
+  try {
+    const { token, nueva_contrasenia } = req.body
+
+    if (!token || !nueva_contrasenia) {
+      return res.status(400).json({
+        success: false,
+        error: 'Token y nueva contraseña son requeridos'
+      })
+    }
+
+    const result = await cambiarContraseniaUseCase.execute(token, nueva_contrasenia)
+
+    res.json({ success: true, data: result })
+
+  } catch (err) {
+    if (err instanceof Error) {
+      res.status(400).json({ success: false, error: err.message })
+    } else {
+      res.status(500).json({ success: false, error: 'Error interno del servidor' })
     }
   }
 })

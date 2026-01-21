@@ -8,6 +8,7 @@ export interface IAuthRepository {
   findUsuarioAuthByEmail(correo_electronico: string): Promise<UsuarioAuth | null>
   findUsuarioAuthById(id_usuario_auth: number): Promise<UsuarioAuth | null>
   findUsuarioAuthByToken(token: string): Promise<UsuarioAuth | null>
+  findUsuarioAuthByRecoveryToken(token: string): Promise<UsuarioAuth | null>
   confirmUsuarioAuth(id_usuario_auth: number): Promise<void>
   updateTokenRecuperacion(id_usuario_auth: number, token: string, expira: string): Promise<void>
   updatePassword(id_usuario_auth: number, nuevaContrasenia: string): Promise<void>
