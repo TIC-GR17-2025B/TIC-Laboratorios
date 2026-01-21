@@ -548,9 +548,9 @@ export class EscenarioController {
     ) ?? []) {
       const personaActual = this.ecsManager.getComponentes(entidadPersona)?.get(PersonaComponent);
       const infoPersonaActual: InfoPersonaEncontrada = {
-        nombre: personaActual?.nombre!,
-        correo: personaActual?.correo!,
-        nivelConcienciaSeguridad: personaActual?.nivelConcienciaSeguridad!
+        nombre: personaActual!.nombre!,
+        correo: personaActual!.correo!,
+        nivelConcienciaSeguridad: personaActual!.nivelConcienciaSeguridad!
       };
       infoPersonasEmpresa.push(infoPersonaActual);
     }
