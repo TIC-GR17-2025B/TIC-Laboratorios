@@ -10,6 +10,7 @@ export class DispositivoComponent extends Componente {
     public tipo: TipoDispositivo,
     public estadoAtaque: EstadoAtaqueDispositivo,
     public redes: Entidad[] = [],
+    public personaEncargada?: string,
     public apps?: SoftwareApp[]
   ) {
     super();

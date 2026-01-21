@@ -114,3 +114,9 @@ export interface ObjetivoFase {
     descripcion: string;
     completado: boolean;
 }
+
+export interface InfoDispositivoEscaneado {
+  nombre: string;
+  sistOp: string;
+  encargado: string;
+}

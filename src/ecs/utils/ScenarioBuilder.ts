@@ -334,6 +334,7 @@ export class ScenarioBuilder {
       estadoAtaque?: unknown;
       posicion?: { x: number; y: number; z: number; rotacionY?: number };
       redes?: string[];
+      personaEncargada?: string;
       apps?: SoftwareApp[];
     };
 
@@ -355,6 +356,7 @@ export class ScenarioBuilder {
         d.tipo as unknown as TipoDispositivo,
         d.estadoAtaque as EstadoAtaqueDispositivo,
         entidadesRedesDispActual,
+        d.personaEncargada,
         d.apps
       )
     );
