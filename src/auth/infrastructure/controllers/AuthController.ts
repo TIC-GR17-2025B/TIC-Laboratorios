@@ -1,4 +1,5 @@
 import express from "express"
+import type SMTPTransport from 'nodemailer/lib/smtp-transport'
 import type { Request, Response } from "express"
 import { PrismaAuthRepository } from "../repositories/PrismaAuthRepository.js"
 import { RegisterEstudianteUseCase } from "../../application/useCases/RegisterEstudianteUseCase.js"
@@ -7,7 +8,7 @@ import { LoginUseCase } from "../../application/useCases/LoginUseCase.js"
 import { ConfirmarEmailUseCase} from "../../application/useCases/ConfirmarEmailUseCase.js"
 import { ReenviarConfirmacionEmailUseCase } from "../../application/useCases/ReenviarConfirmacionEmailUseCase.js"
 import { ObtenerEstudianteProfesorUseCase } from "../../application/useCases/ObtenerEstudianteProfesorUseCase.js"
-import { ResendEmailService } from "../../infrastructure/service/EmailService.js"
+import { NodemailerEmailService } from "../../infrastructure/service/EmailService.js"
 import { authMiddleware, requireProfesor } from "../middlewares/authMiddleware.js"
 import { SolicitudCambioContraseniaUseCase } from "../../application/useCases/SolicitudCambioContraseniaUseCase.js"
 import { CambiarContraseniaUseCase } from "../../application/useCases/CambiarContraseniaUseCase.js"
@@ -17,16 +18,11 @@ const repo = new PrismaAuthRepository()
 
 // Validar variables de entorno
 const jwtSecret = process.env.JWT_SECRET
-const resendApiKey = process.env.RESEND_API_KEY
 const fromEmail = process.env.FROM_EMAIL
 const frontendUrl = process.env.FRONTEND_URL
 
 if (!jwtSecret) {
   throw new Error("Falta la variable de entorno JWT_SECRET")
-}
-
-if (!resendApiKey) {
-  throw new Error("Falta la variable de entorno RESEND_API_KEY")
 }
 
 if (!fromEmail) {
@@ -37,8 +33,30 @@ if (!frontendUrl) {
   throw new Error("Falta la variable de entorno FRONTEND_URL")
 }
 
-// Inicializar servicios
-const emailService = new ResendEmailService(resendApiKey, fromEmail, frontendUrl)
+const {
+  SMTP_HOST,
+  SMTP_PORT,
+  SMTP_SECURE,
+  SMTP_USER,
+  SMTP_PASS,
+} = process.env
+
+if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) {
+  throw new Error('Faltan variables de entorno para la configuración de SMTP')
+}
+
+const smtpConfig: SMTPTransport.Options = {
+  host: SMTP_HOST,
+  port: Number(SMTP_PORT ?? 587),
+  secure: SMTP_SECURE === 'true',
+  auth: {
+    user: SMTP_USER,
+    pass: SMTP_PASS,
+  },
+}
+
+// Inicializar el servicio de correo con Nodemailer
+const emailService = new NodemailerEmailService(smtpConfig, fromEmail, frontendUrl)
 
 // Inicializar use cases
 const registerEstudiante = new RegisterEstudianteUseCase(repo, emailService)

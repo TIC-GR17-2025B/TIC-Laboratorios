@@ -1,17 +1,17 @@
-import { Resend } from 'resend'
+import nodemailer from 'nodemailer'
 
 export interface EmailService {
   sendConfirmationEmail(email: string, token: string, nombre: string): Promise<void>
   sendPasswordResetEmail(email: string, token: string, nombre: string): Promise<void>
 }
 
-export class ResendEmailService implements EmailService {
-  private resend: Resend
+export class NodemailerEmailService implements EmailService {
+  private transporter: nodemailer.Transporter
   private fromEmail: string
   private frontendUrl: string
 
-  constructor(apiKey: string, fromEmail: string, frontendUrl: string) {
-    this.resend = new Resend(apiKey)
+  constructor(smtpConfig: nodemailer.TransportOptions, fromEmail: string, frontendUrl: string) {
+    this.transporter = nodemailer.createTransport(smtpConfig)
     this.fromEmail = fromEmail
     this.frontendUrl = frontendUrl
   }
@@ -20,7 +20,7 @@ export class ResendEmailService implements EmailService {
     const confirmationUrl = `${this.frontendUrl}/auth/confirm?token=${token}`
 
     try {
-      await this.resend.emails.send({
+      await this.transporter.sendMail({
         from: this.fromEmail,
         to: email,
         subject: 'Confirma tu cuenta',
@@ -36,7 +36,7 @@ export class ResendEmailService implements EmailService {
     const resetUrl = `${this.frontendUrl}/auth/reset-password?token=${token}`
 
     try {
-      await this.resend.emails.send({
+      await this.transporter.sendMail({
         from: this.fromEmail,
         to: email,
         subject: 'Recuperación de contraseña',
