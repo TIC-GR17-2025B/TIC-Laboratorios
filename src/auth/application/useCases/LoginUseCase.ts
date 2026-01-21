@@ -17,52 +17,68 @@ export class LoginUseCase {
   ) {}
 
   async execute(correo_electronico: string, contrasenia: string): Promise<LoginResult | null> {
+    // 1. Buscar el usuario_auth por email
+    const usuarioAuth = await this.repo.findUsuarioAuthByEmail(correo_electronico)
     
-    // Buscar profesor
-    const profesor = await this.repo.findProfesorByEmail(correo_electronico)
+    if (!usuarioAuth) {
+      return null
+    }
+
+    // 2. Verificar la contraseña
+    const match = await bcrypt.compare(contrasenia, usuarioAuth.contrasenia_hash)
+    
+    if (!match) {
+      return null
+    }
+
+    // 3. Verificar si la cuenta está confirmada
+    if (!usuarioAuth.confirmado) {
+      throw new Error('Cuenta no confirmada. Por favor, verifica tu correo electrónico.')
+    }
+
+    // 4. Buscar si es profesor
+    const profesor = await this.repo.findProfesorByUsuarioAuth(usuarioAuth.id_usuario_auth)
+    
     if (profesor) {
-      const match = await bcrypt.compare(contrasenia, profesor.contrasenia)
-      if (match) {
+      const token = jwt.sign(
+        { 
+          id_usuario_auth: usuarioAuth.id_usuario_auth,
+          id_profesor: profesor.id_profesor, 
+          role: "profesor" 
+        },
+        this.jwtSecret,
+        { expiresIn: "1h" }
+      )
 
-        // convertir a tipo public
-        const { ...publicProfesor } = profesor
-
-        const token = jwt.sign(
-          { id: profesor.id_profesor, role: "profesor" },
-          this.jwtSecret,
-          { expiresIn: "1h" }
-        )
-
-        return {
-          role: "profesor",
-          user: publicProfesor,
-          token
-        }
+      return {
+        role: "profesor",
+        user: profesor,
+        token
       }
     }
 
-    // Buscar estudiante
-    const estudiante = await this.repo.findEstudianteByEmail(correo_electronico)
+    // 5. Buscar si es estudiante
+    const estudiante = await this.repo.findEstudianteByUsuarioAuth(usuarioAuth.id_usuario_auth)
+    
     if (estudiante) {
-      const match = await bcrypt.compare(contrasenia, estudiante.contrasenia)
-      if (match) {
+      const token = jwt.sign(
+        { 
+          id_usuario_auth: usuarioAuth.id_usuario_auth,
+          id_estudiante: estudiante.id_estudiante, 
+          role: "estudiante" 
+        },
+        this.jwtSecret,
+        { expiresIn: "1h" }
+      )
 
-        const { ...publicEstudiante } = estudiante
-
-        const token = jwt.sign(
-          { id: estudiante.id_estudiante, role: "estudiante" },
-          this.jwtSecret,
-          { expiresIn: "1h" }
-        )
-
-        return {
-          role: "estudiante",
-          user: publicEstudiante,
-          token
-        }
+      return {
+        role: "estudiante",
+        user: estudiante,
+        token
       }
     }
 
-    return null
+    // 6. Si existe usuario_auth pero no es ni profesor ni estudiante
+    throw new Error('Usuario encontrado pero sin rol asignado')
   }
 }

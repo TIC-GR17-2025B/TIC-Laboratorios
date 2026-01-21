@@ -1,72 +1,172 @@
 import type { IAuthRepository } from "../../domain/repositories/IAuthRepository.js"
-import type { Estudiante, EstudiantePublic  } from "../../domain/models/Estudiante.js"
-import type { Profesor } from "../../domain/models/Profesor.js"
+import type { Estudiante, EstudianteInput, EstudiantePublic } from "../../domain/models/Estudiante.js"
+import type { Profesor, ProfesorInput } from "../../domain/models/Profesor.js"
+import type { UsuarioAuth, UsuarioAuthInput } from "../../domain/models/UsuarioAuth.js"
 import { prisma } from "../db/prisma.js"
 
+interface UsuarioAuthPersistence {
+  id_usuario_auth: number
+  correo_electronico: string
+  contrasenia_hash: string
+  confirmado: boolean
+  token_confirmacion: string | null
+  token_recuperacion: string | null
+  token_expira: Date | null
+  creado_en: Date
+}
+
 export class PrismaAuthRepository implements IAuthRepository {
-  async createEstudiante(e: Omit<Estudiante, 'id_estudiante'>) {
+
+  //Conversiones
+  private mapUsuarioAuthToModel(prismaUser: UsuarioAuthPersistence): UsuarioAuth {
+    return {
+      id_usuario_auth: prismaUser.id_usuario_auth,
+      correo_electronico: prismaUser.correo_electronico,
+      contrasenia_hash: prismaUser.contrasenia_hash,
+      confirmado: prismaUser.confirmado,
+      token_confirmacion: prismaUser.token_confirmacion ?? undefined,
+      token_recuperacion: prismaUser.token_recuperacion ?? undefined,
+      token_expira: prismaUser.token_expira ? prismaUser.token_expira.toISOString() : undefined,
+      creado_en: prismaUser.creado_en.toISOString()
+    }
+  }
+
+  // UsuarioAuth
+
+  async createUsuarioAuth(data: UsuarioAuthInput): Promise<UsuarioAuth> {
+    const created = await prisma.usuario_auth.create({
+      data: {
+        correo_electronico: data.correo_electronico,
+        contrasenia_hash: data.contrasenia_hash,
+        token_confirmacion: data.token_confirmacion ?? null,
+        token_recuperacion: data.token_recuperacion ?? null,
+        token_expira: data.token_expira ? new Date(data.token_expira) : null,
+      }
+    })
+    return this.mapUsuarioAuthToModel(created)
+  }
+
+  async findUsuarioAuthByEmail(correo_electronico: string): Promise<UsuarioAuth | null> {
+    const found = await prisma.usuario_auth.findUnique({
+      where: { correo_electronico }
+    })
+    return found ? this.mapUsuarioAuthToModel(found) : null
+  }
+
+  async findUsuarioAuthById(id_usuario_auth: number): Promise<UsuarioAuth | null> {
+    const found = await prisma.usuario_auth.findUnique({
+      where: { id_usuario_auth }
+    })
+    return found ? this.mapUsuarioAuthToModel(found) : null
+  }
+
+  async findUsuarioAuthByToken(token: string): Promise<UsuarioAuth | null> {
+    const found = await prisma.usuario_auth.findFirst({
+      where: { token_confirmacion: token }
+    })
+    return found ? this.mapUsuarioAuthToModel(found) : null
+  }
+
+  async confirmUsuarioAuth(id_usuario_auth: number): Promise<void> {
+    await prisma.usuario_auth.update({
+      where: { id_usuario_auth },
+      data: {
+        confirmado: true,
+        token_confirmacion: null,
+        token_expira: null
+      }
+    })
+  }
+
+  async updateTokenRecuperacion(id_usuario_auth: number, token: string, expira: string): Promise<void> {
+    await prisma.usuario_auth.update({
+      where: { id_usuario_auth },
+      data: {
+        token_recuperacion: token,
+        token_expira: new Date(expira)
+      }
+    })
+  }
+
+  async updatePassword(id_usuario_auth: number, nuevaContrasenia: string): Promise<void> {
+    await prisma.usuario_auth.update({
+      where: { id_usuario_auth },
+      data: {
+        contrasenia_hash: nuevaContrasenia,
+        token_recuperacion: null,
+        token_expira: null
+      }
+    })
+  }
+
+  // Estudiante
+
+  async createEstudiante(data: EstudianteInput & { id_usuario_auth: number }): Promise<Estudiante> {
     const created = await prisma.estudiante.create({
       data: {
-        codigo_unico: e.codigo_unico,
-        primernombre: e.primernombre,
-        segundo_nombre: e.segundo_nombre,
-        primer_apellido: e.primer_apellido,
-        segundo_apellido: e.segundo_apellido,
-        correo_electronico: e.correo_electronico,
-        contrasenia: e.contrasenia,
+        id_usuario_auth: data.id_usuario_auth,
+        codigo_unico: data.codigo_unico,
+        primernombre: data.primernombre,
+        segundo_nombre: data.segundo_nombre,
+        primer_apellido: data.primer_apellido,
+        segundo_apellido: data.segundo_apellido,
       },
     })
     return created as Estudiante
   }
 
-  async createProfesor(p: Omit<Profesor, 'id_profesor'>) {
+  async findEstudianteByUsuarioAuth(id_usuario_auth: number): Promise<Estudiante | null> {
+    const found = await prisma.estudiante.findUnique({
+      where: { id_usuario_auth }
+    })
+    return found as Estudiante | null
+  }
+
+  async findEstudianteById(id_estudiante: number): Promise<Estudiante | null> {
+    const found = await prisma.estudiante.findUnique({
+      where: { id_estudiante }
+    })
+    return found as Estudiante | null
+  }
+
+  async findEstudiantesByProfesor(id_profesor: number): Promise<EstudiantePublic[]> {
+    const estudiantes = await prisma.estudiante.findMany({
+      where: {
+        matricula: {
+          some: {
+            curso: {
+              id_profesor
+            }
+          }
+        }
+      },
+      orderBy: {
+        primer_apellido: 'asc'
+      }
+    })
+
+    return estudiantes as EstudiantePublic[]
+  }
+
+  // Profesor
+
+  async createProfesor(data: ProfesorInput & { id_usuario_auth: number }): Promise<Profesor> {
     const created = await prisma.profesor.create({
       data: {
-        primernombre: p.primernombre,
-        segundo_nombre: p.segundo_nombre,
-        primer_apellido: p.primer_apellido,
-        segundo_apellido: p.segundo_apellido,
-        correo_electronico: p.correo_electronico,
-        contrasenia: p.contrasenia,
+        id_usuario_auth: data.id_usuario_auth,
+        primernombre: data.primernombre,
+        segundo_nombre: data.segundo_nombre,
+        primer_apellido: data.primer_apellido,
+        segundo_apellido: data.segundo_apellido,
       },
     })
     return created as Profesor
   }
 
-  async findEstudianteByEmail(correo_electronico: string) {
-    const found = await prisma.estudiante.findUnique({ where: { correo_electronico } })
-    return found as Estudiante | null
-  }
-
-  async findProfesorByEmail(correo_electronico: string) {
-    const found = await prisma.profesor.findUnique({ where: { correo_electronico } })
-    return found as Profesor | null
-  }
-
-  async findEstudiantesByProfesor(id_profesor: number): Promise<EstudiantePublic[]> {
-  const estudiantes = await prisma.estudiante.findMany({
-    where: {
-      matricula: {
-        some: {
-          curso: {
-            id_profesor: id_profesor
-          }
-        }
-      }
-    },
-    orderBy: {
-      primer_apellido: 'asc'
-    }
-  })
-
-  return estudiantes.map(e => e) as EstudiantePublic[]
-}
-
-
-  async findEstudianteById(id_estudiante: number): Promise<Estudiante | null> {
-    const found = await prisma.estudiante.findUnique({ 
-      where: { id_estudiante } 
+  async findProfesorByUsuarioAuth(id_usuario_auth: number): Promise<Profesor | null> {
+    const found = await prisma.profesor.findUnique({
+      where: { id_usuario_auth }
     })
-    return found as Estudiante | null
+    return found as Profesor | null
   }
 }
