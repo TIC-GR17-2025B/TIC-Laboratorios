@@ -7,6 +7,7 @@ import type { Entidad } from "../ecs/core";
 import {
   EstadoAtaqueDispositivo,
   Mueble,
+  NivelConcienciaSeguridad,
   TipoActivo,
   TipoDispositivo,
   TipoProteccionVPN,
@@ -119,4 +120,10 @@ export interface InfoDispositivoEscaneado {
   nombre: string;
   sistOp: string;
   encargado: string;
+}
+
+export interface InfoPersonaEncontrada {
+  nombre: string;
+  correo: string;
+  nivelConcienciaSeguridad: NivelConcienciaSeguridad;
 }

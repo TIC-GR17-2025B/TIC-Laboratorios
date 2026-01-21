@@ -19,7 +19,7 @@ import {
   SistemaTiempo,
 } from "../systems";
 import { ScenarioBuilder } from "../utils/ScenarioBuilder";
-import type { Activo, Escenario, LogGeneral, SoftwareApp, RegistroVeredictoFirma } from "../../types/EscenarioTypes";
+import type { Activo, Escenario, LogGeneral, SoftwareApp, RegistroVeredictoFirma, InfoPersonaEncontrada } from "../../types/EscenarioTypes";
 import {
   EventosInternos,
   EventosPublicos,
@@ -27,6 +27,7 @@ import {
   TipoLogGeneral,
 } from "../../types/EventosEnums";
 import { ProgresoController } from "./ProgresoController";
+import { PersonaComponent } from "../components/PersonaComponent";
 
 export class EscenarioController {
   public escenario: Escenario;
@@ -537,6 +538,23 @@ export class EscenarioController {
     }
    
     return appsDisponiblesParaDispositivoActual;
+  }
+
+  // Devuelve el listado de información personas que trabajan en una empresa (zona)
+  public getInfoPersonasPorEmpresa(entidadZona: Entidad): InfoPersonaEncontrada[] | undefined {
+    const infoPersonasEmpresa: InfoPersonaEncontrada[] = [];
+    for (const entidadPersona of this.sistemaJerarquiaEscenario?.obtenerPersonasDeZona(
+      entidadZona
+    ) ?? []) {
+      const personaActual = this.ecsManager.getComponentes(entidadPersona)?.get(PersonaComponent);
+      const infoPersonaActual: InfoPersonaEncontrada = {
+        nombre: personaActual?.nombre!,
+        correo: personaActual?.correo!,
+        nivelConcienciaSeguridad: personaActual?.nivelConcienciaSeguridad!
+      };
+      infoPersonasEmpresa.push(infoPersonaActual);
+    }
+    return infoPersonasEmpresa;
   }
 
   // MÉTODO PARA RESETEAR EL SINGLETON (útil para desarrollo/testing)

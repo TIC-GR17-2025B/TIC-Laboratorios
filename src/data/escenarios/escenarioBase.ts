@@ -1,6 +1,7 @@
 import {
   EstadoAtaqueDispositivo,
   Mueble,
+  NivelConcienciaSeguridad,
   TipoActivo,
   TipoDispositivo,
   TipoEvento,
@@ -160,6 +161,18 @@ export const escenarioBase: unknown = {
         {
           nombre: "Internet",
           color: ColoresRed.ROJO,
+        },
+      ],
+      personas: [
+        {
+          nombre: "Juan Pérez",
+          correo: "juan.perez@corp.com",
+          nivelConcienciaSeguridad: NivelConcienciaSeguridad.ALTA,
+        },
+        {
+          nombre: "Jacob García",
+          correo: "jacob.garcia@corp.com",
+          nivelConcienciaSeguridad: NivelConcienciaSeguridad.BAJA,
         },
       ],
       oficinas: [
