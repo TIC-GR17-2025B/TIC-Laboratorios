@@ -8,3 +8,4 @@ export * from "./SistemaRed";
 export * from "./SistemaRelaciones";
 export * from "./SistemaJerarquiaEscenario";
 export * from "./SistemaActivo";
+export * from "./SistemaComandos";
