@@ -9,6 +9,8 @@ export class DispositivoComponent extends Componente {
     public hardware: string = "",
     public tipo: TipoDispositivo,
     public estadoAtaque: EstadoAtaqueDispositivo,
+    public nombreEquipo: string, 
+    public usuario: string,
     public redes: Entidad[] = [],
     public apps?: SoftwareApp[]
   ) {
