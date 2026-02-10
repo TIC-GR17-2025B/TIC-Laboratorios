@@ -236,6 +236,21 @@ export class SistemaEvento extends Sistema {
         else this.ecsManager.emit(EventosPublicos.FASE_NO_COMPLETADA, MensajesGenerales.MSJ_FASE_NO_COMPLETADA);
         break;
       }
+      case TipoEvento.VERIFICACION_ACCION_JUGADOR: {
+        const info = evento.infoAdicional as {
+          accion: string;
+          objeto: string;
+          tiempo: number;
+          val?: unknown;
+        };
+
+        const consultaAccion = this.ecsManager.consultarAccion(info.accion, info.objeto, info.tiempo, info.val);
+
+        if(!consultaAccion)
+          this.ecsManager.emit(EventosPublicos.FASE_NO_COMPLETADA, MensajesGenerales.MSJ_FASE_NO_COMPLETADA);
+
+        break;
+      }
       // Próximamente para futuros eventos
     }
   }

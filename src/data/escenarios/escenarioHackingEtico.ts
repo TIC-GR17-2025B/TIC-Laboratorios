@@ -14,7 +14,7 @@ export const escenarioHackingEtico: unknown = {
   titulo: "Hacking Ético",
   imagenPreview: "/redFirewallVPN.webp",
   descripcion:
-    "Un escenario con 1 reto: 1) Verificar la veracidad de una firma digital de un documento.",
+    "Un escenario en el que se aplica técnicas de ingeniería social para hackear un dipositivo y obtener información.",
   presupuestoInicial: 1000,
   ataques: [],
   apps: [
@@ -97,13 +97,49 @@ export const escenarioHackingEtico: unknown = {
         dispositivoReceptor: "Computadora Lisa",
       },
       ejecutarAlInstante: true,
-    }, 
+    },
+    {
+      nombreEvento: "Conexión a dispositivo mediante SSH",
+      tipoEvento: TipoEvento.VERIFICACION_ACCION_JUGADOR,
+      tiempoNotificacion: 65,
+      descripcion: "Ahora, utilizando las credenciales, abre la consola en 'Computadora Lisa' para acceder al dispositivo del empleado mediante SSH.",
+      fase: 2,
+      infoAdicional: {
+        accion: AccionesRealizables.EJECUTAR,
+        objeto: ObjetosManejables.COMANDO,
+        tiempo: 0,
+        val: {
+          comando: "ssh",
+          nombreEquipo: "PcJacob",
+          usuario: "jgarcia",
+          contrasenia: "j123",
+          conectadoDesde: "Computadora Lisa"
+        },
+      },
+    },
+    {
+      nombreEvento: "Obtención de información confidencial",
+      tipoEvento: TipoEvento.VERIFICACION_ACCION_JUGADOR,
+      tiempoNotificacion: 78,
+      descripcion: "Una vez conectado al dispositivo del empleado, obtén información que sea confidencial para la empresa. Pista: ejecuta el comando de ayuda de la consola para guiarte.",
+      fase: 2,
+      infoAdicional: {
+        accion: AccionesRealizables.EJECUTAR,
+        objeto: ObjetosManejables.COMANDO,
+        tiempo: 0,
+        val: {
+          comando: "cat",
+          nombreArchivo: "secret_keys",
+          nombreDispositivo: "Computadora Jacob"
+        },
+      },
+    },
     {
       nombreEvento: "Completación Escenario",
       tipoEvento: TipoEvento.COMPLETACION_ESCENARIO,
-      tiempoNotificacion: 20,
+      tiempoNotificacion: 90,
       descripcion: "¡Felicidades, has completado el escenario de este nivel!",
-      fase: 1,
+      fase: 2,
     },
   ],
   fases: [
@@ -139,6 +175,14 @@ export const escenarioHackingEtico: unknown = {
         },
         {
           descripcion: "Recepción de credenciales",
+          completado: false,
+        },
+        {
+          descripcion: "Conexión a dispositivo mediante SSH",
+          completado: false,
+        },
+        {
+          descripcion: "Obtención de información confidencial",
           completado: false,
         },
       ],
@@ -246,6 +290,11 @@ export const escenarioHackingEtico: unknown = {
                     {
                       nombre: "credenciales",
                       contenido: "usuario: jgarcia\ncontraseña: j123",
+                      tipo: TipoActivo.DOCUMENTO
+                    },
+                    {
+                      nombre: "secret_keys",
+                      contenido: "# Credenciales de base de datos principal (NO COMPARTIR NI MODIFICAR!!)\nDB_HOST=prod-db.internal.corporacion\nDB_USER=admin_prod\nDB_PASSWORD=Sup3rS3cr3t_DB_P@ss!!\n",
                       tipo: TipoActivo.DOCUMENTO
                     },
                   ],
