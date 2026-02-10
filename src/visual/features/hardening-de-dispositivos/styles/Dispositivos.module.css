@@ -1,117 +1,43 @@
 .contenedor {
   display: flex;
+  flex-direction: column;
   flex: 1 1 auto;
   min-height: 0;
   gap: 0;
 }
 
-/* Panel lateral estilo VirtualBox */
-.panelLateral {
+/* Pestañas de dispositivos */
+.tabsDispositivos {
   display: flex;
-  flex-direction: column;
-  width: 200px;
-  min-width: 200px;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 8px 0;
   background: var(--surface-primary);
-  border-right: 1px solid var(--border-primary);
-}
-
-.panelHeader {
-  display: flex;
-  align-items: center;
-  padding: 8px 12px;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--text-secondary);
-  border-bottom: 1px solid var(--border-primary);
-}
-
-.listaDispositivos {
-  flex: 1 1 auto;
-  overflow-y: auto;
-  padding: 4px;
-}
-
-.itemDispositivo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  padding: 6px 8px;
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: var(--border-radius);
-  cursor: pointer;
-  transition: all 0.15s ease;
-  text-align: left;
-}
-
-.itemDispositivo:hover {
-  background: var(--surface-secondary);
-}
-
-.itemDispositivoActivo {
-  background: var(--surface-secondary);
-  border-color: var(--accent-primary);
-}
-
-.iconoDispositivo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  background: var(--surface-tertiary);
-  border-radius: 6px;
-  color: var(--text-primary);
+  overflow-x: auto;
   flex-shrink: 0;
 }
 
-.iconoDispositivo svg {
-  width: 16px;
-  height: 16px;
-}
-
-.infoDispositivo {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-width: 0;
-}
-
-.nombreDispositivo {
+.tabDispositivo {
+  padding: 6px 16px;
   font-size: 12px;
   font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  border-radius: 8px 8px 0 0;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.tabDispositivo:hover {
   color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 1.3;
+  background: rgba(255, 255, 255, 0.05);
 }
 
-.tipoDispositivo {
-  font-size: 10px;
-  color: var(--text-secondary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 1.3;
-}
-
-.estadoDispositivo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.indicadorEncendido {
-  width: 6px;
-  height: 6px;
-  background: #4ade80;
-  border-radius: 50%;
-  box-shadow: 0 0 4px rgba(74, 222, 128, 0.5);
+.tabDispositivoActivo {
+  color: var(--text-primary);
+  background: var(--surface-secondary);
 }
 
 /* OS-like desktop view */
@@ -141,36 +67,15 @@
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(10px);
   padding: 0 8px;
-  gap: 8px;
-}
-
-.botonInicio {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 32px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.15s ease;
-  color: var(--text-primary);
-}
-
-.botonInicio:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.separadorTareas {
-  width: 1px;
-  height: 24px;
-  background: rgba(255, 255, 255, 0.2);
+  gap: 2px;
 }
 
 .appsTareas {
   flex: 1;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
+  overflow-x: auto;
 }
 
 .bandejaSistema {
@@ -192,16 +97,16 @@
   flex-wrap: wrap;
   flex-direction: column;
   align-content: flex-start;
-  gap: 8px;
+  gap: 4px;
 }
 
 .iconoApp {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  width: 80px;
-  padding: 8px;
+  gap: 4px;
+  width: 76px;
+  padding: 8px 4px;
   background: transparent;
   border: 1px solid transparent;
   border-radius: 6px;
@@ -211,23 +116,26 @@
 }
 
 .iconoApp:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 .iconoApp:active {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.iconoAppSeleccionado {
+  background: rgba(65, 125, 255, 0.15);
+  border-color: rgba(65, 125, 255, 0.4);
 }
 
 .iconoAppImagen {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  color: var(--text-primary);
+  width: 44px;
+  height: 44px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
 }
 
 .iconoAppNombre {
@@ -235,35 +143,41 @@
   text-align: center;
   word-break: break-word;
   line-height: 1.2;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9), 0 0 6px rgba(0, 0, 0, 0.5);
 }
 
 /* Taskbar apps */
 .appTarea {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 36px;
+  gap: 6px;
   height: 32px;
+  padding: 0 10px;
   background: transparent;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   transition: background 0.15s ease;
-  color: var(--text-primary);
+  color: var(--text-muted);
+  position: relative;
+}
+
+.appTareaNombre {
+  font-size: 11px;
+  white-space: nowrap;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .appTarea:hover {
   background: rgba(255, 255, 255, 0.1);
-}
-
-.appTarea:active {
-  background: rgba(255, 255, 255, 0.15);
+  color: var(--text-primary);
 }
 
 .appTareaActiva {
-  background: rgba(255, 255, 255, 0.15);
-  position: relative;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
 }
 
 .appTareaActiva::after {
@@ -273,7 +187,7 @@
   left: 50%;
   transform: translateX(-50%);
   width: 16px;
-  height: 3px;
-  background: var(--accent-primary);
+  height: 2px;
+  background: var(--blue);
   border-radius: 2px;
 }

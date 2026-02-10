@@ -3,7 +3,7 @@ import "./common/styles/global.css"
 import VistaOficina from './features/escenarios-simulados/pages/VistaOficina.tsx'
 import Dispositivos from './features/hardening-de-dispositivos/pages/Dispositivos.tsx'
 import { BrowserRouter, Route, Routes, useLocation, Outlet } from 'react-router'
-import Header from './common/components/Header.tsx'
+import Sidebar from './common/components/Sidebar.tsx'
 import { EscenarioProvider, ModalProvider, SelectedLevelProvider } from './common/contexts'
 import { ECSSceneProvider } from './features/escenarios-simulados/context/ECSSceneContext.tsx'
 import TarjetaLogNuevo from './features/escenarios-simulados/components/TarjetaLogNuevo.tsx'
@@ -49,7 +49,7 @@ function GameProvidersLayout() {
               <ECSSceneProvider>
                 <ModelPreloader />
                 <Modal />
-                <Header />
+                <Sidebar />
                 <div className="content">
                   <Outlet />
                   <TarjetaLogNuevo />

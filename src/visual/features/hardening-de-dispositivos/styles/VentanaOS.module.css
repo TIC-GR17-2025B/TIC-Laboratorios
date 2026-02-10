@@ -1,8 +1,5 @@
 .ventana {
     position: absolute;
-    min-width: 400px;
-    max-width: 90%;
-    max-height: 80%;
     display: flex;
     flex-direction: column;
     background: rgba(30, 30, 40, 0.95);
@@ -10,7 +7,6 @@
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(20px);
     overflow: hidden;
-    z-index: 10;
     transition: border-radius 0.2s ease;
 }
 
@@ -20,9 +16,6 @@
     left: 0;
     right: 0;
     bottom: 0;
-    min-width: unset;
-    max-width: unset;
-    max-height: unset;
     width: 100%;
     height: 100%;
     border-radius: 0;
@@ -86,6 +79,7 @@
     color: var(--text-secondary);
     cursor: pointer;
     transition: all 0.15s ease;
+    padding: 0;
 }
 
 .botonVentana:hover {
@@ -102,4 +96,73 @@
     flex: 1 1 auto;
     overflow: auto;
     min-height: 0;
+}
+
+/* Resize handles */
+.resizeHandle {
+    position: absolute;
+}
+
+.resizeN {
+    top: 0;
+    left: 6px;
+    right: 6px;
+    height: 4px;
+    cursor: n-resize;
+}
+
+.resizeS {
+    bottom: 0;
+    left: 6px;
+    right: 6px;
+    height: 4px;
+    cursor: s-resize;
+}
+
+.resizeE {
+    top: 6px;
+    right: 0;
+    bottom: 6px;
+    width: 4px;
+    cursor: e-resize;
+}
+
+.resizeW {
+    top: 6px;
+    left: 0;
+    bottom: 6px;
+    width: 4px;
+    cursor: w-resize;
+}
+
+.resizeNE {
+    top: 0;
+    right: 0;
+    width: 8px;
+    height: 8px;
+    cursor: ne-resize;
+}
+
+.resizeNW {
+    top: 0;
+    left: 0;
+    width: 8px;
+    height: 8px;
+    cursor: nw-resize;
+}
+
+.resizeSE {
+    bottom: 0;
+    right: 0;
+    width: 8px;
+    height: 8px;
+    cursor: se-resize;
+}
+
+.resizeSW {
+    bottom: 0;
+    left: 0;
+    width: 8px;
+    height: 8px;
+    cursor: sw-resize;
 }

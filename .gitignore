@@ -35,3 +35,4 @@ dist-ssr
 !.env.docker
 
 /src/generated/prisma
+.env.docker

@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import SistemaOpIcon from "../../../common/icons/SistemaOpIcon";
 import styles from "../styles/Dispositivos.module.css"
 
@@ -35,6 +35,10 @@ function Dispositivos() {
     const { dispositivos } = useDispositivos();
     const [ventanasAbiertas, setVentanasAbiertas] = useState<VentanaId[]>([]);
     const [ventanasMinimizadas, setVentanasMinimizadas] = useState<VentanaId[]>([]);
+    const [iconoSeleccionado, setIconoSeleccionado] = useState<VentanaId | null>(null);
+    const [ordenZ, setOrdenZ] = useState<VentanaId[]>([]);
+    const ultimoClick = useRef<{ id: VentanaId; time: number } | null>(null);
+    const estadosPorDispositivo = useRef<Map<string, { ventanasAbiertas: VentanaId[]; ventanasMinimizadas: VentanaId[]; ordenZ: VentanaId[]; iconoSeleccionado: VentanaId | null }>>(new Map());
 
     const ventanasConfig: VentanaConfig[] = [
         { id: "estePC", titulo: "Este PC", icono: <ComputadoraIcon size={14} />, contenido: <ModalEstePC />, posicionInicial: { x: 50, y: 30 } },
@@ -45,22 +49,47 @@ function Dispositivos() {
         { id: "vpn", titulo: "Cliente VPN", icono: <VPNIcon size={14} />, contenido: <ModalVPNCliente />, posicionInicial: { x: 200, y: 80 } },
     ];
 
+    const enfocarVentana = (id: VentanaId) => {
+        setOrdenZ(prev => [...prev.filter(v => v !== id), id]);
+    };
+
     const abrirVentana = (id: VentanaId) => {
-        if (ventanasMinimizadas.includes(id)) {
-            setVentanasMinimizadas(ventanasMinimizadas.filter(v => v !== id));
-        } else if (!ventanasAbiertas.includes(id)) {
-            setVentanasAbiertas([...ventanasAbiertas, id]);
-        }
+        setVentanasMinimizadas(prev => {
+            if (prev.includes(id)) {
+                enfocarVentana(id);
+                return prev.filter(v => v !== id);
+            }
+            return prev;
+        });
+        setVentanasAbiertas(prev => {
+            if (!prev.includes(id)) {
+                setOrdenZ(z => [...z, id]);
+                return [...prev, id];
+            }
+            enfocarVentana(id);
+            return prev;
+        });
     };
 
     const cerrarVentana = (id: VentanaId) => {
-        setVentanasAbiertas(ventanasAbiertas.filter(v => v !== id));
-        setVentanasMinimizadas(ventanasMinimizadas.filter(v => v !== id));
+        setVentanasAbiertas(prev => prev.filter(v => v !== id));
+        setVentanasMinimizadas(prev => prev.filter(v => v !== id));
+        setOrdenZ(prev => prev.filter(v => v !== id));
     };
 
     const minimizarVentana = (id: VentanaId) => {
-        if (!ventanasMinimizadas.includes(id)) {
-            setVentanasMinimizadas([...ventanasMinimizadas, id]);
+        setVentanasMinimizadas(prev => prev.includes(id) ? prev : [...prev, id]);
+    };
+
+    const handleClickIcono = (e: React.MouseEvent, id: VentanaId) => {
+        e.stopPropagation();
+        const ahora = Date.now();
+        if (ultimoClick.current && ultimoClick.current.id === id && ahora - ultimoClick.current.time < 400) {
+            abrirVentana(id);
+            ultimoClick.current = null;
+        } else {
+            setIconoSeleccionado(id);
+            ultimoClick.current = { id, time: ahora };
         }
     };
 
@@ -84,6 +113,35 @@ function Dispositivos() {
         }
     }, [dispositivos]);
 
+    const cambiarDispositivo = (dispositivo: Dispositivo) => {
+        // Save current device state
+        if (dispositivoSeleccionado) {
+            estadosPorDispositivo.current.set(dispositivoSeleccionado.id, {
+                ventanasAbiertas,
+                ventanasMinimizadas,
+                ordenZ,
+                iconoSeleccionado,
+            });
+        }
+
+        setDispositivoSeleccionado(dispositivo);
+
+        // Restore new device state or start fresh
+        const estado = estadosPorDispositivo.current.get(dispositivo.id);
+        if (estado) {
+            setVentanasAbiertas(estado.ventanasAbiertas);
+            setVentanasMinimizadas(estado.ventanasMinimizadas);
+            setOrdenZ(estado.ordenZ);
+            setIconoSeleccionado(estado.iconoSeleccionado);
+        } else {
+            setVentanasAbiertas([]);
+            setVentanasMinimizadas([]);
+            setOrdenZ([]);
+            setIconoSeleccionado(null);
+        }
+        ultimoClick.current = null;
+    };
+
     const getIconoDispositivo = (tipo: string) => {
         switch (tipo?.toLowerCase()) {
             case "servidor":
@@ -95,111 +153,99 @@ function Dispositivos() {
 
     return <PageTransition>
         <div className={styles.contenedor}>
-            {/* Panel lateral de dispositivos */}
-            <div className={styles.panelLateral}>
-                <div className={styles.panelHeader}>
-                    <span>Máquinas</span>
-                </div>
-                <div className={styles.listaDispositivos}>
-                    {dispositivos.map((dispositivo: Dispositivo) => (
-                        <button
-                            key={dispositivo.id}
-                            className={`${styles.itemDispositivo} ${dispositivoSeleccionado?.id === dispositivo.id ? styles.itemDispositivoActivo : ""}`}
-                            onClick={() => setDispositivoSeleccionado(dispositivo)}
-                        >
-                            <div className={styles.iconoDispositivo}>
-                                {getIconoDispositivo(dispositivo.tipo)}
-                            </div>
-                            <div className={styles.infoDispositivo}>
-                                <span className={styles.nombreDispositivo}>
-                                    {dispositivo.nombre ?? "Sin nombre"}
-                                </span>
-                                <span className={styles.tipoDispositivo}>
-                                    {dispositivo.sistemaOperativo ?? dispositivo.tipo}
-                                </span>
-                            </div>
-                            
-                        </button>
-                    ))}
-                </div>
+            {/* Pestañas de dispositivos */}
+            <div className={styles.tabsDispositivos}>
+                {dispositivos.map((dispositivo: Dispositivo) => (
+                    <button
+                        key={dispositivo.id}
+                        className={`${styles.tabDispositivo} ${dispositivoSeleccionado?.id === dispositivo.id ? styles.tabDispositivoActivo : ""}`}
+                        onClick={() => cambiarDispositivo(dispositivo)}
+                    >
+                        {dispositivo.nombre ?? "Sin nombre"}
+                    </button>
+                ))}
             </div>
 
             {/* Área del escritorio */}
             <div className={styles.escritorio}>
-                <div className={styles.areaEscritorio}>
+                <div className={styles.areaEscritorio} onClick={() => setIconoSeleccionado(null)}>
                     <div className={styles.iconosEscritorio}>
-                        <button className={styles.iconoApp} onClick={() => abrirVentana("estePC")}>
-                            <div className={styles.iconoAppImagen}>
-                                <ComputadoraIcon size={32} />
+                        <button className={`${styles.iconoApp} ${iconoSeleccionado === "estePC" ? styles.iconoAppSeleccionado : ""}`} onClick={(e) => handleClickIcono(e, "estePC")}>
+                            <div className={styles.iconoAppImagen} style={{ color: '#4FC3F7' }}>
+                                <ComputadoraIcon size={36} />
                             </div>
                             <span className={styles.iconoAppNombre}>Este PC</span>
                         </button>
-                        <button className={styles.iconoApp} onClick={() => abrirVentana("archivos")}>
-                            <div className={styles.iconoAppImagen}>
-                                <ActivosIcon size={32} />
+                        <button className={`${styles.iconoApp} ${iconoSeleccionado === "archivos" ? styles.iconoAppSeleccionado : ""}`} onClick={(e) => handleClickIcono(e, "archivos")}>
+                            <div className={styles.iconoAppImagen} style={{ color: '#FFD54F' }}>
+                                <ActivosIcon size={36} />
                             </div>
                             <span className={styles.iconoAppNombre}>Archivos</span>
                         </button>
-                        <button className={styles.iconoApp} onClick={() => abrirVentana("apps")}>
-                            <div className={styles.iconoAppImagen}>
-                                <SoftwareIcon size={32} />
+                        <button className={`${styles.iconoApp} ${iconoSeleccionado === "apps" ? styles.iconoAppSeleccionado : ""}`} onClick={(e) => handleClickIcono(e, "apps")}>
+                            <div className={styles.iconoAppImagen} style={{ color: '#81C784' }}>
+                                <SoftwareIcon size={36} />
                             </div>
                             <span className={styles.iconoAppNombre}>Apps</span>
                         </button>
-                        <button className={styles.iconoApp} onClick={() => abrirVentana("configuracion")}>
-                            <div className={styles.iconoAppImagen}>
-                                <ConfiguracionIcon size={32} />
+                        <button className={`${styles.iconoApp} ${iconoSeleccionado === "configuracion" ? styles.iconoAppSeleccionado : ""}`} onClick={(e) => handleClickIcono(e, "configuracion")}>
+                            <div className={styles.iconoAppImagen} style={{ color: '#B0BEC5' }}>
+                                <ConfiguracionIcon size={36} />
                             </div>
-                            <span className={styles.iconoAppNombre}>Configuración</span>
+                            <span className={styles.iconoAppNombre}>Configuracion</span>
                         </button>
-                        <button className={styles.iconoApp} onClick={() => abrirVentana("firmaChecker")}>
-                            <div className={styles.iconoAppImagen}>
-                                <ShieldCheckIcon size={32} />
+                        <button className={`${styles.iconoApp} ${iconoSeleccionado === "firmaChecker" ? styles.iconoAppSeleccionado : ""}`} onClick={(e) => handleClickIcono(e, "firmaChecker")}>
+                            <div className={styles.iconoAppImagen} style={{ color: '#4DB6AC' }}>
+                                <ShieldCheckIcon size={36} />
                             </div>
                             <span className={styles.iconoAppNombre}>FirmaChecker</span>
                         </button>
-                        <button className={styles.iconoApp} onClick={() => abrirVentana("vpn")}>
-                            <div className={styles.iconoAppImagen}>
-                                <VPNIcon size={32} />
+                        <button className={`${styles.iconoApp} ${iconoSeleccionado === "vpn" ? styles.iconoAppSeleccionado : ""}`} onClick={(e) => handleClickIcono(e, "vpn")}>
+                            <div className={styles.iconoAppImagen} style={{ color: '#7E57C2' }}>
+                                <VPNIcon size={36} />
                             </div>
                             <span className={styles.iconoAppNombre}>VPN</span>
                         </button>
                     </div>
 
-                    {ventanasAbiertas
-                        .filter(id => !ventanasMinimizadas.includes(id))
-                        .map(id => {
+                    {ventanasAbiertas.map(id => {
+                        const config = ventanasConfig.find(v => v.id === id);
+                        if (!config) return null;
+                        const minimizada = ventanasMinimizadas.includes(id);
+                        return (
+                            <VentanaOS
+                                key={id}
+                                titulo={config.titulo}
+                                icono={config.icono}
+                                onClose={() => cerrarVentana(id)}
+                                onMinimize={() => minimizarVentana(id)}
+                                onFocus={() => enfocarVentana(id)}
+                                initialPosition={config.posicionInicial}
+                                zIndex={10 + ordenZ.indexOf(id)}
+                                hidden={minimizada}
+                            >
+                                {config.contenido}
+                            </VentanaOS>
+                        );
+                    })}
+                </div>
+                <div className={styles.barraTareas}>
+                    <div className={styles.appsTareas}>
+                        {ventanasAbiertas.map(id => {
                             const config = ventanasConfig.find(v => v.id === id);
                             if (!config) return null;
                             return (
-                                <VentanaOS
+                                <button
                                     key={id}
-                                    titulo={config.titulo}
-                                    icono={config.icono}
-                                    onClose={() => cerrarVentana(id)}
-                                    onMinimize={() => minimizarVentana(id)}
-                                    initialPosition={config.posicionInicial}
+                                    className={`${styles.appTarea} ${!ventanasMinimizadas.includes(id) ? styles.appTareaActiva : ""}`}
+                                    onClick={() => abrirVentana(id)}
+                                    title={config.titulo}
                                 >
-                                    {config.contenido}
-                                </VentanaOS>
+                                    {config.icono}
+                                    <span className={styles.appTareaNombre}>{config.titulo}</span>
+                                </button>
                             );
                         })}
-                </div>
-                <div className={styles.barraTareas}>
-                    <div className={styles.botonInicio}>
-                        <SistemaOpIcon size={18} />
-                    </div>
-                    <div className={styles.separadorTareas} />
-                    <div className={styles.appsTareas}>
-                        <button className={`${styles.appTarea} ${ventanasAbiertas.includes("archivos") ? styles.appTareaActiva : ""}`} onClick={() => abrirVentana("archivos")}>
-                            <ActivosIcon size={18} />
-                        </button>
-                        <button className={`${styles.appTarea} ${ventanasAbiertas.includes("apps") ? styles.appTareaActiva : ""}`} onClick={() => abrirVentana("apps")}>
-                            <SoftwareIcon size={18} />
-                        </button>
-                        <button className={`${styles.appTarea} ${ventanasAbiertas.includes("configuracion") ? styles.appTareaActiva : ""}`} onClick={() => abrirVentana("configuracion")}>
-                            <ConfiguracionIcon size={18} />
-                        </button>
                     </div>
                     <div className={styles.bandejaSistema}>
                         <span className={styles.reloj}>
