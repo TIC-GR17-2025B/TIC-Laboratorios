@@ -335,6 +335,9 @@ export class ScenarioBuilder {
       posicion?: { x: number; y: number; z: number; rotacionY?: number };
       redes?: string[];
       apps?: SoftwareApp[];
+      nombreEquipo?: string;
+      usuario?: string;
+      contrasenia?: string;
     };
 
     // Extraer entidades de redes
@@ -354,6 +357,9 @@ export class ScenarioBuilder {
         d.hardware ?? "",
         d.tipo as unknown as TipoDispositivo,
         d.estadoAtaque as EstadoAtaqueDispositivo,
+        d.nombreEquipo ?? "",
+        d.usuario ?? "",
+        d.contrasenia ?? "",
         entidadesRedesDispActual,
         d.apps
       )

@@ -11,6 +11,7 @@ export class DispositivoComponent extends Componente {
     public estadoAtaque: EstadoAtaqueDispositivo,
     public nombreEquipo: string, 
     public usuario: string,
+    public contrasenia: string,
     public redes: Entidad[] = [],
     public apps?: SoftwareApp[]
   ) {

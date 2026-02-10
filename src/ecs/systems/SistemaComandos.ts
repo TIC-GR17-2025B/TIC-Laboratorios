@@ -22,10 +22,7 @@ export class SistemaComandos extends Sistema {
             case 0: return respuesta;
             case 1: {
                 switch(comando[0]) {
-                    case "h": {
-                        respuesta = this.ejecutarH();
-                        break;
-                    }
+                    case "h": respuesta = this.ejecutarH(); break;
                     case "ls": respuesta = this.ejecutarLS(); break;
                     default: respuesta = this.MENSAJE_AYUDA; break;
                 }
@@ -34,7 +31,13 @@ export class SistemaComandos extends Sistema {
             case 2: {
                 switch(comando[0]) {
                     case "cat": respuesta = this.ejecutarCAT(comando[1]); break;
-                    case "ssh": respuesta = this.ejecutarSSH(comando[1]); break;
+                    default: respuesta = this.MENSAJE_AYUDA; break;
+                }
+                break;
+            }
+            case 3: {
+                switch(comando[0]) {
+                    case "ssh": respuesta = this.ejecutarSSH(comando[1], comando[2]); break;
                     default: respuesta = this.MENSAJE_AYUDA; break;
                 }
                 break;
@@ -62,13 +65,10 @@ export class SistemaComandos extends Sistema {
         return `Error: No existe el archivo '${nombreArchivo}'`;
     }
 
-    private ejecutarSSH(argumentoSSH: string): string {
-        const credenciales = argumentoSSH.split("@");
+    private ejecutarSSH(usuarioYEquipo: string, contrasenia: string): string {
+        const credenciales = usuarioYEquipo.split("@");
         const usuario = credenciales[0];
-        const equipoYContrasenia = credenciales[1];
-        const equipYContrSeparados = equipoYContrasenia.split(":");
-        const nombreEquipo = equipYContrSeparados[0];
-        const contrasenia = equipYContrSeparados[1];
+        const nombreEquipo = credenciales[1]; 
 
         let entidadDispAConectar = null;
         for (const [entidad, container] of this.ecsManager.getEntidades()) {
@@ -83,16 +83,23 @@ export class SistemaComandos extends Sistema {
 
         const usuarioDisp = this.ecsManager.getComponentes(entidadDispAConectar)?.get(DispositivoComponent)?.usuario;
 
-        if (!usuarioDisp) return `Error: No existe el usuario '${usuarioDisp}' en el dispositivo '${nombreEquipo}'`;
+        if (usuario != usuarioDisp) return `Error: No existe el usuario '${usuario}' en el dispositivo '${nombreEquipo}'.`;
 
-        return 
+        const contraDisp = this.ecsManager.getComponentes(entidadDispAConectar)?.get(DispositivoComponent)?.contrasenia;
+
+        if (contrasenia != contraDisp) return `Error: Contraseña incorrecta para el usuario '${usuario}'.`;
+
+        this.entidadDispAnterior = this.entidadDispActual;
+        this.entidadDispActual = entidadDispAConectar;
+
+        return `¡Bienvenido de nuevo ${usuario}!\nEscribe 'h' para ver todos los comandos disponibles.\n`;
     }
 
     private ejecutarH(): string {
         return "Comandos disponibles:\nh\tVer este mensaje de ayuda\n"+
                "cat\tMostrar el contenido de un archivo -> cat nombreArchivo\n"+
                "ls\tListar los archivos del equipo actual\n"+
-               "ssh\tAcceder remótamente a un dispositivo -> ssh usuario@nombre-dispositivo:contraseña\n";
+               "ssh\tAcceder remótamente a un dispositivo -> ssh usuario@nombre-dispositivo\n";
     }
 
     // Quita todos los espacios en blanco y deja los textos/palabras
