@@ -2,10 +2,11 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    background: #1a1a2e;
-    font-family: 'Courier New', monospace;
-    font-size: 13px;
-    color: #e0e0e0;
+    background: #0c0c0c;
+    font-family: 'Cascadia Mono', 'Consolas', 'Courier New', monospace;
+    font-size: 14px;
+    color: #cccccc;
+    line-height: 1.4;
 }
 
 .terminal {
@@ -14,83 +15,74 @@
     padding: 12px 14px;
 }
 
+.terminal::-webkit-scrollbar {
+    width: 6px;
+}
+
+.terminal::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.terminal::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 3px;
+}
+
 .entry {
-    margin-bottom: 6px;
+    margin-bottom: 2px;
 }
 
 .promptLine {
     display: flex;
     gap: 0;
     flex-wrap: wrap;
+    align-items: center;
 }
 
-.prompt {
-    color: #4fc3f7;
-    font-weight: bold;
+.prompt,
+.inputPrompt {
+    color: #16c60c;
     white-space: nowrap;
+    font-family: inherit;
+    font-size: inherit;
 }
 
 .commandText {
-    color: #e0e0e0;
+    color: #cccccc;
 }
 
 .output {
-    color: #b0bec5;
+    color: #cccccc;
     white-space: pre-wrap;
-    padding-left: 4px;
-    margin-top: 2px;
+    word-break: break-word;
 }
 
-.inputLine {
-    display: flex;
-    align-items: center;
-    padding: 6px 14px 12px;
-    gap: 0;
-}
-
-.inputPrompt {
-    color: #4fc3f7;
-    font-weight: bold;
-    white-space: nowrap;
-    font-family: 'Courier New', monospace;
-    font-size: 13px;
-}
-
-.input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: #e0e0e0;
-    font-family: 'Courier New', monospace;
-    font-size: 13px;
-    caret-color: #4fc3f7;
-}
-
-.passwordLabel {
-    color: #ffd54f;
-    font-family: 'Courier New', monospace;
-    font-size: 13px;
-}
-
+.input,
 .passwordInput {
     flex: 1;
     background: transparent;
     border: none;
     outline: none;
-    color: #e0e0e0;
-    font-family: 'Courier New', monospace;
-    font-size: 13px;
-    caret-color: #ffd54f;
+    color: #cccccc;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    caret-color: #cccccc;
+    padding: 0;
+}
+
+.passwordLabel {
+    color: #f9f1a5;
+    font-family: inherit;
+    font-size: inherit;
 }
 
 .banner {
-    color: #81c784;
+    color: #cccccc;
     white-space: pre-wrap;
-    margin-bottom: 8px;
-    line-height: 1.5;
+    margin-bottom: 4px;
 }
 
 .errorText {
-    color: #ef5350;
+    color: #e74856;
 }

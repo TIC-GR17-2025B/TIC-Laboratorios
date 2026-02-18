@@ -5,8 +5,11 @@ import styles from "../styles/Dispositivos.module.css"
 import PanelConfiguraciones from "../components/PanelConfiguraciones";
 import { useEscenario } from "../../../common/contexts";
 import type { Dispositivo } from "../../../../types/EscenarioTypes";
-import { useDispositivos } from "../hooks";
+import { TipoDispositivo } from "../../../../types/DeviceEnums";
+import { useDispositivos, useAppsDispositivo } from "../hooks";
 import VPNIcon from "../../../common/icons/VPNIcon";
+import VPNAppIcon from "../../../common/icons/VPNAppIcon";
+import ConsolaIcon from "../../../common/icons/ConsolaIcon";
 import ModalVPNCliente from "../../simulacion-redes/components/ModalVPNCliente";
 import PageTransition from "../../../common/components/PageTransition";
 import ShieldCheckIcon from "../../../common/icons/ShieldCheckIcon";
@@ -31,6 +34,33 @@ import ModalPhishMatic from "../components/ModalPhishMatic";
 import ModalConsola from "../components/ModalConsola";
 import VentanaOS from "../components/VentanaOS";
 
+type OSCategory = "windows" | "linux" | "other";
+
+function getOSCategory(so?: string): OSCategory {
+    if (!so) return "other";
+    const lower = so.toLowerCase();
+    if (lower.includes("windows")) return "windows";
+    if (lower.includes("ubuntu") || lower.includes("linux") || lower.includes("debian") || lower.includes("fedora") || lower.includes("centos")) return "linux";
+    return "other";
+}
+
+function getDesktopThemeClass(osCategory: OSCategory, tipo?: TipoDispositivo): string {
+    const isServer = tipo === TipoDispositivo.SERVER;
+    switch (osCategory) {
+        case "windows": return isServer ? styles.escritorioWindowsServer : styles.escritorioWindowsWorkstation;
+        case "linux": return `${styles.escritorioLinux} ${isServer ? styles.escritorioLinuxServer : styles.escritorioLinuxWorkstation}`;
+        default: return isServer ? styles.escritorioOtherServer : "";
+    }
+}
+
+function getTaskbarThemeClass(osCategory: OSCategory): string {
+    switch (osCategory) {
+        case "windows": return styles.barraTareasWindows;
+        case "linux": return styles.barraTareasLinux;
+        default: return "";
+    }
+}
+
 type VentanaId = "estePC" | "archivos" | "apps" | "configuracion" | "firmaChecker" | "vpn" | "netScanViz" | "socialSearcher" | "phishMatic" | "consola";
 
 interface VentanaConfig {
@@ -44,6 +74,8 @@ interface VentanaConfig {
 function Dispositivos() {
     const { setDispositivoSeleccionado, dispositivoSeleccionado, entidadSeleccionadaId } = useEscenario();
     const { dispositivos } = useDispositivos();
+    const { appsInstaladas } = useAppsDispositivo(entidadSeleccionadaId ?? undefined);
+    const appInstalada = (nombre: string) => appsInstaladas.some(a => a.nombre === nombre);
     const [ventanasAbiertas, setVentanasAbiertas] = useState<VentanaId[]>([]);
     const [ventanasMinimizadas, setVentanasMinimizadas] = useState<VentanaId[]>([]);
     const [iconoSeleccionado, setIconoSeleccionado] = useState<VentanaId | null>(null);
@@ -57,11 +89,11 @@ function Dispositivos() {
         { id: "apps", titulo: "Aplicaciones", icono: <AppStoreIcon size={14} />, contenido: <ModalApps />, posicionInicial: { x: 110, y: 70 } },
         { id: "configuracion", titulo: "Configuración", icono: <ConfiguracionIcon size={14} />, contenido: <PanelConfiguraciones />, posicionInicial: { x: 140, y: 40 } },
         { id: "firmaChecker", titulo: "FirmaChecker", icono: <ShieldCheckIcon size={14} />, contenido: <ModalVerificacionFirma />, posicionInicial: { x: 170, y: 60 } },
-        { id: "vpn", titulo: "Cliente VPN", icono: <VPNIcon size={14} />, contenido: <ModalVPNCliente />, posicionInicial: { x: 200, y: 80 } },
+        { id: "vpn", titulo: "Cliente VPN", icono: <VPNAppIcon size={14} />, contenido: <ModalVPNCliente />, posicionInicial: { x: 200, y: 80 } },
         { id: "netScanViz", titulo: "Net-Scan Viz", icono: <NetScanVizIcon size={14} />, contenido: <ModalNetScanViz />, posicionInicial: { x: 60, y: 60 } },
         { id: "socialSearcher", titulo: "Social-Searcher", icono: <ConexionIcon size={14} />, contenido: <ModalSocialSearcher />, posicionInicial: { x: 90, y: 40 } },
         { id: "phishMatic", titulo: "Phish-Matic", icono: <RedesIcon size={14} />, contenido: <ModalPhishMatic />, posicionInicial: { x: 120, y: 55 } },
-        { id: "consola", titulo: "Consola", icono: <span style={{ fontSize: 12, fontWeight: 'bold' }}>&gt;_</span>, contenido: <ModalConsola />, posicionInicial: { x: 150, y: 35 } },
+        { id: "consola", titulo: "Consola", icono: <ConsolaIcon size={14} />, contenido: <ModalConsola />, posicionInicial: { x: 150, y: 35 } },
     ];
 
     const enfocarVentana = (id: VentanaId) => {
@@ -182,9 +214,9 @@ function Dispositivos() {
             </div>
 
             {/* Área del escritorio */}
-            <div className={styles.escritorio}>
+            <div className={`${styles.escritorio} ${getDesktopThemeClass(getOSCategory(dispositivoSeleccionado?.sistemaOperativo), dispositivoSeleccionado?.tipo)}`}>
                 <div className={styles.areaEscritorio} onClick={() => setIconoSeleccionado(null)}>
-                    <div className={styles.iconosEscritorio}>
+                    <div className={`${styles.iconosEscritorio} ${getOSCategory(dispositivoSeleccionado?.sistemaOperativo) === "linux" ? styles.iconosEscritorioLinux : ""}`}>
                         <button className={`${styles.iconoApp} ${iconoSeleccionado === "estePC" ? styles.iconoAppSeleccionado : ""}`} onClick={(e) => handleClickIcono(e, "estePC")}>
                             <div className={styles.iconoAppImagen}>
                                 <EstePCIcon size={48} />
@@ -209,39 +241,47 @@ function Dispositivos() {
                             </div>
                             <span className={styles.iconoAppNombre}>Configuracion</span>
                         </button>
+                        {appInstalada("FirmaChecker") && (
                         <button className={`${styles.iconoApp} ${iconoSeleccionado === "firmaChecker" ? styles.iconoAppSeleccionado : ""}`} onClick={(e) => handleClickIcono(e, "firmaChecker")}>
                             <div className={styles.iconoAppImagen} style={{ color: '#4DB6AC' }}>
                                 <ShieldCheckIcon size={48} />
                             </div>
                             <span className={styles.iconoAppNombre}>FirmaChecker</span>
                         </button>
+                        )}
                         <button className={`${styles.iconoApp} ${iconoSeleccionado === "vpn" ? styles.iconoAppSeleccionado : ""}`} onClick={(e) => handleClickIcono(e, "vpn")}>
-                            <div className={styles.iconoAppImagen} style={{ color: '#7E57C2' }}>
-                                <VPNIcon size={48} />
+                            <div className={styles.iconoAppImagen}>
+                                <VPNAppIcon size={48} />
                             </div>
                             <span className={styles.iconoAppNombre}>VPN</span>
                         </button>
+                        {appInstalada("Net-Scan Viz") && (
                         <button className={`${styles.iconoApp} ${iconoSeleccionado === "netScanViz" ? styles.iconoAppSeleccionado : ""}`} onClick={(e) => handleClickIcono(e, "netScanViz")}>
                             <div className={styles.iconoAppImagen}>
                                 <NetScanVizIcon size={48} />
                             </div>
                             <span className={styles.iconoAppNombre}>Net-Scan Viz</span>
                         </button>
+                        )}
+                        {appInstalada("Company Social-Searcher") && (
                         <button className={`${styles.iconoApp} ${iconoSeleccionado === "socialSearcher" ? styles.iconoAppSeleccionado : ""}`} onClick={(e) => handleClickIcono(e, "socialSearcher")}>
                             <div className={styles.iconoAppImagen} style={{ color: '#42A5F5' }}>
                                 <ConexionIcon size={48} />
                             </div>
                             <span className={styles.iconoAppNombre}>Social-Searcher</span>
                         </button>
+                        )}
+                        {appInstalada("Phish-Matic") && (
                         <button className={`${styles.iconoApp} ${iconoSeleccionado === "phishMatic" ? styles.iconoAppSeleccionado : ""}`} onClick={(e) => handleClickIcono(e, "phishMatic")}>
                             <div className={styles.iconoAppImagen} style={{ color: '#EF5350' }}>
                                 <RedesIcon size={48} />
                             </div>
                             <span className={styles.iconoAppNombre}>Phish-Matic</span>
                         </button>
+                        )}
                         <button className={`${styles.iconoApp} ${iconoSeleccionado === "consola" ? styles.iconoAppSeleccionado : ""}`} onClick={(e) => handleClickIcono(e, "consola")}>
-                            <div className={styles.iconoAppImagen} style={{ color: '#78909C', fontSize: 40, fontFamily: 'monospace', fontWeight: 'bold' }}>
-                                &gt;_
+                            <div className={styles.iconoAppImagen}>
+                                <ConsolaIcon size={48} />
                             </div>
                             <span className={styles.iconoAppNombre}>Consola</span>
                         </button>
@@ -268,7 +308,7 @@ function Dispositivos() {
                         );
                     })}
                 </div>
-                <div className={styles.barraTareas}>
+                <div className={`${styles.barraTareas} ${getTaskbarThemeClass(getOSCategory(dispositivoSeleccionado?.sistemaOperativo))}`}>
                     <div className={styles.appsTareas}>
                         {ventanasAbiertas.map(id => {
                             const config = ventanasConfig.find(v => v.id === id);

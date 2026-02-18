@@ -15,6 +15,7 @@ const ECSSceneRenderer: React.FC = () => {
     const { processEntities } = useECSSceneContext();
     const { openModal } = useModal();
     const [menuOpenForEntity, setMenuOpenForEntity] = useState<number | null>(null);
+    const [clickedEntityId, setClickedEntityId] = useState<number | null>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -22,17 +23,33 @@ const ECSSceneRenderer: React.FC = () => {
     }, []);
 
     const handleEntityClick = (entity: unknown) => {
-        const e = entity as { objetoConTipo?: { tipo?: string } };
+        const e = entity as { objetoConTipo?: { tipo?: string }; entidadId?: number };
         // No permitir seleccionar espacios
         if (e.objetoConTipo?.tipo === 'espacio') {
             return;
         }
+        setClickedEntityId(e.entidadId ?? null);
         setDispositivoSeleccionado(entity);
+    };
+
+    const handleEntityHover = (entity: unknown) => {
+        const e = entity as { objetoConTipo?: { tipo?: string } };
+        if (e.objetoConTipo?.tipo === 'espacio') return;
+        if (clickedEntityId === null) {
+            setDispositivoSeleccionado(entity);
+        }
+    };
+
+    const handleEntityHoverEnd = () => {
+        if (clickedEntityId === null) {
+            setDispositivoSeleccionado(null);
+        }
     };
 
     const processedEntities = processEntities();
 
     const handleBackgroundClick = () => {
+        setClickedEntityId(null);
         setDispositivoSeleccionado(null);
         setMenuOpenForEntity(null);
     };
@@ -125,6 +142,8 @@ const ECSSceneRenderer: React.FC = () => {
                         // Solo permitir onClick y selección en dispositivos, no en espacios
                         onClick={isEspacio ? undefined : () => handleEntityClick({ objetoConTipo, entidadId, entidadCompleta })}
                         onContextMenu={isEspacio ? undefined : () => handleContextMenu({ objetoConTipo, entidadId, entidadCompleta })}
+                        onHover={isEspacio ? undefined : () => handleEntityHover({ objetoConTipo, entidadId, entidadCompleta })}
+                        onHoverEnd={isEspacio ? undefined : handleEntityHoverEnd}
                         isSelected={!isEspacio && entidadSeleccionadaId === entidadId}
                         enableHover={!isEspacio} // Deshabilitar hover en espacios
                         showMenu={menuOpenForEntity === entidadId}

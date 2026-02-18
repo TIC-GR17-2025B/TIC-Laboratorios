@@ -33,13 +33,18 @@ export class SistemaComandos extends Sistema {
             case 2: {
                 switch(comando[0]) {
                     case "cat": respuesta = this.ejecutarCAT(comando[1]); break;
-                    default: respuesta = {texto: this.MENSAJE_AYUDA, entidadActual: this.entidadDispActual}; break;
-                }
-                break;
-            }
-            case 3: {
-                switch(comando[0]) {
-                    case "ssh": respuesta = this.ejecutarSSH(comando[1], comando[2]); break;
+                    case "ssh": {
+                        const spaceIdx = comando[1].indexOf(' ');
+                        if (spaceIdx > 0) {
+                            respuesta = this.ejecutarSSH(
+                                comando[1].substring(0, spaceIdx),
+                                comando[1].substring(spaceIdx + 1)
+                            );
+                        } else {
+                            respuesta = {texto: this.MENSAJE_AYUDA, entidadActual: this.entidadDispActual};
+                        }
+                        break;
+                    }
                     default: respuesta = {texto: this.MENSAJE_AYUDA, entidadActual: this.entidadDispActual}; break;
                 }
                 break;
@@ -75,7 +80,7 @@ export class SistemaComandos extends Sistema {
         const activosDisp = this.ecsManager.getComponentes(this.entidadDispActual)?.get(ActivoComponent);
         const nombreDisp = this.ecsManager.getComponentes(this.entidadDispActual)?.get(DispositivoComponent)?.nombre;
         for (const activo of (activosDisp?.activos ?? [])) {
-            if (activo.nombre == nombreArchivo) {
+            if (activo.nombre.normalize("NFC") === nombreArchivo.normalize("NFC")) {
                 
                 this.ecsManager.registrarAccion(
                     AccionesRealizables.EJECUTAR,
@@ -163,9 +168,13 @@ export class SistemaComandos extends Sistema {
         };
     }
 
-    // Quita todos los espacios en blanco y deja los textos/palabras
-    // separados en un array
+    // Extrae el comando y su argumento (máximo 2 partes)
+    // para que nombres de archivo con espacios se preserven
     private formatearEntradaComando(entrada: string): string[] {
-        return entrada.trim().split(/\s+/);
+        const trimmed = entrada.trim().normalize("NFC");
+        if (!trimmed) return [];
+        const spaceIdx = trimmed.search(/\s/);
+        if (spaceIdx === -1) return [trimmed];
+        return [trimmed.substring(0, spaceIdx), trimmed.substring(spaceIdx).trim()];
     }
 }

@@ -108,22 +108,25 @@ export default function ModalConsola() {
         // Tab autocomplete
         if (e.key === "Tab") {
             e.preventDefault();
-            const partes = inputValue.split(/\s+/);
+            const spaceIdx = inputValue.indexOf(' ');
 
-            if (partes.length === 1) {
+            if (spaceIdx === -1) {
                 // Autocompletar nombre de comando
                 const comandos = ["cat", "cls", "clear", "h", "ls", "ssh"];
-                const coincidencias = comandos.filter(c => c.startsWith(partes[0].toLowerCase()));
+                const coincidencias = comandos.filter(c => c.startsWith(inputValue.toLowerCase()));
                 if (coincidencias.length === 1) {
                     setInputValue(coincidencias[0] + " ");
                 }
-            } else if (partes.length === 2 && partes[0].toLowerCase() === "cat") {
-                // Autocompletar nombre de archivo
-                const archivos = obtenerNombresArchivos();
-                const prefijo = partes[1];
-                const coincidencias = archivos.filter(a => a.toLowerCase().startsWith(prefijo.toLowerCase()));
-                if (coincidencias.length === 1) {
-                    setInputValue(`cat ${coincidencias[0]}`);
+            } else {
+                const cmd = inputValue.substring(0, spaceIdx).trim().toLowerCase();
+                const argPrefix = inputValue.substring(spaceIdx + 1);
+                if (cmd === "cat" && argPrefix) {
+                    // Autocompletar nombre de archivo (soporta nombres con espacios)
+                    const archivos = obtenerNombresArchivos();
+                    const coincidencias = archivos.filter(a => a.toLowerCase().startsWith(argPrefix.toLowerCase()));
+                    if (coincidencias.length === 1) {
+                        setInputValue(`cat ${coincidencias[0]}`);
+                    }
                 }
             }
             return;
@@ -242,42 +245,38 @@ export default function ModalConsola() {
                     </div>
                 ))}
 
-                {esperandoPassword && (
-                    <div className={styles.entry}>
-                        <div className={styles.promptLine}>
-                            <span className={styles.passwordLabel}>Ingrese la contrasena: </span>
-                            <input
-                                ref={passwordRef}
-                                type="password"
-                                className={styles.passwordInput}
-                                value={passwordValue}
-                                onChange={(e) => setPasswordValue(e.target.value)}
-                                onKeyDown={handlePasswordKeyDown}
-                                spellCheck={false}
-                                autoComplete="off"
-                                autoFocus
-                            />
-                        </div>
+                {esperandoPassword ? (
+                    <div className={styles.promptLine}>
+                        <span className={styles.passwordLabel}>Ingrese la contraseña: </span>
+                        <input
+                            ref={passwordRef}
+                            type="password"
+                            className={styles.passwordInput}
+                            value={passwordValue}
+                            onChange={(e) => setPasswordValue(e.target.value)}
+                            onKeyDown={handlePasswordKeyDown}
+                            spellCheck={false}
+                            autoComplete="off"
+                            autoFocus
+                        />
+                    </div>
+                ) : (
+                    <div className={styles.promptLine}>
+                        <span className={styles.prompt}>{promptActual}</span>
+                        <input
+                            ref={inputRef}
+                            type="text"
+                            className={styles.input}
+                            value={inputValue}
+                            onChange={(e) => setInputValue(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            spellCheck={false}
+                            autoComplete="off"
+                            autoFocus
+                        />
                     </div>
                 )}
             </div>
-
-            {!esperandoPassword && (
-                <div className={styles.inputLine}>
-                    <span className={styles.inputPrompt}>{promptActual}</span>
-                    <input
-                        ref={inputRef}
-                        type="text"
-                        className={styles.input}
-                        value={inputValue}
-                        onChange={(e) => setInputValue(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        spellCheck={false}
-                        autoComplete="off"
-                        autoFocus
-                    />
-                </div>
-            )}
         </div>
     );
 }

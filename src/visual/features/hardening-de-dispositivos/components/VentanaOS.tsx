@@ -32,7 +32,7 @@ export default function VentanaOS({
     hidden = false,
 }: VentanaOSProps) {
     const [position, setPosition] = useState(initialPosition ?? { x: 80, y: 40 });
-    const [size, setSize] = useState(initialSize ?? { width: 600, height: 420 });
+    const [size, setSize] = useState(initialSize ?? { width: window.innerWidth * 0.7, height: window.innerHeight * 0.7 });
     const [isMaximized, setIsMaximized] = useState(initialMaximized);
     const [isDragging, setIsDragging] = useState(false);
     const [isResizing, setIsResizing] = useState(false);
@@ -40,7 +40,7 @@ export default function VentanaOS({
     const resizeDir = useRef<ResizeDir | null>(null);
     const resizeStart = useRef({ x: 0, y: 0, w: 0, h: 0, posX: 0, posY: 0 });
     const ventanaRef = useRef<HTMLDivElement>(null);
-    const preMaximizeState = useRef({ position: { x: 80, y: 40 }, size: { width: 600, height: 420 } });
+    const preMaximizeState = useRef({ position: { x: 80, y: 40 }, size: { width: window.innerWidth * 0.7, height: window.innerHeight * 0.7 } });
 
     const handleMouseDownTitlebar = (e: React.MouseEvent<HTMLDivElement>) => {
         onFocus?.();

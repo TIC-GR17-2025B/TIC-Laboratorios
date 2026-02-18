@@ -1,4 +1,7 @@
-import { AccionesRealizables, ObjetosManejables } from "../../types/AccionesEnums";
+import {
+  AccionesRealizables,
+  ObjetosManejables,
+} from "../../types/AccionesEnums";
 import {
   EstadoAtaqueDispositivo,
   Mueble,
@@ -26,12 +29,18 @@ export const escenarioHackingEtico: unknown = {
     },
     {
       nombre: "Company Social-Searcher",
-      descripcion: "Aplicación OSINT para obtener información de empleados de una empresa.",
+      descripcion:
+        "Aplicación OSINT para obtener información de empleados de una empresa.",
       precio: "0",
     },
     {
       nombre: "Phish-Matic",
       descripcion: "Aplicación para enviar correos tipo phishing.",
+      precio: "0",
+    },
+    {
+      nombre: "FirmaChecker",
+      descripcion: "Verificador de firmas digitales en documentos.",
       precio: "0",
     },
   ],
@@ -40,7 +49,8 @@ export const escenarioHackingEtico: unknown = {
       nombreEvento: "Escaneo de dispositivos",
       tipoEvento: TipoEvento.VERIFICACION_ACCION_JUGADOR,
       tiempoNotificacion: 5,
-      descripcion: "Para empezar con la fase de Reconocimiento y Escaneo, escanea los dispositivos disponibles en el dominio 'Corporación' utilizando Net-Scan Viz",
+      descripcion:
+        "Para empezar con la fase de Reconocimiento y Escaneo, escanea los dispositivos disponibles en el dominio 'Corporación' utilizando Net-Scan Viz",
       fase: 1,
       infoAdicional: {
         accion: AccionesRealizables.EJECUTAR,
@@ -55,7 +65,8 @@ export const escenarioHackingEtico: unknown = {
       nombreEvento: "Búsqueda de personas",
       tipoEvento: TipoEvento.VERIFICACION_ACCION_JUGADOR,
       tiempoNotificacion: 20,
-      descripcion: "Ahora se necesita obtener información de los empleados de la empresa. Utiliza Company Social-Searcher para lograrlo.",
+      descripcion:
+        "Ahora se necesita obtener información de los empleados de la empresa. Utiliza Company Social-Searcher para lograrlo.",
       fase: 1,
       infoAdicional: {
         accion: AccionesRealizables.EJECUTAR,
@@ -78,19 +89,21 @@ export const escenarioHackingEtico: unknown = {
       nombreEvento: "Creación de correo phishing",
       tipoEvento: TipoEvento.ENVIO_CORREO,
       tiempoNotificacion: 40,
-      descripcion: "Una vez identificados los dispositivos y empleados de la empresa, es posible obtener credenciales de acceso mediante ingeniería social. Utiliza Phish-Matic para crear un correo tipo phishing e intentar obtener credenciales a través de él.",
+      descripcion:
+        "Una vez identificados los dispositivos y empleados de la empresa, es posible obtener credenciales de acceso mediante ingeniería social. Utiliza Phish-Matic para crear un correo tipo phishing e intentar obtener credenciales a través de él.",
       fase: 2,
       infoAdicional: {
         dispositivoEmisor: "Computadora Lisa",
         destinatario: "jacob.garcia@corp.com",
-        asunto: PlantillasCorreoPhishing[0].asunto
+        asunto: PlantillasCorreoPhishing[0].asunto,
       },
     },
     {
       nombreEvento: "Recepción de credenciales",
       tipoEvento: TipoEvento.ENVIO_ACTIVO,
       tiempoNotificacion: 55,
-      descripcion: "El engaño con el correo fue exitoso. El empleado acaba de enviar sus credenciales, revisa tu explorador de archivos para encontrarlas.",
+      descripcion:
+        "El engaño con el correo fue exitoso. El empleado acaba de enviar sus credenciales, revisa tu explorador de archivos para encontrarlas.",
       fase: 2,
       infoAdicional: {
         nombreActivo: "credenciales",
@@ -103,7 +116,8 @@ export const escenarioHackingEtico: unknown = {
       nombreEvento: "Conexión a dispositivo mediante SSH",
       tipoEvento: TipoEvento.VERIFICACION_ACCION_JUGADOR,
       tiempoNotificacion: 65,
-      descripcion: "Ahora, utilizando las credenciales, abre la consola en 'Computadora Lisa' para acceder al dispositivo del empleado mediante SSH.",
+      descripcion:
+        "Ahora, utilizando las credenciales, abre la consola en 'Computadora Lisa' para acceder al dispositivo del empleado mediante SSH.",
       fase: 2,
       infoAdicional: {
         accion: AccionesRealizables.EJECUTAR,
@@ -114,7 +128,7 @@ export const escenarioHackingEtico: unknown = {
           nombreEquipo: "PcJacob",
           usuario: "jgarcia",
           contrasenia: "j123",
-          conectadoDesde: "Computadora Lisa"
+          conectadoDesde: "Computadora Lisa",
         },
       },
     },
@@ -122,7 +136,8 @@ export const escenarioHackingEtico: unknown = {
       nombreEvento: "Obtención de información confidencial",
       tipoEvento: TipoEvento.VERIFICACION_ACCION_JUGADOR,
       tiempoNotificacion: 78,
-      descripcion: "Una vez conectado al dispositivo del empleado, obtén información que sea confidencial para la empresa. Pista: ejecuta el comando de ayuda de la consola para guiarte.",
+      descripcion:
+        "Una vez conectado al dispositivo del empleado, obtén información que sea confidencial para la empresa. Pista: ejecuta el comando de ayuda de la consola para guiarte.",
       fase: 2,
       infoAdicional: {
         accion: AccionesRealizables.EJECUTAR,
@@ -131,7 +146,7 @@ export const escenarioHackingEtico: unknown = {
         val: {
           comando: "cat",
           nombreArchivo: "secret_keys",
-          nombreDispositivo: "Computadora Jacob"
+          nombreDispositivo: "Computadora Jacob",
         },
       },
     },
@@ -253,30 +268,30 @@ export const escenarioHackingEtico: unknown = {
                   activos: [
                     {
                       nombre: "Documento Jacob",
-                      contenido: "La contraseña secreta es 123",
+                      contenido: "La contraseña secreta es 12344",
                       tipo: TipoActivo.DOCUMENTO,
-                      firma: "Firma Documento Jacob"
+                      firma: "Firma Documento Jacob",
                     },
                     {
                       nombre: "Firma Documento Jacob",
                       contenido: "La contraseña secreta es 123",
                       tipo: TipoActivo.FIRMA_DIGITAL,
-                      propietario: "Jacob"
+                      propietario: "Jacob",
                     },
                     {
                       nombre: "Clave_Publica_Jacob",
                       tipo: TipoActivo.CLAVE_PUBLICA,
-                      propietario: "Jacob"
+                      propietario: "Jacob",
                     },
                     {
                       nombre: "Activo genérico",
                       contenido: "a",
-                      tipo: TipoActivo.GENERICO
+                      tipo: TipoActivo.GENERICO,
                     },
                     {
                       nombre: "Activo genérico 2",
                       contenido: "abcdefg",
-                      tipo: TipoActivo.DOCUMENTO
+                      tipo: TipoActivo.DOCUMENTO,
                     },
                     {
                       nombre: "Activo2",
@@ -310,12 +325,13 @@ export const escenarioHackingEtico: unknown = {
                     {
                       nombre: "credenciales",
                       contenido: "usuario: jgarcia\ncontraseña: j123",
-                      tipo: TipoActivo.DOCUMENTO
+                      tipo: TipoActivo.DOCUMENTO,
                     },
                     {
                       nombre: "secret_keys",
-                      contenido: "# Credenciales de base de datos principal (NO COMPARTIR NI MODIFICAR!!)\nDB_HOST=prod-db.internal.corporacion\nDB_USER=admin_prod\nDB_PASSWORD=Sup3rS3cr3t_DB_P@ss!!\n",
-                      tipo: TipoActivo.DOCUMENTO
+                      contenido:
+                        "# Credenciales de base de datos principal (NO COMPARTIR NI MODIFICAR!!)\nDB_HOST=prod-db.internal.corporacion\nDB_USER=admin_prod\nDB_PASSWORD=Sup3rS3cr3t_DB_P@ss!!\n",
+                      tipo: TipoActivo.DOCUMENTO,
                     },
                   ],
                   // --- ESTADO INICIAL: Solo en LAN2 ---
@@ -504,4 +520,3 @@ export const escenarioHackingEtico: unknown = {
     },
   ],
 };
-

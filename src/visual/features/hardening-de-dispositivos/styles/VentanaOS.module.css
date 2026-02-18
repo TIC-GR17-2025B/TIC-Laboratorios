@@ -2,10 +2,9 @@
     position: absolute;
     display: flex;
     flex-direction: column;
-    background: rgba(30, 30, 40, 0.95);
+    background: var(--surface-primary);
     border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18), 0 0 0 1px var(--border-primary);
     overflow: hidden;
     transition: border-radius 0.2s ease;
 }
@@ -28,7 +27,8 @@
     height: 36px;
     min-height: 36px;
     padding: 0 12px;
-    background: rgba(0, 0, 0, 0.3);
+    background: var(--surface-secondary);
+    border-bottom: 1px solid var(--border-primary);
     cursor: grab;
     user-select: none;
 }
@@ -73,17 +73,17 @@
     justify-content: center;
     width: 24px;
     height: 24px;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--surface-tertiary);
     border: none;
     border-radius: 6px;
-    color: var(--text-secondary);
+    color: var(--text-muted);
     cursor: pointer;
     transition: all 0.15s ease;
     padding: 0;
 }
 
 .botonVentana:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--border-primary);
     color: var(--text-primary);
 }
 

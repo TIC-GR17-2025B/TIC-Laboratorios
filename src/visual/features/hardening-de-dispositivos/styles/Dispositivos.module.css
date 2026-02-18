@@ -50,6 +50,30 @@
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
   border-radius: 0;
   overflow: hidden;
+  transition: background 0.4s ease;
+}
+
+/* === OS x Device Type themes === */
+
+/* Windows */
+.escritorioWindowsWorkstation {
+  background: linear-gradient(135deg, #0a1628 0%, #0d47a1 50%, #1565c0 100%);
+}
+.escritorioWindowsServer {
+  background: linear-gradient(135deg, #0a0f1a 0%, #0d2137 50%, #102a4a 100%);
+}
+
+/* Linux / Ubuntu */
+.escritorioLinuxWorkstation {
+  background: linear-gradient(135deg, #2c001e 0%, #3a1048 50%, #5e2750 100%);
+}
+.escritorioLinuxServer {
+  background: linear-gradient(135deg, #1a0a1e 0%, #1e1028 50%, #271535 100%);
+}
+
+/* Other / default */
+.escritorioOtherServer {
+  background: linear-gradient(135deg, #0f0f1a 0%, #111828 50%, #0a1a30 100%);
 }
 
 .areaEscritorio {
@@ -68,6 +92,64 @@
   backdrop-filter: blur(10px);
   padding: 0 8px;
   gap: 2px;
+  transition: background 0.4s ease;
+}
+
+.barraTareasWindows {
+  background: rgba(0, 30, 80, 0.75);
+}
+
+/* Linux: vertical dock on left (Ubuntu-style) */
+.escritorioLinux {
+  flex-direction: row;
+}
+
+.barraTareasLinux {
+  background: rgba(50, 10, 40, 0.75);
+  order: -1;
+  flex-direction: column;
+  width: 52px;
+  height: auto;
+  padding: 8px 0;
+  gap: 4px;
+}
+
+.barraTareasLinux .appsTareas {
+  flex-direction: column;
+  overflow-x: visible;
+  overflow-y: auto;
+}
+
+.barraTareasLinux .appTarea {
+  justify-content: center;
+  padding: 6px;
+  height: auto;
+  width: 40px;
+  margin: 0 auto;
+}
+
+.barraTareasLinux .appTareaNombre {
+  display: none;
+}
+
+.barraTareasLinux .appTareaActiva::after {
+  bottom: auto;
+  top: 50%;
+  left: 0;
+  right: auto;
+  transform: translateY(-50%);
+  width: 2px;
+  height: 16px;
+}
+
+.barraTareasLinux .bandejaSistema {
+  flex-direction: column;
+  padding: 4px 0;
+}
+
+.barraTareasLinux .reloj {
+  font-size: 10px;
+  writing-mode: horizontal-tb;
 }
 
 .appsTareas {
@@ -99,6 +181,13 @@
   align-content: flex-start;
   gap: 4px;
   height: 100%;
+}
+
+/* Linux: horizontal row-based icon grid */
+.iconosEscritorioLinux {
+  flex-direction: row;
+  align-content: flex-start;
+  height: auto;
 }
 
 .iconoApp {

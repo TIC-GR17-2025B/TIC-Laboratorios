@@ -10,6 +10,8 @@ interface Model3DProps {
     scale?: number | [number, number, number];
     onClick?: () => void;
     onContextMenu?: () => void;
+    onHover?: () => void;
+    onHoverEnd?: () => void;
     isSelected?: boolean;
     enableHover?: boolean;
     showMenu?: boolean;
@@ -35,6 +37,8 @@ const Model3D: React.FC<Model3DProps> = React.memo(({
     scale = 1,
     onClick,
     onContextMenu,
+    onHover,
+    onHoverEnd,
     isSelected = false,
     enableHover = true,
     showMenu = false,
@@ -134,6 +138,7 @@ const Model3D: React.FC<Model3DProps> = React.memo(({
                 if (enableHover) {
                     setHovered(true);
                     document.body.style.cursor = 'pointer';
+                    onHover?.();
                 }
             }}
             onPointerOut={(e) => {
@@ -141,6 +146,7 @@ const Model3D: React.FC<Model3DProps> = React.memo(({
                 if (enableHover) {
                     setHovered(false);
                     document.body.style.cursor = 'auto';
+                    onHoverEnd?.();
                 }
             }}
         >
