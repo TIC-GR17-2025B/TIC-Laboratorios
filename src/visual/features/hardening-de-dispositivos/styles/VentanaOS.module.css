@@ -166,3 +166,12 @@
     height: 8px;
     cursor: sw-resize;
 }
+
+/* Snap states */
+.ventanaSnapped {
+    border-radius: 0;
+}
+
+.ventanaSnapping {
+    transition: left 0.15s ease, top 0.15s ease, width 0.15s ease, height 0.15s ease, border-radius 0.15s ease;
+}

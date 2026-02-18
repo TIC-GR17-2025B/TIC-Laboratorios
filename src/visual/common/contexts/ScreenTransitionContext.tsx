@@ -29,6 +29,7 @@ interface SavedCameraState {
 interface ScreenTransitionActions {
     startZoom: (position: [number, number, number], rotationY: number) => void;
     enterDesktopMode: (rect: MonitorRect) => void;
+    updateMonitorRect: (rect: MonitorRect) => void;
     exitDesktopMode: () => void;
     completeExit: () => void;
     savedCameraState: React.RefObject<SavedCameraState | null>;
@@ -68,6 +69,13 @@ export function ScreenTransitionProvider({ children }: { children: ReactNode }) 
         }));
     }, []);
 
+    const updateMonitorRect = useCallback((rect: MonitorRect) => {
+        setState(prev => ({
+            ...prev,
+            monitorRect: rect,
+        }));
+    }, []);
+
     const exitDesktopMode = useCallback(() => {
         // Start reverse zoom: keep desktopMode true so CameraZoomEffect
         // knows to zoom OUT (direction is determined by desktopMode flag).
@@ -95,6 +103,7 @@ export function ScreenTransitionProvider({ children }: { children: ReactNode }) 
                 ...state,
                 startZoom,
                 enterDesktopMode,
+                updateMonitorRect,
                 exitDesktopMode,
                 completeExit,
                 savedCameraState,

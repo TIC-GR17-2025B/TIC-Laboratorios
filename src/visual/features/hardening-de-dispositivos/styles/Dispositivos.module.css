@@ -281,3 +281,34 @@
   background: var(--blue);
   border-radius: 2px;
 }
+
+/* Snap preview overlay */
+.snapPreview {
+  position: absolute;
+  background: rgba(65, 125, 255, 0.15);
+  border: 2px solid rgba(65, 125, 255, 0.4);
+  border-radius: 8px;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.snapPreviewLeft {
+  top: 4px;
+  left: 4px;
+  width: calc(50% - 6px);
+  height: calc(100% - 8px);
+}
+
+.snapPreviewRight {
+  top: 4px;
+  right: 4px;
+  width: calc(50% - 6px);
+  height: calc(100% - 8px);
+}
+
+.snapPreviewTop {
+  top: 4px;
+  left: 4px;
+  right: 4px;
+  height: calc(100% - 8px);
+}

@@ -33,6 +33,7 @@ import ModalSocialSearcher from "../components/ModalSocialSearcher";
 import ModalPhishMatic from "../components/ModalPhishMatic";
 import ModalConsola from "../components/ModalConsola";
 import VentanaOS from "../components/VentanaOS";
+import type { SnapZone } from "../components/VentanaOS";
 
 type OSCategory = "windows" | "linux" | "other";
 
@@ -80,6 +81,7 @@ function Dispositivos({ embedded = false }: { embedded?: boolean }) {
     const [ventanasMinimizadas, setVentanasMinimizadas] = useState<VentanaId[]>([]);
     const [iconoSeleccionado, setIconoSeleccionado] = useState<VentanaId | null>(null);
     const [ordenZ, setOrdenZ] = useState<VentanaId[]>([]);
+    const [snapPreviewZone, setSnapPreviewZone] = useState<SnapZone>(null);
     const ultimoClick = useRef<{ id: VentanaId; time: number } | null>(null);
     const estadosPorDispositivo = useRef<Map<string, { ventanasAbiertas: VentanaId[]; ventanasMinimizadas: VentanaId[]; ordenZ: VentanaId[]; iconoSeleccionado: VentanaId | null }>>(new Map());
 
@@ -299,6 +301,7 @@ function Dispositivos({ embedded = false }: { embedded?: boolean }) {
                                 onClose={() => cerrarVentana(id)}
                                 onMinimize={() => minimizarVentana(id)}
                                 onFocus={() => enfocarVentana(id)}
+                                onSnapZoneChange={setSnapPreviewZone}
                                 initialPosition={config.posicionInicial}
                                 zIndex={10 + ordenZ.indexOf(id)}
                                 hidden={minimizada}
@@ -307,6 +310,14 @@ function Dispositivos({ embedded = false }: { embedded?: boolean }) {
                             </VentanaOS>
                         );
                     })}
+
+                    {snapPreviewZone && (
+                        <div className={`${styles.snapPreview} ${
+                            snapPreviewZone === "left" ? styles.snapPreviewLeft :
+                            snapPreviewZone === "right" ? styles.snapPreviewRight :
+                            styles.snapPreviewTop
+                        }`} />
+                    )}
                 </div>
                 <div className={`${styles.barraTareas} ${getTaskbarThemeClass(getOSCategory(dispositivoSeleccionado?.sistemaOperativo))}`}>
                     <div className={styles.appsTareas}>

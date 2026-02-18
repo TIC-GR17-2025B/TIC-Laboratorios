@@ -1,6 +1,6 @@
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { Vector3, Quaternion } from 'three';
+import { Vector3, Quaternion, PerspectiveCamera } from 'three';
 import { useScreenTransition } from '../../../common/contexts/ScreenTransitionContext';
 
 // Monitor screen center in model's LOCAL space (before rotation)
@@ -11,11 +11,11 @@ const SCREEN_OFFSET = { x: 0.125, y: 0.25, z: 0.25 };
 const SCREEN_HALF_W = 0.22;
 const SCREEN_HALF_H = 0.20;
 // How far in front of the screen the camera should end up
-const CAMERA_DISTANCE = 0.2;
+const CAMERA_DISTANCE = 0.16;
 // Lateral offset: negative = camera shifts left, positive = right
-const CAMERA_LATERAL_OFFSET = -0.32;
+const CAMERA_LATERAL_OFFSET = -0.313;
 // Vertical offset: negative = camera shifts down, positive = up
-const CAMERA_VERTICAL_OFFSET = -0.03;
+const CAMERA_VERTICAL_OFFSET = -0.035;
 
 function easeInOutCubic(t: number): number {
     return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
@@ -31,15 +31,53 @@ const CameraZoomEffect: React.FC = () => {
         isZooming, desktopMode, targetPosition, targetRotationY,
         enterDesktopMode, completeExit, savedCameraState,
     } = useScreenTransition();
-    const { camera, gl } = useThree();
+    const { camera, gl, size } = useThree();
 
     const progress = useRef(0);
     const zoomDirection = useRef<'in' | 'out'>('in');
     const targetCamPos = useRef(new Vector3());
     const targetLookAt = useRef(new Vector3());
     const savedLookAt = useRef(new Vector3());
+    const savedAspect = useRef(0);
 
-    useFrame((_, delta) => {
+    // Fix #1: Restore camera and reset state if component unmounts mid-transition
+    useEffect(() => {
+        return () => {
+            if (savedAspect.current > 0 && camera instanceof PerspectiveCamera) {
+                const w = gl.domElement.clientWidth;
+                const h = gl.domElement.clientHeight;
+                camera.aspect = h > 0 ? w / h : 1;
+                camera.updateProjectionMatrix();
+            }
+            savedAspect.current = 0;
+            if (savedCameraState.current) {
+                camera.position.copy(savedCameraState.current.position);
+                camera.quaternion.copy(savedCameraState.current.quaternion);
+                savedCameraState.current = null;
+            }
+            completeExit();
+        };
+    // stable refs: camera, gl, savedCameraState, completeExit
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useFrame((_, rawDelta) => {
+        // Fix #4: Clamp delta to prevent instant animation skip on tab return
+        const delta = Math.min(rawDelta, 0.1);
+
+        // Fix #2: Lock camera aspect during entire transition (zoom + desktopMode)
+        if ((isZooming || desktopMode) && savedAspect.current > 0 && camera instanceof PerspectiveCamera) {
+            if (camera.aspect !== savedAspect.current) {
+                camera.aspect = savedAspect.current;
+                camera.updateProjectionMatrix();
+            }
+        }
+
+        // Desktop mode idle: aspect is locked above, nothing else to do
+        if (desktopMode && !isZooming) {
+            return;
+        }
+
         if (!isZooming || !targetPosition) {
             if (!isZooming && !desktopMode) {
                 progress.current = 0;
@@ -59,6 +97,10 @@ const CameraZoomEffect: React.FC = () => {
 
         // Save initial camera state on first frame of zoom-in
         if (zoomDirection.current === 'in' && progress.current === 0) {
+            // Fix #2: Save aspect at zoom start to lock for entire transition
+            if (camera instanceof PerspectiveCamera) {
+                savedAspect.current = camera.aspect;
+            }
             savedCameraState.current = {
                 position: camera.position.clone(),
                 quaternion: camera.quaternion.clone(),
@@ -72,7 +114,7 @@ const CameraZoomEffect: React.FC = () => {
         if (!saved) return;
 
         // Calculate the screen center in world space (accounting for model rotation)
-        // Add 90° offset to align camera with the actual screen face
+        // Subtract 90° offset to align camera with the actual screen face
         const adjustedRotation = targetRotationY - Math.PI / 2;
         const cosR = Math.cos(adjustedRotation);
         const sinR = Math.sin(adjustedRotation);
@@ -133,6 +175,13 @@ const CameraZoomEffect: React.FC = () => {
                 // Restore camera exactly
                 camera.position.copy(saved.position);
                 camera.quaternion.copy(saved.quaternion);
+                // Fix #5: Reset aspect ratio with NaN/zero guard
+                if (camera instanceof PerspectiveCamera) {
+                    const aspect = size.width / size.height;
+                    camera.aspect = (isFinite(aspect) && aspect > 0) ? aspect : 1;
+                    camera.updateProjectionMatrix();
+                }
+                savedAspect.current = 0;
                 completeExit();
             }
             progress.current = 0;
@@ -149,11 +198,12 @@ function projectMonitorToScreen(
     screenCenter: Vector3,
     rotationY: number,
 ) {
-    const adjusted = rotationY + Math.PI / 2;
+    // Fix #6: Use same -90° offset as camera zoom calculation (was +90° before)
+    const adjusted = rotationY - Math.PI / 2;
     const cosR = Math.cos(adjusted);
     const sinR = Math.sin(adjusted);
 
-    // Screen corners in world space (with 90° offset matching camera)
+    // Screen corners in world space
     const right = new Vector3(cosR, 0, -sinR);
     const up = new Vector3(0, 1, 0);
 

@@ -2,12 +2,15 @@ import { useState, useRef, useEffect } from "react";
 import type { ReactNode } from "react";
 import styles from "../styles/VentanaOS.module.css";
 
+export type SnapZone = "left" | "right" | "top" | null;
+
 interface VentanaOSProps {
     titulo: string;
     children: ReactNode;
     onClose: () => void;
     onMinimize?: () => void;
     onFocus?: () => void;
+    onSnapZoneChange?: (zone: SnapZone) => void;
     icono?: ReactNode;
     initialPosition?: { x: number; y: number };
     initialSize?: { width: number; height: number };
@@ -18,12 +21,15 @@ interface VentanaOSProps {
 
 type ResizeDir = "n" | "s" | "e" | "w" | "ne" | "nw" | "se" | "sw";
 
+const SNAP_EDGE_THRESHOLD = 8;
+
 export default function VentanaOS({
     titulo,
     children,
     onClose,
     onMinimize,
     onFocus,
+    onSnapZoneChange,
     icono,
     initialPosition,
     initialSize,
@@ -37,15 +43,82 @@ export default function VentanaOS({
     const [isDragging, setIsDragging] = useState(false);
     const [isResizing, setIsResizing] = useState(false);
     const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+    const [snapState, setSnapState] = useState<"left" | "right" | null>(null);
+    const [isSnapping, setIsSnapping] = useState(false);
     const resizeDir = useRef<ResizeDir | null>(null);
     const resizeStart = useRef({ x: 0, y: 0, w: 0, h: 0, posX: 0, posY: 0 });
     const ventanaRef = useRef<HTMLDivElement>(null);
     const preMaximizeState = useRef({ position: { x: 80, y: 40 }, size: { width: window.innerWidth * 0.7, height: window.innerHeight * 0.7 } });
+    const preSnapState = useRef<{ position: { x: number; y: number }; size: { width: number; height: number } } | null>(null);
+    const activeSnapZoneRef = useRef<SnapZone>(null);
+    const onSnapZoneChangeRef = useRef(onSnapZoneChange);
+    onSnapZoneChangeRef.current = onSnapZoneChange;
+
+    const applySnap = (zone: SnapZone) => {
+        if (!zone || !ventanaRef.current) return;
+        const parent = ventanaRef.current.parentElement;
+        if (!parent) return;
+        const parentRect = parent.getBoundingClientRect();
+
+        // Store pre-snap state (only if not already snapped/maximized)
+        if (!snapState && !isMaximized) {
+            preSnapState.current = { position: { ...position }, size: { ...size } };
+        }
+
+        setIsSnapping(true);
+        setTimeout(() => setIsSnapping(false), 200);
+
+        if (zone === "top") {
+            preMaximizeState.current = preSnapState.current ?? { position: { ...position }, size: { ...size } };
+            setIsMaximized(true);
+            setSnapState(null);
+        } else if (zone === "left") {
+            setIsMaximized(false);
+            setSnapState("left");
+            setPosition({ x: 0, y: 0 });
+            setSize({ width: parentRect.width / 2, height: parentRect.height });
+        } else if (zone === "right") {
+            setIsMaximized(false);
+            setSnapState("right");
+            setPosition({ x: parentRect.width / 2, y: 0 });
+            setSize({ width: parentRect.width / 2, height: parentRect.height });
+        }
+    };
 
     const handleMouseDownTitlebar = (e: React.MouseEvent<HTMLDivElement>) => {
         onFocus?.();
-        if (isMaximized) return;
         if ((e.target as HTMLElement).closest(`.${styles.botonesVentana}`)) return;
+
+        // Un-snap or un-maximize on drag start
+        if (snapState || isMaximized) {
+            const rect = ventanaRef.current?.getBoundingClientRect();
+            if (!rect) return;
+            const parent = ventanaRef.current?.parentElement;
+            if (!parent) return;
+            const parentRect = parent.getBoundingClientRect();
+
+            const cursorRatioX = (e.clientX - rect.left) / rect.width;
+            const restoreSize = preSnapState.current?.size ?? preMaximizeState.current.size;
+
+            const newX = e.clientX - parentRect.left - (restoreSize.width * cursorRatioX);
+            const newY = e.clientY - parentRect.top - 18;
+
+            setSize(restoreSize);
+            setPosition({
+                x: Math.max(0, Math.min(newX, parentRect.width - restoreSize.width)),
+                y: Math.max(0, newY)
+            });
+            setIsMaximized(false);
+            setSnapState(null);
+            preSnapState.current = null;
+
+            setIsDragging(true);
+            setDragOffset({
+                x: restoreSize.width * cursorRatioX,
+                y: 18
+            });
+            return;
+        }
 
         setIsDragging(true);
         const rect = ventanaRef.current?.getBoundingClientRect();
@@ -62,20 +135,28 @@ export default function VentanaOS({
     };
 
     const toggleMaximize = () => {
-        if (!isMaximized) {
+        if (snapState) {
+            // Un-snap: restore to pre-snap state
+            const restore = preSnapState.current ?? { position: { ...position }, size: { ...size } };
+            setPosition(restore.position);
+            setSize(restore.size);
+            setSnapState(null);
+            preSnapState.current = null;
+        } else if (!isMaximized) {
             preMaximizeState.current = { position: { ...position }, size: { ...size } };
+            setIsMaximized(true);
         } else {
             setPosition(preMaximizeState.current.position);
             setSize(preMaximizeState.current.size);
+            setIsMaximized(false);
         }
-        setIsMaximized(!isMaximized);
     };
 
     const handleResizeMouseDown = (e: React.MouseEvent, dir: ResizeDir) => {
         e.stopPropagation();
         e.preventDefault();
         onFocus?.();
-        if (isMaximized) return;
+        if (isMaximized || snapState) return;
         setIsResizing(true);
         resizeDir.current = dir;
         resizeStart.current = {
@@ -105,9 +186,34 @@ export default function VentanaOS({
                 x: Math.max(0, Math.min(newX, parentRect.width - size.width)),
                 y: Math.max(0, Math.min(newY, parentRect.height - 40))
             });
+
+            // Detect snap zone
+            const mouseXInParent = e.clientX - parentRect.left;
+            const mouseYInParent = e.clientY - parentRect.top;
+
+            let detectedZone: SnapZone = null;
+            if (mouseYInParent <= SNAP_EDGE_THRESHOLD) {
+                detectedZone = "top";
+            } else if (mouseXInParent <= SNAP_EDGE_THRESHOLD) {
+                detectedZone = "left";
+            } else if (mouseXInParent >= parentRect.width - SNAP_EDGE_THRESHOLD) {
+                detectedZone = "right";
+            }
+
+            if (detectedZone !== activeSnapZoneRef.current) {
+                activeSnapZoneRef.current = detectedZone;
+                onSnapZoneChangeRef.current?.(detectedZone);
+            }
         };
 
-        const handleMouseUp = () => setIsDragging(false);
+        const handleMouseUp = () => {
+            if (activeSnapZoneRef.current) {
+                applySnap(activeSnapZoneRef.current);
+            }
+            activeSnapZoneRef.current = null;
+            onSnapZoneChangeRef.current?.(null);
+            setIsDragging(false);
+        };
 
         document.addEventListener("mousemove", handleMouseMove);
         document.addEventListener("mouseup", handleMouseUp);
@@ -166,10 +272,13 @@ export default function VentanaOS({
         };
     }, [isResizing]);
 
+    const isFullscreen = isMaximized || snapState;
+    const showSnappingTransition = isSnapping && !isDragging;
+
     return (
         <div
             ref={ventanaRef}
-            className={`${styles.ventana} ${isMaximized ? styles.ventanaMaximizada : ""}`}
+            className={`${styles.ventana} ${isMaximized ? styles.ventanaMaximizada : ""} ${snapState ? styles.ventanaSnapped : ""} ${showSnappingTransition ? styles.ventanaSnapping : ""}`}
             style={isMaximized ? { zIndex, display: hidden ? "none" : undefined } : {
                 left: position.x,
                 top: position.y,
@@ -197,8 +306,8 @@ export default function VentanaOS({
                             </svg>
                         </button>
                     )}
-                    <button className={styles.botonVentana} onClick={toggleMaximize} title={isMaximized ? "Restaurar" : "Maximizar"}>
-                        {isMaximized ? (
+                    <button className={styles.botonVentana} onClick={toggleMaximize} title={isFullscreen ? "Restaurar" : "Maximizar"}>
+                        {isFullscreen ? (
                             <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
                                 <rect x="0.75" y="2.75" width="6.5" height="6.5" stroke="currentColor" strokeWidth="1.5" rx="1" />
                                 <path d="M3 2.5V1.5C3 1.22386 3.22386 1 3.5 1H8.5C8.77614 1 9 1.22386 9 1.5V6.5C9 6.77614 8.77614 7 8.5 7H7.5" stroke="currentColor" strokeWidth="1.5" />
@@ -221,7 +330,7 @@ export default function VentanaOS({
             </div>
 
             {/* Resize handles */}
-            {!isMaximized && <>
+            {!isMaximized && !snapState && <>
                 <div className={`${styles.resizeHandle} ${styles.resizeN}`} onMouseDown={(e) => handleResizeMouseDown(e, "n")} />
                 <div className={`${styles.resizeHandle} ${styles.resizeS}`} onMouseDown={(e) => handleResizeMouseDown(e, "s")} />
                 <div className={`${styles.resizeHandle} ${styles.resizeE}`} onMouseDown={(e) => handleResizeMouseDown(e, "e")} />

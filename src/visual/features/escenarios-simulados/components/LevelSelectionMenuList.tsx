@@ -1,11 +1,12 @@
 import { NivelController } from "../../../../ecs/controllers/NivelController";
 import type { EscenarioPreview } from "../../../../types/EscenarioTypes";
 import styles from "../styles/VistaSeleccionNiveles.module.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router";
 import { useSelectedLevel } from "../../../common/contexts/SelectedLevelContext";
 import type { Escenario } from "../../../../types/EscenarioTypes";
 import { API_BASE_URL } from "../../../common/utils/apiConfig";
+import { motion, animate } from "framer-motion";
 
 interface Progreso {
     id_progreso: number;
@@ -68,20 +69,98 @@ export default function LevelSelectionMenuList() {
         // Está completado si hay al menos un progreso con terminado === true
         return progresosEscenario.some(p => p.terminado);
     };
-    return <div className={styles.menuList}>
-        {escenarios.map((escenario) => {
-            const completado = isEscenarioCompletado(escenario.titulo);
 
-            return (
-                <LevelSelectionMenuItem
-                    key={escenario.id}
-                    escenario={escenario}
-                    imagen={escenario.imagenPreview || "https://i.pinimg.com/1200x/53/14/cd/5314cd391bb3df2875d5f9b0d8818586.jpg"}
-                    completado={completado}
-                    onSelect={() => handleSelectLevel(escenario.id)}
-                />
-            );
-        })}
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const targetScrollRef = useRef(0);
+    const [canScrollLeft, setCanScrollLeft] = useState(false);
+    const [canScrollRight, setCanScrollRight] = useState(false);
+
+    const updateScrollButtons = useCallback((scrollPos?: number) => {
+        const el = scrollRef.current;
+        if (!el) return;
+        const pos = scrollPos ?? el.scrollLeft;
+        const maxScroll = el.scrollWidth - el.clientWidth;
+        setCanScrollLeft(pos > 1);
+        setCanScrollRight(pos < maxScroll - 1);
+    }, []);
+
+    useEffect(() => {
+        updateScrollButtons();
+        const el = scrollRef.current;
+        if (!el) return;
+        const onScroll = () => {
+            targetScrollRef.current = el.scrollLeft;
+            updateScrollButtons();
+        };
+        const onResize = () => updateScrollButtons();
+        el.addEventListener("scrollend", onScroll);
+        window.addEventListener("resize", onResize);
+        return () => {
+            el.removeEventListener("scrollend", onScroll);
+            window.removeEventListener("resize", onResize);
+        };
+    }, [escenarios, updateScrollButtons]);
+
+    const scroll = (direction: "left" | "right") => {
+        const el = scrollRef.current;
+        if (!el) return;
+        const cardWidth = el.querySelector(`.${styles.menuItem}`)?.clientWidth ?? 300;
+        const gap = 16;
+        const delta = direction === "left" ? -(cardWidth + gap) : cardWidth + gap;
+        const maxScroll = el.scrollWidth - el.clientWidth;
+        const to = Math.max(0, Math.min(targetScrollRef.current + delta, maxScroll));
+        targetScrollRef.current = to;
+        updateScrollButtons(to);
+        animate(el.scrollLeft, to, {
+            duration: 0.25,
+            ease: [0.25, 0.1, 0.25, 1],
+            onUpdate: (v) => { el.scrollLeft = v; },
+        });
+    };
+
+    return <div className={styles.carouselWrapper}>
+        <div className={styles.menuList} ref={scrollRef}>
+            {escenarios.map((escenario, index) => {
+                const completado = isEscenarioCompletado(escenario.titulo);
+
+                return (
+                    <LevelSelectionMenuItem
+                        key={escenario.id}
+                        index={index}
+                        escenario={escenario}
+                        imagen={escenario.imagenPreview || "https://i.pinimg.com/1200x/53/14/cd/5314cd391bb3df2875d5f9b0d8818586.jpg"}
+                        completado={completado}
+                        onSelect={() => handleSelectLevel(escenario.id)}
+                    />
+                );
+            })}
+        </div>
+        <div className={styles.carouselControls}>
+            <motion.button
+                className={styles.chevronBtn}
+                onClick={() => scroll("left")}
+                disabled={!canScrollLeft}
+                aria-label="Scroll left"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+            >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="15 18 9 12 15 6" />
+                </svg>
+            </motion.button>
+            <motion.button
+                className={styles.chevronBtn}
+                onClick={() => scroll("right")}
+                disabled={!canScrollRight}
+                aria-label="Scroll right"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+            >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="9 6 15 12 9 18" />
+                </svg>
+            </motion.button>
+        </div>
     </div>
 }
 
@@ -89,11 +168,19 @@ interface LevelSelectionMenuItemProps {
     escenario: EscenarioPreview;
     imagen: string;
     completado: boolean;
+    index: number;
     onSelect: () => void;
 }
 
-function LevelSelectionMenuItem({ escenario, imagen, completado, onSelect }: LevelSelectionMenuItemProps) {
-    return <div className={styles.menuItem} onClick={onSelect}>
+function LevelSelectionMenuItem({ escenario, imagen, completado, index, onSelect }: LevelSelectionMenuItemProps) {
+    return <motion.div
+        className={styles.menuItem}
+        onClick={onSelect}
+        initial={{ opacity: 0, x: 60 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.4, delay: index * 0.08, ease: "easeOut" }}
+        whileHover={{ y: -4, boxShadow: "0 8px 24px rgba(0, 0, 0, 0.4)" }}
+    >
         <img src={imagen} className={styles.backgroundImage} alt={escenario.titulo} />
         <div className={styles.gradient}></div>
         <div className={styles.content}>
@@ -103,11 +190,9 @@ function LevelSelectionMenuItem({ escenario, imagen, completado, onSelect }: Lev
                 {completado ? (
                     <span className={styles.locked}>Completado</span>
                 ) : (
-                    <>
-                        <span className={styles.unlocked}>Pendiente</span>
-                    </>
+                    <span className={styles.unlocked}>Pendiente</span>
                 )}
             </div>
         </div>
-    </div>
-};
+    </motion.div>
+}
