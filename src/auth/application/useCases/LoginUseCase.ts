@@ -31,8 +31,8 @@ export class LoginUseCase {
       return null
     }
 
-    // 3. Verificar si la cuenta está confirmada
-    if (!usuarioAuth.confirmado) {
+    // 3. Verificar si la cuenta está confirmada (skip en desarrollo)
+    if (!usuarioAuth.confirmado && process.env.NODE_ENV === 'production') {
       throw new Error('Cuenta no confirmada. Por favor, verifica tu correo electrónico.')
     }
 

@@ -74,7 +74,7 @@ const Model3D: React.FC<Model3DProps> = React.memo(({
         const box = new Box3().setFromObject(scene);
         const size = new Vector3();
         box.getSize(size);
-        // Usar el máximo entre ancho y profundidad 
+        // Usar el máximo entre ancho y profundidad
         return Math.max(size.x, size.z);
     }, [scene]);
 

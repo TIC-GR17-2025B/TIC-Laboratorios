@@ -1,0 +1,114 @@
+import { createContext, useContext, useState, useCallback, useRef, type ReactNode } from 'react';
+import { Vector3, Quaternion } from 'three';
+
+interface MonitorRect {
+    top: number;
+    left: number;
+    width: number;
+    height: number;
+}
+
+interface ScreenTransitionState {
+    /** True only during camera zoom animation */
+    isZooming: boolean;
+    /** True when desktop content is visible on the monitor */
+    desktopMode: boolean;
+    /** 3D world position of the target device */
+    targetPosition: [number, number, number] | null;
+    /** Y rotation of the target device model */
+    targetRotationY: number;
+    /** 2D rect of the monitor screen after zoom completes */
+    monitorRect: MonitorRect | null;
+}
+
+interface SavedCameraState {
+    position: Vector3;
+    quaternion: Quaternion;
+}
+
+interface ScreenTransitionActions {
+    startZoom: (position: [number, number, number], rotationY: number) => void;
+    enterDesktopMode: (rect: MonitorRect) => void;
+    exitDesktopMode: () => void;
+    completeExit: () => void;
+    savedCameraState: React.RefObject<SavedCameraState | null>;
+}
+
+type ScreenTransitionContextType = ScreenTransitionState & ScreenTransitionActions;
+
+const ScreenTransitionContext = createContext<ScreenTransitionContextType | null>(null);
+
+export function ScreenTransitionProvider({ children }: { children: ReactNode }) {
+    const [state, setState] = useState<ScreenTransitionState>({
+        isZooming: false,
+        desktopMode: false,
+        targetPosition: null,
+        targetRotationY: 0,
+        monitorRect: null,
+    });
+
+    const savedCameraState = useRef<SavedCameraState | null>(null);
+
+    const startZoom = useCallback((position: [number, number, number], rotationY: number) => {
+        setState({
+            isZooming: true,
+            desktopMode: false,
+            targetPosition: position,
+            targetRotationY: rotationY,
+            monitorRect: null,
+        });
+    }, []);
+
+    const enterDesktopMode = useCallback((rect: MonitorRect) => {
+        setState(prev => ({
+            ...prev,
+            isZooming: false,
+            desktopMode: true,
+            monitorRect: rect,
+        }));
+    }, []);
+
+    const exitDesktopMode = useCallback(() => {
+        // Start reverse zoom: keep desktopMode true so CameraZoomEffect
+        // knows to zoom OUT (direction is determined by desktopMode flag).
+        // Clear monitorRect to hide the overlay immediately.
+        setState(prev => ({
+            ...prev,
+            isZooming: true,
+            monitorRect: null,
+        }));
+    }, []);
+
+    const completeExit = useCallback(() => {
+        setState({
+            isZooming: false,
+            desktopMode: false,
+            targetPosition: null,
+            targetRotationY: 0,
+            monitorRect: null,
+        });
+    }, []);
+
+    return (
+        <ScreenTransitionContext.Provider
+            value={{
+                ...state,
+                startZoom,
+                enterDesktopMode,
+                exitDesktopMode,
+                completeExit,
+                savedCameraState,
+            }}
+        >
+            {children}
+        </ScreenTransitionContext.Provider>
+    );
+}
+
+export function useScreenTransition() {
+    const ctx = useContext(ScreenTransitionContext);
+    if (!ctx) {
+        throw new Error('useScreenTransition must be used within ScreenTransitionProvider');
+    }
+    return ctx;
+}

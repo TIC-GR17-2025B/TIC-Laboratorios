@@ -2,25 +2,25 @@ import styles from "../styles/VistaOficina.module.css"
 import Escena3D from "../components/Escena3D"
 import TarjetaEntidadSeleccionada from "../components/TarjetaEntidadSeleccionada";
 import { useEscenario } from "../../../common/contexts";
+import { useScreenTransition } from "../../../common/contexts/ScreenTransitionContext";
+import MonitorDesktopOverlay from "../../../common/components/MonitorDesktopOverlay";
 import EventLogsPanel from "../components/EventLogsPanel";
 import { useEffect } from "react";
-import PageTransition from "../../../common/components/PageTransition";
-
 function VistaOficina() {
   const { dispositivoSeleccionado, setDispositivoSeleccionado } = useEscenario();
+  const { desktopMode } = useScreenTransition();
 
   useEffect(() => {
     setDispositivoSeleccionado(null);
   }, []);
 
   return (
-    <PageTransition>
-      <div className={styles.contenedor}>
-        <Escena3D />
-        <TarjetaEntidadSeleccionada visible={!!dispositivoSeleccionado} />
-        <EventLogsPanel />
-      </div>
-    </PageTransition>
+    <div className={styles.contenedor}>
+      <Escena3D />
+      {!desktopMode && <TarjetaEntidadSeleccionada visible={!!dispositivoSeleccionado} />}
+      {!desktopMode && <EventLogsPanel />}
+      <MonitorDesktopOverlay />
+    </div>
   )
 }
 

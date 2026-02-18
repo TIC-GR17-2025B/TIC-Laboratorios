@@ -71,7 +71,7 @@ interface VentanaConfig {
     posicionInicial: { x: number; y: number };
 }
 
-function Dispositivos() {
+function Dispositivos({ embedded = false }: { embedded?: boolean }) {
     const { setDispositivoSeleccionado, dispositivoSeleccionado, entidadSeleccionadaId } = useEscenario();
     const { dispositivos } = useDispositivos();
     const { appsInstaladas } = useAppsDispositivo(entidadSeleccionadaId ?? undefined);
@@ -198,22 +198,22 @@ function Dispositivos() {
         }
     };
 
-    return <PageTransition>
+    const desktopContent = (
         <div className={styles.contenedor}>
-            {/* Pestañas de dispositivos */}
-            <div className={styles.tabsDispositivos}>
-                {dispositivos.map((dispositivo: Dispositivo) => (
-                    <button
-                        key={dispositivo.id}
-                        className={`${styles.tabDispositivo} ${dispositivoSeleccionado?.id === dispositivo.id ? styles.tabDispositivoActivo : ""}`}
-                        onClick={() => cambiarDispositivo(dispositivo)}
-                    >
-                        {dispositivo.nombre ?? "Sin nombre"}
-                    </button>
-                ))}
-            </div>
+            {!embedded && (
+                <div className={styles.tabsDispositivos}>
+                    {dispositivos.map((dispositivo: Dispositivo) => (
+                        <button
+                            key={dispositivo.id}
+                            className={`${styles.tabDispositivo} ${dispositivoSeleccionado?.id === dispositivo.id ? styles.tabDispositivoActivo : ""}`}
+                            onClick={() => cambiarDispositivo(dispositivo)}
+                        >
+                            {dispositivo.nombre ?? "Sin nombre"}
+                        </button>
+                    ))}
+                </div>
+            )}
 
-            {/* Área del escritorio */}
             <div className={`${styles.escritorio} ${getDesktopThemeClass(getOSCategory(dispositivoSeleccionado?.sistemaOperativo), dispositivoSeleccionado?.tipo)}`}>
                 <div className={styles.areaEscritorio} onClick={() => setIconoSeleccionado(null)}>
                     <div className={`${styles.iconosEscritorio} ${getOSCategory(dispositivoSeleccionado?.sistemaOperativo) === "linux" ? styles.iconosEscritorioLinux : ""}`}>
@@ -334,6 +334,9 @@ function Dispositivos() {
                 </div>
             </div>
         </div>
-    </PageTransition>
+    );
+
+    if (embedded) return desktopContent;
+    return <PageTransition>{desktopContent}</PageTransition>;
 }
 export default Dispositivos;

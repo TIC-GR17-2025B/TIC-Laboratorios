@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import Model3D from './Model3D';
 import { getModelo } from '../config/modelConfig';
 import { useEscenario, useModal } from '../../../common/contexts';
 import { useECSSceneContext } from '../context/ECSSceneContext';
+import { useScreenTransition } from '../../../common/contexts/ScreenTransitionContext';
 import ModalFirewall from '../../simulacion-redes/components/ModalFirewall';
 import ModalVPN from '../../simulacion-redes/components/ModalVPN';
 
@@ -14,9 +15,16 @@ const ECSSceneRenderer: React.FC = () => {
     const { setDispositivoSeleccionado, entidadSeleccionadaId } = useEscenario();
     const { processEntities } = useECSSceneContext();
     const { openModal } = useModal();
+    const { startZoom, isZooming, desktopMode } = useScreenTransition();
     const [menuOpenForEntity, setMenuOpenForEntity] = useState<number | null>(null);
     const [clickedEntityId, setClickedEntityId] = useState<number | null>(null);
     const navigate = useNavigate();
+
+    // Handle zoom-to-screen transition for workstations
+    const handleZoomToDevice = useCallback((position: [number, number, number], rotationY: number) => {
+        if (isZooming || desktopMode) return;
+        startZoom(position, rotationY);
+    }, [isZooming, desktopMode, startZoom]);
 
     useEffect(() => {
         setDispositivoSeleccionado(null);
@@ -24,10 +32,7 @@ const ECSSceneRenderer: React.FC = () => {
 
     const handleEntityClick = (entity: unknown) => {
         const e = entity as { objetoConTipo?: { tipo?: string }; entidadId?: number };
-        // No permitir seleccionar espacios
-        if (e.objetoConTipo?.tipo === 'espacio') {
-            return;
-        }
+        if (e.objetoConTipo?.tipo === 'espacio') return;
         setClickedEntityId(e.entidadId ?? null);
         setDispositivoSeleccionado(entity);
     };
@@ -62,8 +67,7 @@ const ECSSceneRenderer: React.FC = () => {
         }
     };
 
-    // Obtener las opciones del menú según el tipo de dispositivo seleccionado
-    const getMenuOptions = () => {
+    const getMenuOptions = (rotacionY: number, position: [number, number, number]) => {
         const selectedEntity = processedEntities.find(e => e.entidadId === menuOpenForEntity);
         const deviceType = selectedEntity?.objetoConTipo?.tipo?.toUpperCase();
 
@@ -71,9 +75,9 @@ const ECSSceneRenderer: React.FC = () => {
             return [
                 {
                     label: 'Configurar',
-                    to: '/dispositivos',
                     onClick: () => {
                         setMenuOpenForEntity(null);
+                        handleZoomToDevice(position, rotacionY);
                     },
                 }
             ];
@@ -95,16 +99,14 @@ const ECSSceneRenderer: React.FC = () => {
                         openModal(<ModalVPN />, "Configuración de VPN Gateway");
                         setMenuOpenForEntity(null);
                     }
-
                 }];
         }
-        // Opciones por defecto para otros dispositivos
         return [
             {
                 label: 'Configurar',
-                to: '/dispositivos',
                 onClick: () => {
                     setMenuOpenForEntity(null);
+                    handleZoomToDevice(position, rotacionY);
                 },
             }
         ];
@@ -125,7 +127,6 @@ const ECSSceneRenderer: React.FC = () => {
                 <meshBasicMaterial visible={false} />
             </mesh>
 
-            {/* Asegúrate de desestructurar con el nombre correcto: 'entidadId' */}
             {processedEntities.map(({ objetoConTipo, position, rotacionY, entidadId, entidadCompleta }) => {
                 const modelPath = getModelo(objetoConTipo);
                 const isEspacio = objetoConTipo?.tipo === 'espacio';
@@ -133,21 +134,19 @@ const ECSSceneRenderer: React.FC = () => {
                 if (modelPath === "") return null;
                 return (
                     <Model3D
-                        // Usa entidadId para la key de React
                         key={`entity-${entidadId}`}
                         modelPath={modelPath}
                         position={position}
                         rotation={[0, rotacionY, 0]}
                         scale={1}
-                        // Solo permitir onClick y selección en dispositivos, no en espacios
                         onClick={isEspacio ? undefined : () => handleEntityClick({ objetoConTipo, entidadId, entidadCompleta })}
                         onContextMenu={isEspacio ? undefined : () => handleContextMenu({ objetoConTipo, entidadId, entidadCompleta })}
                         onHover={isEspacio ? undefined : () => handleEntityHover({ objetoConTipo, entidadId, entidadCompleta })}
                         onHoverEnd={isEspacio ? undefined : handleEntityHoverEnd}
                         isSelected={!isEspacio && entidadSeleccionadaId === entidadId}
-                        enableHover={!isEspacio} // Deshabilitar hover en espacios
+                        enableHover={!isEspacio && !desktopMode}
                         showMenu={menuOpenForEntity === entidadId}
-                        menuOptions={getMenuOptions()}
+                        menuOptions={getMenuOptions(rotacionY, position)}
                         onMenuClose={() => setMenuOpenForEntity(null)}
                         onNavigate={(path) => navigate(path)}
                     />
