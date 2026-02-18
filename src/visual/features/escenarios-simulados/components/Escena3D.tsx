@@ -11,6 +11,7 @@ import {
     DEFAULT_ENVIRONMENT_CONFIG,
 } from '../config/scene3DConfig';
 import ECSSceneRenderer from './ECSSceneRenderer';
+import OfficeWalls from './OfficeWalls';
 import ZoneToast from './ZoneToast';
 import Controles3D from './Controles3D';
 import { useECSSceneContext } from '../context/ECSSceneContext';
@@ -64,6 +65,7 @@ const Escena3D: React.FC = () => {
                     enableShadows={DEFAULT_LIGHT_CONFIG.enableShadows}
                 />
                 <ECSSceneRenderer />
+                <OfficeWalls />
                 <CameraControls
                     enableZoom={DEFAULT_CONTROLS_CONFIG.enableZoom}
                     enablePan={DEFAULT_CONTROLS_CONFIG.enablePan}
