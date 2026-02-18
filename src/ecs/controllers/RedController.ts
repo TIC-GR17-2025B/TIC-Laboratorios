@@ -1,5 +1,6 @@
 import { TipoDispositivo } from "../../types/DeviceEnums";
 import type {
+    InfoDispositivoEscaneado,
   LogGeneral,
   PerfilClienteVPN,
   PerfilVPNGateway,
@@ -487,6 +488,30 @@ export class RedController {
         worksYServersDeZona.push(entidadDispositivo);
     }
     return worksYServersDeZona;
+  }
+
+  // Se le pasa como parámetro la entidad de la zona (dominio) y se extrae la info necesaria
+  // Solo se toman en cuenta workstations para el escaneo
+  public getEscaneoDispositivosDominio(entidadZona: Entidad): InfoDispositivoEscaneado[] | undefined {
+    const dispositivosDominio = this.getDispositivosPorZona(entidadZona);
+
+    const infoDispositivosEscaneados: InfoDispositivoEscaneado[] = [];
+
+    for (const entidadDispositivo of dispositivosDominio ?? []) {
+      const dispActual = this.ecsManager.getComponentes(entidadDispositivo)?.get(DispositivoComponent);
+      
+      if (dispActual?.tipo != TipoDispositivo.WORKSTATION) continue;
+
+      const infoDispActual: InfoDispositivoEscaneado = {
+        nombre: dispActual!.nombre,
+        sistOp: dispActual!.sistemaOperativo,
+        encargado: dispActual!.personaEncargada!
+      };
+
+      infoDispositivosEscaneados.push(infoDispActual);
+    }
+
+    return infoDispositivosEscaneados;
   }
 
   // Obtiene las zonas locales del router/gateway (la zona donde está el dispositivo)

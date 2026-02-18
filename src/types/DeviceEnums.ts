@@ -46,3 +46,9 @@ export enum TipoActivo {
   FIRMA_DIGITAL = "firma digital",
   CLAVE_PUBLICA = "clave publica",
 }
+
+export enum NivelConcienciaSeguridad {
+  ALTA = "Alta",
+  MEDIA = "Media",
+  BAJA = "Baja",
+}

@@ -8,6 +8,7 @@ import {
   EspacioComponent,
   DispositivoComponent,
 } from "../components";
+import { PersonaComponent } from "../components/PersonaComponent";
 
 /**
  * Sistema centralizado para gestionar todas las relaciones jerárquicas del escenario.
@@ -29,6 +30,7 @@ export class SistemaJerarquiaEscenario extends Sistema {
   private relacionZonaOficina: SistemaRelaciones;
   private relacionOficinaEspacio: SistemaRelaciones;
   private relacionEspacioDispositivo: SistemaRelaciones;
+  private relacionZonaPersona: SistemaRelaciones;
 
   constructor() {
     super();
@@ -39,6 +41,7 @@ export class SistemaJerarquiaEscenario extends Sistema {
     this.componentesRequeridos.add(OficinaComponent);
     this.componentesRequeridos.add(EspacioComponent);
     this.componentesRequeridos.add(DispositivoComponent);
+    this.componentesRequeridos.add(PersonaComponent);
 
     // Inicializar sistemas de relaciones
     this.relacionEscenarioZona = new SistemaRelaciones(
@@ -64,6 +67,12 @@ export class SistemaJerarquiaEscenario extends Sistema {
       DispositivoComponent,
       "dispositivos"
     );
+
+    this.relacionZonaPersona = new SistemaRelaciones(
+      ZonaComponent,
+      PersonaComponent,
+      "personas"
+    );
   }
 
   /**
@@ -76,6 +85,7 @@ export class SistemaJerarquiaEscenario extends Sistema {
       this.relacionZonaOficina.ecsManager = this.ecsManager;
       this.relacionOficinaEspacio.ecsManager = this.ecsManager;
       this.relacionEspacioDispositivo.ecsManager = this.ecsManager;
+      this.relacionZonaPersona.ecsManager = this.ecsManager;
     }
   }
 
@@ -98,6 +108,10 @@ export class SistemaJerarquiaEscenario extends Sistema {
     this.relacionEspacioDispositivo.agregar(espacioId, dispositivoId);
   }
 
+  agregarPersonaAZona(personaId: Entidad, zonaId: Entidad): void {
+    this.relacionZonaPersona.agregar(personaId, zonaId);
+  }
+
   // Métodos para OBTENER hijos
 
   obtenerZonasDeEscenario(escenarioId: Entidad): Entidad[] {
@@ -116,6 +130,10 @@ export class SistemaJerarquiaEscenario extends Sistema {
     return this.relacionEspacioDispositivo.obtenerHijos(espacioId);
   }
 
+  obtenerPersonasDeZona(zonaId: Entidad): Entidad[] {
+    return this.relacionZonaPersona.obtenerHijos(zonaId);
+  }
+
   // Métodos para OBTENER padre directo
 
   obtenerEscenarioDeZona(zonaId: Entidad): Entidad | undefined {
@@ -132,6 +150,10 @@ export class SistemaJerarquiaEscenario extends Sistema {
 
   obtenerEspacioDeDispositivo(dispositivoId: Entidad): Entidad | undefined {
     return this.relacionEspacioDispositivo.obtenerPadre(dispositivoId);
+  }
+
+  obtenerZonaDePersona(personaId: Entidad): Entidad | undefined {
+    return this.relacionZonaPersona.obtenerPadre(personaId);
   }
 
   // Métodos para NAVEGACIÓN en jerarquía (múltiples niveles)
@@ -223,6 +245,10 @@ export class SistemaJerarquiaEscenario extends Sistema {
     this.relacionEspacioDispositivo.remover(espacioId, dispositivoId);
   }
 
+  removerPersonaDeZona(zonaId: Entidad, personaId: Entidad): void {
+    this.relacionZonaPersona.remover(zonaId, personaId);
+  }
+
   // Métodos de utilidad
 
   /**
@@ -233,5 +259,6 @@ export class SistemaJerarquiaEscenario extends Sistema {
     this.relacionZonaOficina.limpiar();
     this.relacionOficinaEspacio.limpiar();
     this.relacionEspacioDispositivo.limpiar();
+    this.relacionZonaPersona.limpiar();
   }
 }

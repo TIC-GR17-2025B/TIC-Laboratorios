@@ -1,6 +1,7 @@
 import {
   EstadoAtaqueDispositivo,
   Mueble,
+  NivelConcienciaSeguridad,
   TipoActivo,
   TipoDispositivo,
   TipoEvento,
@@ -80,6 +81,18 @@ export const escenarioFirma: unknown = {
           color: ColoresRed.ROJO,
         },
       ],
+      personas: [
+        {
+          nombre: "Juan Pérez",
+          correo: "juan.perez@corp.com",
+          nivelConcienciaSeguridad: NivelConcienciaSeguridad.ALTA,
+        },
+        {
+          nombre: "Jacob García",
+          correo: "jacob.garcia@corp.com",
+          nivelConcienciaSeguridad: NivelConcienciaSeguridad.BAJA,
+        },
+      ],
       oficinas: [
         {
           id: 101,
@@ -100,6 +113,7 @@ export const escenarioFirma: unknown = {
                   software: "Apache, MySQL, PHP, Management Service",
                   posicion: { x: 0, y: 0, z: 0, rotacionY: 0 },
                   estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
+                  personaEncargada: "Juan Pérez",
                   activos: [
                     {
                       nombre: "Documento Jacob",
@@ -152,6 +166,7 @@ export const escenarioFirma: unknown = {
                   software: "IDS/IPS, VPN",
                   posicion: { x: -3, y: 0, z: 0, rotacionY: 180 },
                   estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
+                  personaEncargada: "Jacob García",
                   activos: [],
                   // --- ESTADO INICIAL: Solo en LAN2 ---
                   // --- RETO 1: El PO debe añadir "LAN1" aquí ---
@@ -240,6 +255,7 @@ export const escenarioFirma: unknown = {
                   software: "Apache, MySQL, DNS",
                   posicion: { x: 1, y: 0, z: 0, rotacionY: 0 },
                   estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
+                  personaEncargada: "Luis López",
                   activos: [],
                   // Origen de los Retos 1 (indirecto) y 2 (directo)
                   redes: ["RedWWW"],
@@ -302,6 +318,7 @@ export const escenarioFirma: unknown = {
                   software: "IDS/IPS, VPN",
                   posicion: { x: -1, y: 0, z: 0, rotacionY: 0 },
                   estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
+                  personaEncargada: "Lisa Rodriguez",
                   activos: [],
                   // Origen del Reto 3 (VPN)
                   redes: ["Red-Lisa"],

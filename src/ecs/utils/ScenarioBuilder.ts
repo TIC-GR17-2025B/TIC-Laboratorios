@@ -24,10 +24,12 @@ import {
   TipoDispositivo,
   EstadoAtaqueDispositivo,
   TipoEvento,
+  NivelConcienciaSeguridad,
 } from "../../types/DeviceEnums";
 import { RedComponent } from "../components/RedComponent";
 import { FirewallBuilder } from "./FirewallBuilder";
 import { SistemaRelaciones } from "../systems";
+import { PersonaComponent } from "../components/PersonaComponent";
 
 /**
  * Builder para crear escenarios de forma declarativa y simple
@@ -91,13 +93,20 @@ export class ScenarioBuilder {
       RedComponent,
       "redes"
     );
+    const relacionZonaPersona = new SistemaRelaciones(
+      ZonaComponent,
+      PersonaComponent,
+      "personas"
+    );
     this.ecsManager.agregarSistema(relacionZonaRed);
+    this.ecsManager.agregarSistema(relacionZonaPersona);
 
     escenario.zonas.forEach((zona: unknown) => {
       const zonaEntidad = this.crearZona(zona, escenarioPadre);
       const z = zona as {
         oficinas?: unknown[];
         redes?: unknown[];
+        personas?: unknown[];
         nombre?: string;
       };
 
@@ -127,6 +136,12 @@ export class ScenarioBuilder {
           redesConEntidades.set(entidadRed, r);
           this.crearRed(zonaEntidad, entidadRed, red, relacionZonaRed);
         }
+      });
+
+      // Procesar personas por zona
+      (z.personas ?? []).forEach((persona) => {
+        const entidadPersona = this.ecsManager.agregarEntidad();
+        this.crearPersona(zonaEntidad, entidadPersona, persona, relacionZonaPersona);
       });
 
       (z.oficinas ?? []).forEach((oficina: unknown) => {
@@ -278,6 +293,28 @@ export class ScenarioBuilder {
     relacionZonaRed.agregar(entidadZona, entidadRed);
   }
 
+  crearPersona(
+    entidadZona: Entidad,
+    entidadPersona: Entidad,
+    persona: unknown,
+    relacionZonaPersona: SistemaRelaciones
+  ) {
+    const p = persona as {
+      nombre: string;
+      correo: string;
+      nivelConcienciaSeguridad: NivelConcienciaSeguridad;
+    };
+
+    const personaComponente = new PersonaComponent(
+      p.nombre, p.correo, p.nivelConcienciaSeguridad
+    );
+
+    this.ecsManager.agregarComponente(entidadPersona, personaComponente);
+
+    // Usar el sistema de relaciones que se pasó como parámetro
+    relacionZonaPersona.agregar(entidadZona, entidadPersona);
+  }
+
   crearOficina(oficina: unknown, zonaId: number): Entidad {
     const entidadOficina = this.ecsManager.agregarEntidad();
     const ofi = oficina as { id: number; nombre?: string };
@@ -334,6 +371,7 @@ export class ScenarioBuilder {
       estadoAtaque?: unknown;
       posicion?: { x: number; y: number; z: number; rotacionY?: number };
       redes?: string[];
+      personaEncargada?: string;
       apps?: SoftwareApp[];
     };
 
@@ -355,6 +393,7 @@ export class ScenarioBuilder {
         d.tipo as unknown as TipoDispositivo,
         d.estadoAtaque as EstadoAtaqueDispositivo,
         entidadesRedesDispActual,
+        d.personaEncargada,
         d.apps
       )
     );
