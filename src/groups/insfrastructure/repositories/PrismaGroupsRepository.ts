@@ -111,12 +111,12 @@ export class PrismaGroupsRepository implements IGroupsRepository {
         estudiante: {
           select: {
             id_estudiante: true,
+            id_usuario_auth: true,
             codigo_unico: true,
             primernombre: true,
             segundo_nombre: true,
             primer_apellido: true,
-            segundo_apellido: true,
-            correo_electronico: true,
+            segundo_apellido: true
           },
         },
       },
