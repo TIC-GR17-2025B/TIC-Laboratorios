@@ -1,5 +1,6 @@
 import { ECSManager } from "../core/ECSManager";
 import { ColoresRed } from "../../data/colores";
+import { APPS } from "../../data/apps";
 import {
   Transform,
   DispositivoComponent,
@@ -72,7 +73,7 @@ export class ScenarioBuilder {
       this.crearFase(escenarioPadre, fase);
     });
 
-    escenario.apps.forEach((app: unknown) => {
+    APPS.forEach((app) => {
       this.crearApp(escenarioPadre, app);
     });
 
@@ -245,12 +246,10 @@ export class ScenarioBuilder {
     escenarioContainer?.get(EscenarioComponent)?.fases.push(faseAAgregar);
   }
 
-  crearApp(entidadEscenario: Entidad, app: unknown) {
-    const a = app as SoftwareApp;
-
+  crearApp(entidadEscenario: Entidad, app: SoftwareApp) {
     const escenarioContainer = this.ecsManager.getEntidades().get(entidadEscenario);
 
-    escenarioContainer?.get(EscenarioComponent)?.apps.push(a);
+    escenarioContainer?.get(EscenarioComponent)?.apps.push(app);
   }
 
   crearZona(zona: unknown, escenarioEntidad?: Entidad): Entidad {

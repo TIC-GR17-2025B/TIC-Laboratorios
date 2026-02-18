@@ -176,10 +176,10 @@ function LevelSelectionMenuItem({ escenario, imagen, completado, index, onSelect
     return <motion.div
         className={styles.menuItem}
         onClick={onSelect}
-        initial={{ opacity: 0, x: 60 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.4, delay: index * 0.08, ease: "easeOut" }}
-        whileHover={{ y: -4, boxShadow: "0 8px 24px rgba(0, 0, 0, 0.4)" }}
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, delay: index * 0.07, ease: "easeOut" }}
+        whileHover={{ y: -4 }}
     >
         <img src={imagen} className={styles.backgroundImage} alt={escenario.titulo} />
         <div className={styles.gradient}></div>

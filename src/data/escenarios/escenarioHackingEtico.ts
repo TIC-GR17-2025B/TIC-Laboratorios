@@ -21,29 +21,6 @@ export const escenarioHackingEtico: unknown = {
     "Un escenario en el que se aplica técnicas de ingeniería social para hackear un dipositivo y obtener información.",
   presupuestoInicial: 1000,
   ataques: [],
-  apps: [
-    {
-      nombre: "Net-Scan Viz",
-      descripcion: "Aplicación de escaneo de dispositivos en un dominio.",
-      precio: "0",
-    },
-    {
-      nombre: "Company Social-Searcher",
-      descripcion:
-        "Aplicación OSINT para obtener información de empleados de una empresa.",
-      precio: "0",
-    },
-    {
-      nombre: "Phish-Matic",
-      descripcion: "Aplicación para enviar correos tipo phishing.",
-      precio: "0",
-    },
-    {
-      nombre: "FirmaChecker",
-      descripcion: "Verificador de firmas digitales en documentos.",
-      precio: "0",
-    },
-  ],
   eventos: [
     {
       nombreEvento: "Escaneo de dispositivos",

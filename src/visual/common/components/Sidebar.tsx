@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLocation, useNavigate } from 'react-router';
 import styles from '../styles/Sidebar.module.css';
 import NavigationLink from './Navigation';
 import DevicesIcon from '../icons/DevicesIcon';
@@ -10,16 +11,75 @@ import { formatearTiempo } from '../utils/formatearTiempo';
 import { useECSSceneContext } from '../../features/escenarios-simulados/context/ECSSceneContext';
 import { useChatContext } from '../../features/chat/context/ChatContext';
 import ChatContainer from '../../features/chat/components/ChatContainer';
+import { useScreenTransition } from '../contexts/ScreenTransitionContext';
+import { useEscenario } from '../contexts';
 
 const Sidebar: React.FC = () => {
-    const { pause, resume, isPaused, tiempoTranscurrido } = useECSSceneContext();
+    const { pause, resume, isPaused, tiempoTranscurrido, processEntities } = useECSSceneContext();
     const { isChatOpen, toggleChat } = useChatContext();
+    const { startZoom, isZooming, desktopMode, requestZoomToDevice, exitDesktopMode } = useScreenTransition();
+    const { entidadSeleccionadaId } = useEscenario();
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    const handleDispositivosClick = () => {
+        if (isZooming || desktopMode) return;
+
+        const entities = processEntities();
+        let target: { position: [number, number, number]; rotationY: number } | null = null;
+
+        // Try selected entity (if it's a workstation)
+        if (entidadSeleccionadaId != null) {
+            const selected = entities.find(
+                e => e.entidadId === entidadSeleccionadaId &&
+                     e.objetoConTipo.tipo?.toUpperCase() === 'WORKSTATION'
+            );
+            if (selected) {
+                target = { position: selected.position, rotationY: selected.rotacionY };
+            }
+        }
+
+        // Fallback: first workstation in current zone
+        if (!target) {
+            const firstWorkstation = entities.find(
+                e => e.objetoConTipo.tipo?.toUpperCase() === 'WORKSTATION'
+            );
+            if (firstWorkstation) {
+                target = { position: firstWorkstation.position, rotationY: firstWorkstation.rotacionY };
+            }
+        }
+
+        if (!target) return;
+
+        if (location.pathname === '/') {
+            startZoom(target.position, target.rotationY);
+        } else {
+            requestZoomToDevice(target.position, target.rotationY);
+            navigate('/');
+        }
+    };
 
     return (
         <nav className={styles.dock}>
             <div className={styles.navSection}>
-                <NavigationLink icon={<OfficeIcon size={20} />} label="Oficina" to="/" />
-                <NavigationLink icon={<DevicesIcon size={20} />} label="Dispositivos" to="/dispositivos" />
+                {desktopMode && !isZooming ? (
+                    <button
+                        className={styles.dockItem}
+                        onClick={exitDesktopMode}
+                    >
+                        <OfficeIcon size={20} />
+                        <span className={styles.tooltip}>Oficina</span>
+                    </button>
+                ) : (
+                    <NavigationLink icon={<OfficeIcon size={20} />} label="Oficina" to="/" forceInactive={desktopMode || isZooming} />
+                )}
+                <button
+                    className={`${styles.dockItem} ${desktopMode || isZooming ? styles.active : ''}`}
+                    onClick={handleDispositivosClick}
+                >
+                    <DevicesIcon size={20} />
+                    <span className={styles.tooltip}>Dispositivos</span>
+                </button>
                 <NavigationLink icon={<RedesIcon size={20} />} label="Redes" to="/redes" />
                 <NavigationLink icon={<EstrellaPartidaIcon size={20} />} label="Partida" to="/fases-partida" />
             </div>

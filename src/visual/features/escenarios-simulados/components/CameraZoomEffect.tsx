@@ -96,7 +96,8 @@ const CameraZoomEffect: React.FC = () => {
         }
 
         // Save initial camera state on first frame of zoom-in
-        if (zoomDirection.current === 'in' && progress.current === 0) {
+        // Guard: only save if not already saved (prevents stale frames after enterDesktopMode from overwriting)
+        if (zoomDirection.current === 'in' && progress.current === 0 && !savedCameraState.current) {
             // Fix #2: Save aspect at zoom start to lock for entire transition
             if (camera instanceof PerspectiveCamera) {
                 savedAspect.current = camera.aspect;
@@ -171,6 +172,8 @@ const CameraZoomEffect: React.FC = () => {
                 // Project the 4 corners of the monitor screen to 2D
                 const rect = projectMonitorToScreen(camera, gl.domElement, screenCenter, targetRotationY);
                 enterDesktopMode(rect);
+                // Keep progress at 1 so stale frames (before React re-renders)
+                // hold the camera at the target position instead of snapping back
             } else {
                 // Restore camera exactly
                 camera.position.copy(saved.position);
@@ -182,9 +185,10 @@ const CameraZoomEffect: React.FC = () => {
                     camera.updateProjectionMatrix();
                 }
                 savedAspect.current = 0;
+                savedCameraState.current = null;
                 completeExit();
+                progress.current = 0;
             }
-            progress.current = 0;
         }
     });
 

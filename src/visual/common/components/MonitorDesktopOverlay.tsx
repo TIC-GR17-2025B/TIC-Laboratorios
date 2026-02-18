@@ -33,16 +33,17 @@ const MonitorDesktopOverlay: React.FC = () => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.25, ease: 'easeOut' }}
+                    transition={{ duration: 0.1, ease: 'easeOut' }}
                 >
                     <button
                         className={styles.closeButton}
                         onClick={exitDesktopMode}
                         title="Volver a la oficina (Esc)"
                     >
-                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                            <path d="M1 1L13 13M13 1L1 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                            <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
+                        Volver
                     </button>
                     <div className={styles.desktopContainer}>
                         <Dispositivos embedded />

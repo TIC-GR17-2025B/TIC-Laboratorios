@@ -16,13 +16,6 @@ export const escenarioFirma: unknown = {
     "Un escenario con 1 reto: 1) Verificar la veracidad de una firma digital de un documento.",
   presupuestoInicial: 1000,
   ataques: [],
-  apps: [
-    {
-      nombre: "TrustedSign",
-      descripcion: "Aplicación de verificación de firmas digitales.",
-      precio: "20",
-    },
-  ],
   eventos: [
     {
       nombreEvento: "Verificación de firma",

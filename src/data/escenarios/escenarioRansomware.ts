@@ -18,23 +18,6 @@ export const escenarioRansomware: unknown = {
     "Un hospital ha detectado actividad sospechosa en su red. Aísla los sistemas críticos, configura firewalls y establece una VPN de emergencia.",
   presupuestoInicial: 3000,
   ataques: [],
-  apps: [
-    {
-      nombre: "Nessus Scanner",
-      descripcion: "Escáner de vulnerabilidades",
-      precio: "200",
-    },
-    {
-      nombre: "Wireshark Pro",
-      descripcion: "Analizador de tráfico de red",
-      precio: "150",
-    },
-    {
-      nombre: "Malware Analyzer",
-      descripcion: "Herramienta de análisis de malware",
-      precio: "250",
-    },
-  ],
   eventos: [
     {
       nombreEvento: "Aislar sistema infectado",

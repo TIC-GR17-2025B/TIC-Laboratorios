@@ -24,7 +24,6 @@ export interface Escenario {
   eventos: EventoComponent[];
   fases: FaseComponent[];
   redes: Entidad[];
-  apps: SoftwareApp[];
 }
 
 export interface EscenarioPreview {
@@ -46,7 +45,7 @@ export interface Dispositivo {
   sistemaOperativo?: string;
   hardware: string;
   software?: string;
-  posicion?: { x: number; y: number; z: number };
+  posicion?: { x: number; y: number; z: number; rotacionY?: number };
   estadoAtaque?: EstadoAtaqueDispositivo;
   // Id de la entidad ECS asociada (útil para acciones sobre la entidad)
   entidadId?: number;

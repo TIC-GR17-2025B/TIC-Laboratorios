@@ -31,11 +31,6 @@ export const escenarioComplejo: unknown = {
     "Un escenario complejo con múltiples oficinas y zonas para evaluar la postura de seguridad de una empresa multinacional.",
   presupuestoInicial: 5000,
   ataques: [],
-  apps: [
-    { nombre: "Nessus Scanner", descripcion: "Escáner de vulnerabilidades", precio: "200" },
-    { nombre: "Wireshark Pro", descripcion: "Analizador de tráfico de red", precio: "150" },
-    { nombre: "TrustedSign", descripcion: "Verificación de firmas digitales", precio: "20" },
-  ],
   eventos: [
     {
       nombreEvento: "Auditoría de red interna",

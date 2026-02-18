@@ -18,18 +18,6 @@ export const escenarioSegmentacion: unknown = {
     "Una cadena de retail necesita segmentar su red para proteger los datos de pago. Configura firewalls y asigna redes correctamente.",
   presupuestoInicial: 2000,
   ataques: [],
-  apps: [
-    {
-      nombre: "Nessus Scanner",
-      descripcion: "Escáner de vulnerabilidades de red",
-      precio: "150",
-    },
-    {
-      nombre: "Wireshark Pro",
-      descripcion: "Analizador de tráfico de red",
-      precio: "100",
-    },
-  ],
   eventos: [
     {
       nombreEvento: "Segmentar red de pagos",

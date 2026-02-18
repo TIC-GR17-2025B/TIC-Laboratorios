@@ -8,11 +8,19 @@ import EventLogsPanel from "../components/EventLogsPanel";
 import { useEffect } from "react";
 function VistaOficina() {
   const { dispositivoSeleccionado, setDispositivoSeleccionado } = useEscenario();
-  const { desktopMode } = useScreenTransition();
+  const { desktopMode, pendingZoom, consumePendingZoom, startZoom } = useScreenTransition();
 
   useEffect(() => {
     setDispositivoSeleccionado(null);
   }, []);
+
+  // Handle pending zoom from Sidebar navigation
+  useEffect(() => {
+    if (pendingZoom) {
+      startZoom(pendingZoom.position, pendingZoom.rotationY);
+      consumePendingZoom();
+    }
+  }, [pendingZoom, startZoom, consumePendingZoom]);
 
   return (
     <div className={styles.contenedor}>

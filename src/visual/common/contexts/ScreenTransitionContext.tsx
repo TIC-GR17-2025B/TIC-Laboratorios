@@ -8,6 +8,11 @@ interface MonitorRect {
     height: number;
 }
 
+interface PendingZoom {
+    position: [number, number, number];
+    rotationY: number;
+}
+
 interface ScreenTransitionState {
     /** True only during camera zoom animation */
     isZooming: boolean;
@@ -19,6 +24,8 @@ interface ScreenTransitionState {
     targetRotationY: number;
     /** 2D rect of the monitor screen after zoom completes */
     monitorRect: MonitorRect | null;
+    /** Pending zoom request (set from Sidebar, consumed by VistaOficina) */
+    pendingZoom: PendingZoom | null;
 }
 
 interface SavedCameraState {
@@ -32,6 +39,8 @@ interface ScreenTransitionActions {
     updateMonitorRect: (rect: MonitorRect) => void;
     exitDesktopMode: () => void;
     completeExit: () => void;
+    requestZoomToDevice: (position: [number, number, number], rotationY: number) => void;
+    consumePendingZoom: () => void;
     savedCameraState: React.RefObject<SavedCameraState | null>;
 }
 
@@ -46,6 +55,7 @@ export function ScreenTransitionProvider({ children }: { children: ReactNode }) 
         targetPosition: null,
         targetRotationY: 0,
         monitorRect: null,
+        pendingZoom: null,
     });
 
     const savedCameraState = useRef<SavedCameraState | null>(null);
@@ -57,6 +67,7 @@ export function ScreenTransitionProvider({ children }: { children: ReactNode }) 
             targetPosition: position,
             targetRotationY: rotationY,
             monitorRect: null,
+            pendingZoom: null,
         });
     }, []);
 
@@ -94,7 +105,22 @@ export function ScreenTransitionProvider({ children }: { children: ReactNode }) 
             targetPosition: null,
             targetRotationY: 0,
             monitorRect: null,
+            pendingZoom: null,
         });
+    }, []);
+
+    const requestZoomToDevice = useCallback((position: [number, number, number], rotationY: number) => {
+        setState(prev => ({
+            ...prev,
+            pendingZoom: { position, rotationY },
+        }));
+    }, []);
+
+    const consumePendingZoom = useCallback(() => {
+        setState(prev => ({
+            ...prev,
+            pendingZoom: null,
+        }));
     }, []);
 
     return (
@@ -106,6 +132,8 @@ export function ScreenTransitionProvider({ children }: { children: ReactNode }) 
                 updateMonitorRect,
                 exitDesktopMode,
                 completeExit,
+                requestZoomToDevice,
+                consumePendingZoom,
                 savedCameraState,
             }}
         >
