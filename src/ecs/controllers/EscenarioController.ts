@@ -19,7 +19,7 @@ import {
   SistemaTiempo,
 } from "../systems";
 import { ScenarioBuilder } from "../utils/ScenarioBuilder";
-import type { Activo, Escenario, LogGeneral, SoftwareApp, RegistroVeredictoFirma, InfoPersonaEncontrada } from "../../types/EscenarioTypes";
+import type { Activo, Escenario, LogGeneral, SoftwareApp, RegistroVeredictoFirma, InfoPersonaEncontrada, PlantillaCorreoPhishing } from "../../types/EscenarioTypes";
 import {
   EventosInternos,
   EventosPublicos,
@@ -28,6 +28,8 @@ import {
 } from "../../types/EventosEnums";
 import { ProgresoController } from "./ProgresoController";
 import { PersonaComponent } from "../components/PersonaComponent";
+import { AccionesRealizables, ObjetosManejables } from "../../types/AccionesEnums";
+import { PlantillasCorreoPhishing } from "../../data/plantillas/Plantillas";
 
 export class EscenarioController {
   public escenario: Escenario;
@@ -555,6 +557,40 @@ export class EscenarioController {
       infoPersonasEmpresa.push(infoPersonaActual);
     }
     return infoPersonasEmpresa;
+  }
+
+  public registrarEjecucionAplicacion(nombreAplicacion: string) {
+    this.ecsManager.registrarAccion(
+      AccionesRealizables.EJECUTAR,
+      ObjetosManejables.APLICACION,
+      0,
+      {
+        nombreAplicacion: nombreAplicacion
+      }
+    );
+  }
+
+  public registrarEnvioDeCorreo(nombreDispEmisor: string, correoDestinatario: string, asunto: string) {
+    this.ecsManager.registrarAccion(
+      AccionesRealizables.ENVIO,
+      ObjetosManejables.CORREO,
+      0,
+      {
+        dispositivoEmisor: nombreDispEmisor,
+        destinatario: correoDestinatario,
+        asunto: asunto
+      }
+    );
+  }
+
+  public getPlantillasCorreo(): PlantillaCorreoPhishing[] {
+    const plantillas: PlantillaCorreoPhishing[] = [];
+
+    for (const plantilla of PlantillasCorreoPhishing) {
+      plantillas.push(plantilla);
+    }
+
+    return plantillas;
   }
 
   // MÉTODO PARA RESETEAR EL SINGLETON (útil para desarrollo/testing)

@@ -127,3 +127,8 @@ export interface InfoPersonaEncontrada {
   correo: string;
   nivelConcienciaSeguridad: NivelConcienciaSeguridad;
 }
+
+export interface PlantillaCorreoPhishing {
+  asunto: string;
+  mensaje: string;
+}

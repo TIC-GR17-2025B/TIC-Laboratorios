@@ -217,6 +217,7 @@ export class ScenarioBuilder {
       descripcion: string;
       fase: number;
       infoAdicional?: unknown;
+      ejecutarAlInstante?: boolean;
     };
     const entidadEvento = this.ecsManager.agregarEntidad();
     this.ecsManager.agregarComponente(
@@ -227,7 +228,8 @@ export class ScenarioBuilder {
         a.tiempoNotificacion,
         a.descripcion,
         a.fase,
-        a.infoAdicional
+        a.infoAdicional,
+        a.ejecutarAlInstante
       )
     );
   }
