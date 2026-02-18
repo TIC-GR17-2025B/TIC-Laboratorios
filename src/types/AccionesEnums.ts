@@ -10,4 +10,5 @@ export enum ObjetosManejables {
     CONFIG_FIREWALL = "configuracion firewall",
     APLICACION = "aplicacion",
     CORREO = "correo",
+    COMANDO = "comando",
 }

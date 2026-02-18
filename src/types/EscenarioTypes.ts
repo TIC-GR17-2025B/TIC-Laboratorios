@@ -132,3 +132,8 @@ export interface PlantillaCorreoPhishing {
   asunto: string;
   mensaje: string;
 }
+
+export interface RespuestaComando {
+  texto: string;
+  entidadActual: Entidad;
+}

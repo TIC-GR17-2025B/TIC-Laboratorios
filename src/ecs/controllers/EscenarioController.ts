@@ -12,6 +12,7 @@ import {
 import { ECSManager, type Entidad } from "../core";
 import {
     SistemaActivo,
+  SistemaComandos,
   SistemaEvento,
   SistemaFase,
   SistemaJerarquiaEscenario,
@@ -19,7 +20,7 @@ import {
   SistemaTiempo,
 } from "../systems";
 import { ScenarioBuilder } from "../utils/ScenarioBuilder";
-import type { Activo, Escenario, LogGeneral, SoftwareApp, RegistroVeredictoFirma, InfoPersonaEncontrada, PlantillaCorreoPhishing } from "../../types/EscenarioTypes";
+import type { Activo, Escenario, LogGeneral, SoftwareApp, RegistroVeredictoFirma, InfoPersonaEncontrada, PlantillaCorreoPhishing, RespuestaComando } from "../../types/EscenarioTypes";
 import {
   EventosInternos,
   EventosPublicos,
@@ -45,6 +46,7 @@ export class EscenarioController {
   private sistemaEvento?: SistemaEvento;
   private sistemaFase?: SistemaFase;
   private sistemaActivo?: SistemaActivo;
+  private sistemaComandos?: SistemaComandos;
   private progresoController?: ProgresoController;
   private escenarioIniciado: boolean = false; // FLAG PARA EVITAR MÚLTIPLES INICIALIZACIONES
 
@@ -100,6 +102,11 @@ export class EscenarioController {
     if (!this.sistemaActivo) {
       this.sistemaActivo = new SistemaActivo();
       this.ecsManager.agregarSistema(this.sistemaActivo);
+    }
+
+    if (!this.sistemaComandos) {
+      this.sistemaComandos = new SistemaComandos();
+      this.ecsManager.agregarSistema(this.sistemaComandos);
     }
 
     if (!this.progresoController) {
@@ -591,6 +598,20 @@ export class EscenarioController {
     }
 
     return plantillas;
+  }
+
+  /* Con esta función se indica el dispositivo en el que el sistema de comandos (la "consola")
+     quiere "abrirse". No hay que confundirse por el nombre de la función, ya que el sistema en
+     realidad ya está "iniciado" (o sea, ya existe) desde que se instancia el controller. Por lo
+     cual, esta función se debe ejecutar cada vez que el usuario decida abrir la consola en algún
+     dispositivo, pasándole a esta función la entidad de ese dispositivo actual.
+  */
+  public iniciarSistemaComandos(entidadDispositivo: Entidad) {
+    this.sistemaComandos?.iniciarSistemaComandos(entidadDispositivo);
+  }
+
+  public ejecutarComando(comando: string): RespuestaComando | undefined {
+    return this.sistemaComandos?.ejecutarComando(comando);
   }
 
   // MÉTODO PARA RESETEAR EL SINGLETON (útil para desarrollo/testing)
