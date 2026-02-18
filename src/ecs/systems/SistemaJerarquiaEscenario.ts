@@ -23,7 +23,7 @@ import { PersonaComponent } from "../components/PersonaComponent";
  * - Garantiza consistencia de datos entre diferentes partes de la aplicación
  */
 export class SistemaJerarquiaEscenario extends Sistema {
-  public componentesRequeridos = new Set<ClaseComponente>();
+  public componentesRequeridos = new Set<ClaseComponente>([EscenarioComponent]);
 
   // Sistemas de relaciones para cada nivel jerárquico
   private relacionEscenarioZona: SistemaRelaciones;
@@ -108,8 +108,9 @@ export class SistemaJerarquiaEscenario extends Sistema {
     this.relacionEspacioDispositivo.agregar(espacioId, dispositivoId);
   }
 
-  agregarPersonaAZona(personaId: Entidad, zonaId: Entidad): void {
-    this.relacionZonaPersona.agregar(personaId, zonaId);
+  agregarPersonaAZona(zonaId: Entidad, personaId: Entidad): void {
+    this.inicializarSiEsNecesario();
+    this.relacionZonaPersona.agregar(zonaId, personaId);
   }
 
   // Métodos para OBTENER hijos

@@ -12,15 +12,26 @@ import PageTransition from "../../../common/components/PageTransition";
 import ShieldCheckIcon from "../../../common/icons/ShieldCheckIcon";
 import ModalVerificacionFirma from "../components/ModalVerificacionFirma";
 import ActivosIcon from "../../../common/icons/ActivosIcon";
+import FileExplorerIcon from "../../../common/icons/FileExplorerIcon";
 import ModalExploradorArchivos from "../components/ModalExploradorArchivos";
 import SoftwareIcon from "../../../common/icons/SoftwareIcon";
+import AppStoreIcon from "../../../common/icons/AppStoreIcon";
 import ModalApps from "../components/ModalApps";
 import ComputadoraIcon from "../../../common/icons/ComputadoraIcon";
+import EstePCIcon from "../../../common/icons/EstePCIcon";
 import ConfiguracionIcon from "../../../common/icons/ConfiguracionIcon";
+import DevicesIcon from "../../../common/icons/DevicesIcon";
+import NetScanVizIcon from "../../../common/icons/NetScanVizIcon";
+import ConexionIcon from "../../../common/icons/ConexionIcon";
+import RedesIcon from "../../../common/icons/RedesIcon";
 import ModalEstePC from "../components/ModalEstePC";
+import ModalNetScanViz from "../components/ModalNetScanViz";
+import ModalSocialSearcher from "../components/ModalSocialSearcher";
+import ModalPhishMatic from "../components/ModalPhishMatic";
+import ModalConsola from "../components/ModalConsola";
 import VentanaOS from "../components/VentanaOS";
 
-type VentanaId = "estePC" | "archivos" | "apps" | "configuracion" | "firmaChecker" | "vpn";
+type VentanaId = "estePC" | "archivos" | "apps" | "configuracion" | "firmaChecker" | "vpn" | "netScanViz" | "socialSearcher" | "phishMatic" | "consola";
 
 interface VentanaConfig {
     id: VentanaId;
@@ -41,12 +52,16 @@ function Dispositivos() {
     const estadosPorDispositivo = useRef<Map<string, { ventanasAbiertas: VentanaId[]; ventanasMinimizadas: VentanaId[]; ordenZ: VentanaId[]; iconoSeleccionado: VentanaId | null }>>(new Map());
 
     const ventanasConfig: VentanaConfig[] = [
-        { id: "estePC", titulo: "Este PC", icono: <ComputadoraIcon size={14} />, contenido: <ModalEstePC />, posicionInicial: { x: 50, y: 30 } },
-        { id: "archivos", titulo: "Explorador de archivos", icono: <ActivosIcon size={14} />, contenido: <ModalExploradorArchivos />, posicionInicial: { x: 80, y: 50 } },
-        { id: "apps", titulo: "Aplicaciones", icono: <SoftwareIcon size={14} />, contenido: <ModalApps />, posicionInicial: { x: 110, y: 70 } },
+        { id: "estePC", titulo: "Este PC", icono: <EstePCIcon size={14} />, contenido: <ModalEstePC />, posicionInicial: { x: 50, y: 30 } },
+        { id: "archivos", titulo: "Explorador de archivos", icono: <FileExplorerIcon size={14} />, contenido: <ModalExploradorArchivos />, posicionInicial: { x: 80, y: 50 } },
+        { id: "apps", titulo: "Aplicaciones", icono: <AppStoreIcon size={14} />, contenido: <ModalApps />, posicionInicial: { x: 110, y: 70 } },
         { id: "configuracion", titulo: "Configuración", icono: <ConfiguracionIcon size={14} />, contenido: <PanelConfiguraciones />, posicionInicial: { x: 140, y: 40 } },
         { id: "firmaChecker", titulo: "FirmaChecker", icono: <ShieldCheckIcon size={14} />, contenido: <ModalVerificacionFirma />, posicionInicial: { x: 170, y: 60 } },
         { id: "vpn", titulo: "Cliente VPN", icono: <VPNIcon size={14} />, contenido: <ModalVPNCliente />, posicionInicial: { x: 200, y: 80 } },
+        { id: "netScanViz", titulo: "Net-Scan Viz", icono: <NetScanVizIcon size={14} />, contenido: <ModalNetScanViz />, posicionInicial: { x: 60, y: 60 } },
+        { id: "socialSearcher", titulo: "Social-Searcher", icono: <ConexionIcon size={14} />, contenido: <ModalSocialSearcher />, posicionInicial: { x: 90, y: 40 } },
+        { id: "phishMatic", titulo: "Phish-Matic", icono: <RedesIcon size={14} />, contenido: <ModalPhishMatic />, posicionInicial: { x: 120, y: 55 } },
+        { id: "consola", titulo: "Consola", icono: <span style={{ fontSize: 12, fontWeight: 'bold' }}>&gt;_</span>, contenido: <ModalConsola />, posicionInicial: { x: 150, y: 35 } },
     ];
 
     const enfocarVentana = (id: VentanaId) => {
@@ -171,40 +186,64 @@ function Dispositivos() {
                 <div className={styles.areaEscritorio} onClick={() => setIconoSeleccionado(null)}>
                     <div className={styles.iconosEscritorio}>
                         <button className={`${styles.iconoApp} ${iconoSeleccionado === "estePC" ? styles.iconoAppSeleccionado : ""}`} onClick={(e) => handleClickIcono(e, "estePC")}>
-                            <div className={styles.iconoAppImagen} style={{ color: '#4FC3F7' }}>
-                                <ComputadoraIcon size={36} />
+                            <div className={styles.iconoAppImagen}>
+                                <EstePCIcon size={48} />
                             </div>
                             <span className={styles.iconoAppNombre}>Este PC</span>
                         </button>
                         <button className={`${styles.iconoApp} ${iconoSeleccionado === "archivos" ? styles.iconoAppSeleccionado : ""}`} onClick={(e) => handleClickIcono(e, "archivos")}>
-                            <div className={styles.iconoAppImagen} style={{ color: '#FFD54F' }}>
-                                <ActivosIcon size={36} />
+                            <div className={styles.iconoAppImagen}>
+                                <FileExplorerIcon size={48} />
                             </div>
                             <span className={styles.iconoAppNombre}>Archivos</span>
                         </button>
                         <button className={`${styles.iconoApp} ${iconoSeleccionado === "apps" ? styles.iconoAppSeleccionado : ""}`} onClick={(e) => handleClickIcono(e, "apps")}>
-                            <div className={styles.iconoAppImagen} style={{ color: '#81C784' }}>
-                                <SoftwareIcon size={36} />
+                            <div className={styles.iconoAppImagen}>
+                                <AppStoreIcon size={48} />
                             </div>
                             <span className={styles.iconoAppNombre}>Apps</span>
                         </button>
                         <button className={`${styles.iconoApp} ${iconoSeleccionado === "configuracion" ? styles.iconoAppSeleccionado : ""}`} onClick={(e) => handleClickIcono(e, "configuracion")}>
-                            <div className={styles.iconoAppImagen} style={{ color: '#B0BEC5' }}>
-                                <ConfiguracionIcon size={36} />
+                            <div className={styles.iconoAppImagen}>
+                                <ConfiguracionIcon size={48} />
                             </div>
                             <span className={styles.iconoAppNombre}>Configuracion</span>
                         </button>
                         <button className={`${styles.iconoApp} ${iconoSeleccionado === "firmaChecker" ? styles.iconoAppSeleccionado : ""}`} onClick={(e) => handleClickIcono(e, "firmaChecker")}>
                             <div className={styles.iconoAppImagen} style={{ color: '#4DB6AC' }}>
-                                <ShieldCheckIcon size={36} />
+                                <ShieldCheckIcon size={48} />
                             </div>
                             <span className={styles.iconoAppNombre}>FirmaChecker</span>
                         </button>
                         <button className={`${styles.iconoApp} ${iconoSeleccionado === "vpn" ? styles.iconoAppSeleccionado : ""}`} onClick={(e) => handleClickIcono(e, "vpn")}>
                             <div className={styles.iconoAppImagen} style={{ color: '#7E57C2' }}>
-                                <VPNIcon size={36} />
+                                <VPNIcon size={48} />
                             </div>
                             <span className={styles.iconoAppNombre}>VPN</span>
+                        </button>
+                        <button className={`${styles.iconoApp} ${iconoSeleccionado === "netScanViz" ? styles.iconoAppSeleccionado : ""}`} onClick={(e) => handleClickIcono(e, "netScanViz")}>
+                            <div className={styles.iconoAppImagen}>
+                                <NetScanVizIcon size={48} />
+                            </div>
+                            <span className={styles.iconoAppNombre}>Net-Scan Viz</span>
+                        </button>
+                        <button className={`${styles.iconoApp} ${iconoSeleccionado === "socialSearcher" ? styles.iconoAppSeleccionado : ""}`} onClick={(e) => handleClickIcono(e, "socialSearcher")}>
+                            <div className={styles.iconoAppImagen} style={{ color: '#42A5F5' }}>
+                                <ConexionIcon size={48} />
+                            </div>
+                            <span className={styles.iconoAppNombre}>Social-Searcher</span>
+                        </button>
+                        <button className={`${styles.iconoApp} ${iconoSeleccionado === "phishMatic" ? styles.iconoAppSeleccionado : ""}`} onClick={(e) => handleClickIcono(e, "phishMatic")}>
+                            <div className={styles.iconoAppImagen} style={{ color: '#EF5350' }}>
+                                <RedesIcon size={48} />
+                            </div>
+                            <span className={styles.iconoAppNombre}>Phish-Matic</span>
+                        </button>
+                        <button className={`${styles.iconoApp} ${iconoSeleccionado === "consola" ? styles.iconoAppSeleccionado : ""}`} onClick={(e) => handleClickIcono(e, "consola")}>
+                            <div className={styles.iconoAppImagen} style={{ color: '#78909C', fontSize: 40, fontFamily: 'monospace', fontWeight: 'bold' }}>
+                                &gt;_
+                            </div>
+                            <span className={styles.iconoAppNombre}>Consola</span>
                         </button>
                     </div>
 

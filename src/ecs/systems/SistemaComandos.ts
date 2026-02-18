@@ -152,11 +152,13 @@ export class SistemaComandos extends Sistema {
     }
 
     private ejecutarH(): RespuestaComando {
-        return { 
-            texto: "Comandos disponibles:\nh\tVer este mensaje de ayuda\n"+
-                   "cat\tMostrar el contenido de un archivo -> cat nombreArchivo\n"+
-                   "ls\tListar los archivos del equipo actual\n"+
-                   "ssh\tAcceder remótamente a un dispositivo -> ssh usuario@nombre-dispositivo\n",
+        return {
+            texto: "Comandos disponibles:\n"+
+                   "  h\tVer este mensaje de ayuda\n"+
+                   "  ls\tListar los archivos del equipo actual\n"+
+                   "  cat\tMostrar el contenido de un archivo -> cat nombreArchivo\n"+
+                   "  ssh\tAcceder remotamente a un dispositivo -> ssh usuario@nombre-dispositivo\n"+
+                   "  cls\tLimpiar la pantalla de la consola\n",
             entidadActual: this.entidadDispActual
         };
     }

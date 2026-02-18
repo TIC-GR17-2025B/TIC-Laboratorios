@@ -106,7 +106,7 @@ export class EscenarioController {
 
     if (!this.sistemaComandos) {
       this.sistemaComandos = new SistemaComandos();
-      this.ecsManager.agregarSistema(this.sistemaComandos);
+      this.sistemaComandos.ecsManager = this.ecsManager;
     }
 
     if (!this.progresoController) {

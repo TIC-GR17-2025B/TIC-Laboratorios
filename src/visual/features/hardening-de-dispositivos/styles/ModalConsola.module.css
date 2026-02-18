@@ -1,0 +1,96 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: #1a1a2e;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    color: #e0e0e0;
+}
+
+.terminal {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 14px;
+}
+
+.entry {
+    margin-bottom: 6px;
+}
+
+.promptLine {
+    display: flex;
+    gap: 0;
+    flex-wrap: wrap;
+}
+
+.prompt {
+    color: #4fc3f7;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.commandText {
+    color: #e0e0e0;
+}
+
+.output {
+    color: #b0bec5;
+    white-space: pre-wrap;
+    padding-left: 4px;
+    margin-top: 2px;
+}
+
+.inputLine {
+    display: flex;
+    align-items: center;
+    padding: 6px 14px 12px;
+    gap: 0;
+}
+
+.inputPrompt {
+    color: #4fc3f7;
+    font-weight: bold;
+    white-space: nowrap;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+}
+
+.input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #e0e0e0;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    caret-color: #4fc3f7;
+}
+
+.passwordLabel {
+    color: #ffd54f;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+}
+
+.passwordInput {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #e0e0e0;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    caret-color: #ffd54f;
+}
+
+.banner {
+    color: #81c784;
+    white-space: pre-wrap;
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+.errorText {
+    color: #ef5350;
+}

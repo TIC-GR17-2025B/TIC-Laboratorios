@@ -2,6 +2,7 @@ import { AccionesRealizables, ObjetosManejables } from "../../types/AccionesEnum
 import {
   EstadoAtaqueDispositivo,
   Mueble,
+  NivelConcienciaSeguridad,
   TipoActivo,
   TipoDispositivo,
   TipoEvento,
@@ -10,7 +11,7 @@ import { ColoresRed } from "../colores";
 import { PlantillasCorreoPhishing } from "../plantillas/Plantillas";
 
 export const escenarioHackingEtico: unknown = {
-  id: 3,
+  id: 4,
   titulo: "Hacking Ético",
   imagenPreview: "/redFirewallVPN.webp",
   descripcion:
@@ -208,6 +209,23 @@ export const escenarioHackingEtico: unknown = {
           color: ColoresRed.ROJO,
         },
       ],
+      personas: [
+        {
+          nombre: "Carlos Mendoza",
+          correo: "carlos.mendoza@corp.com",
+          nivelConcienciaSeguridad: NivelConcienciaSeguridad.ALTA,
+        },
+        {
+          nombre: "Jacob García",
+          correo: "jacob.garcia@corp.com",
+          nivelConcienciaSeguridad: NivelConcienciaSeguridad.BAJA,
+        },
+        {
+          nombre: "Ana Torres",
+          correo: "ana.torres@corp.com",
+          nivelConcienciaSeguridad: NivelConcienciaSeguridad.MEDIA,
+        },
+      ],
       oficinas: [
         {
           id: 101,
@@ -228,6 +246,7 @@ export const escenarioHackingEtico: unknown = {
                   software: "Apache, MySQL, PHP, Management Service",
                   posicion: { x: 0, y: 0, z: 0, rotacionY: 0 },
                   estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
+                  personaEncargada: "Carlos Mendoza",
                   nombreEquipo: "PcAdmin",
                   usuario: "admin",
                   contrasenia: "a123",
@@ -283,6 +302,7 @@ export const escenarioHackingEtico: unknown = {
                   software: "IDS/IPS, VPN",
                   posicion: { x: -3, y: 0, z: 0, rotacionY: 180 },
                   estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
+                  personaEncargada: "Jacob García",
                   nombreEquipo: "PcJacob",
                   usuario: "jgarcia",
                   contrasenia: "j123",
@@ -385,6 +405,7 @@ export const escenarioHackingEtico: unknown = {
                   software: "Apache, MySQL, DNS",
                   posicion: { x: 1, y: 0, z: 0, rotacionY: 0 },
                   estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
+                  personaEncargada: "Ana Torres",
                   activos: [],
                   // Origen de los Retos 1 (indirecto) y 2 (directo)
                   redes: ["RedWWW"],
@@ -447,6 +468,7 @@ export const escenarioHackingEtico: unknown = {
                   software: "IDS/IPS, VPN",
                   posicion: { x: -1, y: 0, z: 0, rotacionY: 0 },
                   estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
+                  personaEncargada: "Lisa Rodriguez",
                   nombreEquipo: "PcLisa",
                   usuario: "lisa",
                   contrasenia: "l123",

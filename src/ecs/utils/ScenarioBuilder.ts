@@ -45,15 +45,11 @@ export class ScenarioBuilder {
   constructor(ecsManager: ECSManager) {
     this.ecsManager = ecsManager;
 
-    // Obtener o crear el sistema de jerarquía centralizado
-    let sistema = this.ecsManager.getSistema(SistemaJerarquiaEscenario);
-
+    // Obtener el sistema de jerarquía centralizado registrado por EscenarioController
+    const sistema = this.ecsManager.getSistema(SistemaJerarquiaEscenario);
     if (!sistema) {
-      // Si no existe, crearlo y agregarlo al ECSManager
-      sistema = new SistemaJerarquiaEscenario();
-      this.ecsManager.agregarSistema(sistema);
+      throw new Error("SistemaJerarquiaEscenario debe estar registrado antes de crear el builder.");
     }
-
     this.sistemaJerarquia = sistema;
   }
 
@@ -93,13 +89,7 @@ export class ScenarioBuilder {
       RedComponent,
       "redes"
     );
-    const relacionZonaPersona = new SistemaRelaciones(
-      ZonaComponent,
-      PersonaComponent,
-      "personas"
-    );
     this.ecsManager.agregarSistema(relacionZonaRed);
-    this.ecsManager.agregarSistema(relacionZonaPersona);
 
     escenario.zonas.forEach((zona: unknown) => {
       const zonaEntidad = this.crearZona(zona, escenarioPadre);
@@ -141,7 +131,7 @@ export class ScenarioBuilder {
       // Procesar personas por zona
       (z.personas ?? []).forEach((persona) => {
         const entidadPersona = this.ecsManager.agregarEntidad();
-        this.crearPersona(zonaEntidad, entidadPersona, persona, relacionZonaPersona);
+        this.crearPersona(zonaEntidad, entidadPersona, persona);
       });
 
       (z.oficinas ?? []).forEach((oficina: unknown) => {
@@ -299,7 +289,6 @@ export class ScenarioBuilder {
     entidadZona: Entidad,
     entidadPersona: Entidad,
     persona: unknown,
-    relacionZonaPersona: SistemaRelaciones
   ) {
     const p = persona as {
       nombre: string;
@@ -313,8 +302,7 @@ export class ScenarioBuilder {
 
     this.ecsManager.agregarComponente(entidadPersona, personaComponente);
 
-    // Usar el sistema de relaciones que se pasó como parámetro
-    relacionZonaPersona.agregar(entidadZona, entidadPersona);
+    this.sistemaJerarquia.agregarPersonaAZona(entidadZona, entidadPersona);
   }
 
   crearOficina(oficina: unknown, zonaId: number): Entidad {
