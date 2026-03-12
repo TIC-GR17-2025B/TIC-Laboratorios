@@ -88,6 +88,20 @@
   opacity: 1;
 }
 
+/* Time display in dock */
+.tiempoDisplay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
 /* Control buttons in dock */
 .controlBtn {
   position: relative;

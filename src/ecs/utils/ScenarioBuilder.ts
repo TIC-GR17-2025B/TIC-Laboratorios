@@ -472,10 +472,10 @@ export class ScenarioBuilder {
   }
 
   /**
-   * Obtiene todas las zonas del escenario con su id y nombre
+   * Obtiene todas las zonas del escenario con su id, nombre y dominio
    */
-  public obtenerZonas(): Array<{ id: number; nombre: string }> {
-    const zonas: Array<{ id: number; nombre: string }> = [];
+  public obtenerZonas(): Array<{ id: number; nombre: string; dominio: string }> {
+    const zonas: Array<{ id: number; nombre: string; dominio: string }> = [];
 
     // Recorrer todas las entidades y buscar las que tienen ZonaComponent
     for (const [, container] of this.ecsManager.getEntidades()) {
@@ -484,6 +484,7 @@ export class ScenarioBuilder {
         zonas.push({
           id: zonaComponent.id,
           nombre: zonaComponent.nombre,
+          dominio: zonaComponent.dominio,
         });
       }
     }

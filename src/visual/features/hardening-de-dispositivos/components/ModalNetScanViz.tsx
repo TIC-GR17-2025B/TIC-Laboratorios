@@ -36,7 +36,7 @@ export default function ModalNetScanViz() {
                     <option value="">Seleccionar dominio...</option>
                     {zonasDisponibles.map((zona) => (
                         <option key={zona.id} value={zona.id}>
-                            {zona.nombre}
+                            {zona.dominio}
                         </option>
                     ))}
                 </select>

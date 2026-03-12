@@ -49,7 +49,7 @@ export default function ModalSocialSearcher() {
                         setBuscado(false);
                     }}
                 >
-                    <option value="">Seleccionar empresa...</option>
+                    <option value="">Seleccionar zona</option>
                     {zonasDisponibles.map((zona) => (
                         <option key={zona.id} value={zona.id}>
                             {zona.nombre}

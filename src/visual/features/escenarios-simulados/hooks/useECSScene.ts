@@ -49,7 +49,7 @@ export function useECSScene() {
   const [hasNewLog, setHasNewLog] = useState(false);
   const [zonaActual, setZonaActual] = useState<number | null>(null);
   const [zonasDisponibles, setZonasDisponibles] = useState<
-    Array<{ id: number; nombre: string }>
+    Array<{ id: number; nombre: string; dominio: string }>
   >([]);
   const [showZoneToast, setShowZoneToast] = useState(false);
   const [zoneToastName, setZoneToastName] = useState("");
