@@ -81,7 +81,7 @@
 }
 
 .closeButton:hover {
-  background-color: rgb(50, 50, 50);
+  background: var(--surface-tertiary);
 }
 
 .closeButton:active {
@@ -109,23 +109,21 @@
   width: 100%;
   padding: 0.75rem;
   border: 1px solid var(--border-primary);
-  border-radius: var(--border-radius);
+  border-radius: 6px;
   font-size: 1rem;
-  transition: all 0.2s;
-  background-color: var(--surface-primary);
+  transition: background 0.15s;
+  background: var(--surface-secondary);
   color: var(--text-primary);
+  outline: none;
 }
 
 .formGroup input:focus {
-  outline: none;
-  border-color: var(--blue);
-  box-shadow: 0 0 0 3px rgba(65, 125, 255, 0.1);
+  background: var(--surface-tertiary);
 }
 
 .formGroup input:disabled {
-  background-color: var(--surface-secondary);
+  opacity: 0.5;
   cursor: not-allowed;
-  opacity: 0.6;
 }
 
 .error {
@@ -162,7 +160,7 @@
 }
 
 .cancelButton:hover:not(:disabled) {
-  background-color: rgb(50, 50, 50);
+  background: var(--surface-tertiary);
 }
 
 .saveButton {

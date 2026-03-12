@@ -181,7 +181,7 @@ export class RedController {
       (data: unknown) => {
         const mensaje = data as string;
         const log = {
-          tipo: TipoLogGeneral.ATAQUE,
+          tipo: TipoLogGeneral.ADVERTENCIA,
           mensaje: mensaje,
           pausarTiempo: true,
         };
@@ -272,7 +272,7 @@ export class RedController {
     this.ecsManager.on(EventosPublicos.TRAFICO_BLOQUEADO, (data: unknown) => {
       const d = data as { mensaje: string };
       const log = {
-        tipo: TipoLogGeneral.ATAQUE,
+        tipo: TipoLogGeneral.COMPLETADO,
         mensaje: d.mensaje,
         pausarTiempo: true,
       };

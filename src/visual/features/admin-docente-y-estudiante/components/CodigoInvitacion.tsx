@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Copy, Check, RefreshCw } from 'lucide-react';
 import styles from '../styles/CodigoInvitacion.module.css';
 
 interface CodigoInvitacionProps {
@@ -26,37 +27,38 @@ export default function CodigoInvitacion({ codigo, onGenerate }: CodigoInvitacio
 
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        <h4>Código de Invitación</h4>
-        <button
-          className={styles.generateButton}
-          onClick={handleGenerate}
-          disabled={loading}
-        >
-          {loading ? 'Generando...' : codigo ? 'Regenerar' : 'Generar Código'}
-        </button>
-      </div>
-
-      {codigo && (
-        <div className={styles.codigoContainer}>
-          <div className={styles.codigo}>{codigo}</div>
+      <div className={styles.row}>
+        <span className={styles.label}>Código de invitación</span>
+        {codigo ? (
+          <div className={styles.codeRow}>
+            <code className={styles.code}>{codigo}</code>
+            <button className={styles.copyButton} onClick={handleCopy} title={showCopied ? 'Copiado' : 'Copiar'}>
+              {showCopied ? <Check size={16} /> : <Copy size={16} />}
+            </button>
+            <button
+              className={styles.regenButton}
+              onClick={handleGenerate}
+              disabled={loading}
+              title="Regenerar"
+            >
+              <RefreshCw size={16} />
+            </button>
+          </div>
+        ) : (
           <button
-            className={styles.copyButton}
-            onClick={handleCopy}
-            title="Copiar código"
+            className={styles.generateButton}
+            onClick={handleGenerate}
+            disabled={loading}
           >
-            {showCopied ? 'Copiado' : 'Copiar'}
+            {loading ? 'Generando...' : 'Generar código'}
           </button>
-        </div>
-      )}
-
+        )}
+      </div>
       {!codigo && !loading && (
-        <p className={styles.noCode}>
-          No hay código activo. Genera uno para que los estudiantes puedan unirse.
+        <p className={styles.hint}>
+          Los estudiantes necesitan un código para unirse a este grupo.
         </p>
       )}
-
-      {showCopied && <span className={styles.copiedMessage}>¡Copiado!</span>}
     </div>
   );
 }

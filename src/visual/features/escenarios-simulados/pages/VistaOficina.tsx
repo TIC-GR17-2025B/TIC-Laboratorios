@@ -26,7 +26,7 @@ function VistaOficina() {
     <div className={styles.contenedor}>
       <Escena3D />
       {!desktopMode && <TarjetaEntidadSeleccionada visible={!!dispositivoSeleccionado} />}
-      {!desktopMode && <EventLogsPanel />}
+      <EventLogsPanel />
       <MonitorDesktopOverlay />
     </div>
   )

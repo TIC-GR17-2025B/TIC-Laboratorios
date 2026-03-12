@@ -38,7 +38,7 @@ export function useECSScene() {
   const [mensajeLog, setMensajeLog] = useState("");
   const [tiempoLog, setTiempoLog] = useState(0);
   const [tipoLog, setTipoLog] = useState<
-    "ataque" | "advertencia" | "completado"
+    "ataque" | "advertencia" | "completado" | "informacion"
   >("advertencia");
   const [logs, setLogs] = useState<
     Array<{ time: string; content: string; category: string }>
@@ -187,7 +187,7 @@ export function useECSScene() {
               setTiempoLog(escenarioController.tiempoTranscurrido);
 
               // Determinar el tipo de log según el tipo del log general
-              let tipoLogUI: "ataque" | "advertencia" | "completado" =
+              let tipoLogUI: "ataque" | "advertencia" | "completado" | "informacion" =
                 "advertencia";
               let categoria = "ADVERTENCIA";
 
@@ -196,7 +196,10 @@ export function useECSScene() {
                 categoria = "ATAQUE";
               } else if (ultimoLog.tipo === TipoLogGeneral.COMPLETADO) {
                 tipoLogUI = "completado";
-                categoria = "INFO";
+                categoria = "COMPLETADO";
+              } else if (ultimoLog.tipo === TipoLogGeneral.INFORMACION) {
+                tipoLogUI = "informacion";
+                categoria = "INFORMACION";
               }
 
               setTipoLog(tipoLogUI);

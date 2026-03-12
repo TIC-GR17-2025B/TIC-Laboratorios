@@ -1,41 +1,61 @@
 .container {
-  background: var(--surface-secondary);
-  border: 1px solid var(--border-primary);
-  border-radius: var(--border-radius);
-  padding: 1rem;
+  padding: 0;
 }
 
-.header {
+.row {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.75rem;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.header h4 {
-  margin: 0;
+.label {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.codeRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.code {
+  font-family: "SF Mono", "Fira Code", monospace;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: var(--text-primary);
+}
+
+.copyButton,
+.regenButton {
+  color: var(--text-secondary);
+  background: transparent;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.copyButton:hover,
+.regenButton:hover {
   color: var(--text-muted);
-  font-size: 0.875rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  background: transparent;
 }
 
 .generateButton {
-  background-color: var(--blue);
-  color: var(--text-primary);
-  border: 1px solid var(--blue);
-  padding: 0.4rem 0.75rem;
-  border-radius: var(--border-radius);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-size: 0.8125rem;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--blue);
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
 }
 
 .generateButton:hover:not(:disabled) {
-  background-color: var(--blue-lighter);
-  transform: translateY(-1px);
+  color: var(--blue-lighter);
+  background: transparent;
 }
 
 .generateButton:disabled {
@@ -43,80 +63,8 @@
   cursor: not-allowed;
 }
 
-.codigoContainer {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-  position: relative;
-}
-
-.codigo {
-  flex: 1;
-  background: var(--surface-primary);
-  border: 1px solid var(--border-primary);
-  padding: 0.65rem 1rem;
-  border-radius: var(--border-radius);
-  font-family: "Courier New", monospace;
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--blue);
-  letter-spacing: 1px;
-  text-align: center;
-}
-
-.copyButton {
-  background: var(--surface-primary);
-  border: 1px solid var(--border-primary);
-  padding: 0.65rem 0.875rem;
-  border-radius: var(--border-radius);
-  font-size: 0.8125rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  min-width: 65px;
-  color: var(--text-muted);
-}
-
-.copyButton:hover {
-  background-color: rgb(50, 50, 50);
-  border-color: var(--blue);
-}
-
-.noCode {
-  color: var(--text-muted);
-  text-align: center;
-  margin: 0;
-  font-style: italic;
-  font-size: 0.875rem;
-}
-
-.copiedMessage {
-  position: absolute;
-  top: -30px;
-  right: 0;
-  background: var(--blue);
-  color: var(--text-primary);
-  padding: 0.5rem 1rem;
-  border-radius: var(--border-radius);
-  font-size: 0.875rem;
-  font-weight: 600;
-  animation: fadeInOut 2s ease;
-}
-
-@keyframes fadeInOut {
-  0% {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  20% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  80% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
+.hint {
+  margin: 6px 0 0 0;
+  font-size: 12px;
+  color: var(--text-secondary);
 }

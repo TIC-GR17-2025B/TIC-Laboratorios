@@ -10,7 +10,7 @@
   flex-direction: column;
   transition: transform 0.3s ease, opacity 0.2s ease;
   min-height: 0;
-  z-index: 100;
+  z-index: 150;
 }
 
 .logsPanel.hidden {
@@ -122,7 +122,7 @@
   align-items: center;
   justify-content: center;
   transition: background-color 0.2s ease;
-  z-index: 10;
+  z-index: 150;
   border-radius: var(--border-radius);
 }
 
