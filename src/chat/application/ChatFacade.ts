@@ -3,14 +3,14 @@
  * casos de uso (enviar mensaje, enviar contexto)
  */
 
-import { ChatSession } from "../domain/models/ChatSession";
-import type { GameContext } from "../domain/models/Message";
-import type { IChatRepository } from "../domain/repositories/IChatRepository";
-import type { IContextModeManager } from "../domain/repositories/IContextModeManager";
+import { ChatSession } from "../domain/models/ChatSession.js";
+import type { GameContext } from "../domain/models/Message.js";
+import type { IChatRepository } from "../domain/repositories/IChatRepository.js";
+import type { IContextModeManager } from "../domain/repositories/IContextModeManager.js";
 
-import { SendMessageUseCase } from "./useCases/SendMessageUseCase";
-import { SendContextUseCase } from "./useCases/SendContextUseCase";
-import { ToggleContextModeUseCase } from "./useCases/ToggleContextModeUseCase";
+import { SendMessageUseCase } from "./useCases/SendMessageUseCase.js";
+import { SendContextUseCase } from "./useCases/SendContextUseCase.js";
+import { ToggleContextModeUseCase } from "./useCases/ToggleContextModeUseCase.js";
 
 export class ChatFacade {
   private session: ChatSession;

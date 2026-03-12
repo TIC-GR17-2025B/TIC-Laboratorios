@@ -2,7 +2,7 @@
  * Gestiona el estado y la lógica de una sesión de chat
  */
 
-import { Message } from "./Message";
+import { Message } from "./Message.js";
 
 export class ChatSession {
   readonly sessionId: string;

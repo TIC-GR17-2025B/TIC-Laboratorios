@@ -2,6 +2,9 @@ import type { IFeedbackStateRepository } from '../../domain/repositories/IFeedba
 import type { FeedbackState } from '../../domain/models/FeedbackState.js';
 
 
+// Estado efímero: se pierde al reiniciar el servidor (redeploy en Render, etc.).
+// Consecuencia: tras un redeploy, el feedback se habilita de nuevo para todos los estudiantes.
+// Si esto es un problema, migrar a persistencia en DB (tabla feedback_state).
 export class InMemoryFeedbackStateRepository implements IFeedbackStateRepository {
   private states: Map<string, FeedbackState> = new Map();
 

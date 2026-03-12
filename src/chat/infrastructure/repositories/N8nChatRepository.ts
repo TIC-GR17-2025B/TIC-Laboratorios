@@ -6,7 +6,7 @@ import type {
   IChatRepository,
   ChatMessagePayload,
   ChatResponse,
-} from "../../domain/repositories/IChatRepository";
+} from "../../domain/repositories/IChatRepository.js";
 
 export class N8nChatRepository implements IChatRepository {
   constructor(private readonly webhookUrl: string) {}

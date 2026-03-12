@@ -1,4 +1,4 @@
-import type { GameContext } from "../models/Message";
+import type { GameContext } from "../models/Message.js";
 
 export interface ChatMessagePayload {
   message: string;

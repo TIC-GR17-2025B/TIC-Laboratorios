@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "../../visual/common/utils/apiConfig";
+import { API_BASE_URL } from "../../config/apiConfig";
 
 export class ProgresoController {
  

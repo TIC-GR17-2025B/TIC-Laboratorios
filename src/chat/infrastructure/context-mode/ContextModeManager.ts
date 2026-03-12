@@ -5,8 +5,8 @@ import type {
   IContextModeManager,
   ContextModeState,
   ContextSelectedCallback,
-} from "../../domain/repositories/IContextModeManager";
-import type { GameContext } from "../../domain/models/Message";
+} from "../../domain/repositories/IContextModeManager.js";
+import type { GameContext } from "../../domain/models/Message.js";
 
 const CONTEXT_SELECTOR = "[data-context]" as const;
 const CONTEXT_MODE_CLASS = "context-mode-active" as const;

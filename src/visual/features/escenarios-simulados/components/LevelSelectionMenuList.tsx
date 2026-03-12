@@ -57,17 +57,8 @@ export default function LevelSelectionMenuList() {
         }
     };
 
-    const isEscenarioCompletado = (escenarioTitulo: string): boolean => {
-        // Buscar progresos que coincidan con el escenario
-        const progresosEscenario = progresos.filter(p => {
-            return p.nombre_escenario === escenarioTitulo ||
-                p.nombre_escenario.toLowerCase() === escenarioTitulo.toLowerCase() ||
-                p.nombre_escenario.toLowerCase().includes(escenarioTitulo.toLowerCase()) ||
-                escenarioTitulo.toLowerCase().includes(p.nombre_escenario.toLowerCase());
-        });
-
-        // Está completado si hay al menos un progreso con terminado === true
-        return progresosEscenario.some(p => p.terminado);
+    const isEscenarioCompletado = (escenarioId: number): boolean => {
+        return progresos.some(p => p.id_escenario === escenarioId && p.terminado);
     };
 
     const scrollRef = useRef<HTMLDivElement>(null);
@@ -121,7 +112,7 @@ export default function LevelSelectionMenuList() {
     return <div className={styles.carouselWrapper}>
         <div className={styles.menuList} ref={scrollRef}>
             {escenarios.map((escenario, index) => {
-                const completado = isEscenarioCompletado(escenario.titulo);
+                const completado = isEscenarioCompletado(escenario.id);
 
                 return (
                     <LevelSelectionMenuItem

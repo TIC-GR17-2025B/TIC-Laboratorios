@@ -1,23 +1,23 @@
-export { Message } from "./domain/models/Message";
-export { ChatSession } from "./domain/models/ChatSession";
-export type { MessageSender, GameContext } from "./domain/models/Message";
+export { Message } from "./domain/models/Message.js";
+export { ChatSession } from "./domain/models/ChatSession.js";
+export type { MessageSender, GameContext } from "./domain/models/Message.js";
 
 export type {
   IChatRepository,
   ChatMessagePayload,
   ChatResponse,
-} from "./domain/repositories/IChatRepository";
+} from "./domain/repositories/IChatRepository.js";
 
 export type {
   IContextModeManager,
   ContextModeState,
   ContextSelectedCallback,
-} from "./domain/repositories/IContextModeManager";
+} from "./domain/repositories/IContextModeManager.js";
 
-export { ChatFacade } from "./application/ChatFacade";
-export { SendMessageUseCase } from "./application/useCases/SendMessageUseCase";
-export { SendContextUseCase } from "./application/useCases/SendContextUseCase";
-export { ToggleContextModeUseCase } from "./application/useCases/ToggleContextModeUseCase";
+export { ChatFacade } from "./application/ChatFacade.js";
+export { SendMessageUseCase } from "./application/useCases/SendMessageUseCase.js";
+export { SendContextUseCase } from "./application/useCases/SendContextUseCase.js";
+export { ToggleContextModeUseCase } from "./application/useCases/ToggleContextModeUseCase.js";
 
-export { N8nChatRepository } from "./infrastructure/repositories/N8nChatRepository";
-export { ContextModeManager } from "./infrastructure/context-mode/ContextModeManager";
+export { N8nChatRepository } from "./infrastructure/repositories/N8nChatRepository.js";
+export { ContextModeManager } from "./infrastructure/context-mode/ContextModeManager.js";

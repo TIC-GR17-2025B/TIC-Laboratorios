@@ -18,6 +18,7 @@ export interface Escenario {
   id: number;
   titulo: string;
   descripcion: string;
+  imagenPreview?: string;
   presupuestoInicial: number;
   zonas: Entidad[];
   ataques: AtaqueComponent[];

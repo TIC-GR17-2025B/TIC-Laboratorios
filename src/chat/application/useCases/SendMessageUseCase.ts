@@ -1,9 +1,9 @@
 /**
  * Orquestar el envío de un mensaje de texto normal
  */
-import type { IChatRepository } from "../../domain/repositories/IChatRepository";
-import { Message } from "../../domain/models/Message";
-import { ChatSession } from "../../domain/models/ChatSession";
+import type { IChatRepository } from "../../domain/repositories/IChatRepository.js";
+import { Message } from "../../domain/models/Message.js";
+import { ChatSession } from "../../domain/models/ChatSession.js";
 
 export class SendMessageUseCase {
   constructor(private readonly chatRepository: IChatRepository) { }

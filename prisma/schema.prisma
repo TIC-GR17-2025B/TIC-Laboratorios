@@ -22,12 +22,6 @@ model curso {
   matricula     matricula[]
 }
 
-model escenario {
-  id_escenario Int        @id @default(autoincrement())
-  nombre       String     @db.VarChar
-  progreso     progreso[]
-}
-
 model estudiante {
   id_estudiante    Int           @id @default(autoincrement())
   codigo_unico     Int           @unique
@@ -67,7 +61,6 @@ model progreso {
   id_escenario  Int
   terminado     Boolean?   @default(false)
   tiempo        Float?
-  escenario     escenario  @relation(fields: [id_escenario], references: [id_escenario], onDelete: NoAction, onUpdate: NoAction, map: "fk_progreso_escenario")
   estudiante    estudiante @relation(fields: [id_estudiante], references: [id_estudiante], onDelete: NoAction, onUpdate: NoAction, map: "fk_progreso_estudiante")
 }
 
