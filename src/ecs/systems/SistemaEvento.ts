@@ -248,6 +248,7 @@ export class SistemaEvento extends Sistema {
 
         if(!consultaAccion)
           this.ecsManager.emit(EventosPublicos.FASE_NO_COMPLETADA, MensajesGenerales.MSJ_FASE_NO_COMPLETADA);
+        else this.ecsManager.emit(EventosInternos.OBJETIVO_COMPLETADO);
 
         break;
       }
@@ -267,6 +268,7 @@ export class SistemaEvento extends Sistema {
 
         if (!consultaEnvioCorreo)
           this.ecsManager.emit(EventosPublicos.FASE_NO_COMPLETADA, MensajesGenerales.MSJ_FASE_NO_COMPLETADA);
+        else this.ecsManager.emit(EventosInternos.OBJETIVO_COMPLETADO);
 
         break;
       }

@@ -88,7 +88,7 @@ export class SistemaComandos extends Sistema {
                     0,
                     {
                         comando: "cat",
-                        archivo: nombreArchivo,
+                        nombreArchivo: nombreArchivo,
                         nombreDispositivo: nombreDisp
                     }
                 );
