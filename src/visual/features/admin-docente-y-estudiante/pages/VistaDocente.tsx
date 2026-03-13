@@ -45,6 +45,20 @@ export default function VistaDocente() {
                     </button>
                 </div>
 
+                {loading && (
+                    <div className={styles.gruposGrid}>
+                        {[0, 1, 2, 3].map((i) => (
+                            <div key={i} className={styles.skeletonCard}>
+                                <div className={styles.skeletonPreview} />
+                                <div className={styles.skeletonBody}>
+                                    <div className={styles.skeletonLine} style={{ width: '60%' }} />
+                                    <div className={styles.skeletonLine} style={{ width: '35%', height: 12 }} />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
                 {error && <p className={styles.errorText}>{error}</p>}
 
                 {!loading && !error && grupos.length === 0 && (

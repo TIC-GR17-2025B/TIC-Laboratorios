@@ -65,7 +65,8 @@ router.post("/", async (req: Request, res: Response) => {
     }
 
     const curso = await createCurso.createCurso(req.body);
-    res.status(201).json({ success: true, data: curso });
+    const cursoConCodigo = await generateCode.execute(curso.id_curso);
+    res.status(201).json({ success: true, data: cursoConCodigo });
   } catch (err) {
     if (err instanceof Error) {
       res.status(400).json({ success: false, error: err.message });
