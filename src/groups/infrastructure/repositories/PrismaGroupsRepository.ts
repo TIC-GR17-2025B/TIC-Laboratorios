@@ -116,12 +116,19 @@ export class PrismaGroupsRepository implements IGroupsRepository {
             primernombre: true,
             segundo_nombre: true,
             primer_apellido: true,
-            segundo_apellido: true
+            segundo_apellido: true,
+            usuario_auth: {
+              select: { correo_electronico: true },
+            },
           },
         },
       },
     });
 
-    return matriculas.map((m) => m.estudiante);
+    return matriculas.map((m) => ({
+      ...m.estudiante,
+      correo_electronico: m.estudiante.usuario_auth?.correo_electronico ?? '',
+      usuario_auth: undefined,
+    }));
   }
 }

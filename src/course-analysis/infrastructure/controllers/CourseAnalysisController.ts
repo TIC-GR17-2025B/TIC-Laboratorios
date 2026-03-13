@@ -72,7 +72,7 @@ export function createCourseAnalysisController(webhookUrl?: string) {
   });
 
 
-  router.get('/health', ( res: Response) => {
+  router.get('/health', (_req: Request, res: Response) => {
     const isConfigured = !!url;
     
     res.status(isConfigured ? 200 : 503).json({

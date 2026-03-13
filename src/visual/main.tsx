@@ -19,6 +19,7 @@ import ProtectedRouteByRole from './features/admin-docente-y-estudiante/componen
 import VistaDocente from './features/admin-docente-y-estudiante/pages/VistaDocente.tsx'
 import DetalleGrupo from './features/admin-docente-y-estudiante/pages/DetalleGrupo.tsx'
 import VistaDetalleEstudiante from './features/admin-docente-y-estudiante/pages/VistaDetalleEstudiante.tsx'
+import DocenteLayout from './features/admin-docente-y-estudiante/components/DocenteLayout.tsx'
 import VistaPerfil from './features/admin-docente-y-estudiante/pages/VistaPerfil.tsx'
 import { AnimatePresence } from 'framer-motion'
 import VistaFasesPartida from './features/escenarios-simulados/pages/VistaFasesPartida.tsx'
@@ -76,21 +77,13 @@ function AnimatedRoutes() {
 
         <Route path='/docente' element={
           <ProtectedRouteByRole requiredRole="profesor">
-            <VistaDocente />
+            <DocenteLayout />
           </ProtectedRouteByRole>
-        } />
-
-        <Route path='/docente/grupo/:id' element={
-          <ProtectedRouteByRole requiredRole="profesor">
-            <DetalleGrupo />
-          </ProtectedRouteByRole>
-        } />
-
-        <Route path='/docente/estudiante/:idEstudiante' element={
-          <ProtectedRouteByRole requiredRole="profesor">
-            <VistaDetalleEstudiante />
-          </ProtectedRouteByRole>
-        } />
+        }>
+          <Route index element={<VistaDocente />} />
+          <Route path='grupo/:id' element={<DetalleGrupo />} />
+          <Route path='estudiante/:idEstudiante' element={<VistaDetalleEstudiante />} />
+        </Route>
 
         <Route path='/seleccion-niveles' element={
           <ProtectedRouteByRole requiredRole="estudiante">

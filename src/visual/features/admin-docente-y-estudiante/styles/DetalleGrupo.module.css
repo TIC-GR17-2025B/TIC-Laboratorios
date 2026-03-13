@@ -1,52 +1,10 @@
-.page {
-  min-height: 100vh;
-  background: var(--surface-primary);
-  color: var(--text-primary);
-  display: flex;
-  flex-direction: column;
-}
-
-/* ── Top bar ── */
-
-.topBar {
-  display: flex;
-  align-items: center;
-  padding: 16px max(24px, calc((100% - var(--content-width) - 200px) / 2));
-  border-bottom: 1px solid var(--border-primary);
-}
-
-.breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.breadcrumbLink {
-  color: var(--text-secondary);
-  background: transparent;
-  padding: 0;
-}
-
-.breadcrumbLink:hover {
-  color: var(--text-primary);
-  background: transparent;
-}
-
-.breadcrumbSep {
-  color: var(--text-secondary);
-}
-
-.breadcrumbCurrent {
-  color: var(--text-muted);
-}
-
 /* ── Layout ── */
 
 .layout {
   display: flex;
   flex: 1;
   min-height: 0;
-  max-width: calc(var(--content-width) + 200px);
+  max-width: var(--content-width);
   margin: 0 auto;
   width: 100%;
 }
@@ -98,7 +56,7 @@
 .main {
   flex: 1;
   min-width: 0;
-  padding: 32px 40px;
+  padding: 32px 0px 32px 40px;
 }
 
 /* ── Panel header ── */
@@ -114,12 +72,22 @@
 .panelTitle {
   margin: 0;
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 8px;
 }
 
 .badge {
-  color: var(--text-secondary);
+  font-size: 0.8rem;
+  line-height: 1;
+  color: var(--text-muted);
+  background: var(--surface-tertiary);
+  border: 1px solid var(--border-primary);
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
 }
 
 /* ── Empty text ── */
@@ -149,7 +117,7 @@
 }
 
 .studentRow:hover {
-  background: var(--surface-secondary);
+  background: none;
 }
 
 .studentClickable {
@@ -165,12 +133,13 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: var(--border-primary);
-  color: var(--text-muted);
+  background: var(--surface-secondary);
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.7rem;
+  font-size: 13px;
   flex-shrink: 0;
 }
 

@@ -10,6 +10,7 @@ import { CourseAnalysisButton } from '../../course-analysis/components/CourseAna
 import { CourseAnalysisModal } from '../../course-analysis/components/CourseAnalysisModal';
 import type { CourseAnalysisResponse } from '../../course-analysis/types/courseAnalysis.types';
 import styles from '../styles/DetalleGrupo.module.css';
+import Breadcrumb from '../components/Breadcrumb';
 
 type Tab = 'students' | 'analysis' | 'settings';
 
@@ -76,7 +77,9 @@ export default function DetalleGrupo() {
   };
 
   const handleEstudianteClick = (idEstudiante: number) => {
-    navigate(`/docente/estudiante/${idEstudiante}`);
+    navigate(`/docente/estudiante/${idEstudiante}`, {
+      state: { fromGrupo: { id: grupo!.id_curso, nombre: grupo!.nombre } },
+    });
   };
 
   const handleRenameGrupo = async () => {
@@ -119,7 +122,7 @@ export default function DetalleGrupo() {
 
   if (loading) {
     return (
-      <div className={styles.page}>
+      <div>
         <p className={styles.loadingText}>Cargando...</p>
       </div>
     );
@@ -127,7 +130,7 @@ export default function DetalleGrupo() {
 
   if (!grupo) {
     return (
-      <div className={styles.page}>
+      <div>
         <p className={styles.errorText}>Grupo no encontrado</p>
         <button onClick={() => navigate('/docente')} className={styles.backLink}>
           Volver a mis grupos
@@ -147,17 +150,7 @@ export default function DetalleGrupo() {
   });
 
   return (
-    <div className={styles.page}>
-      <header className={styles.topBar}>
-        <nav className={styles.breadcrumb}>
-          <button onClick={() => navigate('/docente')} className={styles.breadcrumbLink}>
-            Mis Grupos
-          </button>
-          <span className={styles.breadcrumbSep}>/</span>
-          <span className={styles.breadcrumbCurrent}>{grupo.nombre}</span>
-        </nav>
-      </header>
-
+    <>
       <div className={styles.layout}>
         <aside className={styles.sidebar}>
           <nav className={styles.sidebarNav}>
@@ -166,7 +159,7 @@ export default function DetalleGrupo() {
               onClick={() => setActiveTab('students')}
             >
               <Users size={18} />
-              Estudiantes
+              Curso
             </button>
             <button
               className={`${styles.navItem} ${activeTab === 'analysis' ? styles.navItemActive : ''}`}
@@ -186,6 +179,10 @@ export default function DetalleGrupo() {
         </aside>
 
         <main className={styles.main}>
+          <Breadcrumb items={[
+            { label: 'Mis Cursos', to: '/docente' },
+            { label: grupo.nombre },
+          ]} />
           {/* ── Students tab ── */}
           {activeTab === 'students' && (
             <>
@@ -326,6 +323,6 @@ export default function DetalleGrupo() {
           cursoNombre={grupo.nombre}
         />
       )}
-    </div>
+    </>
   );
 }

@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router';
+import { useParams, useLocation } from 'react-router';
 import { useProgresoEstudiante } from '../hooks/useEstudiantes';
 import { NivelController } from '../../../../ecs/controllers/NivelController';
 import styles from '../styles/VistaDetalleEstudiante.module.css';
+import Breadcrumb from '../components/Breadcrumb';
 
 // Hook para obtener escenarios
 const useEscenarios = () => {
@@ -39,7 +40,8 @@ interface Escenario {
 
 export default function VistaDetalleEstudiante() {
     const { idEstudiante } = useParams<{ idEstudiante: string }>();
-    const navigate = useNavigate();
+    const location = useLocation();
+    const fromGrupo = (location.state as { fromGrupo?: { id: number; nombre: string } })?.fromGrupo;
     const [expandedEscenario, setExpandedEscenario] = useState<number | null>(null);
 
     const { progresos, loading: loadingProgresos, error: errorProgresos } =
@@ -47,27 +49,12 @@ export default function VistaDetalleEstudiante() {
 
     const { escenarios, loading: loadingEscenarios, error: errorEscenarios } = useEscenarios();
 
-    const handleBack = () => {
-        navigate('/docente');
-    };
-
     const toggleEscenario = (escenarioId: number) => {
         setExpandedEscenario(expandedEscenario === escenarioId ? null : escenarioId);
     };
 
-    const getProgresosPorEscenario = (escenarioTitulo: string) => {
-        const exactMatch = progresos.filter(p => p.nombre_escenario === escenarioTitulo);
-        if (exactMatch.length > 0) return exactMatch;
-        
-        const caseInsensitiveMatch = progresos.filter(p => 
-            p.nombre_escenario.toLowerCase() === escenarioTitulo.toLowerCase()
-        );
-        if (caseInsensitiveMatch.length > 0) return caseInsensitiveMatch;
-        
-        return progresos.filter(p => 
-            p.nombre_escenario.toLowerCase().includes(escenarioTitulo.toLowerCase()) ||
-            escenarioTitulo.toLowerCase().includes(p.nombre_escenario.toLowerCase())
-        );
+    const getProgresosPorEscenario = (escenarioId: number) => {
+        return progresos.filter(p => p.id_escenario === escenarioId);
     };
 
     const formatearTiempo = (segundos: number) => {
@@ -80,27 +67,25 @@ export default function VistaDetalleEstudiante() {
     const error = errorProgresos || errorEscenarios;
 
     return (
-        <div className={styles.container}>
-            <div className={styles.header}>
-                <button onClick={handleBack} className={styles.backButton}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
-                    </svg>
-                    Volver
-                </button>
-                <h1>Progreso del Estudiante</h1>
-            </div>
+        <>
+            <main className={styles.main}>
+                <Breadcrumb items={[
+                    { label: 'Mis Cursos', to: '/docente' },
+                    ...(fromGrupo
+                      ? [{ label: fromGrupo.nombre, to: `/docente/grupo/${fromGrupo.id}` }]
+                      : []),
+                    { label: 'Progreso del Estudiante' },
+                ]} />
 
-            <div className={styles.content}>
                 {loading && <p className={styles.loadingText}>Cargando información...</p>}
                 {error && <p className={styles.errorText}>{error}</p>}
 
                 {!loading && !error && (
-                    <div>
-                        <h2>Escenarios</h2>
+                    <>
+                        <h2 className={styles.sectionTitle}>Escenarios</h2>
                         <div className={styles.escenariosList}>
                             {escenarios.map((escenario: Escenario) => {
-                                const progresosEscenario = getProgresosPorEscenario(escenario.titulo);
+                                const progresosEscenario = getProgresosPorEscenario(escenario.id);
                                 const completado = progresosEscenario.some(p => p.terminado);
                                 const intentos = progresosEscenario.length;
                                 const isExpanded = expandedEscenario === escenario.id;
@@ -179,9 +164,9 @@ export default function VistaDetalleEstudiante() {
                                 );
                             })}
                         </div>
-                    </div>
+                    </>
                 )}
-            </div>
-        </div>
+            </main>
+        </>
     );
 }

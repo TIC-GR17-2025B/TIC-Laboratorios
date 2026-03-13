@@ -1,17 +1,28 @@
-import { useState, useRef, useEffect } from 'react';
-import { ChevronDown, User, LogOut } from 'lucide-react';
+import { useState, useRef, useEffect, type ReactNode } from 'react';
+import { LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { useAuth } from '../hooks/useAuth';
 import styles from '../styles/UserMenu.module.css';
 
-export default function UserMenu() {
+export interface UserMenuItem {
+    icon: ReactNode;
+    label: string;
+    onClick: () => void;
+}
+
+interface UserMenuProps {
+    items?: UserMenuItem[];
+}
+
+export default function UserMenu({ items = [] }: UserMenuProps) {
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
     const { logout, getUser } = useAuth();
 
     const user = getUser();
-    const userName = user?.primernombre || 'Usuario';
+    const userName = user?.primernombre || user?.nombre_completo || 'Usuario';
+    const userEmail = user?.correo_electronico || user?.email || '';
     const userInitial = userName.charAt(0).toUpperCase();
 
     useEffect(() => {
@@ -30,56 +41,41 @@ export default function UserMenu() {
         navigate('/login');
     };
 
-    const handleProfile = () => {
-        setIsOpen(false);
-        navigate('/perfil');
-    };
-
     return (
-        <div className={styles.userMenuContainer} ref={menuRef}>
+        <div className={styles.container} ref={menuRef}>
             <button
-                className={styles.userButton}
+                className={styles.trigger}
                 onClick={() => setIsOpen(!isOpen)}
                 aria-label="Menú de usuario"
             >
                 <div className={styles.avatar}>
                     {userInitial}
                 </div>
-                <span className={styles.userName}>{userName}</span>
-                <ChevronDown
-                    size={16}
-                    className={`${styles.chevron} ${isOpen ? styles.chevronOpen : ''}`}
-                />
             </button>
 
             {isOpen && (
                 <div className={styles.dropdown}>
-                    <div className={styles.dropdownHeader}>
-                        <div className={styles.avatarLarge}>
-                            {userInitial}
-                        </div>
-                        <div className={styles.userInfo}>
-                            <span className={styles.userNameLarge}>
-                                {user?.primernombre} {user?.primer_apellido}
-                            </span>
-                            <span className={styles.userEmail}>
-                                {user?.correo_electronico}
-                            </span>
-                        </div>
-                    </div>
+                    {userEmail && (
+                        <>
+                            <span className={styles.email}>{userEmail}</span>
+                            <div className={styles.divider} />
+                        </>
+                    )}
 
-                    <div className={styles.dropdownDivider} />
+                    {items.map((item, i) => (
+                        <button
+                            key={i}
+                            className={styles.item}
+                            onClick={() => { setIsOpen(false); item.onClick(); }}
+                        >
+                            {item.icon}
+                            {item.label}
+                        </button>
+                    ))}
 
-                    <button className={styles.dropdownItem} onClick={handleProfile}>
-                        <User size={18} />
-                        Mi Perfil
-                    </button>
-
-                    <div className={styles.dropdownDivider} />
-
-                    <button className={styles.dropdownItem} onClick={handleLogout}>
-                        <LogOut size={18} />
-                        Cerrar Sesión
+                    <button style={{ color: "#fd525b" }} className={`${styles.item} ${styles.itemDanger}`} onClick={handleLogout}>
+                        <LogOut size={16} />
+                        Cerrar sesión
                     </button>
                 </div>
             )}
