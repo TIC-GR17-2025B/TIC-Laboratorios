@@ -40,7 +40,7 @@ model matricula {
   id_curso      Int
   id_estudiante Int
   fecha         DateTime   @default(dbgenerated("CURRENT_DATE")) @db.Date
-  curso         curso      @relation(fields: [id_curso], references: [id_curso], onDelete: NoAction, onUpdate: NoAction, map: "fk_matricula_curso")
+  curso         curso      @relation(fields: [id_curso], references: [id_curso], onDelete: Cascade, onUpdate: NoAction, map: "fk_matricula_curso")
   estudiante    estudiante @relation(fields: [id_estudiante], references: [id_estudiante], onDelete: NoAction, onUpdate: NoAction, map: "fk_matricula_estudiante")
 }
 

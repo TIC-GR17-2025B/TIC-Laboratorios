@@ -1,364 +1,297 @@
-.container {
-  min-height: 100vh;
-  background-color: var(--surface-primary);
-  color: var(--text-primary);
+/* ── Layout ── */
+
+.main {
+  width: 100%;
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 48px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
 }
 
-.header {
+/* ── Profile ── */
+
+.profileRow {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 24px;
-  border-bottom: 1px solid var(--border-primary);
+  gap: 16px;
 }
 
-.header h1 {
-  font-size: 1.5rem;
-  font-weight: 500;
-  color: var(--text-primary);
-  margin: 0;
-}
-
-.backButton {
-  display: flex;
-  align-items: center;
-  padding: 0.5rem 1rem;
-  background: transparent;
-  border: 1px solid var(--border-primary);
-  border-radius: var(--border-radius);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  line-height: 0;
-  color: var(--text-primary);
-}
-
-.backButton:hover {
-  border-color: var(--blue);
-  background: var(--surface-secondary);
-}
-
-.content {
-  padding: 24px;
-}
-
-.profileHeader {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  padding: 2rem;
-  background: var(--surface-secondary);
-  border: 1px solid var(--border-primary);
-  border-radius: 12px;
-  margin-bottom: 2rem;
-}
-
-.avatarLarge {
-  width: 80px;
-  height: 80px;
+.avatar {
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--blue) 0%, var(--blue-lighter) 100%);
+  background: var(--surface-secondary);
+  border: 1px solid var(--border-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
-  font-size: 32px;
-  color: white;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--text-primary);
   flex-shrink: 0;
 }
 
-.profileInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.profileName {
-  margin: 0 0 0.25rem 0;
-  font-size: 1.25rem;
+.pageTitle {
+  font-size: 28px;
   font-weight: 600;
+  margin: 0;
   color: var(--text-primary);
 }
 
-.profileEmail {
-  margin: 0;
-  font-size: 14px;
+.meta {
+  margin: 2px 0 0 0;
+  font-size: 13px;
   color: var(--text-muted);
 }
 
-.profileCode {
-  margin: 0;
-  font-size: 14px;
-  color: var(--text-muted);
-  font-family: monospace;
+.code {
+  margin: 2px 0 0 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-family: "SF Mono", "Fira Code", monospace;
+  letter-spacing: 0.04em;
 }
 
-.statsSection {
-  margin-bottom: 2rem;
-}
+/* ── Stats ── */
 
-.sectionTitle {
-  margin: 0 0 1rem 0;
-  font-size: 1.25rem;
-  font-weight: 500;
-  color: var(--text-primary);
-}
-
-.statsGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-}
-
-.statCard {
+.statsRow {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 1.5rem;
-  background: var(--surface-secondary);
+  gap: 16px;
+  padding: 16px 20px;
   border: 1px solid var(--border-primary);
-  border-radius: 12px;
-  text-align: center;
+  border-radius: var(--border-radius);
+}
+
+.stat {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
 }
 
 .statValue {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: var(--blue);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
 .statLabel {
-  font-size: 14px;
-  color: var(--text-muted);
-  margin-top: 0.25rem;
-}
-
-.progressSection {
-  margin-bottom: 2rem;
-}
-
-.loadingState {
-  padding: 3rem;
-  text-align: center;
+  font-size: 13px;
   color: var(--text-muted);
 }
 
-.emptyState {
+.statDivider {
+  width: 1px;
+  height: 20px;
+  background: var(--border-primary);
+}
+
+/* ── Sections ── */
+
+.sectionHeader {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 4rem 2rem;
-  background: var(--surface-secondary);
-  border: 1px solid var(--border-primary);
-  border-radius: 12px;
-  text-align: center;
-  gap: 1rem;
+  justify-content: space-between;
+  margin-bottom: 12px;
 }
 
-.emptyState svg {
-  color: var(--text-muted);
-  opacity: 0.5;
+.sectionTitle {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0 0 12px 0;
+  color: var(--text-primary);
 }
 
-.emptyState p {
+.sectionHeader .sectionTitle {
   margin: 0;
-  color: var(--text-muted);
 }
 
-.emptyState button {
-  padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, var(--blue) 0%, var(--blue-lighter) 100%);
-  border: none;
-  border-radius: 8px;
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
+/* ── Shared list / card ── */
 
-.emptyState button:hover {
-  transform: translateY(-2px);
-}
-
-.escenariosList {
+.list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 8px;
 }
 
-.escenarioCard {
+.card {
   border: 1px solid var(--border-primary);
   border-radius: var(--border-radius);
   overflow: hidden;
-  transition: all 0.2s ease;
-  background: var(--surface-primary);
 }
 
-.escenarioHeader {
+.cardHeader {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 1rem;
-  gap: 1rem;
-}
-
-.escenarioClickArea {
-  display: flex;
   justify-content: space-between;
-  align-items: center;
-  flex: 1;
+  padding: 12px 16px;
   cursor: pointer;
-  transition: opacity 0.2s ease;
-  min-width: 0;
+  transition: background 0.1s ease;
 }
 
-.escenarioClickArea:hover {
-  opacity: 0.8;
+.cardHeader:hover {
+  background: var(--surface-secondary);
 }
 
-.escenarioInfo {
-  flex: 1;
-  min-width: 0;
-}
-
-.escenarioInfo h3 {
-  margin: 0;
-  color: var(--text-primary);
+.cardTitle {
   font-weight: 500;
-  font-size: 1.1rem;
+  color: var(--text-primary);
 }
 
-.escenarioStatus {
+.cardActions {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 8px;
   flex-shrink: 0;
 }
 
-.badgeCompletado,
-.badgeIntentado,
-.badgeNoIntentado {
-  padding: 0.5rem 1rem;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
+.cardBody {
+  border-top: 1px solid var(--border-primary);
+  padding: 8px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.badgeCompletado {
-  background: rgba(76, 175, 80, 0.2);
+/* ── Badges ── */
+
+.badgeDone,
+.badgePending {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.badgeDone {
+  background: rgba(76, 175, 80, 0.12);
   color: #4caf50;
 }
 
-.badgeIntentado {
-  background: rgba(255, 193, 7, 0.2);
-  color: #ffc107;
+.badgePending {
+  background: var(--surface-tertiary);
+  color: var(--text-muted);
 }
 
-.badgeNoIntentado {
-  background: var(--surface-secondary);
+/* ── Chevron ── */
+
+.chevron {
   color: var(--text-secondary);
-  border: 1px solid var(--border-primary);
+  transition: transform 0.15s ease;
+  flex-shrink: 0;
 }
 
-.expandIcon {
-  color: var(--text-secondary);
-  transition: transform 0.2s ease;
-}
-
-.expandIcon.expanded {
+.chevronOpen {
   transform: rotate(180deg);
 }
 
-.feedbackButtonWrapper {
-  flex-shrink: 0;
-}
+/* ── Intento rows ── */
 
-.escenarioDetails {
-  padding: 1rem;
-  border-top: 1px solid var(--border-primary);
-}
-
-.intentosList {
+.intentoRow {
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.intentoItem {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem;
-  background: var(--surface-primary);
-  border-radius: var(--border-radius);
-  border: 1px solid var(--border-primary);
+  gap: 12px;
+  padding: 8px 0;
 }
 
-.intentoNumero {
-  width: 75px;
+.intentoLabel {
+  font-size: 13px;
   font-weight: 500;
+  color: var(--text-primary);
+  min-width: 80px;
+}
+
+.intentoOk {
+  font-size: 12px;
+  color: #4caf50;
+  margin-left: auto;
+}
+
+.intentoFail {
+  font-size: 12px;
+  color: #ff6b6b;
+  margin-left: auto;
+}
+
+/* ── Buttons ── */
+
+.secondaryButton {
+  padding: 6px 14px;
+  font-size: 13px;
+  background: transparent;
+  border: 1px solid var(--border-primary);
+  border-radius: var(--border-radius);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.secondaryButton:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+.linkButton {
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 13px;
+  transition: color 0.15s ease;
+}
+
+.linkButton:hover {
   color: var(--text-primary);
 }
 
-.intentoInfo {
-  display: flex;
-  gap: 0.75rem;
-  align-items: center;
+/* ── Empty / loading ── */
+
+.empty {
+  padding: 48px 24px;
+  text-align: center;
 }
 
-.intentoTiempo {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
+.muted {
+  font-size: 13px;
   color: var(--text-muted);
-  font-size: 14px;
+  margin: 0;
 }
 
-.intentoFecha {
+.hint {
+  font-size: 13px;
   color: var(--text-secondary);
-  font-size: 0.75rem;
-  text-align: right;
+  margin: 4px 0 0 0;
 }
 
-.intentoExito {
-  color: #4caf50;
-  font-size: 0.75rem;
-  font-weight: 500;
-}
+/* ── Responsive ── */
 
-.intentoFallo {
-  color: #ff6b6b;
-  font-size: 0.75rem;
-  font-weight: 500;
-}
+@media (max-width: 640px) {
+  .main {
+    padding: 24px 16px;
+  }
 
-@media (max-width: 768px) {
-  .escenarioHeader {
+  .statsRow {
     flex-direction: column;
-    align-items: stretch;
+    align-items: flex-start;
+    gap: 8px;
   }
 
-  .escenarioClickArea {
-    width: 100%;
+  .statDivider {
+    display: none;
   }
 
-  .feedbackButtonWrapper {
-    width: 100%;
+  .cardHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
   }
 
-  .intentoItem {
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
-  }
-
-  .escenarioStatus {
+  .cardActions {
     width: 100%;
     justify-content: space-between;
-  }
-
-  .statsGrid {
-    grid-template-columns: 1fr;
   }
 }

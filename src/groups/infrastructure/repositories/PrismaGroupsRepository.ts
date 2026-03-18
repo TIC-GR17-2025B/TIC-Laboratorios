@@ -56,6 +56,13 @@ export class PrismaGroupsRepository implements IGroupsRepository {
     return !!found;
   }
 
+  async hasAnyMatricula(id_estudiante: number): Promise<boolean> {
+    const found = await prisma.matricula.findFirst({
+      where: { id_estudiante },
+    });
+    return !!found;
+  }
+
   async createMatricula(data: MatriculaInput): Promise<Matricula> {
     return (await prisma.matricula.create({ data })) as Matricula;
   }
@@ -93,6 +100,30 @@ export class PrismaGroupsRepository implements IGroupsRepository {
     return await prisma.curso.findUnique({
       where: { id_curso },
     });
+  }
+
+  async findCursosByEstudiante(id_estudiante: number): Promise<(Curso & { nombre_profesor: string })[]> {
+    const matriculas = await prisma.matricula.findMany({
+      where: { id_estudiante },
+      include: {
+        curso: {
+          include: {
+            profesor: {
+              select: { primernombre: true, primer_apellido: true },
+            },
+          },
+        },
+      },
+    });
+
+    return matriculas.map((m) => ({
+      id_curso: m.curso.id_curso,
+      id_profesor: m.curso.id_profesor,
+      nombre: m.curso.nombre,
+      codigo_acceso: m.curso.codigo_acceso,
+      codigo_expira: m.curso.codigo_expira,
+      nombre_profesor: `${m.curso.profesor.primernombre} ${m.curso.profesor.primer_apellido}`,
+    }));
   }
 
   async findCursosByProfesor(id_profesor: number): Promise<Curso[]> {

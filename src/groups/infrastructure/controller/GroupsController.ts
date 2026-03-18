@@ -33,6 +33,24 @@ router.get("/profesor/:id_profesor", async (req: Request, res: Response) => {
   }
 });
 
+// GET /groups/estudiante/:id_estudiante - Obtener grupo(s) de un estudiante
+router.get("/estudiante/:id_estudiante", async (req: Request, res: Response) => {
+  try {
+    const id_estudiante = Number(req.params.id_estudiante);
+
+    if (isNaN(id_estudiante)) {
+      return res.status(400).json({ success: false, error: "ID inválido" });
+    }
+
+    const cursos = await repo.findCursosByEstudiante(id_estudiante);
+    res.json({ success: true, data: cursos });
+  } catch (err) {
+    if (err instanceof Error) {
+      res.status(400).json({ success: false, error: err.message });
+    }
+  }
+});
+
 // GET /groups/:id_curso/estudiantes - Obtener estudiantes de un grupo
 router.get("/:id_curso/estudiantes", async (req: Request, res: Response) => {
   try {

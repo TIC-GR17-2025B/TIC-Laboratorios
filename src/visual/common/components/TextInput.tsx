@@ -5,11 +5,12 @@ interface TextInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'on
   value: string;
   onChange: (value: string) => void;
   label?: string;
+  error?: string;
 }
 
 const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
-  ({ value, onChange, label, className, id, ...rest }, ref) => (
-    <div className={styles.field}>
+  ({ value, onChange, label, error, className, id, ...rest }, ref) => (
+    <div className={`${styles.field} ${error ? styles.hasError : ''}`}>
       {label && (
         <label htmlFor={id} className={styles.label}>
           {label}
@@ -21,9 +22,10 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className={`${styles.input} ${className ?? ''}`}
+        className={`${styles.input} ${error ? styles.inputError : ''} ${className ?? ''}`}
         {...rest}
       />
+      {error && <span className={styles.errorText}>{error}</span>}
     </div>
   ),
 );

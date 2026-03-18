@@ -69,7 +69,7 @@ const Escena3D: React.FC = () => {
                 />
                 <ECSSceneRenderer />
                 <CameraZoomEffect />
-                <OfficeWalls />
+                {/* <OfficeWalls /> */}
                 <CameraControls
                     enabled={!isZooming && !desktopMode}
                     enableZoom={DEFAULT_CONTROLS_CONFIG.enableZoom}
