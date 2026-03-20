@@ -60,7 +60,7 @@ const Sidebar: React.FC = () => {
     };
 
     return (
-        <nav className={styles.dock}>
+        <nav className={styles.dock} data-tour="dock">
             <div className={styles.navSection}>
                 {desktopMode && !isZooming ? (
                     <button
@@ -71,29 +71,31 @@ const Sidebar: React.FC = () => {
                         <span className={styles.tooltip}>Oficina</span>
                     </button>
                 ) : (
-                    <NavigationLink icon={<OfficeIcon size={20} />} label="Oficina" to="/" forceInactive={desktopMode || isZooming} />
+                    <NavigationLink icon={<OfficeIcon size={20} />} label="Oficina" to="/" forceInactive={desktopMode || isZooming} data-tour="dock-oficina" />
                 )}
                 <button
                     className={`${styles.dockItem} ${desktopMode || isZooming ? styles.active : ''}`}
                     onClick={handleDispositivosClick}
+                    data-tour="dock-dispositivos"
                 >
                     <DevicesIcon size={20} />
                     <span className={styles.tooltip}>Dispositivos</span>
                 </button>
-                <NavigationLink icon={<RedesIcon size={20} />} label="Redes" to="/redes" />
-                <NavigationLink icon={<EstrellaPartidaIcon size={20} />} label="Partida" to="/fases-partida" />
+                <NavigationLink icon={<RedesIcon size={20} />} label="Redes" to="/redes" data-tour="dock-redes" />
+                <NavigationLink icon={<EstrellaPartidaIcon size={20} />} label="Partida" to="/fases-partida" data-tour="dock-partida" />
             </div>
 
             <div className={styles.spacer} />
 
             <div className={styles.controlsSection}>
-                <div className={styles.tiempoDisplay}>
+                <div className={styles.tiempoDisplay} data-tour="dock-tiempo">
                     {formatearTiempo(tiempoTranscurrido)}
                 </div>
 
                 <button
                     className={styles.controlBtn}
                     onClick={() => { if (isPaused) resume(); else pause(); }}
+                    data-tour="dock-pausa"
                     aria-label={isPaused ? 'Reanudar animacion' : 'Pausar animacion'}
                 >
                     {isPaused ? (

@@ -33,6 +33,7 @@ const useEscenarios = () => {
 
 interface Escenario {
     id: number;
+    slug: string;
     titulo: string;
     descripcion: string;
     imagenPreview?: string;
@@ -53,8 +54,8 @@ export default function VistaDetalleEstudiante() {
         setExpandedEscenario(expandedEscenario === escenarioId ? null : escenarioId);
     };
 
-    const getProgresosPorEscenario = (escenarioId: number) => {
-        return progresos.filter(p => p.id_escenario === escenarioId);
+    const getProgresosPorEscenario = (slug: string) => {
+        return progresos.filter(p => p.slug_escenario === slug);
     };
 
     const formatearTiempo = (segundos: number) => {
@@ -85,7 +86,7 @@ export default function VistaDetalleEstudiante() {
                         <h2 className={styles.sectionTitle}>Escenarios</h2>
                         <div className={styles.escenariosList}>
                             {escenarios.map((escenario: Escenario) => {
-                                const progresosEscenario = getProgresosPorEscenario(escenario.id);
+                                const progresosEscenario = getProgresosPorEscenario(escenario.slug);
                                 const completado = progresosEscenario.some(p => p.terminado);
                                 const intentos = progresosEscenario.length;
                                 const isExpanded = expandedEscenario === escenario.id;

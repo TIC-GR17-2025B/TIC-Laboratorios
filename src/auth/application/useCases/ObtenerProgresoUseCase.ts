@@ -4,7 +4,7 @@ import type { IProgresoRepository } from "../../domain/repositories/IProgresoRep
 export class ObtenerProgresoUseCase {
   constructor(private repo: IProgresoRepository) {}
 
-  async execute(idEstudiante: number, idEscenario: number): Promise<ProgresoResumen | null> {
-    return await this.repo.getProgresoEstudiante(idEstudiante, idEscenario)
+  async execute(idEstudiante: number, slugEscenario: string): Promise<ProgresoResumen | null> {
+    return await this.repo.getProgresoEstudiante(idEstudiante, slugEscenario)
   }
 }

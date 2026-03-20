@@ -16,6 +16,7 @@ import type { TipoLogGeneral } from "./EventosEnums";
 
 export interface Escenario {
   id: number;
+  slug: string;
   titulo: string;
   descripcion: string;
   imagenPreview?: string;
@@ -29,9 +30,11 @@ export interface Escenario {
 
 export interface EscenarioPreview {
   id: number;
+  slug: string;
   titulo: string;
   descripcion: string;
   imagenPreview?: string;
+  categoria?: string;
 }
 
 export interface Zona {

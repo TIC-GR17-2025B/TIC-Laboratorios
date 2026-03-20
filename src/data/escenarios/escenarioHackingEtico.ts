@@ -14,8 +14,10 @@ import { ColoresRed } from "../colores";
 import { PlantillasCorreoPhishing } from "../plantillas/Plantillas";
 
 export const escenarioHackingEtico: unknown = {
-  id: 4,
-  titulo: "Hacking Ético",
+  id: 5,
+  slug: "hacking-etico",
+  titulo: "Hacking Ético y Análisis de Vulnerabilidades",
+  categoria: "Cap. 5 — Administración de Riesgos",
   imagenPreview: "/redFirewallVPN.webp",
   descripcion:
     "Un escenario en el que se aplica técnicas de ingeniería social para hackear un dipositivo y obtener información.",

@@ -49,7 +49,9 @@ import { ColoresRed } from "../colores";
  */
 export const escenarioBanco: unknown = {
   id: 7,
+  slug: "banco",
   titulo: "Banco Nacional: Operación Firewall — Defensa APT",
+  categoria: "Cap. 6 — Tendencias Actuales",
   imagenPreview: "/redFirewallVPN.webp",
   descripcion:
     "El Banco Nacional ha detectado indicadores de compromiso asociados a un grupo APT. " +

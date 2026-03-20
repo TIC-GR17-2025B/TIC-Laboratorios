@@ -56,12 +56,13 @@ model profesor {
 }
 
 model progreso {
-  id_progreso   Int        @id @default(autoincrement())
-  id_estudiante Int
-  id_escenario  Int
-  terminado     Boolean?   @default(false)
-  tiempo        Float?
-  estudiante    estudiante @relation(fields: [id_estudiante], references: [id_estudiante], onDelete: NoAction, onUpdate: NoAction, map: "fk_progreso_estudiante")
+  id_progreso    Int        @id @default(autoincrement())
+  id_estudiante  Int
+  slug_escenario String      @db.VarChar
+  terminado      Boolean?   @default(false)
+  tiempo         Float?
+  fecha_creacion DateTime   @default(now())
+  estudiante     estudiante @relation(fields: [id_estudiante], references: [id_estudiante], onDelete: NoAction, onUpdate: NoAction, map: "fk_progreso_estudiante")
 }
 
 model usuario_auth {

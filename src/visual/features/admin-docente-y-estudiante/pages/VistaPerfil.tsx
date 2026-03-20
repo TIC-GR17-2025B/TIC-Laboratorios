@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../hooks/useAuth';
 import { useProgresoEstudiante } from '../hooks/useEstudiantes';
 import { FeedbackButton } from '../../feedback/components/FeedbackButton';
@@ -30,7 +31,7 @@ export default function VistaPerfil() {
     const idEstudiante = role === 'estudiante' && user ? (user as { id_estudiante: number }).id_estudiante : null;
 
     const { progresos, loading } = useProgresoEstudiante(user?.id_estudiante || null);
-    const [expandedEscenario, setExpandedEscenario] = useState<number | null>(null);
+    const [expandedEscenarios, setExpandedEscenarios] = useState<Set<string>>(new Set());
     const [feedbackModal, setFeedbackModal] = useState<{
         isOpen: boolean;
         feedback: FeedbackData | null;
@@ -90,110 +91,99 @@ export default function VistaPerfil() {
     const nivelController = new NivelController();
     const escenariosDisponibles = nivelController.getEscenarios() || [];
 
-    const getIdEscenarioByNombre = (nombre: string): number | null => {
-        const e = escenariosDisponibles.find(e =>
-            e.titulo.toLowerCase() === nombre.toLowerCase() ||
-            e.titulo.toLowerCase().includes(nombre.toLowerCase()) ||
-            nombre.toLowerCase().includes(e.titulo.toLowerCase())
-        );
-        return e?.id || null;
-    };
-
-    const getNombreEscenario = (id: number): string => {
-        return escenariosDisponibles.find(e => e.id === id)?.titulo || `Escenario ${id}`;
-    };
-
     const progresosPorEscenario = progresos.reduce((acc, p) => {
-        const id = p.id_escenario || getIdEscenarioByNombre(p.nombre_escenario);
-        if (!id) return acc;
-        const key = id.toString();
-        if (!acc[key]) acc[key] = { nombre: getNombreEscenario(id), id_escenario: id, intentos: [], completado: false };
-        acc[key].intentos.push(p);
-        if (p.terminado) acc[key].completado = true;
+        const slug = p.slug_escenario;
+        if (!slug) return acc;
+        if (!acc[slug]) acc[slug] = { nombre: p.nombre_escenario, slug_escenario: slug, intentos: [], completado: false };
+        acc[slug].intentos.push(p);
+        if (p.terminado) acc[slug].completado = true;
         return acc;
-    }, {} as Record<string, { nombre: string; id_escenario: number; intentos: typeof progresos; completado: boolean }>);
+    }, {} as Record<string, { nombre: string; slug_escenario: string; intentos: typeof progresos; completado: boolean }>);
 
     const escenarios = Object.values(progresosPorEscenario);
-    const completados = escenarios.filter(e => e.completado).length;
 
     const formatTiempo = (t: number | null) => {
         if (t === null) return '--:--';
-        return `${Math.floor(t / 60)}m ${Math.floor(t % 60)}s`;
+        const mins = Math.floor(t / 60).toString().padStart(2, '0');
+        const secs = Math.floor(t % 60).toString().padStart(2, '0');
+        return `${mins}:${secs}`;
+    };
+
+    const formatFecha = (fecha?: string) => {
+        if (!fecha) return '';
+        const date = new Date(fecha);
+        const now = new Date();
+        const isToday = date.toDateString() === now.toDateString();
+        const yesterday = new Date(now);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const isYesterday = date.toDateString() === yesterday.toDateString();
+
+        const time = date.toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit', hour12: true }).toUpperCase();
+
+        if (isToday) return `Hoy, ${time}`;
+        if (isYesterday) return `Ayer, ${time}`;
+        return date.toLocaleDateString('es', { day: 'numeric', month: 'short' }) + `, ${time}`;
     };
 
     return (
         <div className={styles.main}>
             {/* ── Profile ── */}
-            <div className={styles.profileRow}>
-                <div className={styles.avatar}>
-                    {user?.primernombre?.charAt(0).toUpperCase() || 'U'}
-                </div>
-                <div>
-                    <h1 className={styles.pageTitle}>
-                        {user?.primernombre} {user?.primer_apellido}
-                    </h1>
-                    <p className={styles.meta}>{user?.correo_electronico}</p>
-                    {user?.codigo_unico && (
-                        <p className={styles.code}>{user.codigo_unico}</p>
-                    )}
-                </div>
+            <div>
+                <h1 className={styles.pageTitle}>
+                    {user?.primernombre} {user?.primer_apellido}
+                </h1>
+                <p className={styles.meta}>{user?.correo_electronico}</p>
+                {grupo && <p className={styles.meta}>{grupo.nombre}</p>}
+                {!grupo && !grupoLoading && (
+                    <button className={styles.linkButton} onClick={() => setIsModalOpen(true)}>
+                        Unirse a un grupo
+                    </button>
+                )}
             </div>
 
-            {/* ── Stats (inline) ── */}
-            <div className={styles.statsRow}>
-                <div className={styles.stat}>
-                    <span className={styles.statValue}>{escenarios.length}</span>
-                    <span className={styles.statLabel}>jugados</span>
-                </div>
-                <span className={styles.statDivider} />
-                <div className={styles.stat}>
-                    <span className={styles.statValue}>{completados}</span>
-                    <span className={styles.statLabel}>completados</span>
-                </div>
-                <span className={styles.statDivider} />
-                <div className={styles.stat}>
-                    <span className={styles.statValue}>{progresos.length}</span>
-                    <span className={styles.statLabel}>intentos</span>
-                </div>
-            </div>
-
-            {/* ── Progreso ── */}
-            <section>
-                <h2 className={styles.sectionTitle}>Progreso</h2>
+            {/* ── Historial de evaluaciones ── */}
+            <section className={styles.historialSection}>
+                <h2 className={styles.historialTitle}>Historial de evaluaciones</h2>
 
                 {loading ? (
                     <p className={styles.muted}>Cargando...</p>
                 ) : escenarios.length === 0 ? (
                     <div className={styles.empty}>
-                        <p className={styles.muted}>Aún no has jugado ningún escenario</p>
+                        <p className={styles.muted}>Aun no has jugado ningun escenario</p>
                         <button className={styles.linkButton} onClick={() => navigate('/seleccion-niveles')}>
                             Ir a escenarios
                         </button>
                     </div>
                 ) : (
-                    <div className={styles.list}>
+                    <div className={styles.historialList}>
                         {escenarios.map((esc) => {
-                            const open = expandedEscenario === esc.id_escenario;
+                            const open = expandedEscenarios.has(esc.slug_escenario);
                             return (
-                                <div key={esc.id_escenario} className={styles.card}>
+                                <div key={esc.slug_escenario} className={styles.escenarioBlock}>
                                     <div
-                                        className={styles.cardHeader}
-                                        onClick={() => setExpandedEscenario(open ? null : esc.id_escenario)}
+                                        className={styles.escenarioHeader}
+                                        onClick={() => setExpandedEscenarios(prev => {
+                                            const next = new Set(prev);
+                                            open ? next.delete(esc.slug_escenario) : next.add(esc.slug_escenario);
+                                            return next;
+                                        })}
                                     >
-                                        <span className={styles.cardTitle}>{esc.nombre}</span>
-                                        <div className={styles.cardActions}>
-                                            {user?.id_estudiante && esc.id_escenario && (
+                                        <div>
+                                            <h3 className={styles.escenarioTitle}>{esc.nombre}</h3>
+                                            <p className={styles.escenarioMeta}>
+                                                {esc.intentos.length} intento{esc.intentos.length !== 1 ? 's' : ''}
+                                            </p>
+                                        </div>
+                                        <div className={styles.escenarioActions}>
+                                            {user?.id_estudiante && esc.slug_escenario && (
                                                 <FeedbackButton
                                                     idEstudiante={user.id_estudiante}
-                                                    idEscenario={esc.id_escenario}
+                                                    slugEscenario={esc.slug_escenario}
                                                     onFeedbackGenerated={(feedback) => {
                                                         setFeedbackModal({ isOpen: true, feedback, escenarioNombre: esc.nombre });
                                                     }}
                                                 />
                                             )}
-                                            <span className={esc.completado ? styles.badgeDone : styles.badgePending}>
-                                                {esc.completado ? 'Completado' : `${esc.intentos.length} intento${esc.intentos.length > 1 ? 's' : ''}`}
-                                            </span>
                                             <svg
                                                 className={`${styles.chevron} ${open ? styles.chevronOpen : ''}`}
                                                 width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
@@ -203,52 +193,38 @@ export default function VistaPerfil() {
                                         </div>
                                     </div>
 
-                                    {open && (
-                                        <div className={styles.cardBody}>
-                                            {esc.intentos.map((intento, i) => (
-                                                <div key={intento.id_progreso} className={styles.intentoRow}>
-                                                    <span className={styles.intentoLabel}>Intento {i + 1}</span>
-                                                    <span className={styles.muted}>{formatTiempo(intento.tiempo)}</span>
-                                                    <span className={intento.terminado ? styles.intentoOk : styles.intentoFail}>
-                                                        {intento.terminado ? 'Completado' : 'No completado'}
-                                                    </span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
+                                    <AnimatePresence initial={false}>
+                                        {open && esc.intentos.length > 0 && (
+                                            <motion.div
+                                                className={styles.intentosList}
+                                                initial={{ height: 0, opacity: 0 }}
+                                                animate={{ height: 'auto', opacity: 1 }}
+                                                exit={{ height: 0, opacity: 0 }}
+                                                transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }}
+                                            >
+                                                {[...esc.intentos].reverse().map((intento, i) => (
+                                                    <motion.div
+                                                        key={intento.id_progreso}
+                                                        className={styles.intentoRow}
+                                                        initial={{ opacity: 0, x: -6 }}
+                                                        animate={{ opacity: 1, x: 0 }}
+                                                        transition={{ duration: 0.12, delay: i * 0.025 }}
+                                                    >
+                                                        <span className={`${styles.intentoDot} ${intento.terminado ? styles.dotOk : styles.dotFail}`} />
+                                                        <span className={styles.intentoNum}>#{esc.intentos.length - i}</span>
+                                                        <span className={styles.intentoFecha}>{formatFecha(intento.fecha_creacion)}</span>
+                                                        <span className={styles.intentoTiempo}>{formatTiempo(intento.tiempo)}</span>
+                                                        <span className={intento.terminado ? styles.intentoStatusOk : styles.intentoStatusFail}>
+                                                            {intento.terminado ? 'Completado' : 'Fallido'}
+                                                        </span>
+                                                    </motion.div>
+                                                ))}
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
                                 </div>
                             );
                         })}
-                    </div>
-                )}
-            </section>
-
-            {/* ── Grupo ── */}
-            <section>
-                <div className={styles.sectionHeader}>
-                    <h2 className={styles.sectionTitle}>Mi Grupo</h2>
-                    {!grupo && !grupoLoading && (
-                        <button className={styles.secondaryButton} onClick={() => setIsModalOpen(true)}>
-                            Unirse a un grupo
-                        </button>
-                    )}
-                </div>
-
-                {grupoLoading ? (
-                    <p className={styles.muted}>Cargando...</p>
-                ) : !grupo ? (
-                    <div className={styles.empty}>
-                        <p className={styles.muted}>No perteneces a ningún grupo</p>
-                        <p className={styles.hint}>Únete con un código de invitación de tu docente</p>
-                    </div>
-                ) : (
-                    <div className={styles.card}>
-                        <div className={styles.cardHeader}>
-                            <span className={styles.cardTitle}>{grupo.nombre}</span>
-                            {grupo.nombre_profesor && (
-                                <span className={styles.muted}>{grupo.nombre_profesor}</span>
-                            )}
-                        </div>
                     </div>
                 )}
             </section>

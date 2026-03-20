@@ -12,10 +12,14 @@ import { ColoresRed } from "../colores";
 
 export const escenarioRansomware: unknown = {
   id: 6,
-  titulo: "Respuesta a Incidentes: Ransomware",
+  slug: "ransomware",
+  titulo: "Gestión de Riesgos: Respuesta a Incidentes",
+  categoria: "Cap. 5 — Administración de Riesgos",
   imagenPreview: "/redFirewallVPN.webp",
   descripcion:
-    "Un hospital ha detectado actividad sospechosa en su red. Aísla los sistemas críticos, configura firewalls y establece una VPN de emergencia.",
+    "Un hospital ha detectado actividad de ransomware en su red. Como parte del plan de gestión de riesgos, " +
+    "debes ejecutar el proceso de respuesta a incidentes: contener la amenaza, proteger los activos críticos " +
+    "y establecer una VPN de emergencia para el equipo CSIRT.",
   presupuestoInicial: 3000,
   ataques: [],
   eventos: [

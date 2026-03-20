@@ -17,7 +17,7 @@ interface Estudiante {
 interface Progreso {
   id_progreso: number;
   id_estudiante: number;
-  id_escenario: number;
+  slug_escenario: string;
   nombre_escenario: string;
   terminado: boolean;
   tiempo: number | null;

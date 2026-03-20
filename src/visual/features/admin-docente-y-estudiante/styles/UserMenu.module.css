@@ -4,17 +4,19 @@
 }
 
 .trigger {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
+  min-height: 34px;
   padding: 0;
   background: transparent;
   border-radius: 50%;
   cursor: pointer;
+  overflow: hidden;
 }
 
 .avatar {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   background: var(--surface-secondary);
   border: 1px solid var(--border-primary);

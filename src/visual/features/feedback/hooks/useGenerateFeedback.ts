@@ -18,7 +18,7 @@ export const useGenerateFeedback = () => {
 
   const generateFeedback = async (
     idEstudiante: number,
-    idEscenario: number
+    slugEscenario: string
   ): Promise<{ feedback: FeedbackResponse } | null> => {
     setLoading(true);
 
@@ -30,7 +30,7 @@ export const useGenerateFeedback = () => {
         },
         body: JSON.stringify({
           id_estudiante: idEstudiante,
-          id_escenario: idEscenario,
+          slug_escenario: slugEscenario,
         }),
       });
 

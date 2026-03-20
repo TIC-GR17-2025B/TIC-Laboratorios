@@ -11,9 +11,11 @@ export class NivelController {
     this.listaEscenarios.forEach((e) => {
       previewsDeEscenarios.push({
         id: e.id,
+        slug: e.slug,
         titulo: e.titulo,
         descripcion: e.descripcion,
         imagenPreview: e.imagenPreview,
+        categoria: e.categoria,
       });
     });
 

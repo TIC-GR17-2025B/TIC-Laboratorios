@@ -15,13 +15,13 @@ const obtenerTodosProgresos = new ObtenerTodosProgresosUseCase(repo);
 // POST /progreso - Guardar progreso de un estudiante
 router.post('/', async (req: Request , res: Response) => {
   try {
-    const { id_estudiante, id_escenario, terminado, tiempo } = req.body
+    const { id_estudiante, slug_escenario, terminado, tiempo } = req.body
 
     // Validación de campos requeridos
-    if (!id_estudiante || !id_escenario || terminado === undefined || tiempo === undefined) {
+    if (!id_estudiante || !slug_escenario || terminado === undefined || tiempo === undefined) {
       return res.status(400).json({
         success: false,
-        error: 'Faltan campos requeridos: id_estudiante, id_escenario, terminado'
+        error: 'Faltan campos requeridos: id_estudiante, slug_escenario, terminado, tiempo'
       })
     }
 
@@ -34,21 +34,21 @@ router.post('/', async (req: Request , res: Response) => {
   }
 })
 
-// GET /progreso/estudiante/10/escenario/3 - Obtener progreso específico
-router.get('/estudiante/:idEstudiante/escenario/:idEscenario', async (req: Request , res: Response) => {
+// GET /progreso/estudiante/10/escenario/tutorial - Obtener progreso específico
+router.get('/estudiante/:idEstudiante/escenario/:slugEscenario', async (req: Request , res: Response) => {
   try {
     const idEstudiante = parseInt(req.params.idEstudiante)
-    const idEscenario = parseInt(req.params.idEscenario)
+    const slugEscenario = req.params.slugEscenario
 
-    if (isNaN(idEstudiante) || isNaN(idEscenario)) {
+    if (isNaN(idEstudiante) || !slugEscenario) {
       return res.status(400).json({
         success: false,
-        error: 'Los IDs deben ser números válidos'
+        error: 'idEstudiante debe ser un número válido y slugEscenario debe ser un string'
       })
     }
 
-    const progreso = await obtenerProgreso.execute(idEstudiante, idEscenario)
-    
+    const progreso = await obtenerProgreso.execute(idEstudiante, slugEscenario)
+
     if (!progreso) {
       return res.status(404).json({
         success: false,

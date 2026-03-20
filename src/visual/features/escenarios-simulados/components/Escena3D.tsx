@@ -48,6 +48,7 @@ const Escena3D: React.FC = () => {
         <section
             className={styles.vista3D}
             aria-label="Vista 3D de la escena"
+            data-tour="escena-3d"
         >
             {zonasDisponibles.length > 1 && zonaActual !== null && (
                 <>

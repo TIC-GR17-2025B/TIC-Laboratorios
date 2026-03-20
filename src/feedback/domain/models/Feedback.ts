@@ -7,5 +7,5 @@ export interface FeedbackResponse {
 
 export interface FeedbackPayload {
   id_estudiante: number;
-  id_escenario: number;
+  slug_escenario: string;
 }

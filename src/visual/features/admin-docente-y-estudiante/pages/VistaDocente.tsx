@@ -37,7 +37,7 @@ export default function VistaDocente() {
                     <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                         <h2 className={styles.sectionTitle}>Mis Cursos</h2>
                         <span className={styles.count}>
-                            {!loading && grupos.length > 0 && grupos.length}
+                            {!loading && grupos.length}
                         </span>
                     </div>
                     <button onClick={handleCreateGrupo} className={styles.primaryButton}>
@@ -63,13 +63,10 @@ export default function VistaDocente() {
 
                 {!loading && !error && grupos.length === 0 && (
                     <div className={styles.emptyState}>
-                        <p className={styles.emptyText}>No tienes grupos todavía</p>
+                        <p className={styles.emptyText}>No tienes cursos todavía</p>
                         <p className={styles.emptyHint}>
-                            Crea un grupo y comparte el código de acceso con tus estudiantes.
+                            Crea un curso y comparte el código de acceso con tus estudiantes.
                         </p>
-                        <button onClick={handleCreateGrupo} className={styles.primaryButton}>
-                            Crear curso <Plus size={16} />
-                        </button>
                     </div>
                 )}
 

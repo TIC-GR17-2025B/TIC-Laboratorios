@@ -1,10 +1,8 @@
 import { Outlet, useNavigate } from 'react-router';
 import { motion } from 'framer-motion';
 import { User } from 'lucide-react';
-import AppLogo from '../../../common/components/AppLogo';
 import UserMenu from './UserMenu';
-import styles from '../styles/DocenteLayout.module.css';
-import headerStyles from '../styles/DocenteHeader.module.css';
+import styles from '../styles/EstudianteLayout.module.css';
 
 export default function EstudianteLayout() {
   const navigate = useNavigate();
@@ -12,17 +10,22 @@ export default function EstudianteLayout() {
   return (
     <motion.div
       className={styles.page}
-      initial={{ opacity: 0, scale: 0.98 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
     >
-      <header className={headerStyles.topBar}>
-        <AppLogo size={32} />
+      <header className={styles.header}>
+        <button className={styles.logoButton} onClick={() => navigate('/seleccion-niveles')}>
+          <img src="/assets/pictures/computer_logo.webp" alt="Logo" width={32} height={32} />
+        </button>
         <UserMenu items={[
           { icon: <User size={16} />, label: 'Mi Perfil', onClick: () => navigate('/perfil') }
         ]} />
       </header>
-      <Outlet />
+
+      <main className={styles.content}>
+        <Outlet />
+      </main>
     </motion.div>
   );
 }

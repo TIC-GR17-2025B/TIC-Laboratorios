@@ -3,22 +3,22 @@
 // Si agregas/renombras un escenario, actualiza este mapa.
 
 interface EscenarioMeta {
-  id: number;
+  slug: string;
   titulo: string;
 }
 
-const escenarioMap = new Map<number, EscenarioMeta>([
-  [1, { id: 1, titulo: "Demo: Asignar Red, Firewall y VPN" }],
-  [2, { id: 2, titulo: "Verificación de Firma Digital" }],
-  [3, { id: 3, titulo: "Empresa Multinacional: Auditoría de Seguridad" }],
-  [4, { id: 4, titulo: "Hacking Ético" }],
-  [5, { id: 5, titulo: "Segmentación de Red: Empresa Retail" }],
-  [6, { id: 6, titulo: "Respuesta a Incidentes: Ransomware" }],
-  [7, { id: 7, titulo: "Banco Nacional: Operación Firewall — Defensa APT" }],
+const escenarioMap = new Map<string, EscenarioMeta>([
+  ["tutorial", { slug: "tutorial", titulo: "Tutorial: Introducción a la Seguridad" }],
+  ["criptografia", { slug: "criptografia", titulo: "Criptografía: Firma Digital y Comunicación Segura" }],
+  ["autenticacion", { slug: "autenticacion", titulo: "Autenticación y Control de Acceso" }],
+  ["redes", { slug: "redes", titulo: "Seguridad de Redes: Firewall, Segmentación y VPN" }],
+  ["hacking-etico", { slug: "hacking-etico", titulo: "Hacking Ético y Análisis de Vulnerabilidades" }],
+  ["ransomware", { slug: "ransomware", titulo: "Gestión de Riesgos: Respuesta a Incidentes" }],
+  ["banco", { slug: "banco", titulo: "Banco Nacional: Operación Firewall — Defensa APT" }],
 ]);
 
-export function getNombreEscenario(id: number): string {
-  return escenarioMap.get(id)?.titulo ?? `Escenario #${id}`;
+export function getNombreEscenario(slug: string): string {
+  return escenarioMap.get(slug)?.titulo ?? `Escenario: ${slug}`;
 }
 
 export { escenarioMap };
