@@ -8,13 +8,73 @@ interface EscenarioMeta {
 }
 
 const escenarioMap = new Map<string, EscenarioMeta>([
-  ["tutorial", { slug: "tutorial", titulo: "Tutorial: Introducción a la Seguridad" }],
-  ["criptografia", { slug: "criptografia", titulo: "Criptografía: Firma Digital y Comunicación Segura" }],
-  ["autenticacion", { slug: "autenticacion", titulo: "Autenticación y Control de Acceso" }],
-  ["redes", { slug: "redes", titulo: "Seguridad de Redes: Firewall, Segmentación y VPN" }],
-  ["hacking-etico", { slug: "hacking-etico", titulo: "Hacking Ético y Análisis de Vulnerabilidades" }],
-  ["ransomware", { slug: "ransomware", titulo: "Gestión de Riesgos: Respuesta a Incidentes" }],
-  ["banco", { slug: "banco", titulo: "Banco Nacional: Operación Firewall — Defensa APT" }],
+  [
+    "tutorial",
+    { slug: "tutorial", titulo: "Tutorial: Introducción a la Seguridad" },
+  ],
+  ["amenazas", { slug: "amenazas", titulo: "Amenazas y Ataques Comunes" }],
+  [
+    "criptografia",
+    {
+      slug: "criptografia",
+      titulo: "Criptografía: Firma Digital y Comunicación Segura",
+    },
+  ],
+  [
+    "certificados",
+    { slug: "certificados", titulo: "Certificados Digitales y PKI" },
+  ],
+  [
+    "autenticacion",
+    { slug: "autenticacion", titulo: "Autenticación y Control de Acceso" },
+  ],
+  [
+    "control-acceso",
+    {
+      slug: "control-acceso",
+      titulo: "Control de Acceso y Protocolos Seguros",
+    },
+  ],
+  [
+    "redes",
+    {
+      slug: "redes",
+      titulo: "Seguridad de Redes: Firewall, Segmentación y VPN",
+    },
+  ],
+  [
+    "segmentacion-pci",
+    {
+      slug: "segmentacion-pci",
+      titulo: "Segmentación PCI-DSS: Empresa Retail",
+    },
+  ],
+  [
+    "hacking-etico",
+    {
+      slug: "hacking-etico",
+      titulo: "Hacking Ético y Análisis de Vulnerabilidades",
+    },
+  ],
+  [
+    "ransomware",
+    {
+      slug: "ransomware",
+      titulo: "Gestión de Riesgos: Respuesta a Incidentes",
+    },
+  ],
+  [
+    "auditoria",
+    { slug: "auditoria", titulo: "Auditoría de Seguridad Empresarial" },
+  ],
+  [
+    "banco",
+    {
+      slug: "banco",
+      titulo: "Banco Nacional: Operación Firewall — Defensa APT",
+    },
+  ],
+  ["iot", { slug: "iot", titulo: "Seguridad IoT e Infraestructura Crítica" }],
 ]);
 
 export function getNombreEscenario(slug: string): string {

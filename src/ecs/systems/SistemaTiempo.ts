@@ -46,8 +46,10 @@ export class SistemaTiempo extends Sistema {
     if (!tiempo) return;
     tiempo.pausado = false;
 
-    // Reiniciar el intervalo cuando se reanuda
-    this.iniciarIntervalo(tiempo);
+    // Solo crear intervalo si no existe uno ya corriendo
+    if (!this.intervalo) {
+      this.iniciarIntervalo(tiempo);
+    }
 
     this.ecsManager.emit(EventosPublicos.TIEMPO_REANUDADO, {
       transcurrido: tiempo.transcurrido,

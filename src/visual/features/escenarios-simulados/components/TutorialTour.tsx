@@ -7,9 +7,6 @@ import Joyride, {
 } from "react-joyride";
 import { useECSSceneContext } from "../context/ECSSceneContext";
 
-
-const STORAGE_KEY = "tutorial_tour_completado";
-
 const steps: Step[] = [
   {
     target: "body",
@@ -162,9 +159,6 @@ export default function TutorialTour() {
     const slugEscenario = localStorage.getItem("slug_escenario_actual");
     if (slugEscenario !== "tutorial") return;
 
-    const completado = localStorage.getItem(STORAGE_KEY);
-    if (completado === "true") return;
-
     // Small delay to let the 3D scene load
     const timer = setTimeout(() => {
       wasPausedBeforeTour.current = isPaused;
@@ -183,7 +177,6 @@ export default function TutorialTour() {
 
       if (finished || action === ACTIONS.CLOSE) {
         setRun(false);
-        localStorage.setItem(STORAGE_KEY, "true");
         // Solo reanudar si el juego no estaba pausado antes del tour
         if (!wasPausedBeforeTour.current) {
           resume();

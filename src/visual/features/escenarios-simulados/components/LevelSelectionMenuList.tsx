@@ -34,12 +34,14 @@ const NODES_PADDING_TOP = 28; // .nodes padding-top
 const BANNER_HEIGHT = 34; // banner approximate height (padding 4+4 + font ~26)
 
 
-// Category display order
+// Category display order (reversed: Cap. 6 at top, Cap. 1 at bottom)
 const CATEGORY_ORDER = [
-    'Fundamentos de Red',
-    'Seguridad Corporativa',
-    'Seguridad Ofensiva',
-    'Respuesta a Incidentes',
+    'Cap. 6 — Tendencias Actuales',
+    'Cap. 5 — Administración de Riesgos',
+    'Cap. 4 — Seguridad de Redes',
+    'Cap. 3 — Autenticación',
+    'Cap. 2 — Criptografía',
+    'Cap. 1 — Introducción',
 ];
 
 /** Build an SVG path string with smooth quadratic curves through all node centers */
