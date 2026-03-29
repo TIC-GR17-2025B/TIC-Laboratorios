@@ -76,16 +76,19 @@ export class SistemaEvento extends Sistema {
           val: {
             nombreConfig: string;
             activado: boolean;
-          };
+          }[];
         };
         const dispositivo = containerDispositivo.get(WorkstationComponent);
-        const config = dispositivo?.configuraciones.find(
-          (conf) => conf.nombreConfig == c?.val.nombreConfig
-        );
-        if (config?.activado == c?.val.activado) return true;
-        return false;
+        
+        for (const configItem of c.val) {
+          const config = dispositivo?.configuraciones.find(
+            (conf) => conf.nombreConfig == configItem.nombreConfig
+          );
+          if (config?.activado != configItem.activado) return false;
+        }
+        return true;
       }
-      case ObjetosManejables.CONFIG_FIREWALL: {
+      case ObjetosManejables.CONFIG_FIREWALL: {  // NO está funcionando, tal vez sea porque los valores iniciales de las reglas en el router no se están creando
         const c = condicionMitigacion as {
           val: {
             accion: AccionFirewall;
@@ -99,8 +102,8 @@ export class SistemaEvento extends Sistema {
         for (const [, reglas] of router.bloqueosFirewall.entries()) {
           for (const regla of reglas) {
             if (
-              regla.accion === c.val.accion &&
-              regla.direccion === c.val.direccion &&
+              regla.accion == c.val.accion &&
+              regla.direccion == c.val.direccion &&
               regla.protocolo == c.val.protocolo
             )
               return true;

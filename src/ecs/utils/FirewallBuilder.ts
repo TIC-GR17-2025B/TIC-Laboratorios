@@ -7,7 +7,7 @@ import type { Entidad } from '../core/Componente';
 export class FirewallBuilder {
   private bloqueosFirewall: Map<Entidad, Reglas[]>;
 
-  constructor() {
+  constructor() { 
     this.bloqueosFirewall = new Map();
   }
 

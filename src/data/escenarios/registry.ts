@@ -75,6 +75,13 @@ const escenarioMap = new Map<string, EscenarioMeta>([
     },
   ],
   ["iot", { slug: "iot", titulo: "Seguridad IoT e Infraestructura Crítica" }],
+  [
+    "prueba",
+    {
+      slug: "Prueba",
+      titulo: "Prueba",
+    },
+  ],
 ]);
 
 export function getNombreEscenario(slug: string): string {
