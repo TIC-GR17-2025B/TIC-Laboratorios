@@ -15,7 +15,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest",
-    "coverage": "vitest run --coverage",
+    "coverage": "vitest run --coverage --coverage.reportOnFailure",
     "render-build": "npm install --include=dev && npx prisma generate && npx prisma migrate deploy && npm run build:server",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",

@@ -9,13 +9,13 @@ import {
   AccionesRealizables,
   ObjetosManejables,
 } from "../../types/AccionesEnums";
-import { EventosPublicos } from "../../types/EventosEnums";
+// import { EventosPublicos } from "../../types/EventosEnums";
 
 export class SistemaPresupuesto extends Sistema {
   public componentesRequeridos = new Set([PresupuestoComponent]);
 
   public toggleConfiguracionWorkstation(
-    entidadPresupuesto: Entidad,
+    // entidadPresupuesto: Entidad,
     entidadWorkstation: Entidad,
     config: string
   ) {
@@ -34,23 +34,23 @@ export class SistemaPresupuesto extends Sistema {
 
       // Al hacer click, primero se verifica si la config está desactivada
       if (!listaConfigsWorkstation[i].activado) {
-        if (
-          this.hayPresupuestoSuficiente(
-            entidadPresupuesto,
-            listaConfigsWorkstation[i].costoActivacion
-          )
-        ) {
+        // if (
+        //   this.hayPresupuestoSuficiente(
+        //     entidadPresupuesto,
+        //     listaConfigsWorkstation[i].costoActivacion
+        //   )
+        // ) {
           // Aquí recién se hace el toggle
           listaConfigsWorkstation[i].activado =
             !listaConfigsWorkstation[i].activado;
 
-          const presupuestoComp = this.ecsManager
-            .getComponentes(entidadPresupuesto)
-            ?.get(PresupuestoComponent);
-          if (presupuestoComp) {
-            presupuestoComp.monto -= listaConfigsWorkstation[i].costoActivacion;
-          }
-        } else break;
+          // const presupuestoComp = this.ecsManager
+          //   .getComponentes(entidadPresupuesto)
+          //   ?.get(PresupuestoComponent);
+          // if (presupuestoComp) {
+          //   presupuestoComp.monto -= listaConfigsWorkstation[i].costoActivacion;
+          // }
+        // } else break;
 
         const dispositivoComp =
           componentesEntidadWorkstation?.get(DispositivoComponent);
@@ -67,23 +67,23 @@ export class SistemaPresupuesto extends Sistema {
         break;
         // Caso contrario significa que está activada
       } else {
-        if (
-          this.hayPresupuestoSuficiente(
-            entidadPresupuesto,
-            listaConfigsWorkstation[i].costoActivacion * 0.5
-          )
-        ) {
+        // if (
+        //   this.hayPresupuestoSuficiente(
+        //     entidadPresupuesto,
+        //     listaConfigsWorkstation[i].costoActivacion * 0.5
+        //   )
+        // ) {
           listaConfigsWorkstation[i].activado =
             !listaConfigsWorkstation[i].activado;
 
-          const presupuestoComp = this.ecsManager
-            .getComponentes(entidadPresupuesto)
-            ?.get(PresupuestoComponent);
-          if (presupuestoComp) {
-            presupuestoComp.monto -=
-              listaConfigsWorkstation[i].costoActivacion * 0.5;
-          }
-        } else break;
+          // const presupuestoComp = this.ecsManager
+          //   .getComponentes(entidadPresupuesto)
+          //   ?.get(PresupuestoComponent);
+          // if (presupuestoComp) {
+          //   presupuestoComp.monto -=
+          //     listaConfigsWorkstation[i].costoActivacion * 0.5;
+          // }
+        // } else break;
 
         const dispositivoComp =
           componentesEntidadWorkstation?.get(DispositivoComponent);
@@ -100,18 +100,18 @@ export class SistemaPresupuesto extends Sistema {
         break;
       }
     }
-    const presupuestoComp = this.ecsManager
-      .getComponentes(entidadPresupuesto)
-      ?.get(PresupuestoComponent);
-
-    this.ecsManager.emit(EventosPublicos.PRESUPUESTO_ACTUALIZADO, {
-      presupuesto: presupuestoComp?.monto ?? 0,
-    });
-    this.notificarPresupuestoAgotado(entidadPresupuesto);
+    // const presupuestoComp = this.ecsManager
+    //   .getComponentes(entidadPresupuesto)
+    //   ?.get(PresupuestoComponent);
+    //
+    // this.ecsManager.emit(EventosPublicos.PRESUPUESTO_ACTUALIZADO, {
+    //   presupuesto: presupuestoComp?.monto ?? 0,
+    // });
+    // this.notificarPresupuestoAgotado(entidadPresupuesto);
   }
 
   public comprarApp(
-    entidadPresupuesto: Entidad,
+    // entidadPresupuesto: Entidad,
     entidadDispoitivo: Entidad,
     nombreApp: string
   ) {
@@ -131,7 +131,7 @@ export class SistemaPresupuesto extends Sistema {
 
     for (const app of appsEscenario ?? []) {
       if (app.nombre == nombreApp) {
-        if (this.hayPresupuestoSuficiente(entidadPresupuesto, app.precio)) {
+        // if (this.hayPresupuestoSuficiente(entidadPresupuesto, app.precio)) {
           // Inicializar el array de apps si no existe
           if (!dispositivo) break;
           if (!dispositivo.apps) {
@@ -139,17 +139,17 @@ export class SistemaPresupuesto extends Sistema {
           }
 
           dispositivo.apps.push(app);
-          const presupuestoComp = this.ecsManager
-            .getComponentes(entidadPresupuesto)
-            ?.get(PresupuestoComponent);
-          if (presupuestoComp) {
-            presupuestoComp.monto -= app.precio;
-            this.ecsManager.emit(EventosPublicos.PRESUPUESTO_ACTUALIZADO, {
-              presupuesto: presupuestoComp.monto,
-            });
-            this.notificarPresupuestoAgotado(entidadPresupuesto);
-          }
-        } else break;
+          // const presupuestoComp = this.ecsManager
+          //   .getComponentes(entidadPresupuesto)
+          //   ?.get(PresupuestoComponent);
+          // if (presupuestoComp) {
+          //   presupuestoComp.monto -= app.precio;
+          //   this.ecsManager.emit(EventosPublicos.PRESUPUESTO_ACTUALIZADO, {
+          //     presupuesto: presupuestoComp.monto,
+          //   });
+          //   this.notificarPresupuestoAgotado(entidadPresupuesto);
+          // }
+        // } else break;
 
         break;
       }
@@ -157,7 +157,7 @@ export class SistemaPresupuesto extends Sistema {
   }
 
   public desinstalarApp(
-    entidadPresupuesto: Entidad,
+    // entidadPresupuesto: Entidad,
     entidadDispoitivo: Entidad,
     nombreApp: string
   ) {
@@ -171,43 +171,43 @@ export class SistemaPresupuesto extends Sistema {
       const app = appsDispositivo[i];
       if (app?.nombre == nombreApp) {
         // Guardar precio antes de eliminar
-        const precioApp = app.precio;
+        // const precioApp = app.precio;
         dispositivo?.apps?.splice(i, 1);
 
-        const presupuestoComp = this.ecsManager
-          .getComponentes(entidadPresupuesto)
-          ?.get(PresupuestoComponent);
-        if (presupuestoComp) {
-          presupuestoComp.monto += precioApp * 0.5;
-          this.ecsManager.emit(EventosPublicos.PRESUPUESTO_ACTUALIZADO, {
-            presupuesto: presupuestoComp.monto,
-          });
-        }
+        // const presupuestoComp = this.ecsManager
+        //   .getComponentes(entidadPresupuesto)
+        //   ?.get(PresupuestoComponent);
+        // if (presupuestoComp) {
+        //   presupuestoComp.monto += precioApp * 0.5;
+        //   this.ecsManager.emit(EventosPublicos.PRESUPUESTO_ACTUALIZADO, {
+        //     presupuesto: presupuestoComp.monto,
+        //   });
+        // }
         break;
       }
     }
   }
 
-  private hayPresupuestoSuficiente(
-    entidadPresupuesto: Entidad,
-    montoAProcesar: number
-  ): boolean {
-    const presupuestoComp = this.ecsManager
-      .getComponentes(entidadPresupuesto)
-      ?.get(PresupuestoComponent);
-    const presupuestoActual = presupuestoComp?.monto ?? 0;
+  // private hayPresupuestoSuficiente(
+  //   entidadPresupuesto: Entidad,
+  //   montoAProcesar: number
+  // ): boolean {
+  //   const presupuestoComp = this.ecsManager
+  //     .getComponentes(entidadPresupuesto)
+  //     ?.get(PresupuestoComponent);
+  //   const presupuestoActual = presupuestoComp?.monto ?? 0;
+  //
+  //   if (montoAProcesar > presupuestoActual) return false;
+  //
+  //   return true;
+  // }
 
-    if (montoAProcesar > presupuestoActual) return false;
-
-    return true;
-  }
-
-  private notificarPresupuestoAgotado(entidadPresupuesto: Entidad): void {
-    const presupuestoComp = this.ecsManager
-      .getComponentes(entidadPresupuesto)
-      ?.get(PresupuestoComponent);
-
-    if (presupuestoComp?.monto === 0)
-      this.ecsManager.emit(EventosPublicos.PRESUPUESTO_AGOTADO);
-  }
+  // private notificarPresupuestoAgotado(entidadPresupuesto: Entidad): void {
+  //   const presupuestoComp = this.ecsManager
+  //     .getComponentes(entidadPresupuesto)
+  //     ?.get(PresupuestoComponent);
+  //
+  //   if (presupuestoComp?.monto === 0)
+  //     this.ecsManager.emit(EventosPublicos.PRESUPUESTO_AGOTADO);
+  // }
 }

@@ -5,7 +5,7 @@ import {
   EscenarioComponent,
   EventoComponent,
   FaseComponent,
-  PresupuestoComponent,
+  // PresupuestoComponent,
   TiempoComponent,
   WorkstationComponent,
 } from "../components";
@@ -42,7 +42,7 @@ export class EscenarioController {
   private sistemaTiempo?: SistemaTiempo;
   private sistemaPresupuesto?: SistemaPresupuesto;
   private sistemaJerarquiaEscenario?: SistemaJerarquiaEscenario;
-  private entidadPresupuesto?: Entidad;
+  // private entidadPresupuesto?: Entidad;
   private sistemaEvento?: SistemaEvento;
   private sistemaFase?: SistemaFase;
   private sistemaActivo?: SistemaActivo;
@@ -182,18 +182,18 @@ export class EscenarioController {
       this.agregarLogGeneralEscenario(log);
     });
 
-    this.ecsManager.on(EventosPublicos.PRESUPUESTO_AGOTADO, () => {
-      this.sistemaTiempo?.pausar(this.entidadTiempo!);
-      const log = {
-        tipo: TipoLogGeneral.ADVERTENCIA,
-        mensaje: "Se agotó el presupuesto, fin de la partida.",
-        pausarTiempo: true,
-      };
-      this.agregarLogGeneralEscenario(log);
-      this.ecsManager.emit(EventosPublicos.FASE_NO_COMPLETADA,
-                           MensajesGenerales.MSJ_FASE_NO_COMPLETADA);
-      this.sistemaTiempo?.destruir();
-    });
+    // this.ecsManager.on(EventosPublicos.PRESUPUESTO_AGOTADO, () => {
+    //   this.sistemaTiempo?.pausar(this.entidadTiempo!);
+    //   const log = {
+    //     tipo: TipoLogGeneral.ADVERTENCIA,
+    //     mensaje: "Se agotó el presupuesto, fin de la partida.",
+    //     pausarTiempo: true,
+    //   };
+    //   this.agregarLogGeneralEscenario(log);
+    //   this.ecsManager.emit(EventosPublicos.FASE_NO_COMPLETADA,
+    //                        MensajesGenerales.MSJ_FASE_NO_COMPLETADA);
+    //   this.sistemaTiempo?.destruir();
+    // });
 
     this.ecsManager.on(EventosPublicos.FASE_COMPLETADA, (data: unknown) => {
       const descripcion = data as string;
@@ -352,28 +352,28 @@ export class EscenarioController {
     return this.ecsManager.on(eventName, callback);
   }
 
-  public efectuarPresupuesto(montoInicial: number): void {
-    if (!this.entidadPresupuesto) {
-      this.entidadPresupuesto = this.ecsManager.agregarEntidad();
-      this.ecsManager.agregarComponente(
-        this.entidadPresupuesto,
-        new PresupuestoComponent(montoInicial)
-      );
+  public efectuarPresupuesto(/*montoInicial: number*/): void {
+    // if (!this.entidadPresupuesto) {
+    //   this.entidadPresupuesto = this.ecsManager.agregarEntidad();
+    //   this.ecsManager.agregarComponente(
+    //     this.entidadPresupuesto,
+    //     new PresupuestoComponent(montoInicial)
+    //   );
       this.sistemaPresupuesto = new SistemaPresupuesto();
       this.ecsManager.agregarSistema(this.sistemaPresupuesto);
-    }
+    // }
   }
 
   public toggleConfiguracionWorkstation(
     entidadWorkstation: Entidad,
     nombreConfig: string
   ): void {
-    if (!this.sistemaPresupuesto || !this.entidadPresupuesto) {
+    if (!this.sistemaPresupuesto /*|| !this.entidadPresupuesto*/) {
       console.error("Sistema de presupuesto no inicializado");
       return;
     }
     this.sistemaPresupuesto.toggleConfiguracionWorkstation(
-      this.entidadPresupuesto,
+      // this.entidadPresupuesto,
       entidadWorkstation,
       nombreConfig
     );
@@ -409,14 +409,15 @@ export class EscenarioController {
   }
 
   public getPresupuestoActual(): number {
-    if (!this.ecsManager || !this.entidadPresupuesto) {
+  //   if (!this.ecsManager || !this.entidadPresupuesto) {
+  //     return 0;
+  //   }
+  //   const cont = this.ecsManager.getComponentes(this.entidadPresupuesto);
+  //   if (!cont) return 0;
+  //
+  //   const presupuesto = cont.get(PresupuestoComponent);
+  //   return presupuesto?.monto ?? 0;
       return 0;
-    }
-    const cont = this.ecsManager.getComponentes(this.entidadPresupuesto);
-    if (!cont) return 0;
-
-    const presupuesto = cont.get(PresupuestoComponent);
-    return presupuesto?.monto ?? 0;
   }
 
   public getEventos(): EventoComponent[] {
@@ -503,24 +504,24 @@ export class EscenarioController {
   }
 
   public comprarApp(entidadDispositivo: Entidad, nombreApp: string): void {
-    if (!this.sistemaPresupuesto || !this.entidadPresupuesto) {
+    if (!this.sistemaPresupuesto /*|| !this.entidadPresupuesto*/) {
       console.error("Sistema de presupuesto no inicializado");
       return;
     }
     this.sistemaPresupuesto?.comprarApp(
-      this.entidadPresupuesto,
+      // this.entidadPresupuesto,
       entidadDispositivo,
       nombreApp
     );
   }
 
   public desinstalarApp(entidadDispositivo: Entidad, nombreApp: string): void {
-    if (!this.sistemaPresupuesto || !this.entidadPresupuesto) {
+    if (!this.sistemaPresupuesto /*|| !this.entidadPresupuesto*/) {
       console.error("Sistema de presupuesto no inicializado");
       return;
     }
     this.sistemaPresupuesto?.desinstalarApp(
-      this.entidadPresupuesto,
+      // this.entidadPresupuesto,
       entidadDispositivo,
       nombreApp
     );

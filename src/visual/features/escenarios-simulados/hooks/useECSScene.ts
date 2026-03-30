@@ -142,7 +142,7 @@ export function useECSScene() {
     // TERCERO: Cargar eventos DIRECTAMENTE en el sistema de tiempo
     escenarioController.cargarEventosEnSistema();
     // CUARTO: Configurar presupuesto
-    escenarioController.efectuarPresupuesto(escenario.presupuestoInicial);
+    escenarioController.efectuarPresupuesto(/*escenario.presupuestoInicial*/);
     // QUINTO: Obtener estado inicial
     setEntities(escenarioController.builder.getEntidades());
     setIsPaused(escenarioController.estaTiempoPausado());
