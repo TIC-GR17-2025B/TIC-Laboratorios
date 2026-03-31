@@ -54,3 +54,11 @@ export enum NivelConcienciaSeguridad {
   MEDIA = "Media",
   BAJA = "Baja",
 }
+
+export enum ComandoTerminal {
+  H = "h",
+  LS = "ls",
+  CAT = "cat",
+  SSH = "ssh",
+  CLS = "cls",
+}

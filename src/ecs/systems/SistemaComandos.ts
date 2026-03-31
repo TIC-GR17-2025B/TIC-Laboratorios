@@ -1,4 +1,5 @@
 import { AccionesRealizables, ObjetosManejables } from "../../types/AccionesEnums";
+import { ComandoTerminal } from "../../types/DeviceEnums";
 import type { RespuestaComando } from "../../types/EscenarioTypes";
 import { ActivoComponent, DispositivoComponent } from "../components";
 import { Sistema, type ClaseComponente, type Entidad } from "../core";
@@ -24,16 +25,16 @@ export class SistemaComandos extends Sistema {
             case 0: return respuesta;
             case 1: {
                 switch(comando[0]) {
-                    case "h": respuesta = this.ejecutarH(); break;
-                    case "ls": respuesta = this.ejecutarLS(); break;
+                    case ComandoTerminal.H: respuesta = this.ejecutarH(); break;
+                    case ComandoTerminal.LS: respuesta = this.ejecutarLS(); break;
                     default: respuesta = {texto: this.MENSAJE_AYUDA, entidadActual: this.entidadDispActual}; break;
                 }
                 break;
             }
             case 2: {
                 switch(comando[0]) {
-                    case "cat": respuesta = this.ejecutarCAT(comando[1]); break;
-                    case "ssh": {
+                    case ComandoTerminal.CAT: respuesta = this.ejecutarCAT(comando[1]); break;
+                    case ComandoTerminal.SSH: {
                         const spaceIdx = comando[1].indexOf(' ');
                         if (spaceIdx > 0) {
                             respuesta = this.ejecutarSSH(
@@ -113,7 +114,7 @@ export class SistemaComandos extends Sistema {
             }
         }
 
-        if (!entidadDispAConectar) return { 
+        if (entidadDispAConectar == null) return { 
             texto: `Error: No se ha encontrado el dispositivo '${nombreEquipo}'.`,
             entidadActual: this.entidadDispActual
         };

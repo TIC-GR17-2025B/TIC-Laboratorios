@@ -11,11 +11,7 @@ export class SistemaTiempo extends Sistema {
   public componentesRequeridos = new Set([TiempoComponent]);
   public intervalo: ReturnType<typeof setInterval> | null = null;
   public intervaloTiempoTotal: ReturnType<typeof setInterval> | null = null;
-  public eventosEscenario: EventoComponent[] = [];
-
-  public on(eventName: string, callback: (data: unknown) => void): () => void {
-    return this.ecsManager.on(eventName, callback);
-  }
+  public eventosEscenario: EventoComponent[] = []; 
 
   public pausar(entidad: Entidad) {
     const container = this.ecsManager.getComponentes(entidad);

@@ -64,12 +64,12 @@ export class ECSManager {
   // Para Sistemas
 
   public agregarSistema(sistema: Sistema): void {
-    if (sistema.componentesRequeridos.size == 0) {
+    /*if (sistema.componentesRequeridos.size == 0) {
       console.warn(
         `Sistema ${sistema} no agregado: lista de componentes vacía.`
       );
       return;
-    }
+    }*/
 
     sistema.ecsManager = this;
 
