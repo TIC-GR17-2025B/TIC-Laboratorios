@@ -1,5 +1,4 @@
 // Export de systems
-export * from "./SistemaMovimiento";
 export * from "./SistemaEvento";
 export * from "./SistemaTiempo";
 export * from "./SistemaPresupuesto";

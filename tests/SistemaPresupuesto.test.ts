@@ -1,9 +1,10 @@
 import { describe, expect, test } from "vitest";
 import { ECSManager } from "../src/ecs/core";
 import { SistemaPresupuesto } from "../src/ecs/systems";
-import { DispositivoComponent, PresupuestoComponent, WorkstationComponent } from "../src/ecs/components";
+import { DispositivoComponent, EscenarioComponent, PresupuestoComponent, WorkstationComponent } from "../src/ecs/components";
 import { ConfiguracionWorkstation } from "../src/data/configuraciones/configWorkstation";
 import { EstadoAtaqueDispositivo, TipoDispositivo } from "../src/types/DeviceEnums";
+import { APPS } from "../src/data/apps";
 
 describe(/*'PresupuestoComponent y */'SistemaPresupuesto', () => {
     test('activación y desactivación de configuraciones'/* con presupuesto suficiente'*/, () => {
@@ -79,4 +80,33 @@ describe(/*'PresupuestoComponent y */'SistemaPresupuesto', () => {
     //     console.log("No se desactivó la configuración:", configuracion)
     //     console.log("Presupuesto actual:", presupuesto.monto)
     // });
+
+    test("instalación y desinstalación de apps de workstations", () => {
+        const em = new ECSManager();
+
+        const sistemaPresupuesto = new SistemaPresupuesto();
+        em.agregarSistema(sistemaPresupuesto);
+
+        const appsDisponibles = APPS;
+
+        const entidadEscenario = em.agregarEntidad();
+        em.agregarComponente(entidadEscenario, new EscenarioComponent(1,"escenario","escenario",10,[],[],[],"",[],appsDisponibles));
+
+        const entidadWorkstation = em.agregarEntidad();
+        em.agregarComponente(entidadWorkstation, new DispositivoComponent("dispo", "so", "hw", TipoDispositivo.WORKSTATION, EstadoAtaqueDispositivo.NORMAL, "", "", "",[],"",[]));        
+
+        // Instalación de app
+        sistemaPresupuesto.comprarApp(entidadWorkstation, appsDisponibles[0].nombre);
+
+        const appsEnDispositivo = em.getEntidades().get(entidadWorkstation)!.get(DispositivoComponent)!.apps;
+
+        expect(appsEnDispositivo![0].nombre).toBe(appsDisponibles[0].nombre);
+
+        // Desinstalación de app
+        sistemaPresupuesto.desinstalarApp(entidadWorkstation, appsDisponibles[0].nombre);
+
+        const appsEnDispLuego = em.getEntidades().get(entidadWorkstation)!.get(DispositivoComponent)!.apps;
+
+        expect(appsEnDispLuego!.length).toBe(0);
+    });
 });

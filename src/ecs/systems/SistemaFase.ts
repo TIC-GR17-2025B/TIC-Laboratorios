@@ -48,7 +48,6 @@ export class SistemaFase extends Sistema {
       faseActual!.faseActual = false;
       if (eventoActual.fase + 1 <= escenario!.fases.length) escenario!.fases.at(eventoActual.fase)!.faseActual = true;
       this.indexEventoActualACumplir++;
-      console.log(`SistemaFase: Evento solo Completacion Fase: ${nombreEventoActual}`,this.ecsManager.getEntidades());
       return;
     } 
 
@@ -61,7 +60,6 @@ export class SistemaFase extends Sistema {
       if (objetivo.descripcion == nombreEventoActual) {
         objetivo.completado = true;
         this.indexEventoActualACumplir++;
-        console.log(`SistemaFase: Evento: ${nombreEventoActual}`,this.ecsManager.getEntidades());
         break;
       }
     }

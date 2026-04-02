@@ -265,7 +265,7 @@ export class SistemaEvento extends Sistema {
         const consultaEnvioCorreo = this.ecsManager.consultarAccion(
           AccionesRealizables.ENVIO,
           ObjetosManejables.CORREO,
-          0,
+          undefined,
           info
         );
 
