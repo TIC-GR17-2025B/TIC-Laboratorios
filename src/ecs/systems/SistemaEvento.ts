@@ -243,7 +243,7 @@ export class SistemaEvento extends Sistema {
         const info = evento.infoAdicional as {
           accion: string;
           objeto: string;
-          tiempo: number;
+          tiempo?: number;
           val?: unknown;
         };
 

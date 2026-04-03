@@ -52,26 +52,29 @@ export class EscenarioController {
 
   private static instance: EscenarioController | null = null;
 
-  private constructor(escenario: Escenario) {
+  private constructor(escenario: Escenario, em?: ECSManager) {
     this.escenario = escenario;
-    this.ecsManager = new ECSManager();
+    if (em) this.ecsManager = em;
+    else this.ecsManager = new ECSManager();
 
     this.sistemaJerarquiaEscenario = new SistemaJerarquiaEscenario();
     this.ecsManager.agregarSistema(this.sistemaJerarquiaEscenario);
   }
 
   // SINGLETON
-  public static getInstance(escenario?: Escenario): EscenarioController {
+  public static getInstance(escenario?: Escenario, em?: ECSManager): EscenarioController {
     if (!EscenarioController.instance) {
       if (!escenario) {
         throw new Error(
           "Debe proporcionar un escenario para inicializar el controlador la primera vez."
         );
       }
-      EscenarioController.instance = new EscenarioController(escenario);
+      if (!em) EscenarioController.instance = new EscenarioController(escenario);
+      else EscenarioController.instance = new EscenarioController(escenario, em);
     } else if (escenario && escenario.id !== EscenarioController.instance.escenario.id) {
       // Si es un escenario diferente, resetear completamente la instancia
-      EscenarioController.instance = new EscenarioController(escenario);
+      if (!em) EscenarioController.instance = new EscenarioController(escenario);
+      else EscenarioController.instance = new EscenarioController(escenario, em);
     } else if (escenario) {
       // Si es el mismo escenario, solo actualizar la referencia
       EscenarioController.instance.escenario = escenario;
