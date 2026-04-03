@@ -1,19 +1,23 @@
 import { describe, beforeEach, test, expect } from "vitest";
 import { ECSManager, Entidad } from "../src/ecs/core";
-import { SistemaActivo, SistemaEvento, SistemaFase, SistemaPresupuesto, SistemaRed } from "../src/ecs/systems";
-import { EstadoAtaqueDispositivo, TipoActivo, TipoAtaque, TipoDispositivo, TipoEvento } from "../src/types/DeviceEnums";
+import { SistemaActivo, SistemaEvento, SistemaFase, SistemaPresupuesto, SistemaRed, SistemaRelaciones } from "../src/ecs/systems";
+import { EstadoAtaqueDispositivo, TipoActivo, TipoAtaque, TipoDispositivo, TipoEvento, TipoProteccionVPN } from "../src/types/DeviceEnums";
 import { AccionesRealizables, ObjetosManejables } from "../src/types/AccionesEnums";
-import { ActivoComponent, AtaqueComponent, DispositivoComponent, EscenarioComponent, EventoComponent, FaseComponent, RedComponent, RouterComponent, WorkstationComponent } from "../src/ecs/components";
+import { ActivoComponent, AtaqueComponent, ClienteVPNComponent, DispositivoComponent, EscenarioComponent, EventoComponent, FaseComponent, RedComponent, RouterComponent, VPNGatewayComponent, WorkstationComponent, ZonaComponent } from "../src/ecs/components";
 import { PlantillasCorreoPhishing } from "../src/data/plantillas/Plantillas";
 import { FirewallBuilder } from "../src/ecs/utils/FirewallBuilder";
 import { RedController } from "../src/ecs/controllers/RedController";
 import { EscenarioController } from "../src/ecs/controllers/EscenarioController";
+import { TipoProtocolo } from "../src/types/TrafficEnums";
+import { PerfilClienteVPN, PerfilVPNGateway } from "../src/types/EscenarioTypes";
+import { ColoresRed } from "../src/data/colores";
 
 describe("SistemaEvento y SistemaFase", () => {
 
     let em: ECSManager;
     let sistemaEvento: SistemaEvento;
     let entidadDispJacob: Entidad;
+    let entidadVpnGateway: Entidad;
     let entidadDispLisa: Entidad;
     let sistemaPresupuesto: SistemaPresupuesto;
     let sistemaFase: SistemaFase;
@@ -70,12 +74,21 @@ describe("SistemaEvento y SistemaFase", () => {
         sistemaActivo = new SistemaActivo();
         em.agregarSistema(sistemaActivo);
 
+        const sistemaRelacionesZonasRedes = new SistemaRelaciones(ZonaComponent, RedComponent, "redes");
+        em.agregarSistema(sistemaRelacionesZonasRedes);
+        
         redController = RedController.getInstance(em);
         redController.iniciarController();
 
         entidadEscenario = em.agregarEntidad();
         em.agregarComponente(entidadEscenario, new EscenarioComponent(1, "escenario", "escenario", 10));  
 
+        const entidadZonaJacob = em.agregarEntidad();
+        em.agregarComponente(entidadZonaJacob,new ZonaComponent(1,"Zona Jacob","Dominio Jacob"));
+        
+        const entidadZonaLisa = em.agregarEntidad();
+        em.agregarComponente(entidadZonaLisa,new ZonaComponent(2,"Zona Lisa","Dominio Lisa"));
+        
         entidadDispJacob = em.agregarEntidad();
         em.agregarComponente(
             entidadDispJacob,
@@ -90,10 +103,8 @@ describe("SistemaEvento y SistemaFase", () => {
                 "j123"
             )
         );
-        em.agregarComponente(
-            entidadDispJacob,
-            new WorkstationComponent()
-        );
+        em.agregarComponente(entidadDispJacob, new WorkstationComponent());
+
         activoComponenteJacob = new ActivoComponent();
         activoComponenteJacob.activos.push(
             {
@@ -138,9 +149,11 @@ describe("SistemaEvento y SistemaFase", () => {
         activoComponenteLisa = new ActivoComponent();
         em.agregarComponente(entidadDispLisa, activoComponenteLisa);
 
-        const router = em.agregarEntidad();
+        em.agregarComponente(entidadDispLisa, new ClienteVPNComponent()); // Perfil de Cliente VPN en la PC de Lisa
+
+        const entidadRouterJacob = em.agregarEntidad();
         em.agregarComponente(
-          router,
+          entidadRouterJacob,
           new DispositivoComponent(
             "router1",
             "Cisco",
@@ -153,14 +166,65 @@ describe("SistemaEvento y SistemaFase", () => {
           )
         );
 
-        const red1 = em.agregarEntidad();
-        em.agregarComponente(red1, new RedComponent("LAN1", "#00DD00"));
+        const entidadRouterLisa = em.agregarEntidad();
+        em.agregarComponente(
+          entidadRouterLisa,
+          new DispositivoComponent(
+            "router2",
+            "Cisco",
+            "hw",
+            TipoDispositivo.ROUTER,
+            EstadoAtaqueDispositivo.NORMAL,
+            "router1",
+            "admin",
+            "1234"
+          )
+        );
 
-        const firewallConfig = new FirewallBuilder().build();
-        em.agregarComponente(router, new RouterComponent(firewallConfig));
+        entidadVpnGateway = em.agregarEntidad();  // Dispositivo VPN Gateway en el lado de Jacob
+        em.agregarComponente(
+            entidadVpnGateway,
+            new DispositivoComponent(
+                "vpnGateway",
+                "Cisco",
+                "hw",
+                TipoDispositivo.VPN,
+                EstadoAtaqueDispositivo.NORMAL,
+                "vpn1",
+                "",
+                ""
+            )
+        );
+        em.agregarComponente(entidadVpnGateway, new VPNGatewayComponent());
 
-        sistemaRed.asignarRed(entidadDispJacob, red1);
-        sistemaRed.asignarRed(entidadDispLisa, red1);
+        const entidadRedJacob = em.agregarEntidad();
+        em.agregarComponente(entidadRedJacob, new RedComponent("LAN1", ColoresRed.VERDE));
+
+        const firewallConfigJacob = new FirewallBuilder().build();
+        em.agregarComponente(entidadRouterJacob, new RouterComponent(firewallConfigJacob)); 
+
+        const entidadRedLisa = em.agregarEntidad();
+        em.agregarComponente(entidadRedLisa, new RedComponent("LAN2", ColoresRed.AZUL));
+
+        const firewallConfigLisa = new FirewallBuilder().build();
+        em.agregarComponente(entidadRouterLisa, new RouterComponent(firewallConfigLisa));
+
+        const entidadRedInternet = em.agregarEntidad();
+        em.agregarComponente(entidadRedInternet, new RedComponent("Internet", ColoresRed.ROJO));
+
+        sistemaRelacionesZonasRedes.agregar(entidadZonaJacob, entidadRedJacob);
+        sistemaRelacionesZonasRedes.agregar(entidadZonaJacob, entidadRedInternet);
+        sistemaRelacionesZonasRedes.agregar(entidadZonaLisa, entidadRedLisa);
+        sistemaRelacionesZonasRedes.agregar(entidadZonaLisa, entidadRedInternet);
+
+        sistemaRed.asignarRed(entidadDispJacob, entidadRedJacob);
+        sistemaRed.asignarRed(entidadVpnGateway, entidadRedJacob);
+        sistemaRed.asignarRed(entidadVpnGateway, entidadRedInternet);
+        sistemaRed.asignarRed(entidadRouterJacob, entidadRedJacob);
+        sistemaRed.asignarRed(entidadRouterJacob, entidadRedInternet);
+        sistemaRed.asignarRed(entidadRouterLisa, entidadRedInternet);
+        sistemaRed.asignarRed(entidadRouterLisa, entidadRedLisa);
+        sistemaRed.asignarRed(entidadDispLisa, entidadRedLisa);
     });
 
     test("Verificación condición de mitigación Exitosa: Configuraciones de Workstation", () => {
@@ -302,19 +366,19 @@ describe("SistemaEvento y SistemaFase", () => {
         ];
 
         fases = [
-            new FaseComponent(
-              1,
-              "Fase 1: Prueba",
-                "Prueba",
-              true,
-              false,
-              [ 
+            {
+              id: 1,
+              nombre: "Fase 1: Prueba",
+              descripcion: "Prueba",
+              faseActual: true,
+              completada: false,
+              objetivos: [ 
                 {
                   descripcion: "verificación de firma",
                   completado: false,
                 },
               ],
-            )
+            }
         ];
 
         em.getSistema(SistemaFase)!.eventosEscenario = eventos;
@@ -345,7 +409,137 @@ describe("SistemaEvento y SistemaFase", () => {
         expect(registro?.nombreDocumento).toBe("Activo2");
 
         // Idealmente se debe comprobar únicamente con el primer expect definido que está comentado en este test, 
-        // para lo cual se debe tener también el escenarioController en uso, pero por cuestiones del comportamiento
-        // del controller en el test, estos últimos expects es con lo que se puede comprobar el resultado 
+        // para lo cual se debe tener también el escenarioController en uso, pero por cuestiones de un comportamiento
+        // inesperado del controller en el test, estos últimos expects es con lo que se puede comprobar el resultado 
+    });
+
+    test("Verificación de ejecución de evento Exitoso: Tráfico de red", () => {
+        eventos = [
+            new EventoComponent(
+                "trafico de red",
+                TipoEvento.TRAFICO_RED,
+                1,
+                "envío de trafico de red",
+                1,
+                {
+                    // Para el evento de TRAFICO_RED, el protocolo puede ser cualquiera y sólo con los atributos
+                    // que se ven aquí, ya que sólo es una simulación de que el tráfico ha circulado entre los dos 
+                    // dispositivos definidos aquí, sin necesidad de enviar un payload real. Para los casos en los 
+                    // que se necesite enviar un payload real, se puede consultar el switch de TipoProtocolo definido 
+                    // en la función enviarTrafico de SistemaRed. (Tomar en cuenta que para cuando se quiere enviar con 
+                    // un payload real, se deben utilizar las funciones respectivas para ello [FTP y VPN_GATEWAY son, de 
+                    // momento, los únicos protocolos que están disponibles para eso]. Esto se puede hacer directo con el evento 
+                    // de TRAFICO_RED si se desea, pero para esos 2 protocolos ya se tienen sus eventos propios: ENVIO_ACTIVO 
+                    // para FTP y CONEXION_VPN para VPN_GATEWAY)
+                    dispositivoOrigen: "Computadora Jacob",
+                    dispositivoDestino: "Computadora Lisa",
+                    protocolo: TipoProtocolo.TELNET, 
+                    // Este parámetro debe ser true cuando se quiere que el paso del tráfico sea un objetivo definido en el escenario.
+                    // Por lo que, cuando sea true, también se debe definir su respectivo objetivo en las fases.
+                    esObjetivo: true, 
+                    debeSerBloqueado: false
+                }
+            ),
+        ];
+
+        fases = [
+            {
+              id: 1,
+              nombre: "Fase 1: Prueba",
+              descripcion: "Prueba",
+              faseActual: true,
+              completada: false,
+              objetivos: [ 
+                {
+                  descripcion: "trafico de red",
+                  completado: false,
+                },
+              ],
+            }
+        ];
+
+        sistemaFase.eventosEscenario = eventos;
+
+        em.getEntidades().get(entidadEscenario)!.get(EscenarioComponent)!.fases = fases; 
+
+        sistemaEvento.ejecutarEvento(eventos[0]);
+ 
+        const fasesDespuesDeEjecutarEvento = em.getEntidades().get(entidadEscenario)!.get(EscenarioComponent)!.fases;
+        
+        expect(fasesDespuesDeEjecutarEvento[0].objetivos[0].completado).toBe(true);
+    });
+
+    test("Verificación de ejecución de evento Exitoso: Conexión VPN", () => {
+        eventos = [
+            new EventoComponent(
+                "conexion vpn",
+                TipoEvento.CONEXION_VPN,
+                1,
+                "establecer conexion vpn",
+                1,
+                {
+                    gateway: {
+                        lanLocal: "LAN1",
+                        hostLan: "Computadora Jacob",
+                        proteccion: TipoProteccionVPN.EA,
+                        dominioRemoto: "Dominio Lisa",
+                        hostRemoto: "Computadora Lisa"
+                    },
+                    cliente: {
+                        proteccion: TipoProteccionVPN.EA,
+                        dominioRemoto: "Dominio Jacob",
+                        hostRemoto: "Computadora Jacob"
+                    }
+                }
+            ),
+        ];
+
+        fases = [
+            new FaseComponent(
+              1,
+              "Fase 1: Prueba",
+              "Prueba",
+              true,
+              false,
+              [ 
+                {
+                  descripcion: "conexion vpn",
+                  completado: false,
+                },
+              ],
+            )
+        ];
+
+        sistemaFase.eventosEscenario = eventos;
+
+        em.getEntidades().get(entidadEscenario)!.get(EscenarioComponent)!.fases = fases; 
+
+        // Simulamos la adición de perfiles de Cliente VPN (PC de Lisa) y VPN Gateway (dispositivo VPN en el lado de Jacob)
+        redController.agregarPerfilClienteVPN(
+            entidadDispLisa,
+            {
+                proteccion: TipoProteccionVPN.EA,
+                dominioRemoto: "Dominio Jacob",
+                hostRemoto: "Computadora Jacob"
+            } as PerfilClienteVPN
+        );
+
+
+        redController.agregarPerfilVPNGateway(
+            entidadVpnGateway, 
+            {
+                lanLocal: "LAN1",
+                hostLan: "Computadora Jacob",
+                proteccion: TipoProteccionVPN.EA,
+                dominioRemoto: "Dominio Lisa",
+                hostRemoto: "Computadora Lisa" 
+            } as PerfilVPNGateway
+        );
+
+        sistemaEvento.ejecutarEvento(eventos[0]);
+
+        const fasesDespuesDeEjecutarEvento = em.getEntidades().get(entidadEscenario)!.get(EscenarioComponent)!.fases;
+        
+        expect(fasesDespuesDeEjecutarEvento[0].objetivos[0].completado).toBe(true);
     });
 });

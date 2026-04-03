@@ -1,4 +1,4 @@
-import { Componente } from "../core";
+/*import { Componente } from "../core";
 
 export class PresupuestoComponent extends Componente {
     constructor(
@@ -6,4 +6,4 @@ export class PresupuestoComponent extends Componente {
     ){
         super();
     }
-}
+}*/

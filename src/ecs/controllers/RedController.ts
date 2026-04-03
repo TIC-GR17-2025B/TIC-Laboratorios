@@ -153,7 +153,6 @@ export class RedController {
         d.evento.infoAdicional.esObjetivo,
         d.evento.infoAdicional.debeSerBloqueado
       );
-      //console.log("Tráfico enviado desde el controlador de red", resultado);
     });
 
     this.ecsManager.on(
