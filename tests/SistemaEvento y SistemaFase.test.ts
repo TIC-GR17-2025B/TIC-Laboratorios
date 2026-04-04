@@ -1,9 +1,9 @@
 import { describe, beforeEach, test, expect } from "vitest";
 import { ECSManager, Entidad } from "../src/ecs/core";
-import { SistemaActivo, SistemaEvento, SistemaFase, SistemaPresupuesto, SistemaRed, SistemaRelaciones } from "../src/ecs/systems";
+import { SistemaActivo, SistemaEvento, SistemaFase, SistemaPresupuesto, SistemaRed, SistemaRelaciones, SistemaTiempo } from "../src/ecs/systems";
 import { EstadoAtaqueDispositivo, TipoActivo, TipoAtaque, TipoDispositivo, TipoEvento, TipoProteccionVPN } from "../src/types/DeviceEnums";
 import { AccionesRealizables, ObjetosManejables } from "../src/types/AccionesEnums";
-import { ActivoComponent, AtaqueComponent, ClienteVPNComponent, DispositivoComponent, EscenarioComponent, EventoComponent, FaseComponent, RedComponent, RouterComponent, VPNGatewayComponent, WorkstationComponent, ZonaComponent } from "../src/ecs/components";
+import { ActivoComponent, AtaqueComponent, ClienteVPNComponent, DispositivoComponent, EscenarioComponent, EventoComponent, FaseComponent, RedComponent, RouterComponent, TiempoComponent, VPNGatewayComponent, WorkstationComponent, ZonaComponent } from "../src/ecs/components";
 import { PlantillasCorreoPhishing } from "../src/data/plantillas/Plantillas";
 import { FirewallBuilder } from "../src/ecs/utils/FirewallBuilder";
 import { RedController } from "../src/ecs/controllers/RedController";
@@ -11,6 +11,7 @@ import { EscenarioController } from "../src/ecs/controllers/EscenarioController"
 import { TipoProtocolo } from "../src/types/TrafficEnums";
 import { PerfilClienteVPN, PerfilVPNGateway } from "../src/types/EscenarioTypes";
 import { ColoresRed } from "../src/data/colores";
+import { APPS } from "../src/data/apps";
 
 describe("SistemaEvento y SistemaFase", () => {
 
@@ -381,13 +382,13 @@ describe("SistemaEvento y SistemaFase", () => {
             }
         ];
 
-        em.getSistema(SistemaFase)!.eventosEscenario = eventos;
+        sistemaFase.eventosEscenario = eventos;
 
         // em.getEntidades().get(entidadEscenario)!.get(EscenarioComponent)!.eventos = eventos;
         em.getEntidades().get(entidadEscenario)!.get(EscenarioComponent)!.fases = fases;
 
-        // escenarioController = EscenarioController.getInstance(em.getEntidades().get(entidadEscenario)!.get(EscenarioComponent), em);
-        // escenarioController.iniciarEscenario();
+        escenarioController = EscenarioController.getInstance(em.getEntidades().get(entidadEscenario)!.get(EscenarioComponent), em);
+        escenarioController.iniciarEscuchaDeEventos();
 
         // Simulamos el registro de un veredicto luego de comprobar la firma y la clave pública contra el documento
         em.getSistema(SistemaActivo)!.registrarVeredictoFirma({
@@ -399,18 +400,11 @@ describe("SistemaEvento y SistemaFase", () => {
 
         em.getSistema(SistemaEvento)!.ejecutarEvento(eventos[0]);
 
-        // const fasesDespuesDeEjecutarEvento = em.getEntidades().get(entidadEscenario)!.get(EscenarioComponent)!.fases;
+        const fasesDespuesDeEjecutarEvento = em.getEntidades().get(entidadEscenario)!.get(EscenarioComponent)!.fases;
         
-        // expect(fasesDespuesDeEjecutarEvento[0].objetivos[0].completado).toBe(true);
+        expect(fasesDespuesDeEjecutarEvento[0].objetivos[0].completado).toBe(true);
 
-        const registro = em.getSistema(SistemaActivo)?.registroVeredictosFirmas[0];
-
-        expect(registro).toBeDefined();
-        expect(registro?.nombreDocumento).toBe("Activo2");
-
-        // Idealmente se debe comprobar únicamente con el primer expect definido que está comentado en este test, 
-        // para lo cual se debe tener también el escenarioController en uso, pero por cuestiones de un comportamiento
-        // inesperado del controller en el test, estos últimos expects es con lo que se puede comprobar el resultado 
+        EscenarioController.reset();
     });
 
     test("Verificación de ejecución de evento Exitoso: Tráfico de red", () => {
@@ -524,7 +518,6 @@ describe("SistemaEvento y SistemaFase", () => {
             } as PerfilClienteVPN
         );
 
-
         redController.agregarPerfilVPNGateway(
             entidadVpnGateway, 
             {
@@ -541,5 +534,183 @@ describe("SistemaEvento y SistemaFase", () => {
         const fasesDespuesDeEjecutarEvento = em.getEntidades().get(entidadEscenario)!.get(EscenarioComponent)!.fases;
         
         expect(fasesDespuesDeEjecutarEvento[0].objetivos[0].completado).toBe(true);
+    });
+
+    test("Verificación de ejecución de evento Exitoso: Verificación de Acción de jugador", () => {
+        eventos = [
+            new EventoComponent(
+                "verificación de acción",
+                TipoEvento.VERIFICACION_ACCION_JUGADOR,
+                1,
+                "verificación de acción de jugador",
+                1,
+                {
+                    // El evento de VERIFICACION_ACCION_JUGADOR debe definir los parámetros a evaluar igual 
+                    // al formato de un registro del registro de acciones del ECSManager; es decir: accion,
+                    // objeto, tiempo y val. El tiempo es opcional al igual que val, pero en val se pueden definir 
+                    // más parámetros según la acción y/u objeto que se quiera evaluar. Por ejemplo, en este caso se 
+                    // quiere verificar que el jugador a ejecutado una aplicación en la simulación, y en val se le pasa
+                    // el nombre de la aplicación. Por lo cual, en val se definirá según sea el caso, dando más flexibilidad
+                    // para el uso de este evento. De igual forma, dependiendo de la acción y/u objeto a verificar, puede ser
+                    // necesario colocar un endpoint específico en el frontend para registrar la acción. 
+                    accion: AccionesRealizables.EJECUTAR,
+                    objeto: ObjetosManejables.APLICACION,
+                    val: {
+                        nombreAplicacion: APPS[0].nombre
+                    }
+                }
+            ),
+        ];
+
+        fases = [
+            {
+              id: 1,
+              nombre: "Fase 1: Prueba",
+              descripcion: "Prueba",
+              faseActual: true,
+              completada: false,
+              objetivos: [ 
+                {
+                  descripcion: "verificación de acción",
+                  completado: false,
+                },
+              ],
+            }
+        ];
+
+        sistemaFase.eventosEscenario = eventos;
+
+        em.getEntidades().get(entidadEscenario)!.get(EscenarioComponent)!.fases = fases; 
+
+        // Simulamos la acción de que el jugador ha ejecutado la aplicación
+        em.registrarAccion(
+            AccionesRealizables.EJECUTAR,
+            ObjetosManejables.APLICACION,
+            undefined,
+            { 
+                nombreAplicacion: APPS[0].nombre
+            }
+        );
+
+        sistemaEvento.ejecutarEvento(eventos[0]);
+
+        const fasesDespuesDeEjecutarEvento = em.getEntidades().get(entidadEscenario)!.get(EscenarioComponent)!.fases;
+        
+        expect(fasesDespuesDeEjecutarEvento[0].objetivos[0].completado).toBe(true);
+    });
+
+    test("Verificación de ejecución de evento Exitoso: Fase Completada", () => {
+        eventos = [
+            new EventoComponent(
+                "verificación de acción",
+                TipoEvento.VERIFICACION_ACCION_JUGADOR,
+                1,
+                "verificación de acción de jugador",
+                1,
+                {
+                    accion: AccionesRealizables.EJECUTAR,
+                    objeto: ObjetosManejables.APLICACION,
+                    val: {
+                        nombreAplicacion: APPS[0].nombre
+                    }
+                }
+            ),
+            new EventoComponent(
+                "completación de fase",
+                TipoEvento.COMPLETACION_FASE, // Para este evento no se necesita de info adicional, ya que solo es una señal de que, al ejecutarse este evento, se completa la fase actual
+                12,
+                "completación de una fase",
+                1
+            ),
+        ];
+
+        fases = [
+            new FaseComponent(
+              1,
+              "Fase 1: Prueba",
+              "Prueba",
+              true,
+              false,
+              [ // Para el evento de tipo COMPLETACION_FASE, no se necesita definirlo en los objetivos de las fases 
+                {
+                    descripcion: "verificación de acción",
+                    completado: false
+                },
+              ],
+            ),
+            new FaseComponent(
+              2,
+              "Fase 2: Prueba 2",
+              "Prueba 2",
+              false,
+              false,
+              [],
+            )
+        ];
+
+        sistemaFase.eventosEscenario = eventos;
+
+        // em.getEntidades().get(entidadEscenario)!.get(EscenarioComponent)!.eventos = eventos;  
+        em.getEntidades().get(entidadEscenario)!.get(EscenarioComponent)!.fases = fases;  
+
+        escenarioController = EscenarioController.getInstance(em.getComponentes(entidadEscenario)?.get(EscenarioComponent), em); 
+        escenarioController.iniciarEscuchaDeEventos();
+
+        const fasesAntesDeEjecutarEvento = em.getEntidades().get(entidadEscenario)!.get(EscenarioComponent)!.fases;
+
+        // Se verifica que las fases estén con sus valores por defecto
+        expect(fasesAntesDeEjecutarEvento[0].completada).toBe(false);
+        expect(fasesAntesDeEjecutarEvento[0].faseActual).toBe(true);
+        expect(fasesAntesDeEjecutarEvento[1].faseActual).toBe(false);
+
+        // Simulamos la acción para el primer evento
+        em.registrarAccion(
+            AccionesRealizables.EJECUTAR,
+            ObjetosManejables.APLICACION,
+            undefined,
+            { 
+                nombreAplicacion: APPS[0].nombre
+            }
+        );
+
+        // Ejecución del primer evento
+        sistemaEvento.ejecutarEvento(eventos[0]);
+        // Ejecución del segundo evento (Completación de fase)
+        sistemaEvento.ejecutarEvento(eventos[1]);
+
+        const fasesDespuesDeEjecutarEvento = em.getEntidades().get(entidadEscenario)!.get(EscenarioComponent)!.fases;
+
+        // Ahora se espera que la primera fase esté completada y que ya no sea la fase actual; por lo que la segunda fase es la que debe ser la actual
+        expect(fasesDespuesDeEjecutarEvento[0].completada).toBe(true);
+        expect(fasesDespuesDeEjecutarEvento[0].faseActual).toBe(false);
+        expect(fasesDespuesDeEjecutarEvento[1].faseActual).toBe(true);
+
+        EscenarioController.reset();
+    });
+
+    test("Verificación de ejecución de evento Exitoso: Escenario Completado", () => {
+        eventos = [ 
+            new EventoComponent(
+                "completación de escenario",
+                TipoEvento.COMPLETACION_ESCENARIO, // Para este evento no se necesita de info adicional, ya que solo es una señal de que, al ejecutarse, se completa el escenario
+                1,
+                "completación del escenario",
+                1
+            ),
+        ];
+
+        sistemaFase.eventosEscenario = eventos;
+
+        escenarioController = EscenarioController.getInstance(em.getComponentes(entidadEscenario)?.get(EscenarioComponent), em); 
+        escenarioController.iniciarEscuchaDeEventos();
+        escenarioController.ejecutarTiempo();
+        escenarioController.iniciarTiempo();
+
+        expect(em.getSistema(SistemaTiempo)?.intervalo).not.toBeNull();
+
+        sistemaEvento.ejecutarEvento(eventos[0]);
+
+        // Al completar el escenario, se espera que el tiempo se haya destruido por completo
+        expect(em.getSistema(SistemaTiempo)?.intervalo).toBeNull();
     });
 });

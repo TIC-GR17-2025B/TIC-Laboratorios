@@ -117,6 +117,12 @@ export class EscenarioController {
     }
 
     // NO emitir el evento aquí - lo haremos después de que los sistemas se suscriban
+    this.iniciarEscuchaDeEventos();
+
+    this.escenarioIniciado = true;
+  }
+
+  public iniciarEscuchaDeEventos(): void {
     this.ecsManager.on(
       EventosPublicos.TIEMPO_NOTIFICACION_ATAQUE,
       (data: unknown) => {
@@ -206,7 +212,6 @@ export class EscenarioController {
         pausarTiempo: true,
       };
       this.ecsManager.emit(EventosInternos.OBJETIVO_COMPLETADO);
-      console.log("EscenarioController: on de FASE_COMPLETADA:",this.ecsManager.getEntidades());
       this.agregarLogGeneralEscenario(log);
     });
 
@@ -231,8 +236,6 @@ export class EscenarioController {
         this.progresoController?.guardarProgresoEstudiante(true, this.getTiempoTotalTranscurrido()); 
         this.sistemaTiempo?.destruir();
     });
-
-    this.escenarioIniciado = true;
   }
 
   private agregarLogGeneralEscenario(log: LogGeneral): void {

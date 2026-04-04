@@ -20,5 +20,17 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
+    test: {
+      coverage: {
+        provider: 'v8',
+        exclude: [
+          '**/EscenarioController.ts',
+          '**/ProgresoController.ts',
+          '**/ScenarioBuilder.ts',
+          '**/FirewallBuilder.ts',
+          '**/apiConfig.ts',
+        ],
+      },
+    },
   };
 });
