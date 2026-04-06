@@ -20,13 +20,13 @@ import {
   WorkstationComponent,
 } from "../components";
 import { Sistema, type Entidad } from "../core";
-import type { ClaseComponente } from "../core/Componente";
+// import type { ClaseComponente } from "../core/Componente";
 import { SistemaActivo } from "./SistemaActivo";
 
 export class SistemaEvento extends Sistema {
-  public componentesRequeridos: Set<ClaseComponente> = new Set([
-    AtaqueComponent,
-  ]);
+  // public componentesRequeridos: Set<ClaseComponente> = new Set([
+  //   AtaqueComponent,
+  // ]);
 
   public ejecutarAtaque(
     entidadDispositivo: Entidad,

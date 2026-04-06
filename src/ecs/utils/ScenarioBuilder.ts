@@ -16,6 +16,7 @@ import {
   EventoComponent,
   VPNGatewayComponent,
   ClienteVPNComponent,
+  PersonaComponent,
 } from "../components";
 import type { ComponenteContainer, Entidad } from "../core/Componente";
 import { type Activo, type Dispositivo, type Escenario, type ObjetivoFase, type SoftwareApp } from "../../types/EscenarioTypes";
@@ -30,7 +31,6 @@ import {
 import { RedComponent } from "../components/RedComponent";
 import { FirewallBuilder } from "./FirewallBuilder";
 import { SistemaRelaciones } from "../systems";
-import { PersonaComponent } from "../components/PersonaComponent";
 // import { TipoProtocolo } from "../../types/TrafficEnums";
 import { AccionFirewall, DireccionTrafico } from "../../types/FirewallTypes";
 import { FirewallConfigService } from "../systems/red";

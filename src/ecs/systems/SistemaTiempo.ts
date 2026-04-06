@@ -8,7 +8,7 @@ import {
 import { EventosInternos, EventosPublicos } from "../../types/EventosEnums";
 
 export class SistemaTiempo extends Sistema {
-  public componentesRequeridos = new Set([TiempoComponent]);
+  // public componentesRequeridos = new Set([TiempoComponent]);
   public intervalo: ReturnType<typeof setInterval> | null = null;
   public intervaloTiempoTotal: ReturnType<typeof setInterval> | null = null;
   public eventosEscenario: EventoComponent[] = []; 

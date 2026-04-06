@@ -8,6 +8,7 @@ import {
   // PresupuestoComponent,
   TiempoComponent,
   WorkstationComponent,
+  PersonaComponent,
 } from "../components";
 import { ECSManager, type Entidad } from "../core";
 import {
@@ -28,7 +29,6 @@ import {
   TipoLogGeneral,
 } from "../../types/EventosEnums";
 import { ProgresoController } from "./ProgresoController";
-import { PersonaComponent } from "../components/PersonaComponent";
 import { AccionesRealizables, ObjetosManejables } from "../../types/AccionesEnums";
 import { PlantillasCorreoPhishing } from "../../data/plantillas/Plantillas";
 

@@ -1,6 +1,6 @@
 import {
-  ActivoComponent,
-  RouterComponent,
+  // ActivoComponent,
+  // RouterComponent,
   DispositivoComponent,
   VPNGatewayComponent,
   ClienteVPNComponent,
@@ -25,7 +25,7 @@ import { EventosPublicos, MensajesGenerales } from "../../types/EventosEnums";
 
 // Sistema encargado de gestionar redes, conectividad y firewalls
 export class SistemaRed extends Sistema {
-  public componentesRequeridos = new Set([ActivoComponent, RouterComponent]);
+  // public componentesRequeridos = new Set([ActivoComponent, RouterComponent]);
 
   // Servicios especializados
   private conectividadService: ConectividadService | null = null;

@@ -2,10 +2,10 @@ import { AccionesRealizables, ObjetosManejables } from "../../types/AccionesEnum
 import { ComandoTerminal } from "../../types/DeviceEnums";
 import type { RespuestaComando } from "../../types/EscenarioTypes";
 import { ActivoComponent, DispositivoComponent } from "../components";
-import { Sistema, type ClaseComponente, type Entidad } from "../core";
+import { Sistema, /*type ClaseComponente,*/ type Entidad } from "../core";
 
 export class SistemaComandos extends Sistema {
-    public componentesRequeridos: Set<ClaseComponente> = new Set();
+    // public componentesRequeridos: Set<ClaseComponente> = new Set();
     private MENSAJE_AYUDA: string = "Parece que el comando ingresado no existe o tiene un formato inválido. Ingresa 'h' para ver todos los comandos disponibles.";
     private entidadDispAnterior: Entidad = -1;
     private entidadDispActual: Entidad = -1;

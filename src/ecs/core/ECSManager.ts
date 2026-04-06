@@ -46,7 +46,7 @@ export class ECSManager {
 
   public agregarComponente(entidad: Entidad, componente: Componente): void {
     this.entidades.get(entidad)?.agregar(componente);
-    this.verificarEntidad(entidad);
+    // this.verificarEntidad(entidad);
   }
 
   public getComponentes(entidad: Entidad): ComponenteContainer | undefined {
@@ -58,7 +58,7 @@ export class ECSManager {
     claseComponente: ClaseComponente
   ): void {
     this.entidades.get(entidad)?.eliminar(claseComponente);
-    this.verificarEntidad(entidad);
+    // this.verificarEntidad(entidad);
   }
 
   // Para Sistemas
@@ -74,9 +74,9 @@ export class ECSManager {
     sistema.ecsManager = this;
 
     this.sistemas.set(sistema, new Set());
-    for (const entidad of this.entidades.keys()) {
+    /*for (const entidad of this.entidades.keys()) {
       this.verificarEntidadSistema(entidad, sistema);
-    }
+    }*/
   }
 
   public removerSistema(sistema: Sistema): void {
@@ -126,13 +126,13 @@ export class ECSManager {
     }
   }*/
 
-  private verificarEntidad(entidad: Entidad): void {
+  /*private verificarEntidad(entidad: Entidad): void {
     for (const sistema of this.sistemas.keys()) {
       this.verificarEntidadSistema(entidad, sistema);
     }
-  }
+  }*/
 
-  private verificarEntidadSistema(entidad: Entidad, sistema: Sistema): void {
+  /*private verificarEntidadSistema(entidad: Entidad, sistema: Sistema): void {
     const componenteContainer = this.entidades.get(entidad);
     const componentesRequeridos = sistema.componentesRequeridos;
     if (componenteContainer?.tieneTodos(componentesRequeridos)) {
@@ -140,7 +140,7 @@ export class ECSManager {
     } else {
       this.sistemas.get(sistema)?.delete(entidad);
     }
-  }
+  }*/
 
   // Sistema de eventos
 

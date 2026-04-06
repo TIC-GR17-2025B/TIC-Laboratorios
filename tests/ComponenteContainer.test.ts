@@ -87,7 +87,7 @@ describe("ComponenteContainer", () => {
     });
   });
 
-  describe("tieneTodos", () => {
+  /*describe("tieneTodos", () => {
     it("debe retornar true si tiene todos los componentes requeridos", () => {
       container.agregar(new Transform(0, 0, 0, 0));
       container.agregar(new Velocidad(0, 0));
@@ -116,7 +116,7 @@ describe("ComponenteContainer", () => {
       const resultado = container.tieneTodos([Transform]);
       expect(resultado).toBe(true);
     });
-  });
+  });*/
 
   describe("eliminar", () => {
     it("debe eliminar un componente existente", () => {

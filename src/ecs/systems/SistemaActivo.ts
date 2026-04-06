@@ -1,9 +1,9 @@
 import type { Activo, RegistroVeredictoFirma } from "../../types/EscenarioTypes";
-import { ActivoComponent } from "../components";
-import { Sistema, type ClaseComponente } from "../core";
+// import { ActivoComponent } from "../components";
+import { Sistema/*, type ClaseComponente*/ } from "../core";
 
 export class SistemaActivo extends Sistema {
-    public componentesRequeridos: Set<ClaseComponente> = new Set([ActivoComponent]);
+    // public componentesRequeridos: Set<ClaseComponente> = new Set([ActivoComponent]);
     public registroVeredictosFirmas: Array<RegistroVeredictoFirma> = [];
 
     public async calcularHashDocumento(contenido: string) {

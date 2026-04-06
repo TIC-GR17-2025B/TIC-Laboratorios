@@ -1,6 +1,6 @@
 import { describe, beforeEach, test, expect } from "vitest";
 import { ECSManager, Entidad } from "../src/ecs/core";
-import { SistemaActivo, SistemaEvento, SistemaFase, SistemaPresupuesto, SistemaRed, SistemaRelaciones, SistemaTiempo } from "../src/ecs/systems";
+import { SistemaActivo, SistemaEvento, SistemaFase, SistemaJerarquiaEscenario, SistemaPresupuesto, SistemaRed, SistemaRelaciones, SistemaTiempo } from "../src/ecs/systems";
 import { EstadoAtaqueDispositivo, TipoActivo, TipoAtaque, TipoDispositivo, TipoEvento, TipoProteccionVPN } from "../src/types/DeviceEnums";
 import { AccionesRealizables, ObjetosManejables } from "../src/types/AccionesEnums";
 import { ActivoComponent, AtaqueComponent, ClienteVPNComponent, DispositivoComponent, EscenarioComponent, EventoComponent, FaseComponent, RedComponent, RouterComponent, TiempoComponent, VPNGatewayComponent, WorkstationComponent, ZonaComponent } from "../src/ecs/components";
@@ -57,9 +57,9 @@ describe("SistemaEvento y SistemaFase", () => {
         sistemaActivo = new SistemaActivo();
         em.agregarSistema(sistemaActivo);
 
-        const sistemaRelacionesZonasRedes = new SistemaRelaciones(ZonaComponent, RedComponent, "redes");
-        em.agregarSistema(sistemaRelacionesZonasRedes);
-        
+        const sistemaJerarquiaEscenario = new SistemaJerarquiaEscenario(em);
+        em.agregarSistema(sistemaJerarquiaEscenario);
+
         redController = RedController.getInstance(em);
         redController.iniciarController();
 
@@ -195,10 +195,10 @@ describe("SistemaEvento y SistemaFase", () => {
         const entidadRedInternet = em.agregarEntidad();
         em.agregarComponente(entidadRedInternet, new RedComponent("Internet", ColoresRed.ROJO));
 
-        sistemaRelacionesZonasRedes.agregar(entidadZonaJacob, entidadRedJacob);
-        sistemaRelacionesZonasRedes.agregar(entidadZonaJacob, entidadRedInternet);
-        sistemaRelacionesZonasRedes.agregar(entidadZonaLisa, entidadRedLisa);
-        sistemaRelacionesZonasRedes.agregar(entidadZonaLisa, entidadRedInternet);
+        sistemaJerarquiaEscenario.agregarRedAZona(entidadZonaJacob, entidadRedJacob);
+        sistemaJerarquiaEscenario.agregarRedAZona(entidadZonaJacob, entidadRedInternet);
+        sistemaJerarquiaEscenario.agregarRedAZona(entidadZonaLisa, entidadRedLisa);
+        sistemaJerarquiaEscenario.agregarRedAZona(entidadZonaLisa, entidadRedInternet);
 
         redController.asignarRed(entidadDispJacob, entidadRedJacob);
         redController.asignarRed(entidadVpnGateway, entidadRedJacob);
@@ -407,7 +407,7 @@ describe("SistemaEvento y SistemaFase", () => {
         expect(estadoAtaqueDispositivo).toBe(EstadoAtaqueDispositivo.COMPROMETIDO);
     });
 
-    test("Verificación de ejecución de evento Exitoso: Envio de correo", () => {
+    test("Verificación de ejecución de evento Exitoso: Envío de correo", () => {
         eventos = [
             new EventoComponent(
                 "envio de correo",
@@ -463,7 +463,7 @@ describe("SistemaEvento y SistemaFase", () => {
         expect(fasesDespuesDeEjecutarEvento[0].objetivos[0].completado).toBe(true); // Como para este caso sólo hay una fase con un objetivo, seleccionamos directamente todo con el primer índice
     });
 
-    test("Verificación de ejecución de evento Exitoso: Envio de activo", () => {
+    test("Verificación de ejecución de evento Exitoso: Envío de activo", () => {
         eventos = [
             new EventoComponent(
                 "envio de activo",
@@ -721,7 +721,7 @@ describe("SistemaEvento y SistemaFase", () => {
 
         sistemaFase.eventosEscenario = eventos;
 
-        em.getEntidades().get(entidadEscenario)!.get(EscenarioComponent)!.fases = fases; 
+        em.getEntidades().get(entidadEscenario)!.get(EscenarioComponent)!.fases = fases;
 
         // Simulamos la adición de perfiles de Cliente VPN (PC de Lisa) y VPN Gateway (dispositivo VPN en el lado de Jacob)
         redController.agregarPerfilClienteVPN(
@@ -927,5 +927,7 @@ describe("SistemaEvento y SistemaFase", () => {
 
         // Al completar el escenario, se espera que el tiempo se haya destruido por completo
         expect(em.getSistema(SistemaTiempo)?.intervalo).toBeNull();
+
+        EscenarioController.reset();
     });
 });

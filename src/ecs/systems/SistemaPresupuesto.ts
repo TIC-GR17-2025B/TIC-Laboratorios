@@ -12,7 +12,7 @@ import {
 // import { EventosPublicos } from "../../types/EventosEnums";
 
 export class SistemaPresupuesto extends Sistema {
-  public componentesRequeridos = new Set([/*PresupuestoComponent*/]);
+  // public componentesRequeridos = new Set([/*PresupuestoComponent*/]);
 
   public toggleConfiguracionWorkstation(
     // entidadPresupuesto: Entidad,

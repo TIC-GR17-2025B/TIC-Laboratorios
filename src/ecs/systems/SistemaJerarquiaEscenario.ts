@@ -1,5 +1,5 @@
-import { Sistema } from "../core";
-import type { Entidad, ClaseComponente } from "../core/Componente";
+import { ECSManager, Sistema } from "../core";
+import type { Entidad } from "../core/Componente";
 import { SistemaRelaciones } from "./SistemaRelaciones";
 import {
   EscenarioComponent,
@@ -7,8 +7,9 @@ import {
   OficinaComponent,
   EspacioComponent,
   DispositivoComponent,
+  RedComponent,
+  PersonaComponent,
 } from "../components";
-import { PersonaComponent } from "../components/PersonaComponent";
 
 /**
  * Sistema centralizado para gestionar todas las relaciones jerárquicas del escenario.
@@ -23,25 +24,18 @@ import { PersonaComponent } from "../components/PersonaComponent";
  * - Garantiza consistencia de datos entre diferentes partes de la aplicación
  */
 export class SistemaJerarquiaEscenario extends Sistema {
-  public componentesRequeridos = new Set<ClaseComponente>([EscenarioComponent]);
-
   // Sistemas de relaciones para cada nivel jerárquico
   private relacionEscenarioZona: SistemaRelaciones;
   private relacionZonaOficina: SistemaRelaciones;
+  private relacionZonaRed: SistemaRelaciones;
   private relacionOficinaEspacio: SistemaRelaciones;
   private relacionEspacioDispositivo: SistemaRelaciones;
   private relacionZonaPersona: SistemaRelaciones;
 
-  constructor() {
+  constructor(em?: ECSManager) {
     super();
 
-    // Registrar todos los componentes involucrados en la jerarquía
-    this.componentesRequeridos.add(EscenarioComponent);
-    this.componentesRequeridos.add(ZonaComponent);
-    this.componentesRequeridos.add(OficinaComponent);
-    this.componentesRequeridos.add(EspacioComponent);
-    this.componentesRequeridos.add(DispositivoComponent);
-    this.componentesRequeridos.add(PersonaComponent);
+    if (em) this.ecsManager = em;
 
     // Inicializar sistemas de relaciones
     this.relacionEscenarioZona = new SistemaRelaciones(
@@ -54,6 +48,12 @@ export class SistemaJerarquiaEscenario extends Sistema {
       ZonaComponent,
       OficinaComponent,
       "oficinas"
+    );
+
+    this.relacionZonaRed = new SistemaRelaciones(
+      ZonaComponent,
+      RedComponent,
+      "redes"
     );
 
     this.relacionOficinaEspacio = new SistemaRelaciones(
@@ -81,11 +81,18 @@ export class SistemaJerarquiaEscenario extends Sistema {
    */
   private inicializarSiEsNecesario(): void {
     if (!this.relacionEscenarioZona.ecsManager) {
-      this.relacionEscenarioZona.ecsManager = this.ecsManager;
-      this.relacionZonaOficina.ecsManager = this.ecsManager;
-      this.relacionOficinaEspacio.ecsManager = this.ecsManager;
-      this.relacionEspacioDispositivo.ecsManager = this.ecsManager;
-      this.relacionZonaPersona.ecsManager = this.ecsManager;
+      this.ecsManager.agregarSistema(this.relacionEscenarioZona);
+      this.ecsManager.agregarSistema(this.relacionZonaOficina);
+      this.ecsManager.agregarSistema(this.relacionZonaRed);
+      this.ecsManager.agregarSistema(this.relacionOficinaEspacio);
+      this.ecsManager.agregarSistema(this.relacionEspacioDispositivo);
+      this.ecsManager.agregarSistema(this.relacionZonaPersona);
+      // this.relacionEscenarioZona.ecsManager = this.ecsManager;
+      // this.relacionZonaRed.ecsManager = this.ecsManager;
+      // this.relacionZonaOficina.ecsManager = this.ecsManager;
+      // this.relacionOficinaEspacio.ecsManager = this.ecsManager;
+      // this.relacionEspacioDispositivo.ecsManager = this.ecsManager;
+      // this.relacionZonaPersona.ecsManager = this.ecsManager;
     }
   }
 
@@ -96,15 +103,23 @@ export class SistemaJerarquiaEscenario extends Sistema {
     this.relacionEscenarioZona.agregar(escenarioId, zonaId);
   }
 
+  agregarRedAZona(zonaId: Entidad, redId: Entidad): void {
+    this.inicializarSiEsNecesario();
+    this.relacionZonaRed.agregar(zonaId, redId);
+  }
+
   agregarOficinaAZona(zonaId: Entidad, oficinaId: Entidad): void {
+    this.inicializarSiEsNecesario();
     this.relacionZonaOficina.agregar(zonaId, oficinaId);
   }
 
   agregarEspacioAOficina(oficinaId: Entidad, espacioId: Entidad): void {
+    this.inicializarSiEsNecesario();
     this.relacionOficinaEspacio.agregar(oficinaId, espacioId);
   }
 
   agregarDispositivoAEspacio(espacioId: Entidad, dispositivoId: Entidad): void {
+    this.inicializarSiEsNecesario();
     this.relacionEspacioDispositivo.agregar(espacioId, dispositivoId);
   }
 
@@ -117,6 +132,10 @@ export class SistemaJerarquiaEscenario extends Sistema {
 
   obtenerZonasDeEscenario(escenarioId: Entidad): Entidad[] {
     return this.relacionEscenarioZona.obtenerHijos(escenarioId);
+  }
+
+  obtenerRedesDeZona(zonaId: Entidad): Entidad[] {
+    return this.relacionZonaRed.obtenerHijos(zonaId);
   }
 
   obtenerOficinasDeZona(zonaId: Entidad): Entidad[] {
@@ -139,6 +158,10 @@ export class SistemaJerarquiaEscenario extends Sistema {
 
   obtenerEscenarioDeZona(zonaId: Entidad): Entidad | undefined {
     return this.relacionEscenarioZona.obtenerPadre(zonaId);
+  }
+
+  obtenerZonaDeRed(redId: Entidad): Entidad | undefined {
+    return this.relacionZonaRed.obtenerPadre(redId);
   }
 
   obtenerZonaDeOficina(oficinaId: Entidad): Entidad | undefined {
@@ -231,6 +254,10 @@ export class SistemaJerarquiaEscenario extends Sistema {
     this.relacionEscenarioZona.remover(escenarioId, zonaId);
   }
 
+  removerRedDeZona(zonaId: Entidad, redId: Entidad): void {
+    this.relacionZonaRed.remover(zonaId, redId);
+  }
+
   removerOficinaDeZona(zonaId: Entidad, oficinaId: Entidad): void {
     this.relacionZonaOficina.remover(zonaId, oficinaId);
   }
@@ -257,6 +284,7 @@ export class SistemaJerarquiaEscenario extends Sistema {
    */
   limpiarTodo(): void {
     this.relacionEscenarioZona.limpiar();
+    this.relacionZonaRed.limpiar();
     this.relacionZonaOficina.limpiar();
     this.relacionOficinaEspacio.limpiar();
     this.relacionEspacioDispositivo.limpiar();
