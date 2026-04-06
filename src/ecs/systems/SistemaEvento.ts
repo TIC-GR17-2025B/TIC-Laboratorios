@@ -92,7 +92,7 @@ export class SistemaEvento extends Sistema {
       case ObjetosManejables.CONFIG_FIREWALL: {
         const c = condicionMitigacion as {
           val: {
-            nombreRed: string,
+            nombreRed: string;
             accion: AccionFirewall;
             direccion: DireccionTrafico;
             protocolo: TipoProtocolo;

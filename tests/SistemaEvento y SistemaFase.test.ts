@@ -12,6 +12,8 @@ import { TipoProtocolo } from "../src/types/TrafficEnums";
 import { PerfilClienteVPN, PerfilVPNGateway } from "../src/types/EscenarioTypes";
 import { ColoresRed } from "../src/data/colores";
 import { APPS } from "../src/data/apps";
+import { FirewallConfigService } from "../src/ecs/systems/red";
+import { AccionFirewall, DireccionTrafico } from "../src/types/FirewallTypes";
 
 describe("SistemaEvento y SistemaFase", () => {
 
@@ -30,31 +32,11 @@ describe("SistemaEvento y SistemaFase", () => {
     let redController: RedController;
     let sistemaActivo: SistemaActivo;
     let escenarioController: EscenarioController;
-
-    const ataques: AtaqueComponent[] = [
-        new AtaqueComponent(
-          "ataque troyano",
-          5,
-          TipoAtaque.INFECCION_TROYANO,
-          "Computadora Jacob",
-          "Un dispositivo está por ser infectado con un troyano. Revisa la activación del antivirus para evitarlo.",
-          1,
-          {
-            accion: AccionesRealizables.CLICK,
-            objeto: ObjetosManejables.CONFIG_WORKSTATION,
-            val: [ // Estas 2 por defecto son falsas, por lo que se quiere verificar que se han activado (puesto en true)
-               {
-                 nombreConfig: "Actualizaciones automáticas de antivirus", 
-                 activado: true,
-               },
-               {
-                 nombreConfig: "Antivirus gestionado",
-                 activado: true,
-               }
-            ],
-          },
-        ),
-    ];
+    let ataques: AtaqueComponent[];
+    let entidadRedJacob: Entidad;
+    let entidadRouterJacob: Entidad;
+    let entidadRouterLisa: Entidad;
+    let entidadRedLisa: Entidad;
 
     beforeEach(() => {
         em = new ECSManager();
@@ -152,7 +134,7 @@ describe("SistemaEvento y SistemaFase", () => {
 
         em.agregarComponente(entidadDispLisa, new ClienteVPNComponent()); // Perfil de Cliente VPN en la PC de Lisa
 
-        const entidadRouterJacob = em.agregarEntidad();
+        entidadRouterJacob = em.agregarEntidad();
         em.agregarComponente(
           entidadRouterJacob,
           new DispositivoComponent(
@@ -167,7 +149,7 @@ describe("SistemaEvento y SistemaFase", () => {
           )
         );
 
-        const entidadRouterLisa = em.agregarEntidad();
+        entidadRouterLisa = em.agregarEntidad();
         em.agregarComponente(
           entidadRouterLisa,
           new DispositivoComponent(
@@ -176,7 +158,7 @@ describe("SistemaEvento y SistemaFase", () => {
             "hw",
             TipoDispositivo.ROUTER,
             EstadoAtaqueDispositivo.NORMAL,
-            "router1",
+            "router2",
             "admin",
             "1234"
           )
@@ -198,13 +180,13 @@ describe("SistemaEvento y SistemaFase", () => {
         );
         em.agregarComponente(entidadVpnGateway, new VPNGatewayComponent());
 
-        const entidadRedJacob = em.agregarEntidad();
+        entidadRedJacob = em.agregarEntidad();
         em.agregarComponente(entidadRedJacob, new RedComponent("LAN1", ColoresRed.VERDE));
 
         const firewallConfigJacob = new FirewallBuilder().build();
         em.agregarComponente(entidadRouterJacob, new RouterComponent(firewallConfigJacob)); 
 
-        const entidadRedLisa = em.agregarEntidad();
+        entidadRedLisa = em.agregarEntidad();
         em.agregarComponente(entidadRedLisa, new RedComponent("LAN2", ColoresRed.AZUL));
 
         const firewallConfigLisa = new FirewallBuilder().build();
@@ -218,17 +200,68 @@ describe("SistemaEvento y SistemaFase", () => {
         sistemaRelacionesZonasRedes.agregar(entidadZonaLisa, entidadRedLisa);
         sistemaRelacionesZonasRedes.agregar(entidadZonaLisa, entidadRedInternet);
 
-        sistemaRed.asignarRed(entidadDispJacob, entidadRedJacob);
-        sistemaRed.asignarRed(entidadVpnGateway, entidadRedJacob);
-        sistemaRed.asignarRed(entidadVpnGateway, entidadRedInternet);
-        sistemaRed.asignarRed(entidadRouterJacob, entidadRedJacob);
-        sistemaRed.asignarRed(entidadRouterJacob, entidadRedInternet);
-        sistemaRed.asignarRed(entidadRouterLisa, entidadRedInternet);
-        sistemaRed.asignarRed(entidadRouterLisa, entidadRedLisa);
-        sistemaRed.asignarRed(entidadDispLisa, entidadRedLisa);
+        redController.asignarRed(entidadDispJacob, entidadRedJacob);
+        redController.asignarRed(entidadVpnGateway, entidadRedJacob);
+        redController.asignarRed(entidadVpnGateway, entidadRedInternet);
+        redController.asignarRed(entidadRouterJacob, entidadRedJacob);
+        redController.asignarRed(entidadRouterJacob, entidadRedInternet);
+        redController.asignarRed(entidadRouterLisa, entidadRedInternet);
+        redController.asignarRed(entidadRouterLisa, entidadRedLisa);
+        redController.asignarRed(entidadDispLisa, entidadRedLisa);
+
+        // Se añaden reglas sólo para el firewall de Jacob
+        const firewallConfigService = new FirewallConfigService(em);
+        for (const entidadRed of em.getComponentes(entidadRouterJacob)!.get(DispositivoComponent)!.redes) {
+            for (const protocolo of FirewallConfigService.obtenerTodosLosProtocolos()){
+                firewallConfigService.agregarReglaFirewall(
+                                    entidadRouterJacob,
+                                    entidadRed,
+                                    protocolo,
+                                    AccionFirewall.PERMITIR,
+                                    DireccionTrafico.DESDE
+                                ); 
+            }
+        }
+        for (const entidadRed of em.getComponentes(entidadRouterJacob)!.get(DispositivoComponent)!.redes) {
+            for (const protocolo of FirewallConfigService.obtenerTodosLosProtocolos()){
+                firewallConfigService.agregarReglaFirewall(
+                                    entidadRouterJacob,
+                                    entidadRed,
+                                    protocolo,
+                                    AccionFirewall.PERMITIR,
+                                    DireccionTrafico.HACIA
+                                 ); 
+            }
+        }
     });
 
-    test("Verificación condición de mitigación Exitosa: Configuraciones de Workstation", () => {
+    test("Verificación de condición de mitigación Exitosa: Configuraciones de Workstation", () => {
+        ataques = [
+            new AtaqueComponent(
+              "ataque troyano",
+              5,
+              TipoAtaque.INFECCION_TROYANO,
+              "Computadora Jacob",
+              "Un dispositivo está por ser infectado con un troyano. Revisa la activación del antivirus para evitarlo.",
+              1,
+              {
+                accion: AccionesRealizables.CLICK,
+                objeto: ObjetosManejables.CONFIG_WORKSTATION,
+                val: [ // Estas 2 por defecto son falsas, por lo que se quiere verificar que se han activado (puesto en true)
+                   {
+                     nombreConfig: "Actualizaciones automáticas de antivirus", 
+                     activado: true,
+                   },
+                   {
+                     nombreConfig: "Antivirus gestionado",
+                     activado: true,
+                   }
+                ],
+              },
+            ),
+        ];
+
+
         sistemaPresupuesto.toggleConfiguracionWorkstation(entidadDispJacob, "Actualizaciones automáticas de antivirus");
         sistemaPresupuesto.toggleConfiguracionWorkstation(entidadDispJacob, "Antivirus gestionado");
 
@@ -239,12 +272,137 @@ describe("SistemaEvento y SistemaFase", () => {
         expect(estadoAtaqueDispositivo).toBe(EstadoAtaqueDispositivo.NORMAL);
     });
 
-    test("Verificación condición de mitigación Fallida: Configuraciones de Workstation", () => {
+    test("Verificación de condición de mitigación Fallida: Configuraciones de Workstation", () => {
+        ataques = [
+            new AtaqueComponent(
+              "ataque troyano",
+              5,
+              TipoAtaque.INFECCION_TROYANO,
+              "Computadora Jacob",
+              "Un dispositivo está por ser infectado con un troyano. Revisa la activación del antivirus para evitarlo.",
+              1,
+              {
+                accion: AccionesRealizables.CLICK,
+                objeto: ObjetosManejables.CONFIG_WORKSTATION,
+                val: [ // Estas 2 por defecto son falsas, por lo que se quiere verificar que se han activado (puesto en true)
+                   {
+                     nombreConfig: "Actualizaciones automáticas de antivirus", 
+                     activado: true,
+                   },
+                   {
+                     nombreConfig: "Antivirus gestionado",
+                     activado: true,
+                   }
+                ],
+              },
+            ),
+        ];
+
         // No se activan las configuraciones esperadas //
 
         sistemaEvento.ejecutarAtaque(entidadDispJacob, ataques[0]);
 
         const estadoAtaqueDispositivo = em.getEntidades().get(entidadDispJacob)?.get(DispositivoComponent)?.estadoAtaque;
+
+        expect(estadoAtaqueDispositivo).toBe(EstadoAtaqueDispositivo.COMPROMETIDO);
+    });
+
+    test("Verificación de condición de mitigación Exitosa: Configuraciones de Firewall", () => {
+        ataques = [
+            new AtaqueComponent(
+              "ataque troyano",
+              1,
+              TipoAtaque.INFECCION_TROYANO,
+              "router1",
+              "Un router está por ser infectado con un troyano. Revisa la activación del antivirus para evitarlo.",
+              1,
+              {
+                accion: AccionesRealizables.CLICK,
+                objeto: ObjetosManejables.CONFIG_FIREWALL,
+                val: [
+                  {
+                    nombreRed: "LAN1",
+                    accion: AccionFirewall.DENEGAR,
+                    direccion: DireccionTrafico.HACIA,
+                    protocolo: TipoProtocolo.SSH,
+                  },
+                  {
+                    nombreRed: "LAN1",
+                    accion: AccionFirewall.DENEGAR,
+                    direccion: DireccionTrafico.HACIA,
+                    protocolo: TipoProtocolo.FTP,
+                  },
+                ],
+              },
+            ),
+        ];
+
+        // Modificamos las reglas 
+        redController.agregarReglaFirewall(
+            entidadRouterJacob,
+            entidadRedJacob,
+            TipoProtocolo.SSH,
+            AccionFirewall.DENEGAR,
+            DireccionTrafico.HACIA
+        );
+
+        redController.agregarReglaFirewall(
+            entidadRouterJacob,
+            entidadRedJacob,
+            TipoProtocolo.FTP,
+            AccionFirewall.DENEGAR,
+            DireccionTrafico.HACIA
+        );
+
+        sistemaEvento.ejecutarAtaque(entidadRouterJacob, ataques[0]);
+
+        const estadoAtaqueDispositivo = em.getComponentes(entidadRouterJacob)?.get(DispositivoComponent)?.estadoAtaque;
+
+        expect(estadoAtaqueDispositivo).toBe(EstadoAtaqueDispositivo.NORMAL);
+    });
+
+    test("Verificación de condición de mitigación Fallida: Configuraciones de Firewall", () => {
+        ataques = [
+            new AtaqueComponent(
+              "ataque troyano",
+              1,
+              TipoAtaque.INFECCION_TROYANO,
+              "router1",
+              "Un router está por ser infectado con un troyano. Revisa la activación del antivirus para evitarlo.",
+              1,
+              {
+                accion: AccionesRealizables.CLICK,
+                objeto: ObjetosManejables.CONFIG_FIREWALL,
+                val: [
+                  {
+                    nombreRed: "LAN1",
+                    accion: AccionFirewall.DENEGAR,
+                    direccion: DireccionTrafico.HACIA,
+                    protocolo: TipoProtocolo.SSH,
+                  },
+                  {
+                    nombreRed: "LAN1",
+                    accion: AccionFirewall.DENEGAR,
+                    direccion: DireccionTrafico.HACIA,
+                    protocolo: TipoProtocolo.FTP,
+                  },
+                ],
+              },
+            ),
+        ];
+
+        // No modificamos todas las reglas (o ninguna). 
+        redController.agregarReglaFirewall(
+            entidadRouterJacob,
+            entidadRedJacob,
+            TipoProtocolo.SSH,
+            AccionFirewall.DENEGAR,
+            DireccionTrafico.HACIA
+        );
+
+        sistemaEvento.ejecutarAtaque(entidadRouterJacob, ataques[0]);
+
+        const estadoAtaqueDispositivo = em.getComponentes(entidadRouterJacob)?.get(DispositivoComponent)?.estadoAtaque;
 
         expect(estadoAtaqueDispositivo).toBe(EstadoAtaqueDispositivo.COMPROMETIDO);
     });
@@ -407,7 +565,7 @@ describe("SistemaEvento y SistemaFase", () => {
         EscenarioController.reset();
     });
 
-    test("Verificación de ejecución de evento Exitoso: Tráfico de red", () => {
+    test("Verificación de ejecución de evento Exitoso: Tráfico de red Permitido", () => {
         eventos = [
             new EventoComponent(
                 "trafico de red",
@@ -455,6 +613,63 @@ describe("SistemaEvento y SistemaFase", () => {
         sistemaFase.eventosEscenario = eventos;
 
         em.getEntidades().get(entidadEscenario)!.get(EscenarioComponent)!.fases = fases; 
+
+        sistemaEvento.ejecutarEvento(eventos[0]);
+ 
+        const fasesDespuesDeEjecutarEvento = em.getEntidades().get(entidadEscenario)!.get(EscenarioComponent)!.fases;
+        
+        expect(fasesDespuesDeEjecutarEvento[0].objetivos[0].completado).toBe(true);
+    });
+
+    test("Verificación de ejecución de evento Exitoso: Tráfico de red Bloqueado", () => {
+        eventos = [
+            new EventoComponent(
+                "trafico de red",
+                TipoEvento.TRAFICO_RED,
+                1,
+                "envío de trafico de red",
+                1,
+                {
+                    dispositivoOrigen: "Computadora Jacob",
+                    dispositivoDestino: "Computadora Lisa",
+                    protocolo: TipoProtocolo.TELNET, 
+                    esObjetivo: true, 
+                    debeSerBloqueado: true
+                }
+            ),
+        ];
+
+        fases = [
+            {
+              id: 1,
+              nombre: "Fase 1: Prueba",
+              descripcion: "Prueba",
+              faseActual: true,
+              completada: false,
+              objetivos: [ 
+                {
+                  descripcion: "trafico de red",
+                  completado: false,
+                },
+              ],
+            }
+        ];
+
+        sistemaFase.eventosEscenario = eventos;
+
+        em.getEntidades().get(entidadEscenario)!.get(EscenarioComponent)!.fases = fases; 
+
+        // Dado que se espera que el tráfico enviado sea bloqueado, se necesita modificar la regla en el firewall correspondiente 
+        // del router que está conectado con el dispositivo de destino. Importante: la dirección de ley debe ser HACIA, ya que se 
+        // supone que se está bloqueando el tráfico Hacia la red del dispositivo destino; y evidentemente, la acción debe ser Denegar, 
+        // con el mismo protocolo.
+        redController.agregarReglaFirewall(
+            entidadRouterLisa,
+            entidadRedLisa,
+            TipoProtocolo.TELNET,
+            AccionFirewall.DENEGAR,
+            DireccionTrafico.HACIA
+        );
 
         sistemaEvento.ejecutarEvento(eventos[0]);
  
