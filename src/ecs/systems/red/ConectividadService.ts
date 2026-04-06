@@ -152,7 +152,7 @@ export class ConectividadService {
     return routersEnRed;
   }
 
-  buscarRouterConDispositivo(
+  /*buscarRouterConDispositivo(
     entidadDispositivo: Entidad
   ): { router: RouterComponent; zonaId: Entidad } | null {
     // 1. Obtener las redes del dispositivo
@@ -194,9 +194,9 @@ export class ConectividadService {
     }
 
     return null;
-  }
+  }*/
 
-  obtenerRoutersDeRed(
+  /*obtenerRoutersDeRed(
     entidadDisp1: Entidad,
     entidadDisp2: Entidad
   ): RouterComponent[] {
@@ -226,7 +226,7 @@ export class ConectividadService {
     }
 
     return routersAplicables;
-  }
+  }*/
 
   obtenerRutaRouters(
     entidadOrigen: Entidad,

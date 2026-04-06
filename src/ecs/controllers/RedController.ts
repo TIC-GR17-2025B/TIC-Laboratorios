@@ -210,7 +210,7 @@ export class RedController {
       (data: unknown) => {
         const mensaje = data as string;
         const log = {
-          tipo: TipoLogGeneral.COMPLETADO,
+          tipo: TipoLogGeneral.INFORMACION,
           mensaje: mensaje,
           pausarTiempo: false,
         };
@@ -223,7 +223,7 @@ export class RedController {
       (data: unknown) => {
         const mensaje = data as string;
         const log = {
-          tipo: TipoLogGeneral.ADVERTENCIA,
+          tipo: TipoLogGeneral.INFORMACION,
           mensaje: mensaje,
           pausarTiempo: false,
         };
@@ -236,7 +236,7 @@ export class RedController {
       (data: unknown) => {
         const mensaje = data as string;
         const log = {
-          tipo: TipoLogGeneral.COMPLETADO,
+          tipo: TipoLogGeneral.INFORMACION,
           mensaje: mensaje,
           pausarTiempo: false,
         };
@@ -249,7 +249,7 @@ export class RedController {
       (data: unknown) => {
         const mensaje = data as string;
         const log = {
-          tipo: TipoLogGeneral.ADVERTENCIA,
+          tipo: TipoLogGeneral.INFORMACION,
           mensaje: mensaje,
           pausarTiempo: false,
         };

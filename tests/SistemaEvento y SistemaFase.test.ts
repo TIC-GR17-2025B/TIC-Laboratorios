@@ -1,4 +1,4 @@
-import { describe, beforeEach, test, expect } from "vitest";
+import { describe, beforeEach, test, expect, it } from "vitest";
 import { ECSManager, Entidad } from "../src/ecs/core";
 import { SistemaActivo, SistemaEvento, SistemaFase, SistemaJerarquiaEscenario, SistemaPresupuesto, SistemaRed, SistemaTiempo } from "../src/ecs/systems";
 import { EstadoAtaqueDispositivo, TipoActivo, TipoAtaque, TipoDispositivo, TipoEvento, TipoProteccionVPN } from "../src/types/DeviceEnums";
@@ -210,10 +210,9 @@ describe("SistemaEvento y SistemaFase", () => {
         redController.asignarRed(entidadDispLisa, entidadRedLisa);
 
         // Se añaden reglas sólo para el firewall de Jacob
-        const firewallConfigService = new FirewallConfigService(em);
         for (const entidadRed of em.getComponentes(entidadRouterJacob)!.get(DispositivoComponent)!.redes) {
             for (const protocolo of FirewallConfigService.obtenerTodosLosProtocolos()){
-                firewallConfigService.agregarReglaFirewall(
+                redController.agregarReglaFirewall(
                                     entidadRouterJacob,
                                     entidadRed,
                                     protocolo,
@@ -224,7 +223,7 @@ describe("SistemaEvento y SistemaFase", () => {
         }
         for (const entidadRed of em.getComponentes(entidadRouterJacob)!.get(DispositivoComponent)!.redes) {
             for (const protocolo of FirewallConfigService.obtenerTodosLosProtocolos()){
-                firewallConfigService.agregarReglaFirewall(
+                redController.agregarReglaFirewall(
                                     entidadRouterJacob,
                                     entidadRed,
                                     protocolo,
@@ -507,6 +506,95 @@ describe("SistemaEvento y SistemaFase", () => {
         expect(activosEnOtraPc[0].nombre).toBe("Activo1");
     });
 
+    describe("Verificación de ejecución de evento Fallido: Envío de activo", () => {
+        beforeEach(() => {
+            eventos = [
+                new EventoComponent(
+                    "envio de activo",
+                    TipoEvento.ENVIO_ACTIVO,
+                    1,
+                    "envio de activo a otra pc",
+                    1,
+                    {
+                        nombreActivo: "Activo1",
+                        dispositivoEmisor: "Computadora Jacob",
+                        dispositivoReceptor: "Computadora Lisa",
+                    }
+                ),
+            ];
+
+            fases = [
+                {
+                  id: 1,
+                  nombre: "Fase 1: Prueba",
+                  descripcion:
+                    "Prueba",
+                  faseActual: true,
+                  completada: false,
+                  objetivos: [ 
+                    {
+                      descripcion: "envio de activo",
+                      completado: false,
+                    },
+                  ],
+                },
+            ];
+
+            sistemaFase.eventosEscenario = eventos;
+
+            em.getEntidades().get(entidadEscenario)!.get(EscenarioComponent)!.fases = fases;        
+        });
+
+        it("no debe enviar el activo si el dispositivo receptor no tiene el componente de activos", () => {
+            em.removerComponente(entidadDispLisa, ActivoComponent);
+            
+            sistemaEvento.ejecutarEvento(eventos[0]);
+
+            const logsEscenario = em.getComponentes(entidadEscenario)?.get(EscenarioComponent)?.logsGenerales;
+            const logResultanteDeRechazo = logsEscenario?.find((log) => log.mensaje == "Activo no enviado: Computadora Lisa no tiene componente de activos.");
+
+            expect(logResultanteDeRechazo).toBeDefined();
+        });
+
+        it("no debe enviar el activo si el dispositivo emisor no tiene el componente de activos", () => {
+            em.removerComponente(entidadDispJacob, ActivoComponent);
+            
+            sistemaEvento.ejecutarEvento(eventos[0]);
+
+            const logsEscenario = em.getComponentes(entidadEscenario)?.get(EscenarioComponent)?.logsGenerales;
+            const logResultanteDeRechazo = logsEscenario?.find((log) => log.mensaje == "Activo no enviado: Computadora Jacob no tiene componente de activos.");
+
+            expect(logResultanteDeRechazo).toBeDefined();
+        });
+
+        it("no debe enviar el activo si el dispositivo emisor no tiene el activo esperado", () => { 
+            em.getComponentes(entidadDispJacob)!.get(ActivoComponent)!.activos = [];
+
+            sistemaEvento.ejecutarEvento(eventos[0]);
+
+            const logsEscenario = em.getComponentes(entidadEscenario)?.get(EscenarioComponent)?.logsGenerales;
+            const logResultanteDeRechazo = logsEscenario?.find((log) => log.mensaje == "Activo no enviado: Computadora Jacob no tiene el activo: Activo1.");
+
+            expect(logResultanteDeRechazo).toBeDefined();
+        });
+
+        it("no debe enviar el activo si el dispositivo receptor ya tiene el activo esperado", () => { 
+            em.getComponentes(entidadDispLisa)!.get(ActivoComponent)!.activos.push(
+                                                                        {
+                                                                            nombre: "Activo1",
+                                                                            contenido: "Infor importante",
+                                                                            tipo: TipoActivo.DOCUMENTO
+                                                                        }
+                                                                    );
+            sistemaEvento.ejecutarEvento(eventos[0]);
+
+            const logsEscenario = em.getComponentes(entidadEscenario)?.get(EscenarioComponent)?.logsGenerales;
+            const logResultanteDeRechazo = logsEscenario?.find((log) => log.mensaje == "Activo no enviado: Computadora Lisa ya contiene el activo: Activo1.");
+
+            expect(logResultanteDeRechazo).toBeDefined();
+        });
+    });
+
     test("Verificación de ejecución de evento Exitoso: Verificación de firma", () => {
         eventos = [
             new EventoComponent(
@@ -749,6 +837,130 @@ describe("SistemaEvento y SistemaFase", () => {
         const fasesDespuesDeEjecutarEvento = em.getEntidades().get(entidadEscenario)!.get(EscenarioComponent)!.fases;
         
         expect(fasesDespuesDeEjecutarEvento[0].objetivos[0].completado).toBe(true);
+    });
+
+    describe("Verificación de ejecución de evento Fallido: Conexión VPN", () => {
+
+        beforeEach(() => {
+            eventos = [
+                new EventoComponent(
+                    "conexion vpn",
+                    TipoEvento.CONEXION_VPN,
+                    1,
+                    "establecer conexion vpn",
+                    1,
+                    {
+                        gateway: {
+                            lanLocal: "LAN1",
+                            hostLan: "Computadora Jacob",
+                            proteccion: TipoProteccionVPN.EA,
+                            dominioRemoto: "Dominio Lisa",
+                            hostRemoto: "Computadora Lisa"
+                        },
+                        cliente: {
+                            proteccion: TipoProteccionVPN.EA,
+                            dominioRemoto: "Dominio Jacob",
+                            hostRemoto: "Computadora Jacob"
+                        }
+                    }
+                ),
+            ];
+
+            fases = [
+                new FaseComponent(
+                  1,
+                  "Fase 1: Prueba",
+                  "Prueba",
+                  true,
+                  false,
+                  [ 
+                    {
+                      descripcion: "conexion vpn",
+                      completado: false,
+                    },
+                  ],
+                )
+            ];
+
+            sistemaFase.eventosEscenario = eventos;
+
+            em.getEntidades().get(entidadEscenario)!.get(EscenarioComponent)!.fases = fases;
+
+        });
+
+        it("debe rechazar la conexión si el cliente no tiene perfiles definidos", () => {
+            sistemaEvento.ejecutarEvento(eventos[0]);
+
+            const logsEscenario = em.getComponentes(entidadEscenario)?.get(EscenarioComponent)?.logsGenerales;
+            const logResultanteDeRechazo = logsEscenario?.find((log) => log.mensaje == "Conexión VPN rechazada: No existen perfiles de conexión VPN definidos en Computadora Lisa.");
+
+            expect(logResultanteDeRechazo).toBeDefined();
+        });
+
+        it("debe rechazar la conexión si el cliente no tiene definido el perfil esperado", () => {
+            redController.agregarPerfilClienteVPN(
+                entidadDispLisa,
+                {
+                    proteccion: TipoProteccionVPN.B,
+                    dominioRemoto: "Dominio Jacob",
+                    hostRemoto: "Computadora Jacob"
+                } as PerfilClienteVPN
+            );
+
+            sistemaEvento.ejecutarEvento(eventos[0]);
+
+            const logsEscenario = em.getComponentes(entidadEscenario)?.get(EscenarioComponent)?.logsGenerales;
+            const logResultanteDeRechazo = logsEscenario?.find((log) => log.mensaje == "Conexión VPN rechazada: Computadora Lisa no cuenta con un permiso para establecer una conexión VPN con Computadora Jacob.");
+
+            expect(logResultanteDeRechazo).toBeDefined();
+        });
+
+        it("debe rechazar la conexión si el gateway no tiene perfiles definidos", () => {
+            redController.agregarPerfilClienteVPN(
+                entidadDispLisa,
+                {
+                    proteccion: TipoProteccionVPN.EA,
+                    dominioRemoto: "Dominio Jacob",
+                    hostRemoto: "Computadora Jacob"
+                } as PerfilClienteVPN
+            );
+
+            sistemaEvento.ejecutarEvento(eventos[0]);
+
+            const logsEscenario = em.getComponentes(entidadEscenario)?.get(EscenarioComponent)?.logsGenerales;
+            const logResultanteDeRechazo = logsEscenario?.find((log) => log.mensaje == "Conexión VPN rechazada: No existen perfiles de conexión VPN definidos en vpnGateway.");
+
+            expect(logResultanteDeRechazo).toBeDefined();
+        });
+
+        it("debe rechazar la conexión si el gateway no tiene definido el perfil esperado", () => {
+            redController.agregarPerfilClienteVPN(
+                entidadDispLisa,
+                {
+                    proteccion: TipoProteccionVPN.EA,
+                    dominioRemoto: "Dominio Jacob",
+                    hostRemoto: "Computadora Jacob"
+                } as PerfilClienteVPN
+            );
+
+            redController.agregarPerfilVPNGateway(
+                entidadVpnGateway, 
+                {
+                    lanLocal: "LAN1",
+                    hostLan: "Computadora Jacob",
+                    proteccion: TipoProteccionVPN.B,
+                    dominioRemoto: "Dominio Lisa",
+                    hostRemoto: "Computadora Lisa" 
+                } as PerfilVPNGateway
+            );
+
+            sistemaEvento.ejecutarEvento(eventos[0]);
+
+            const logsEscenario = em.getComponentes(entidadEscenario)?.get(EscenarioComponent)?.logsGenerales;
+            const logResultanteDeRechazo = logsEscenario?.find((log) => log.mensaje == "Conexión VPN rechazada: vpnGateway no cuenta con un permiso para permitir una conexión VPN entre Computadora Lisa y Computadora Jacob.");
+
+            expect(logResultanteDeRechazo).toBeDefined();
+        });
     });
 
     test("Verificación de ejecución de evento Exitoso: Verificación de Acción de jugador", () => {
