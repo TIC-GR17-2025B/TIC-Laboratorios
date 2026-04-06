@@ -45,13 +45,13 @@ export default function ModalFirewall() {
                     <div className={styles.direccionGroup}>
                         <div className={styles.direccionHeader}>
                             <span className={styles.direccionLabel}>
-                                Desde
+                                {`Desde ${REDES.find(r => r.value === redSeleccionada)?.label}`}
                             </span>
                             <button
                                 className={styles.toggleTodosBtn}
-                                onClick={() => { toggleTodosServicios(entidadSeleccionadaId!, redSeleccionada, DireccionTrafico.ENTRANTE) }}
+                                onClick={() => { toggleTodosServicios(entidadSeleccionadaId!, redSeleccionada, DireccionTrafico.DESDE) }}
                             >
-                                {obtenerTextoBoton(redSeleccionada, DireccionTrafico.ENTRANTE)}
+                                {obtenerTextoBoton(redSeleccionada, DireccionTrafico.DESDE)}
                             </button>
                         </div>
                         <div className={styles.serviciosGrid}>
@@ -61,7 +61,7 @@ export default function ModalFirewall() {
                                     protocolo={protocolo.protocolo}
                                     label={protocolo.nombre}
                                     redSeleccionada={redSeleccionada}
-                                    direccion={DireccionTrafico.ENTRANTE}
+                                    direccion={DireccionTrafico.DESDE}
                                 />
                             ))}
                         </div>
@@ -71,13 +71,13 @@ export default function ModalFirewall() {
                     <div className={styles.direccionGroup}>
                         <div className={styles.direccionHeader}>
                             <span className={styles.direccionLabel}>
-                                Hacia
+                                {`Hacia ${REDES.find(r => r.value === redSeleccionada)?.label}`}
                             </span>
                             <button
                                 className={styles.toggleTodosBtn}
-                                onClick={() => { toggleTodosServicios(entidadSeleccionadaId!, redSeleccionada, DireccionTrafico.SALIENTE) }}
+                                onClick={() => { toggleTodosServicios(entidadSeleccionadaId!, redSeleccionada, DireccionTrafico.HACIA) }}
                             >
-                                {obtenerTextoBoton(redSeleccionada, DireccionTrafico.SALIENTE)}
+                                {obtenerTextoBoton(redSeleccionada, DireccionTrafico.HACIA)}
                             </button>
                         </div>
                         <div className={styles.serviciosGrid}>
@@ -87,7 +87,7 @@ export default function ModalFirewall() {
                                     protocolo={protocolo.protocolo}
                                     label={protocolo.nombre}
                                     redSeleccionada={redSeleccionada}
-                                    direccion={DireccionTrafico.SALIENTE}
+                                    direccion={DireccionTrafico.HACIA}
                                 />
                             ))}
                         </div>

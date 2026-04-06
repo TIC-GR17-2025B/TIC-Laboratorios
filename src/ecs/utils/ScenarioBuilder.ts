@@ -31,6 +31,9 @@ import { RedComponent } from "../components/RedComponent";
 import { FirewallBuilder } from "./FirewallBuilder";
 import { SistemaRelaciones } from "../systems";
 import { PersonaComponent } from "../components/PersonaComponent";
+// import { TipoProtocolo } from "../../types/TrafficEnums";
+import { AccionFirewall, DireccionTrafico } from "../../types/FirewallTypes";
+import { FirewallConfigService } from "../systems/red";
 
 /**
  * Builder para crear escenarios de forma declarativa y simple
@@ -42,6 +45,7 @@ import { PersonaComponent } from "../components/PersonaComponent";
 export class ScenarioBuilder {
   private ecsManager: ECSManager;
   private sistemaJerarquia: SistemaJerarquiaEscenario;
+  private entidadRedInternet: Entidad = -1;
 
   constructor(ecsManager: ECSManager) {
     this.ecsManager = ecsManager;
@@ -78,9 +82,9 @@ export class ScenarioBuilder {
     });
 
     // Crear la red Internet UNA SOLA VEZ como red global
-    const entidadRedInternet = this.ecsManager.agregarEntidad();
+    this.entidadRedInternet = this.ecsManager.agregarEntidad();
     this.ecsManager.agregarComponente(
-      entidadRedInternet,
+      this.entidadRedInternet,
       new RedComponent("Internet", ColoresRed.ROJO)
     );
 
@@ -118,9 +122,9 @@ export class ScenarioBuilder {
           if (!tieneRouters) {
             return; // Saltar esta red
           }
-          redesConEntidades.set(entidadRedInternet, r);
+          redesConEntidades.set(this.entidadRedInternet, r);
           // Agregar relación entre esta zona e Internet usando el sistema ya creado
-          relacionZonaRed.agregar(zonaEntidad, entidadRedInternet);
+          relacionZonaRed.agregar(zonaEntidad, this.entidadRedInternet);
         } else {
           // Para otras redes, crear una nueva entidad
           const entidadRed = this.ecsManager.agregarEntidad();
@@ -418,17 +422,38 @@ export class ScenarioBuilder {
         break;
       }
       case TipoDispositivo.ROUTER: {
-        // const r = dispositivo as {
-        //   nombre?: string;
-        //   conectadoAInternet?: boolean;
-        //   redes?: string[]; // Array de NOMBRES de redes (referencias)
-        // };
         // Agregar RouterComponent con firewall y referencias a redes
         const firewallConfig = new FirewallBuilder().build();
         this.ecsManager.agregarComponente(
           entidadDispositivo,
           new RouterComponent(firewallConfig, [])
         );
+
+        // Se agregan las reglas para cada red, protocolo, y dirección. Por defecto, todas las reglas están Permitidas para todas las redes y en las 2 direcciones
+        const firewallConfigService = new FirewallConfigService(this.ecsManager);
+        for (const entidadRed of entidadesRedesDispActual) {
+          // const accion = entidadRed == this.entidadRedInternet ? AccionFirewall.DENEGAR : AccionFirewall.PERMITIR; // Esto era porque tiene más sentido que no se permita ningún protocolo desde afuera (desde Internet), pero por cómo se comporta el frontend con los botones de las reglas, se lo deja todo en Permitir igualmente
+          for (const protocolo of FirewallConfigService.obtenerTodosLosProtocolos()){
+            firewallConfigService.agregarReglaFirewall(
+                                    entidadDispositivo,
+                                    entidadRed,
+                                    protocolo,
+                                    AccionFirewall.PERMITIR,
+                                    DireccionTrafico.DESDE
+                                 ); 
+          }
+        }
+        for (const entidadRed of entidadesRedesDispActual) {
+          for (const protocolo of FirewallConfigService.obtenerTodosLosProtocolos()){
+            firewallConfigService.agregarReglaFirewall(
+                                    entidadDispositivo,
+                                    entidadRed,
+                                    protocolo,
+                                    AccionFirewall.PERMITIR,
+                                    DireccionTrafico.HACIA
+                                 ); 
+          }
+        }
         break;
       }
       case TipoDispositivo.VPN: {

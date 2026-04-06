@@ -15,6 +15,7 @@ import {
   AtaqueComponent,
   DispositivoComponent,
   EventoComponent,
+  RedComponent,
   RouterComponent,
   WorkstationComponent,
 } from "../components";
@@ -88,28 +89,35 @@ export class SistemaEvento extends Sistema {
         }
         return true;
       }
-      case ObjetosManejables.CONFIG_FIREWALL: {  // NO está funcionando, tal vez sea porque los valores iniciales de las reglas en el router no se están creando
+      case ObjetosManejables.CONFIG_FIREWALL: {
         const c = condicionMitigacion as {
           val: {
+            nombreRed: string,
             accion: AccionFirewall;
             direccion: DireccionTrafico;
             protocolo: TipoProtocolo;
-          };
+          }[];
         };
         const router = containerDispositivo.get(RouterComponent);
         if (!router) return false;
-        
-        for (const [, reglas] of router.bloqueosFirewall.entries()) {
-          for (const regla of reglas) {
-            if (
-              regla.accion == c.val.accion &&
-              regla.direccion == c.val.direccion &&
-              regla.protocolo == c.val.protocolo
-            )
-              return true;
-          }
+
+        for (const configItem of c.val) {
+          const entidadRedEsperada = this.buscarRedPorNombre(configItem.nombreRed);
+          if(entidadRedEsperada == null) return false;
+
+          const reglas = router.bloqueosFirewall.get(entidadRedEsperada);
+          if(!reglas) return false;
+
+          const reglaItem = reglas.find(
+                                (regla) =>
+                                  regla.protocolo == configItem.protocolo &&
+                                  regla.direccion == configItem.direccion
+                              );
+
+          if (reglaItem && reglaItem.accion != configItem.accion) return false;
         }
-        return false;
+        
+        return true;
       }
       // Próximamente para otros dispositivos y/o configuraciones
     }
@@ -284,6 +292,16 @@ export class SistemaEvento extends Sistema {
     for (const [entidad, container] of this.ecsManager.getEntidades()) {
       const dispositivo = container.get(DispositivoComponent);
       if (dispositivo && dispositivo.nombre === nombre) {
+        return entidad;
+      }
+    }
+    return null;
+  }
+
+  private buscarRedPorNombre(nombreRed: string): Entidad | null {
+    for (const [entidad, container] of this.ecsManager.getEntidades()) {
+      const red = container.get(RedComponent);
+      if (red && red.nombre === nombreRed) {
         return entidad;
       }
     }

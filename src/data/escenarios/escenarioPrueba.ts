@@ -24,35 +24,10 @@ export const escenarioPrueba: unknown = {
   descripcion:
     "Un escenario en el que se aplica técnicas de ingeniería social para hackear un dipositivo y obtener información.",
   presupuestoInicial: 1000,
-  ataques: [
+  ataques: [ 
     {
       nombreAtaque: "ataque 1",
       tiempoNotificacion: 5,
-      tipoAtaque: TipoAtaque.INFECCION_TROYANO,
-      dispositivoAAtacar: "Computadora Jacob",
-      descripcion:
-        "Un dispositivo está por ser infectado con un troyano. Revisa la activación del antivirus para evitarlo.",
-      fase: 1,
-      condicionMitigacion: {
-        accion: AccionesRealizables.CLICK,
-        objeto: ObjetosManejables.CONFIG_WORKSTATION,
-        // tiempo: -1,
-        val: [
-           {
-             nombreConfig: "Actualizaciones automáticas de antivirus",
-             // dispositivoAAtacar: "Computadora Jacob",
-             activado: true,
-           },
-           {
-             nombreConfig: "Antivirus gestionado",
-             activado: true,
-           }
-        ],
-      },
-    },
-    {
-      nombreAtaque: "ataque 2",
-      tiempoNotificacion: 20,
       tipoAtaque: TipoAtaque.INFECCION_TROYANO,
       dispositivoAAtacar: "Router Principal",
       descripcion:
@@ -61,12 +36,43 @@ export const escenarioPrueba: unknown = {
       condicionMitigacion: {
         accion: AccionesRealizables.CLICK,
         objeto: ObjetosManejables.CONFIG_FIREWALL,
-        // tiempo: -1,
-        val: {
-          accion: AccionFirewall.PERMITIR,
-          direccion: DireccionTrafico.ENTRANTE,
-          protocolo: TipoProtocolo.SSH,
-        }
+        val: [
+          {
+            nombreRed: "LAN1",
+            accion: AccionFirewall.DENEGAR,
+            direccion: DireccionTrafico.HACIA,
+            protocolo: TipoProtocolo.SSH,
+          },
+          {
+            nombreRed: "LAN1",
+            accion: AccionFirewall.DENEGAR,
+            direccion: DireccionTrafico.HACIA,
+            protocolo: TipoProtocolo.FTP,
+          },
+        ],
+      },
+    },
+    {
+      nombreAtaque: "ataque 2",
+      tiempoNotificacion: 20,
+      tipoAtaque: TipoAtaque.INFECCION_TROYANO,
+      dispositivoAAtacar: "Computadora Jacob",
+      descripcion:
+        "Un dispositivo está por ser infectado con un troyano. Revisa la activación del antivirus para evitarlo.",
+      fase: 1,
+      condicionMitigacion: {
+        accion: AccionesRealizables.CLICK,
+        objeto: ObjetosManejables.CONFIG_WORKSTATION,
+        val: [
+           {
+             nombreConfig: "Actualizaciones automáticas de antivirus",
+             activado: true,
+           },
+           {
+             nombreConfig: "Antivirus gestionado",
+             activado: true,
+           }
+        ],
       },
     },
   ],

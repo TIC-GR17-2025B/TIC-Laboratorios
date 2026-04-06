@@ -434,7 +434,7 @@ export class RedController {
       (regla) => regla.protocolo === protocolo && regla.direccion === direccion
     );
 
-    return !!reglaEncontrada;
+    return reglaEncontrada?.accion == AccionFirewall.DENEGAR ? true : false;
   }
 
   public obtenerLogsTrafico(entidadRouter: Entidad): RegistroFirewallBloqueado[] {
