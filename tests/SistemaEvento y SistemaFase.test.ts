@@ -1,9 +1,9 @@
 import { describe, beforeEach, test, expect } from "vitest";
 import { ECSManager, Entidad } from "../src/ecs/core";
-import { SistemaActivo, SistemaEvento, SistemaFase, SistemaJerarquiaEscenario, SistemaPresupuesto, SistemaRed, SistemaRelaciones, SistemaTiempo } from "../src/ecs/systems";
+import { SistemaActivo, SistemaEvento, SistemaFase, SistemaJerarquiaEscenario, SistemaPresupuesto, SistemaRed, SistemaTiempo } from "../src/ecs/systems";
 import { EstadoAtaqueDispositivo, TipoActivo, TipoAtaque, TipoDispositivo, TipoEvento, TipoProteccionVPN } from "../src/types/DeviceEnums";
 import { AccionesRealizables, ObjetosManejables } from "../src/types/AccionesEnums";
-import { ActivoComponent, AtaqueComponent, ClienteVPNComponent, DispositivoComponent, EscenarioComponent, EventoComponent, FaseComponent, RedComponent, RouterComponent, TiempoComponent, VPNGatewayComponent, WorkstationComponent, ZonaComponent } from "../src/ecs/components";
+import { ActivoComponent, AtaqueComponent, ClienteVPNComponent, DispositivoComponent, EscenarioComponent, EventoComponent, FaseComponent, RedComponent, RouterComponent, VPNGatewayComponent, WorkstationComponent, ZonaComponent } from "../src/ecs/components";
 import { PlantillasCorreoPhishing } from "../src/data/plantillas/Plantillas";
 import { FirewallBuilder } from "../src/ecs/utils/FirewallBuilder";
 import { RedController } from "../src/ecs/controllers/RedController";
