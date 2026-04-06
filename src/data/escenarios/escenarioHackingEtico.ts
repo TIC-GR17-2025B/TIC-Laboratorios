@@ -188,6 +188,7 @@ export const escenarioHackingEtico: unknown = {
       id: 1,
       nombre: "Edificio Principal - Piso 1",
       dominio: "Corporación",
+      esInteractiva: false,
       // Redes disponibles para asignar en esta zona
       redes: [
         {
@@ -370,6 +371,7 @@ export const escenarioHackingEtico: unknown = {
       id: 2,
       nombre: "WWW - Red Externa",
       dominio: "WWW",
+      esInteractiva: false,
       redes: [
         {
           nombre: "RedWWW",
@@ -436,6 +438,7 @@ export const escenarioHackingEtico: unknown = {
       id: 3,
       nombre: "Casa Atacante",
       dominio: "Off-site",
+      esInteractiva: true,
       redes: [
         {
           nombre: "Red-Lisa",

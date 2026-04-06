@@ -254,10 +254,10 @@ export class ScenarioBuilder {
 
   crearZona(zona: unknown, escenarioEntidad?: Entidad): Entidad {
     const entidadZona = this.ecsManager.agregarEntidad();
-    const z = zona as { id: number; nombre: string; dominio: string };
+    const z = zona as { id: number; nombre: string; dominio: string; esInteractiva: boolean; };
     this.ecsManager.agregarComponente(
       entidadZona,
-      new ZonaComponent(z.id, z.nombre, z.dominio)
+      new ZonaComponent(z.id, z.nombre, z.dominio, z.esInteractiva)
     );
     const escEntidad = escenarioEntidad;
     if (escEntidad != null) {
@@ -474,8 +474,8 @@ export class ScenarioBuilder {
   /**
    * Obtiene todas las zonas del escenario con su id, nombre y dominio
    */
-  public obtenerZonas(): Array<{ id: number; nombre: string; dominio: string }> {
-    const zonas: Array<{ id: number; nombre: string; dominio: string }> = [];
+  public obtenerZonas(): Array<{ id: number; nombre: string; dominio: string; esInteractiva: boolean; }> {
+    const zonas: Array<{ id: number; nombre: string; dominio: string; esInteractiva: boolean; }> = [];
 
     // Recorrer todas las entidades y buscar las que tienen ZonaComponent
     for (const [, container] of this.ecsManager.getEntidades()) {
@@ -485,6 +485,7 @@ export class ScenarioBuilder {
           id: zonaComponent.id,
           nombre: zonaComponent.nombre,
           dominio: zonaComponent.dominio,
+          esInteractiva: zonaComponent.esInteractiva,
         });
       }
     }

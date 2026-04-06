@@ -8,10 +8,11 @@ export class ZonaComponent extends Componente {
     public id: number,
     public nombre: string,
     public dominio: string,
+    public esInteractiva: boolean = true,
     public oficinas: Entidad[] = [],
     public redes: Entidad[] = [],
     public personas: Entidad[] = [],
-    public tipo: string = "zona" 
+    public tipo: string = "zona"
   ) {
     super();
   }
