@@ -37,6 +37,7 @@ describe("SistemaEvento y SistemaFase", () => {
     let entidadRouterJacob: Entidad;
     let entidadRouterLisa: Entidad;
     let entidadRedLisa: Entidad;
+    let entidadRedInternet: Entidad;
 
     beforeEach(() => {
         em = new ECSManager();
@@ -192,7 +193,7 @@ describe("SistemaEvento y SistemaFase", () => {
         const firewallConfigLisa = new FirewallBuilder().build();
         em.agregarComponente(entidadRouterLisa, new RouterComponent(firewallConfigLisa));
 
-        const entidadRedInternet = em.agregarEntidad();
+        entidadRedInternet = em.agregarEntidad();
         em.agregarComponente(entidadRedInternet, new RedComponent("Internet", ColoresRed.ROJO));
 
         sistemaJerarquiaEscenario.agregarRedAZona(entidadZonaJacob, entidadRedJacob);
@@ -209,7 +210,7 @@ describe("SistemaEvento y SistemaFase", () => {
         redController.asignarRed(entidadRouterLisa, entidadRedLisa);
         redController.asignarRed(entidadDispLisa, entidadRedLisa);
 
-        // Se añaden reglas sólo para el firewall de Jacob
+        // Se añaden reglas para el firewall de Jacob
         for (const entidadRed of em.getComponentes(entidadRouterJacob)!.get(DispositivoComponent)!.redes) {
             for (const protocolo of FirewallConfigService.obtenerTodosLosProtocolos()){
                 redController.agregarReglaFirewall(
@@ -225,6 +226,30 @@ describe("SistemaEvento y SistemaFase", () => {
             for (const protocolo of FirewallConfigService.obtenerTodosLosProtocolos()){
                 redController.agregarReglaFirewall(
                                     entidadRouterJacob,
+                                    entidadRed,
+                                    protocolo,
+                                    AccionFirewall.PERMITIR,
+                                    DireccionTrafico.HACIA
+                                 ); 
+            }
+        }
+
+        // Se añaden reglas para el firewall de Lisa
+        for (const entidadRed of em.getComponentes(entidadRouterLisa)!.get(DispositivoComponent)!.redes) {
+            for (const protocolo of FirewallConfigService.obtenerTodosLosProtocolos()){
+                redController.agregarReglaFirewall(
+                                    entidadRouterLisa,
+                                    entidadRed,
+                                    protocolo,
+                                    AccionFirewall.PERMITIR,
+                                    DireccionTrafico.DESDE
+                                ); 
+            }
+        }
+        for (const entidadRed of em.getComponentes(entidadRouterLisa)!.get(DispositivoComponent)!.redes) {
+            for (const protocolo of FirewallConfigService.obtenerTodosLosProtocolos()){
+                redController.agregarReglaFirewall(
+                                    entidadRouterLisa,
                                     entidadRed,
                                     protocolo,
                                     AccionFirewall.PERMITIR,
@@ -593,6 +618,74 @@ describe("SistemaEvento y SistemaFase", () => {
 
             expect(logResultanteDeRechazo).toBeDefined();
         });
+
+        it("no debe enviar el activo si un firewall del Emisor tiene bloqueadas las conexiones FTP, DESDE su Red Interna", () => {
+            redController.agregarReglaFirewall(
+                entidadRouterJacob,
+                entidadRedJacob,
+                TipoProtocolo.FTP,
+                AccionFirewall.DENEGAR,
+                DireccionTrafico.DESDE
+            );
+
+            sistemaEvento.ejecutarEvento(eventos[0]);
+
+            const logsEscenario = em.getComponentes(entidadEscenario)?.get(EscenarioComponent)?.logsGenerales;
+            const logResultanteDeRechazo = logsEscenario?.find((log) => log.mensaje == "Activo no enviado: un firewall ha rechazado la conexión entre Computadora Jacob y Computadora Lisa.");
+
+            expect(logResultanteDeRechazo).toBeDefined();
+        });
+
+        it("no debe enviar el activo si un firewall del Emisor tiene bloqueadas las conexiones FTP, HACIA el Internet", () => {
+            redController.agregarReglaFirewall(
+                entidadRouterJacob,
+                entidadRedInternet,
+                TipoProtocolo.FTP,
+                AccionFirewall.DENEGAR,
+                DireccionTrafico.HACIA
+            );
+
+            sistemaEvento.ejecutarEvento(eventos[0]);
+
+            const logsEscenario = em.getComponentes(entidadEscenario)?.get(EscenarioComponent)?.logsGenerales;
+            const logResultanteDeRechazo = logsEscenario?.find((log) => log.mensaje == "Activo no enviado: un firewall ha rechazado la conexión entre Computadora Jacob y Computadora Lisa.");
+
+            expect(logResultanteDeRechazo).toBeDefined();
+        });
+
+        it("no debe enviar el activo si un firewall del Receptor tiene bloqueadas las conexiones FTP, DESDE el Internet", () => {
+            redController.agregarReglaFirewall(
+                entidadRouterLisa,
+                entidadRedInternet,
+                TipoProtocolo.FTP,
+                AccionFirewall.DENEGAR,
+                DireccionTrafico.DESDE
+            );
+
+            sistemaEvento.ejecutarEvento(eventos[0]);
+
+            const logsEscenario = em.getComponentes(entidadEscenario)?.get(EscenarioComponent)?.logsGenerales;
+            const logResultanteDeRechazo = logsEscenario?.find((log) => log.mensaje == "Activo no enviado: un firewall ha rechazado la conexión entre Computadora Jacob y Computadora Lisa.");
+
+            expect(logResultanteDeRechazo).toBeDefined();
+        });
+
+        it("no debe enviar el activo si un firewall del Receptor tiene bloqueadas las conexiones FTP, HACIA su Red Interna", () => {
+            redController.agregarReglaFirewall(
+                entidadRouterLisa,
+                entidadRedLisa,
+                TipoProtocolo.FTP,
+                AccionFirewall.DENEGAR,
+                DireccionTrafico.HACIA
+            );
+
+            sistemaEvento.ejecutarEvento(eventos[0]);
+
+            const logsEscenario = em.getComponentes(entidadEscenario)?.get(EscenarioComponent)?.logsGenerales;
+            const logResultanteDeRechazo = logsEscenario?.find((log) => log.mensaje == "Activo no enviado: un firewall ha rechazado la conexión entre Computadora Jacob y Computadora Lisa.");
+
+            expect(logResultanteDeRechazo).toBeDefined();
+        });
     });
 
     test("Verificación de ejecución de evento Exitoso: Verificación de firma", () => {
@@ -958,6 +1051,80 @@ describe("SistemaEvento y SistemaFase", () => {
 
             const logsEscenario = em.getComponentes(entidadEscenario)?.get(EscenarioComponent)?.logsGenerales;
             const logResultanteDeRechazo = logsEscenario?.find((log) => log.mensaje == "Conexión VPN rechazada: vpnGateway no cuenta con un permiso para permitir una conexión VPN entre Computadora Lisa y Computadora Jacob.");
+
+            expect(logResultanteDeRechazo).toBeDefined();
+        });
+
+        it("debe rechazar la conexión si un firewall del cliente tiene bloqueada la salida de conexiones VPN, DESDE su Red Interna", () => {
+            redController.agregarPerfilClienteVPN(
+                entidadDispLisa,
+                {
+                    proteccion: TipoProteccionVPN.EA,
+                    dominioRemoto: "Dominio Jacob",
+                    hostRemoto: "Computadora Jacob"
+                } as PerfilClienteVPN
+            );
+
+            redController.agregarPerfilVPNGateway(
+                entidadVpnGateway, 
+                {
+                    lanLocal: "LAN1",
+                    hostLan: "Computadora Jacob",
+                    proteccion: TipoProteccionVPN.EA,
+                    dominioRemoto: "Dominio Lisa",
+                    hostRemoto: "Computadora Lisa" 
+                } as PerfilVPNGateway
+            );
+
+            redController.agregarReglaFirewall(
+                entidadRouterLisa,
+                entidadRedLisa,
+                TipoProtocolo.VPN_GATEWAY,
+                AccionFirewall.DENEGAR,
+                DireccionTrafico.DESDE
+            );
+
+            sistemaEvento.ejecutarEvento(eventos[0]);
+
+            const logsEscenario = em.getComponentes(entidadEscenario)?.get(EscenarioComponent)?.logsGenerales;
+            const logResultanteDeRechazo = logsEscenario?.find((log) => log.mensaje == "Conexión VPN rechazada: un firewall de Computadora Lisa tiene bloqueada la salida de conexiones VPN.");
+
+            expect(logResultanteDeRechazo).toBeDefined();
+        });
+
+        it("debe rechazar la conexión si un firewall del cliente tiene bloqueada la salida de conexiones VPN, HACIA el Internet", () => {
+            redController.agregarPerfilClienteVPN(
+                entidadDispLisa,
+                {
+                    proteccion: TipoProteccionVPN.EA,
+                    dominioRemoto: "Dominio Jacob",
+                    hostRemoto: "Computadora Jacob"
+                } as PerfilClienteVPN
+            );
+
+            redController.agregarPerfilVPNGateway(
+                entidadVpnGateway, 
+                {
+                    lanLocal: "LAN1",
+                    hostLan: "Computadora Jacob",
+                    proteccion: TipoProteccionVPN.EA,
+                    dominioRemoto: "Dominio Lisa",
+                    hostRemoto: "Computadora Lisa" 
+                } as PerfilVPNGateway
+            );
+
+            redController.agregarReglaFirewall(
+                entidadRouterLisa,
+                entidadRedInternet,
+                TipoProtocolo.VPN_GATEWAY,
+                AccionFirewall.DENEGAR,
+                DireccionTrafico.HACIA
+            );
+
+            sistemaEvento.ejecutarEvento(eventos[0]);
+
+            const logsEscenario = em.getComponentes(entidadEscenario)?.get(EscenarioComponent)?.logsGenerales;
+            const logResultanteDeRechazo = logsEscenario?.find((log) => log.mensaje == "Conexión VPN rechazada: un firewall de Computadora Lisa tiene bloqueada la salida de conexiones VPN.");
 
             expect(logResultanteDeRechazo).toBeDefined();
         });

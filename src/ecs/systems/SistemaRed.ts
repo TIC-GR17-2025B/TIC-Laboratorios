@@ -197,6 +197,19 @@ export class SistemaRed extends Sistema {
       // console.log(
       //   `❌ SistemaRed.enviarTrafico: Tráfico BLOQUEADO por firewall`
       // );
+      if (protocolo == TipoProtocolo.VPN_GATEWAY) { // Esto debería ir en las comprobaciones del lado del cliente dentro del método getVPNService().establecerConexion(...), pero por cuestiones de compatibilidad se lo deja aquí, ya que la comprobación que se hace con !resultadoFirewall.permitido es lo mismo que se haría dentro del método de establecerConexion.
+        this.ecsManager.emit(EventosPublicos.VPN_CONEXION_RECHAZADA, 
+          `Conexión VPN rechazada: un firewall de ${dispOrigen.nombre} tiene bloqueada la salida de conexiones VPN.`
+        );
+        return;
+      }
+
+      if (protocolo == TipoProtocolo.FTP) { // La misma razón que arriba
+        this.ecsManager.emit(EventosPublicos.RED_ACTIVO_NO_ENVIADO,
+          `Activo no enviado: un firewall ha rechazado la conexión entre ${dispOrigen.nombre} y ${dispDestino.nombre}.`
+        );
+        return;
+      }
 
       // Emitir evento de bloqueo
       this.getEventoService().emitirEventoBloqueado(
@@ -245,15 +258,6 @@ export class SistemaRed extends Sistema {
       }
       // Próximamente para otros protocolos
     }
-
-    // Tráfico exitoso
-    // if (protocolo != TipoProtocolo.VPN_GATEWAY) {
-    //   this.getEventoService().registrarTrafico(
-    //     dispOrigen.nombre,
-    //     dispDestino.nombre,
-    //     protocolo
-    //   );
-    // }
 
     return;
   }
