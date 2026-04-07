@@ -9,10 +9,7 @@ const FloatingChat: React.FC = () => {
 
   return (
     <div className={`${styles.floatingChatWrapper} ${!isChatOpen ? styles.hidden : ''}`}>
-      <ChatContainer
-        isOpen={isChatOpen}
-        webhookUrl="https://pymwebhooks.pymbots.com/webhook/5b947366-065c-4f88-878b-176f8ebdf392"
-      />
+      <ChatContainer isOpen={isChatOpen} />
     </div>
   );
 };

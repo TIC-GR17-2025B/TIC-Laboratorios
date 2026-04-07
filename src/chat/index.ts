@@ -19,5 +19,6 @@ export { SendMessageUseCase } from "./application/useCases/SendMessageUseCase";
 export { SendContextUseCase } from "./application/useCases/SendContextUseCase";
 export { ToggleContextModeUseCase } from "./application/useCases/ToggleContextModeUseCase";
 
-export { N8nChatRepository } from "./infrastructure/repositories/N8nChatRepository";
+export { HttpChatRepository } from "./infrastructure/repositories/HttpChatRepository";
+export { NativeChatRepository } from "./infrastructure/repositories/NativeChatRepository";
 export { ContextModeManager } from "./infrastructure/context-mode/ContextModeManager";
