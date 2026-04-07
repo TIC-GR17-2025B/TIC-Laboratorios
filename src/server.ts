@@ -5,10 +5,7 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import authRouter from './auth/infrastructure/controllers/AuthController.js'
 import progresoRouter from './auth/infrastructure/controllers/ProgresoController.js'
-<<<<<<< HEAD
-=======
 import groupsRouter from './groups/infrastructure/controller/GroupsController.js'
->>>>>>> origin/chore/union-sprint5
 import feedbackRouter from './feedback/infrastructure/controllers/FeedbackController.js'
 import courseAnalysisRouter from './course-analysis/infrastructure/controllers/CourseAnalysisController.js'
 import chatRouter from './chat/infrastructure/controllers/ChatController.js'

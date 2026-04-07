@@ -32,11 +32,8 @@
     "npm": ">=9.0.0"
   },
   "dependencies": {
-<<<<<<< HEAD
     "@google/generative-ai": "^0.24.1",
-=======
     "@phosphor-icons/react": "^2.1.10",
->>>>>>> origin/chore/union-sprint5
     "@prisma/adapter-pg": "^7.0.1",
     "@prisma/client": "^7.0.1",
     "@qdrant/js-client-rest": "^1.17.0",
