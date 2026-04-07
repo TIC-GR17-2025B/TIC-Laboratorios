@@ -1,8 +1,10 @@
 import { AccionesRealizables, ObjetosManejables } from "../../types/AccionesEnums";
 import { ComandoTerminal } from "../../types/DeviceEnums";
 import type { RespuestaComando } from "../../types/EscenarioTypes";
+import { TipoProtocolo } from "../../types/TrafficEnums";
 import { ActivoComponent, DispositivoComponent } from "../components";
 import { Sistema, /*type ClaseComponente,*/ type Entidad } from "../core";
+import { ConectividadService, FirewallService } from "./red";
 
 export class SistemaComandos extends Sistema {
     // public componentesRequeridos: Set<ClaseComponente> = new Set();
@@ -97,7 +99,7 @@ export class SistemaComandos extends Sistema {
                 return { texto: activo.contenido!, entidadActual: this.entidadDispActual };
             }
         }
-        return { texto: `Error: No existe el archivo '${nombreArchivo}'`, entidadActual: this.entidadDispActual };
+        return { texto: `Error: cat: No existe el archivo '${nombreArchivo}'`, entidadActual: this.entidadDispActual };
     }
 
     private ejecutarSSH(usuarioYEquipo: string, contrasenia: string): RespuestaComando {
@@ -115,21 +117,29 @@ export class SistemaComandos extends Sistema {
         }
 
         if (entidadDispAConectar == null) return { 
-            texto: `Error: No se ha encontrado el dispositivo '${nombreEquipo}'.`,
+            texto: `Error: ssh: No se ha encontrado el dispositivo '${nombreEquipo}'.`,
             entidadActual: this.entidadDispActual
         };
+
+        const firewallService = new FirewallService(new ConectividadService(this.ecsManager), this.ecsManager);
+        const tieneSshBloqueado = firewallService.validarFirewall(this.entidadDispActual, entidadDispAConectar,TipoProtocolo.SSH);
+
+        if (!tieneSshBloqueado.permitido) return {
+            texto: `Error: ssh: Conectar con dispositivo '${nombreEquipo}': Conexión rechazada.`,
+            entidadActual: this.entidadDispActual
+        }
 
         const usuarioDisp = this.ecsManager.getComponentes(entidadDispAConectar)?.get(DispositivoComponent)?.usuario;
 
         if (usuario != usuarioDisp) return {
-            texto: `Error: No existe el usuario '${usuario}' en el dispositivo '${nombreEquipo}'.`,
+            texto: `Error: ssh: No existe el usuario '${usuario}' en el dispositivo '${nombreEquipo}'.`,
             entidadActual: this.entidadDispActual
         };
 
         const contraDisp = this.ecsManager.getComponentes(entidadDispAConectar)?.get(DispositivoComponent)?.contrasenia;
 
         if (contrasenia != contraDisp) return {
-            texto: `Error: Contraseña incorrecta para el usuario '${usuario}'.`,
+            texto: `Error: ssh: Contraseña incorrecta para el usuario '${usuario}'.`,
             entidadActual: this.entidadDispActual
         };
 
