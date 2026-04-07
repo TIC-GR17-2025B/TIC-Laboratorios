@@ -8,8 +8,8 @@ export enum AccionFirewall {
 
 
 export enum DireccionTrafico {
-    SALIENTE = 'SALIENTE',
-    ENTRANTE = 'ENTRANTE',
+    HACIA = 'HACIA',  // SALIENTE
+    DESDE = 'DESDE',  // ENTRANTE
     AMBAS = 'AMBAS'
 }
 

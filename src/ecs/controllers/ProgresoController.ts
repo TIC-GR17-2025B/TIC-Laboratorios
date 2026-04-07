@@ -1,7 +1,7 @@
-import { API_BASE_URL } from "../../visual/common/utils/apiConfig";
+import { API_BASE_URL } from "../../config/apiConfig";
 
 export class ProgresoController {
- 
+
   private API_URL = API_BASE_URL;
 
   private static instance: ProgresoController | null = null;
@@ -15,10 +15,10 @@ export class ProgresoController {
 
   public async guardarProgresoEstudiante(terminado: boolean, tiempo: number) {
 
-    const {id_estudiante, id_escenario} = await this.getDatosSesion();
+    const {id_estudiante, slug_escenario} = await this.getDatosSesion();
     const data = {
       id_estudiante: id_estudiante,
-      id_escenario: id_escenario,
+      slug_escenario: slug_escenario,
       terminado: terminado,
       tiempo: tiempo
     };
@@ -54,14 +54,14 @@ export class ProgresoController {
 
   public async getProgresoEstudiante(
     id_estudiante: number,
-    id_escenario: number
+    slug_escenario: string
   ): Promise<{
       terminado: boolean;
       intentos: number;
   } | null> {
 
     try {
-      const response = await fetch(`${this.API_URL}/progreso/estudiante/${id_estudiante}/escenario/${id_escenario}`, {
+      const response = await fetch(`${this.API_URL}/progreso/estudiante/${id_estudiante}/escenario/${slug_escenario}`, {
         method: "GET",
       });
 
@@ -87,9 +87,9 @@ export class ProgresoController {
     }
   }
 
-  private async getDatosSesion(): Promise<{id_estudiante: number; id_escenario: number}> {
+  private async getDatosSesion(): Promise<{id_estudiante: number; slug_escenario: string}> {
     const id_estudiante = JSON.parse(localStorage.getItem("user")!).id_estudiante;
-    const id_escenario = parseInt(localStorage.getItem("id_escenario_actual")!);
-    return { id_estudiante: id_estudiante, id_escenario: id_escenario };
+    const slug_escenario = localStorage.getItem("slug_escenario_actual")!;
+    return { id_estudiante, slug_escenario };
   }
 }

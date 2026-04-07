@@ -1,364 +1,244 @@
-.container {
-  min-height: 100vh;
-  background-color: var(--surface-primary);
-  color: var(--text-primary);
-}
+/* ── Layout ── */
 
-.header {
+.main {
   display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 24px;
-  border-bottom: 1px solid var(--border-primary);
+  flex-direction: column;
+  gap: 32px;
 }
 
-.header h1 {
-  font-size: 1.5rem;
-  font-weight: 500;
-  color: var(--text-primary);
+/* ── Profile ── */
+
+.pageTitle {
+  font-size: 28px;
+  font-weight: 600;
   margin: 0;
+  color: var(--text-primary);
 }
 
-.backButton {
+.meta {
+  margin: 2px 0 0 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* ── Historial de evaluaciones ── */
+
+.historialSection {
+  padding-top: 8px;
+}
+
+.historialTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 32px 0;
+}
+
+.historialList {
   display: flex;
-  align-items: center;
-  padding: 0.5rem 1rem;
-  background: transparent;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── Escenario block ── */
+
+.escenarioBlock {
+  display: flex;
+  flex-direction: column;
   border: 1px solid var(--border-primary);
   border-radius: var(--border-radius);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  line-height: 0;
-  color: var(--text-primary);
-}
-
-.backButton:hover {
-  border-color: var(--blue);
-  background: var(--surface-secondary);
-}
-
-.content {
-  padding: 24px;
-}
-
-.profileHeader {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  padding: 2rem;
-  background: var(--surface-secondary);
-  border: 1px solid var(--border-primary);
-  border-radius: 12px;
-  margin-bottom: 2rem;
-}
-
-.avatarLarge {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--blue) 0%, var(--blue-lighter) 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 32px;
-  color: white;
-  flex-shrink: 0;
-}
-
-.profileInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.profileName {
-  margin: 0 0 0.25rem 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.profileEmail {
-  margin: 0;
-  font-size: 14px;
-  color: var(--text-muted);
-}
-
-.profileCode {
-  margin: 0;
-  font-size: 14px;
-  color: var(--text-muted);
-  font-family: monospace;
-}
-
-.statsSection {
-  margin-bottom: 2rem;
-}
-
-.sectionTitle {
-  margin: 0 0 1rem 0;
-  font-size: 1.25rem;
-  font-weight: 500;
-  color: var(--text-primary);
-}
-
-.statsGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-}
-
-.statCard {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 1.5rem;
-  background: var(--surface-secondary);
-  border: 1px solid var(--border-primary);
-  border-radius: 12px;
-  text-align: center;
-}
-
-.statValue {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: var(--blue);
-}
-
-.statLabel {
-  font-size: 14px;
-  color: var(--text-muted);
-  margin-top: 0.25rem;
-}
-
-.progressSection {
-  margin-bottom: 2rem;
-}
-
-.loadingState {
-  padding: 3rem;
-  text-align: center;
-  color: var(--text-muted);
-}
-
-.emptyState {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 4rem 2rem;
-  background: var(--surface-secondary);
-  border: 1px solid var(--border-primary);
-  border-radius: 12px;
-  text-align: center;
-  gap: 1rem;
-}
-
-.emptyState svg {
-  color: var(--text-muted);
-  opacity: 0.5;
-}
-
-.emptyState p {
-  margin: 0;
-  color: var(--text-muted);
-}
-
-.emptyState button {
-  padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, var(--blue) 0%, var(--blue-lighter) 100%);
-  border: none;
-  border-radius: 8px;
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.emptyState button:hover {
-  transform: translateY(-2px);
-}
-
-.escenariosList {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.escenarioCard {
-  border: 1px solid var(--border-primary);
-  border-radius: var(--border-radius);
-  overflow: hidden;
-  transition: all 0.2s ease;
-  background: var(--surface-primary);
+  padding: 16px;
 }
 
 .escenarioHeader {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 1rem;
-  gap: 1rem;
-}
-
-.escenarioClickArea {
-  display: flex;
   justify-content: space-between;
-  align-items: center;
-  flex: 1;
   cursor: pointer;
-  transition: opacity 0.2s ease;
-  min-width: 0;
+  padding: 4px 0;
 }
 
-.escenarioClickArea:hover {
-  opacity: 0.8;
-}
-
-.escenarioInfo {
-  flex: 1;
-  min-width: 0;
-}
-
-.escenarioInfo h3 {
-  margin: 0;
+.escenarioTitle {
+  font-size: 18px;
+  font-weight: 600;
   color: var(--text-primary);
-  font-weight: 500;
-  font-size: 1.1rem;
+  margin: 0;
 }
 
-.escenarioStatus {
+.escenarioMeta {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 2px 0 0 0;
+}
+
+.escenarioActions {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 8px;
   flex-shrink: 0;
 }
 
-.badgeCompletado,
-.badgeIntentado,
-.badgeNoIntentado {
-  padding: 0.5rem 1rem;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
+.chevron {
+  color: var(--text-muted);
+  transition: transform 0.15s ease;
+  flex-shrink: 0;
 }
 
-.badgeCompletado {
-  background: rgba(76, 175, 80, 0.2);
-  color: #4caf50;
-}
-
-.badgeIntentado {
-  background: rgba(255, 193, 7, 0.2);
-  color: #ffc107;
-}
-
-.badgeNoIntentado {
-  background: var(--surface-secondary);
-  color: var(--text-secondary);
-  border: 1px solid var(--border-primary);
-}
-
-.expandIcon {
-  color: var(--text-secondary);
-  transition: transform 0.2s ease;
-}
-
-.expandIcon.expanded {
+.chevronOpen {
   transform: rotate(180deg);
 }
 
-.feedbackButtonWrapper {
-  flex-shrink: 0;
-}
-
-.escenarioDetails {
-  padding: 1rem;
-  border-top: 1px solid var(--border-primary);
-}
+/* ── Intento rows (timeline) ── */
 
 .intentosList {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  position: relative;
+  margin-left: 3px;
+  padding-top: 12px;
+  overflow: hidden;
 }
 
-.intentoItem {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem;
-  background: var(--surface-primary);
-  border-radius: var(--border-radius);
-  border: 1px solid var(--border-primary);
-}
-
-.intentoNumero {
-  width: 75px;
-  font-weight: 500;
-  color: var(--text-primary);
-}
-
-.intentoInfo {
-  display: flex;
-  gap: 0.75rem;
-  align-items: center;
-}
-
-.intentoTiempo {
+.intentoRow {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
-  color: var(--text-muted);
+  gap: 16px;
+  padding: 14px 0 14px 24px;
+  position: relative;
+}
+
+/* line segment per row */
+.intentoRow::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--border-primary);
+}
+
+.intentoRow:first-child::before {
+  top: 50%;
+}
+
+.intentoRow:last-child::before {
+  bottom: 50%;
+}
+
+.intentoRow:only-child::before {
+  display: none;
+}
+
+.intentoDot {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.dotOk {
+  background: #4caf50;
+}
+
+.dotFail {
+  background: #ff6b6b;
+}
+
+.intentoNum {
   font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  min-width: 28px;
 }
 
 .intentoFecha {
-  color: var(--text-secondary);
-  font-size: 0.75rem;
+  font-size: 13px;
+  color: var(--text-muted);
+  flex: 1;
+}
+
+.intentoTiempo {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-family: "SF Mono", "Fira Code", monospace;
+  letter-spacing: 0.04em;
+  min-width: 48px;
   text-align: right;
 }
 
-.intentoExito {
+.intentoStatusOk {
+  font-size: 13px;
   color: #4caf50;
-  font-size: 0.75rem;
-  font-weight: 500;
+  min-width: 90px;
+  text-align: right;
 }
 
-.intentoFallo {
+.intentoStatusFail {
+  font-size: 13px;
   color: #ff6b6b;
-  font-size: 0.75rem;
-  font-weight: 500;
+  min-width: 90px;
+  text-align: right;
 }
 
-@media (max-width: 768px) {
-  .escenarioHeader {
-    flex-direction: column;
-    align-items: stretch;
+/* ── Buttons ── */
+
+.linkButton {
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 13px;
+  transition: color 0.15s ease;
+}
+
+.linkButton:hover {
+  color: var(--text-primary);
+}
+
+/* ── Empty / loading ── */
+
+.empty {
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.muted {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 640px) {
+  .main {
+    padding: 24px 16px;
   }
 
-  .escenarioClickArea {
-    width: 100%;
+  .intentoRow {
+    gap: 8px;
   }
 
-  .feedbackButtonWrapper {
-    width: 100%;
+  .intentoFecha {
+    flex: unset;
+    font-size: 12px;
   }
 
-  .intentoItem {
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
+  .intentoTiempo {
+    min-width: unset;
   }
 
-  .escenarioStatus {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .statsGrid {
-    grid-template-columns: 1fr;
+  .intentoStatusOk,
+  .intentoStatusFail {
+    min-width: unset;
+    font-size: 12px;
   }
 }

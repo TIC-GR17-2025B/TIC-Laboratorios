@@ -38,7 +38,7 @@ export function useECSScene() {
   const [mensajeLog, setMensajeLog] = useState("");
   const [tiempoLog, setTiempoLog] = useState(0);
   const [tipoLog, setTipoLog] = useState<
-    "ataque" | "advertencia" | "completado"
+    "ataque" | "advertencia" | "completado" | "informacion"
   >("advertencia");
   const [logs, setLogs] = useState<
     Array<{ time: string; content: string; category: string }>
@@ -49,7 +49,7 @@ export function useECSScene() {
   const [hasNewLog, setHasNewLog] = useState(false);
   const [zonaActual, setZonaActual] = useState<number | null>(null);
   const [zonasDisponibles, setZonasDisponibles] = useState<
-    Array<{ id: number; nombre: string }>
+    Array<{ id: number; nombre: string; dominio: string }>
   >([]);
   const [showZoneToast, setShowZoneToast] = useState(false);
   const [zoneToastName, setZoneToastName] = useState("");
@@ -142,7 +142,7 @@ export function useECSScene() {
     // TERCERO: Cargar eventos DIRECTAMENTE en el sistema de tiempo
     escenarioController.cargarEventosEnSistema();
     // CUARTO: Configurar presupuesto
-    escenarioController.efectuarPresupuesto(escenario.presupuestoInicial);
+    escenarioController.efectuarPresupuesto(/*escenario.presupuestoInicial*/);
     // QUINTO: Obtener estado inicial
     setEntities(escenarioController.builder.getEntidades());
     setIsPaused(escenarioController.estaTiempoPausado());
@@ -187,7 +187,7 @@ export function useECSScene() {
               setTiempoLog(escenarioController.tiempoTranscurrido);
 
               // Determinar el tipo de log según el tipo del log general
-              let tipoLogUI: "ataque" | "advertencia" | "completado" =
+              let tipoLogUI: "ataque" | "advertencia" | "completado" | "informacion" =
                 "advertencia";
               let categoria = "ADVERTENCIA";
 
@@ -196,7 +196,10 @@ export function useECSScene() {
                 categoria = "ATAQUE";
               } else if (ultimoLog.tipo === TipoLogGeneral.COMPLETADO) {
                 tipoLogUI = "completado";
-                categoria = "INFO";
+                categoria = "COMPLETADO";
+              } else if (ultimoLog.tipo === TipoLogGeneral.INFORMACION) {
+                tipoLogUI = "informacion";
+                categoria = "INFORMACION";
               }
 
               setTipoLog(tipoLogUI);

@@ -8,7 +8,7 @@ export class CheckFeedbackStatusUseCase {
     private readonly prisma: PrismaClient
   ) {}
 
-  async execute(idEstudiante: number, idEscenario: number): Promise<{
+  async execute(idEstudiante: number, slugEscenario: string): Promise<{
     habilitado: boolean;
     intentosActuales: number;
     intentosAlGenerar: number | null;
@@ -16,17 +16,17 @@ export class CheckFeedbackStatusUseCase {
     const intentosActuales = await this.prisma.progreso.count({
       where: {
         id_estudiante: idEstudiante,
-        id_escenario: idEscenario,
+        slug_escenario: slugEscenario,
       },
     });
 
     const habilitado = await this.feedbackStateRepository.debeHabilitar(
       idEstudiante,
-      idEscenario,
+      slugEscenario,
       intentosActuales
     );
 
-    const estado = await this.feedbackStateRepository.obtener(idEstudiante, idEscenario);
+    const estado = await this.feedbackStateRepository.obtener(idEstudiante, slugEscenario);
 
     return {
       habilitado,

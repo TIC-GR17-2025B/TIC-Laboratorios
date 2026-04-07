@@ -87,7 +87,7 @@ export interface RegistroFirewallRegla {
   tipo: 'REGLA_AGREGADA';
   protocolo: TipoProtocolo;
   accion: 'PERMITIR' | 'DENEGAR';
-  direccion: 'SALIENTE' | 'ENTRANTE' | 'AMBAS';
+  direccion: 'HACIA' | 'DESDE' | 'AMBAS';
 }
 
 // Registro cuando se cambia la política por defecto

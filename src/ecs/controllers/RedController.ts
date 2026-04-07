@@ -1,5 +1,6 @@
 import { TipoDispositivo } from "../../types/DeviceEnums";
 import type {
+    InfoDispositivoEscaneado,
   LogGeneral,
   PerfilClienteVPN,
   PerfilVPNGateway,
@@ -152,7 +153,6 @@ export class RedController {
         d.evento.infoAdicional.esObjetivo,
         d.evento.infoAdicional.debeSerBloqueado
       );
-      //console.log("Tráfico enviado desde el controlador de red", resultado);
     });
 
     this.ecsManager.on(
@@ -180,7 +180,7 @@ export class RedController {
       (data: unknown) => {
         const mensaje = data as string;
         const log = {
-          tipo: TipoLogGeneral.ATAQUE,
+          tipo: TipoLogGeneral.ADVERTENCIA,
           mensaje: mensaje,
           pausarTiempo: true,
         };
@@ -210,7 +210,7 @@ export class RedController {
       (data: unknown) => {
         const mensaje = data as string;
         const log = {
-          tipo: TipoLogGeneral.COMPLETADO,
+          tipo: TipoLogGeneral.INFORMACION,
           mensaje: mensaje,
           pausarTiempo: false,
         };
@@ -223,7 +223,7 @@ export class RedController {
       (data: unknown) => {
         const mensaje = data as string;
         const log = {
-          tipo: TipoLogGeneral.ADVERTENCIA,
+          tipo: TipoLogGeneral.INFORMACION,
           mensaje: mensaje,
           pausarTiempo: false,
         };
@@ -236,7 +236,7 @@ export class RedController {
       (data: unknown) => {
         const mensaje = data as string;
         const log = {
-          tipo: TipoLogGeneral.COMPLETADO,
+          tipo: TipoLogGeneral.INFORMACION,
           mensaje: mensaje,
           pausarTiempo: false,
         };
@@ -249,7 +249,7 @@ export class RedController {
       (data: unknown) => {
         const mensaje = data as string;
         const log = {
-          tipo: TipoLogGeneral.ADVERTENCIA,
+          tipo: TipoLogGeneral.INFORMACION,
           mensaje: mensaje,
           pausarTiempo: false,
         };
@@ -271,7 +271,7 @@ export class RedController {
     this.ecsManager.on(EventosPublicos.TRAFICO_BLOQUEADO, (data: unknown) => {
       const d = data as { mensaje: string };
       const log = {
-        tipo: TipoLogGeneral.ATAQUE,
+        tipo: TipoLogGeneral.COMPLETADO,
         mensaje: d.mensaje,
         pausarTiempo: true,
       };
@@ -434,7 +434,7 @@ export class RedController {
       (regla) => regla.protocolo === protocolo && regla.direccion === direccion
     );
 
-    return !!reglaEncontrada;
+    return reglaEncontrada?.accion == AccionFirewall.DENEGAR;
   }
 
   public obtenerLogsTrafico(entidadRouter: Entidad): RegistroFirewallBloqueado[] {
@@ -487,6 +487,30 @@ export class RedController {
         worksYServersDeZona.push(entidadDispositivo);
     }
     return worksYServersDeZona;
+  }
+
+  // Se le pasa como parámetro la entidad de la zona (dominio) y se extrae la info necesaria
+  // Solo se toman en cuenta workstations para el escaneo
+  public getEscaneoDispositivosDominio(entidadZona: Entidad): InfoDispositivoEscaneado[] | undefined {
+    const dispositivosDominio = this.getDispositivosPorZona(entidadZona);
+
+    const infoDispositivosEscaneados: InfoDispositivoEscaneado[] = [];
+
+    for (const entidadDispositivo of dispositivosDominio ?? []) {
+      const dispActual = this.ecsManager.getComponentes(entidadDispositivo)?.get(DispositivoComponent);
+      
+      if (dispActual?.tipo != TipoDispositivo.WORKSTATION) continue;
+
+      const infoDispActual: InfoDispositivoEscaneado = {
+        nombre: dispActual!.nombre,
+        sistOp: dispActual!.sistemaOperativo,
+        encargado: dispActual!.personaEncargada!
+      };
+
+      infoDispositivosEscaneados.push(infoDispActual);
+    }
+
+    return infoDispositivosEscaneados;
   }
 
   // Obtiene las zonas locales del router/gateway (la zona donde está el dispositivo)

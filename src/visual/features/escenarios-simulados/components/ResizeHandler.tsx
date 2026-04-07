@@ -19,7 +19,6 @@ const ResizeHandler = () => {
 
             if (width === 0 || height === 0) return;
 
-            // Actualizar el aspect ratio de la cámara
             if (camera instanceof PerspectiveCamera) {
                 camera.aspect = width / height;
                 camera.updateProjectionMatrix();
@@ -28,19 +27,22 @@ const ResizeHandler = () => {
             gl.setSize(width, height, false);
         };
 
-        handleResize();
+        // Delay inicial para que el layout flex/CSS se estabilice
+        const initTimeout = window.setTimeout(handleResize, 100);
 
-        let resizeTimeout: number;
-        const debouncedResize = () => {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = window.setTimeout(handleResize, 50);
-        };
-
-        window.addEventListener('resize', debouncedResize);
+        // ResizeObserver para detectar cambios en el contenedor
+        const container = gl.domElement.parentElement;
+        let resizeObserver: ResizeObserver | null = null;
+        if (container) {
+            resizeObserver = new ResizeObserver(() => {
+                handleResize();
+            });
+            resizeObserver.observe(container);
+        }
 
         return () => {
-            window.removeEventListener('resize', debouncedResize);
-            clearTimeout(resizeTimeout);
+            clearTimeout(initTimeout);
+            resizeObserver?.disconnect();
         };
     }, [camera, gl, size]);
 

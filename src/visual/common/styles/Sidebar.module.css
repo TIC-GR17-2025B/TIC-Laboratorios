@@ -1,0 +1,151 @@
+.dock {
+  position: fixed;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 99900;
+  display: flex;
+  align-items: center;
+  padding: 6px 8px;
+  gap: 4px;
+  background: rgba(41, 41, 41, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-primary);
+  border-radius: 16px;
+  user-select: none;
+}
+
+/* Navigation section */
+.navSection {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Vertical divider between nav and controls */
+.spacer {
+  width: 1px;
+  height: 28px;
+  background: var(--border-primary);
+  margin: 0 6px;
+}
+
+/* Controls section (timer, pause, chat) */
+.controlsSection {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Individual dock item (navigation link) */
+.dockItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.dockItem:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+}
+
+.dockItem.active {
+  background: var(--blue-transparent);
+  color: var(--blue);
+}
+
+/* Tooltip - now appears above the dock */
+.tooltip {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface-secondary);
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.dockItem:hover .tooltip {
+  opacity: 1;
+}
+
+/* Time display in dock */
+.tiempoDisplay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* Control buttons in dock */
+.controlBtn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: var(--text-muted);
+  transition: all 0.15s ease;
+}
+
+.controlBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+}
+
+.controlBtn:hover .tooltip {
+  opacity: 1;
+}
+
+/* Chat button special styling */
+.chatBtn {
+  composes: controlBtn;
+}
+
+.chatBtn.chatActive {
+  background: var(--blue-transparent);
+  color: var(--blue);
+}
+
+/* Override ChatContainer positioning for dock context */
+.chatWrapper {
+  position: static;
+}
+
+.chatWrapper > div:last-child {
+  position: fixed;
+  bottom: 68px;
+  right: 12px;
+  left: auto;
+  top: auto;
+}

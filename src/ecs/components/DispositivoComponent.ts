@@ -9,7 +9,11 @@ export class DispositivoComponent extends Componente {
     public hardware: string = "",
     public tipo: TipoDispositivo,
     public estadoAtaque: EstadoAtaqueDispositivo,
+    public nombreEquipo: string, 
+    public usuario: string,
+    public contrasenia: string,
     public redes: Entidad[] = [],
+    public personaEncargada?: string,
     public apps?: SoftwareApp[]
   ) {
     super();

@@ -1,0 +1,115 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 16px;
+    gap: 14px;
+    font-family: 'Inter', sans-serif;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+.select {
+    padding: 8px 12px;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-primary);
+    background: var(--surface-primary);
+    color: var(--text-primary);
+    font-size: 13px;
+    font-family: inherit;
+}
+
+.input {
+    padding: 8px 12px;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-primary);
+    background: var(--surface-primary);
+    color: var(--text-primary);
+    font-size: 13px;
+    font-family: inherit;
+}
+
+.input:focus,
+.select:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.preview {
+    flex: 1;
+    overflow: auto;
+    background: var(--surface-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--border-radius);
+    padding: 14px;
+}
+
+.previewSubject {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 14px;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-primary);
+}
+
+.previewBody {
+    color: var(--text-primary);
+    font-size: 13px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+.previewEmpty {
+    color: var(--text-muted);
+    font-size: 13px;
+    font-style: italic;
+}
+
+.footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.btnSend {
+    padding: 8px 24px;
+    border: none;
+    border-radius: var(--border-radius);
+    background: var(--blue);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.btnSend:hover {
+    background: var(--blue-lighter);
+}
+
+.btnSend:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.successMsg {
+    padding: 10px 14px;
+    background: var(--success-bg);
+    color: var(--success);
+    border-radius: var(--border-radius);
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+}

@@ -38,6 +38,8 @@ export enum TipoEvento {
   COMPLETACION_FASE = "Completación de fase",
   COMPLETACION_ESCENARIO = "Completación de escenario",
   VERIFICACION_FIRMA = "Verificación de firma",
+  VERIFICACION_ACCION_JUGADOR = "Verificación de acciones de un jugador en la simulación",
+  ENVIO_CORREO = "Envío de correo",
 }
 
 export enum TipoActivo {
@@ -45,4 +47,18 @@ export enum TipoActivo {
   DOCUMENTO = "doc",
   FIRMA_DIGITAL = "firma digital",
   CLAVE_PUBLICA = "clave publica",
+}
+
+export enum NivelConcienciaSeguridad {
+  ALTA = "Alta",
+  MEDIA = "Media",
+  BAJA = "Baja",
+}
+
+export enum ComandoTerminal {
+  H = "h",
+  LS = "ls",
+  CAT = "cat",
+  SSH = "ssh",
+  CLS = "cls",
 }

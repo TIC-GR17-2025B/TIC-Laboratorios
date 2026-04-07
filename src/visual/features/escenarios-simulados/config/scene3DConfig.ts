@@ -37,7 +37,7 @@ export const DEFAULT_CONTROLS_CONFIG: ControlsConfig = {
   autoRotate: false,
   autoRotateSpeed: 2,
   minDistance: 2,
-  maxDistance: 10,
+  maxDistance: 25,
   minPolarAngle: 0,
   maxPolarAngle: Math.PI / 2,
 };

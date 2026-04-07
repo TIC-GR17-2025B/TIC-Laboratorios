@@ -34,7 +34,8 @@ export default function TarjetaLogNuevo() {
     const tipoToCategory: Record<string, LogCategory> = {
         ataque: LogCategory.ATAQUE,
         advertencia: LogCategory.ADVERTENCIA,
-        completado: LogCategory.INFO
+        completado: LogCategory.COMPLETADO,
+        informacion: LogCategory.INFORMACION,
     };
 
     const category = tipoToCategory[tipoLog];

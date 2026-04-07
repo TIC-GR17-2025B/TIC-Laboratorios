@@ -1,20 +1,200 @@
+/* ── Container ── */
 .contenedor {
   display: flex;
+  flex-direction: column;
   width: 100%;
-  height: 500px;
-  gap: 0;
-  border: 1px solid var(--border-color);
+  height: 100%;
+  overflow: hidden;
+  background: var(--surface-primary);
+}
+
+/* ── Address bar ── */
+.addressBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border-primary);
+  flex-shrink: 0;
+}
+
+.navButtons {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.navBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
   border-radius: 4px;
+  font-size: 14px;
+  color: var(--text-muted);
+  cursor: default;
+  user-select: none;
+}
+
+.addressPath {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: var(--surface-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text-primary);
+  min-width: 0;
   overflow: hidden;
 }
 
-.panelIzquierdo {
-  flex: 0 0 250px;
+.addressSep {
+  color: var(--text-secondary);
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+/* ── Body (sidebar + file list + preview) ── */
+.body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  width: 160px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border-primary);
+  overflow-y: auto;
+  padding: 6px 0;
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--border-primary);
+  border-radius: 2px;
+}
+
+.sidebarSection {
+  padding: 2px 0;
+}
+
+.sidebarSection + .sidebarSection {
+  border-top: 1px solid var(--border-primary);
+  margin-top: 4px;
+  padding-top: 6px;
+}
+
+.sidebarItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  font-size: 13px;
+  color: var(--text-primary);
+  cursor: default;
+  user-select: none;
+  border-radius: 0;
+  transition: background 0.1s;
+}
+
+.sidebarItem:hover {
+  background: var(--surface-secondary);
+}
+
+.sidebarItemActive {
+  background: var(--blue-transparent);
+  color: var(--blue);
+  font-weight: 500;
+}
+
+.sidebarItemActive:hover {
+  background: var(--blue-transparent);
+}
+
+/* ── File list panel ── */
+.filePanel {
+  flex: 0 0 340px;
   display: flex;
   flex-direction: column;
-  background: var(--background-secondary);
-  border-right: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-primary);
   overflow: hidden;
+  min-width: 0;
+}
+
+.listaArchivos {
+  flex: 1;
+  overflow-y: auto;
+  padding: 2px 0;
+}
+
+.listaArchivos::-webkit-scrollbar {
+  width: 5px;
+}
+
+.listaArchivos::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.listaArchivos::-webkit-scrollbar-thumb {
+  background: var(--border-primary);
+  border-radius: 3px;
+}
+
+.itemArchivo {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 10px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.1s;
+}
+
+.itemArchivo:hover:not(.seleccionado) {
+  background: var(--surface-secondary);
+}
+
+.itemArchivo.seleccionado {
+  background: var(--blue-transparent);
+}
+
+.itemArchivo svg {
+  flex-shrink: 0;
+}
+
+.nombreArchivo {
+  flex: 1;
+  font-size: 13px;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.extension {
+  color: var(--text-muted);
+}
+
+.fileSize {
+  font-size: 11px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .sinArchivos {
@@ -23,78 +203,62 @@
   align-items: center;
   justify-content: center;
   height: 100%;
-  color: var(--text-secondary);
-  padding: 2rem 1rem;
+  color: var(--text-muted);
+  padding: 1.5rem 1rem;
   text-align: center;
-  font-size: 0.875rem;
+  font-size: 13px;
+  gap: 6px;
 }
 
-.listaArchivos {
-  flex: 1;
-  overflow-y: auto;
-  padding: 0.5rem;
-}
-
-.itemArchivo {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.625rem 0.875rem;
-  cursor: pointer;
-  user-select: none;
-  border-radius: calc(var(--border-radius) / 2);
-  transition: background-color 0.15s ease;
-}
-
-.itemArchivo:hover:not(.seleccionado) {
-  background: var(--surface-secondary);
-}
-
-.itemArchivo.seleccionado {
-  background: var(--surface-secondary);
-}
-
-.nombreArchivo {
-  flex: 1;
-  font-size: 0.875rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.panelDerecho {
+/* ── Preview panel ── */
+.previewPanel {
   flex: 1;
   display: flex;
-  background: #f5f5f5;
+  background: var(--surface-secondary);
   overflow: hidden;
+  min-width: 0;
 }
 
 .visorDocumento {
   flex: 1;
-  padding: 2rem;
+  padding: 16px;
   overflow: auto;
   display: flex;
   justify-content: center;
 }
 
+.visorDocumento::-webkit-scrollbar {
+  width: 5px;
+}
+
+.visorDocumento::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.visorDocumento::-webkit-scrollbar-thumb {
+  background: var(--border-primary);
+  border-radius: 3px;
+}
+
 .documento {
-  background: white;
-  width: 600px;
-  max-width: 100%;
+  background: var(--surface-primary);
+  width: 100%;
+  max-width: 560px;
   min-height: 100%;
-  padding: 2.5rem 3rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 2px;
+  padding: 20px 24px;
+  border: 1px solid var(--border-primary);
+  border-radius: 6px;
+  box-shadow: var(--shadow-sm);
 }
 
 .documento pre {
   margin: 0;
   font-family: "Consolas", "Monaco", "Courier New", monospace;
-  font-size: 0.9rem;
+  font-size: 13px;
   line-height: 1.6;
   white-space: pre-wrap;
   word-wrap: break-word;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .sinSeleccion {
@@ -102,42 +266,60 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
+  gap: 6px;
   width: 100%;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   text-align: center;
+  font-size: 13px;
 }
 
-.sinSeleccion svg {
-  opacity: 0.3;
+/* ── Status bar ── */
+.statusBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border-top: 1px solid var(--border-primary);
+  font-size: 12px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  background: var(--surface-secondary);
 }
 
+.statusSep {
+  width: 1px;
+  height: 12px;
+  background: var(--border-primary);
+}
+
+/* ── Context menu ── */
 .menuContextual {
   position: fixed;
-  background: white;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background: var(--surface-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
   min-width: 150px;
-  padding: 0.25rem 0;
+  padding: 4px;
   z-index: 10000;
 }
 
-.menuItem {
+.menuItemDanger {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem 1rem;
+  gap: 10px;
+  padding: 8px 12px;
   cursor: pointer;
-  font-size: 0.875rem;
-  color: #333;
-  transition: background-color 0.1s ease;
+  font-size: 13px;
+  color: var(--error);
+  border-radius: 6px;
+  transition: background-color 0.1s;
 }
 
-.menuItem:hover {
-  background: #f0f0f0;
+.menuItemDanger:hover {
+  background: var(--error-bg);
 }
 
-.menuItem svg {
-  color: #666;
+.menuItemDanger svg {
+  flex-shrink: 0;
 }

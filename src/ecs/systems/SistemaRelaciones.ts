@@ -13,7 +13,7 @@ import { Sistema } from "../core";
  */
 export class SistemaRelaciones extends Sistema {
   // Conjunto de componentes requeridos por este sistema (se completa en el constructor)
-  public componentesRequeridos = new Set<ClaseComponente>();
+  // public componentesRequeridos = new Set<ClaseComponente>();
 
   // Índice inverso: hijo -> padre (para navegación inversa)
   private indiceHijoPadre = new Map<Entidad, Entidad>();
@@ -25,8 +25,8 @@ export class SistemaRelaciones extends Sistema {
   ) {
     super();
     // registrar ambos tipos para que el ECS pueda filtrar entidades si hace falta
-    this.componentesRequeridos.add(this.ClasePadre);
-    this.componentesRequeridos.add(this.ClaseHijo);
+    // this.componentesRequeridos.add(this.ClasePadre);
+    // this.componentesRequeridos.add(this.ClaseHijo);
   }
 
   // Añade childId al array padre[propiedadPadre] si existen ambos componentes

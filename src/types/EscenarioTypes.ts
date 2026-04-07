@@ -7,6 +7,7 @@ import type { Entidad } from "../ecs/core";
 import {
   EstadoAtaqueDispositivo,
   Mueble,
+  NivelConcienciaSeguridad,
   TipoActivo,
   TipoDispositivo,
   TipoProteccionVPN,
@@ -15,22 +16,25 @@ import type { TipoLogGeneral } from "./EventosEnums";
 
 export interface Escenario {
   id: number;
+  slug: string;
   titulo: string;
   descripcion: string;
+  imagenPreview?: string;
   presupuestoInicial: number;
   zonas: Entidad[];
   ataques: AtaqueComponent[];
   eventos: EventoComponent[];
   fases: FaseComponent[];
   redes: Entidad[];
-  apps: SoftwareApp[];
 }
 
 export interface EscenarioPreview {
   id: number;
+  slug: string;
   titulo: string;
   descripcion: string;
   imagenPreview?: string;
+  categoria?: string;
 }
 
 export interface Zona {
@@ -45,7 +49,7 @@ export interface Dispositivo {
   sistemaOperativo?: string;
   hardware: string;
   software?: string;
-  posicion?: { x: number; y: number; z: number };
+  posicion?: { x: number; y: number; z: number; rotacionY?: number };
   estadoAtaque?: EstadoAtaqueDispositivo;
   // Id de la entidad ECS asociada (útil para acciones sobre la entidad)
   entidadId?: number;
@@ -113,4 +117,26 @@ export interface LogGeneral {
 export interface ObjetivoFase {
     descripcion: string;
     completado: boolean;
+}
+
+export interface InfoDispositivoEscaneado {
+  nombre: string;
+  sistOp: string;
+  encargado: string;
+}
+
+export interface InfoPersonaEncontrada {
+  nombre: string;
+  correo: string;
+  nivelConcienciaSeguridad: NivelConcienciaSeguridad;
+}
+
+export interface PlantillaCorreoPhishing {
+  asunto: string;
+  mensaje: string;
+}
+
+export interface RespuestaComando {
+  texto: string;
+  entidadActual: Entidad;
 }

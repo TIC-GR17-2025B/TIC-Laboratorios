@@ -1,0 +1,177 @@
+.ventana {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    background: var(--surface-primary);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18), 0 0 0 1px var(--border-primary);
+    overflow: hidden;
+    transition: border-radius 0.2s ease;
+}
+
+.ventanaMaximizada {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+}
+
+.barraVentana {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 36px;
+    min-height: 36px;
+    padding: 0 12px;
+    background: var(--surface-secondary);
+    border-bottom: 1px solid var(--border-primary);
+    cursor: grab;
+    user-select: none;
+}
+
+.ventanaMaximizada .barraVentana {
+    cursor: default;
+}
+
+.barraVentana:active {
+    cursor: grabbing;
+}
+
+.ventanaMaximizada .barraVentana:active {
+    cursor: default;
+}
+
+.tituloVentana {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.iconoVentana {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.8;
+}
+
+.botonesVentana {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.botonVentana {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: var(--surface-tertiary);
+    border: none;
+    border-radius: 6px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    padding: 0;
+}
+
+.botonVentana:hover {
+    background: var(--border-primary);
+    color: var(--text-primary);
+}
+
+.botonCerrar:hover {
+    background: rgba(255, 80, 80, 0.8);
+    color: white;
+}
+
+.contenidoVentana {
+    flex: 1 1 auto;
+    overflow: auto;
+    min-height: 0;
+}
+
+/* Resize handles */
+.resizeHandle {
+    position: absolute;
+}
+
+.resizeN {
+    top: 0;
+    left: 6px;
+    right: 6px;
+    height: 4px;
+    cursor: n-resize;
+}
+
+.resizeS {
+    bottom: 0;
+    left: 6px;
+    right: 6px;
+    height: 4px;
+    cursor: s-resize;
+}
+
+.resizeE {
+    top: 6px;
+    right: 0;
+    bottom: 6px;
+    width: 4px;
+    cursor: e-resize;
+}
+
+.resizeW {
+    top: 6px;
+    left: 0;
+    bottom: 6px;
+    width: 4px;
+    cursor: w-resize;
+}
+
+.resizeNE {
+    top: 0;
+    right: 0;
+    width: 8px;
+    height: 8px;
+    cursor: ne-resize;
+}
+
+.resizeNW {
+    top: 0;
+    left: 0;
+    width: 8px;
+    height: 8px;
+    cursor: nw-resize;
+}
+
+.resizeSE {
+    bottom: 0;
+    right: 0;
+    width: 8px;
+    height: 8px;
+    cursor: se-resize;
+}
+
+.resizeSW {
+    bottom: 0;
+    left: 0;
+    width: 8px;
+    height: 8px;
+    cursor: sw-resize;
+}
+
+/* Snap states */
+.ventanaSnapped {
+    border-radius: 0;
+}
+
+.ventanaSnapping {
+    transition: left 0.15s ease, top 0.15s ease, width 0.15s ease, height 0.15s ease, border-radius 0.15s ease;
+}

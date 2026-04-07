@@ -1,7 +1,7 @@
 import { describe, it, beforeEach, expect } from "vitest";
 import { ECSManager } from "../src/ecs/core";
 import { Transform, Velocidad } from "../src/ecs/components";
-import { SistemaMovimiento } from "../src/ecs/systems";
+import { SistemaTiempo } from "../src/ecs/systems";
 
 describe("ECSManager", () => {
   let em: ECSManager;
@@ -132,7 +132,7 @@ describe("ECSManager", () => {
 
   describe("agregarSistema", () => {
     it("debe agregar un sistema al ECS", () => {
-      const sistema = new SistemaMovimiento();
+      const sistema = new SistemaTiempo();
       em.agregarSistema(sistema);
 
       expect(sistema.ecsManager).toBe(em);

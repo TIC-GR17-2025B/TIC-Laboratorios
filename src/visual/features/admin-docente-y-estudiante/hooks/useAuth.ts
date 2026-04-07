@@ -151,7 +151,10 @@ export const useAuth = () => {
       if (result.data?.token) {
         localStorage.setItem("authToken", result.data.token);
         localStorage.setItem("userRole", result.data.role);
-        localStorage.setItem("user", JSON.stringify(result.data.user));
+        localStorage.setItem("user", JSON.stringify({
+          ...result.data.user,
+          correo_electronico: data.correo_electronico,
+        }));
       }
 
       return result;

@@ -42,16 +42,16 @@ export function initializeFeedbackController(stateRepo: IFeedbackStateRepository
 router.get('/check-status', async (req: Request, res: Response) => {
   try {
     const id_estudiante = parseInt(req.query.id_estudiante as string);
-    const id_escenario = parseInt(req.query.id_escenario as string);
+    const slug_escenario = req.query.slug_escenario as string;
 
-    if (!id_estudiante || !id_escenario || isNaN(id_estudiante) || isNaN(id_escenario)) {
+    if (!id_estudiante || isNaN(id_estudiante) || !slug_escenario) {
       return res.status(400).json({
         success: false,
-        error: 'id_estudiante e id_escenario son requeridos y deben ser números',
+        error: 'id_estudiante (número) y slug_escenario (string) son requeridos',
       });
     }
 
-    const result = await checkFeedbackStatusUseCase.execute(id_estudiante, id_escenario);
+    const result = await checkFeedbackStatusUseCase.execute(id_estudiante, slug_escenario);
 
     res.status(200).json({
       success: true,
@@ -76,18 +76,18 @@ router.get('/check-status', async (req: Request, res: Response) => {
 
 router.post('/generate', async (req: Request, res: Response) => {
   try {
-    const { id_estudiante, id_escenario } = req.body;
+    const { id_estudiante, slug_escenario } = req.body;
 
-    if (!id_estudiante || !id_escenario) {
+    if (!id_estudiante || !slug_escenario) {
       return res.status(400).json({
         success: false,
-        error: 'id_estudiante e id_escenario son requeridos'
+        error: 'id_estudiante y slug_escenario son requeridos'
       });
     }
 
     const feedback = await generateFeedbackUseCase.execute({
       id_estudiante,
-      id_escenario,
+      slug_escenario,
     });
 
     res.status(200).json({

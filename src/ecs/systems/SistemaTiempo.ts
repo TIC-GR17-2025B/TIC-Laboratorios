@@ -8,14 +8,10 @@ import {
 import { EventosInternos, EventosPublicos } from "../../types/EventosEnums";
 
 export class SistemaTiempo extends Sistema {
-  public componentesRequeridos = new Set([TiempoComponent]);
+  // public componentesRequeridos = new Set([TiempoComponent]);
   public intervalo: ReturnType<typeof setInterval> | null = null;
   public intervaloTiempoTotal: ReturnType<typeof setInterval> | null = null;
-  public eventosEscenario: EventoComponent[] = [];
-
-  public on(eventName: string, callback: (data: unknown) => void): () => void {
-    return this.ecsManager.on(eventName, callback);
-  }
+  public eventosEscenario: EventoComponent[] = []; 
 
   public pausar(entidad: Entidad) {
     const container = this.ecsManager.getComponentes(entidad);
@@ -46,8 +42,10 @@ export class SistemaTiempo extends Sistema {
     if (!tiempo) return;
     tiempo.pausado = false;
 
-    // Reiniciar el intervalo cuando se reanuda
-    this.iniciarIntervalo(tiempo);
+    // Solo crear intervalo si no existe uno ya corriendo
+    if (!this.intervalo) {
+      this.iniciarIntervalo(tiempo);
+    }
 
     this.ecsManager.emit(EventosPublicos.TIEMPO_REANUDADO, {
       transcurrido: tiempo.transcurrido,

@@ -19,7 +19,7 @@ export class ECSManager {
   private eventListeners = new Map<string, Set<EventCallback>>();
 
   // Sistema de registro de acciones realizadas durante la simulacion
-  private accionesSimulacion = new Array<[string, string, number, unknown?]>();
+  private accionesSimulacion = new Array<[string, string, number | undefined, unknown?]>();
   /* Array<nombre de acción,
         objeto sobre el cual se hizo la acción (no necesariamente es un objeto de la escena 3D),
         tiempo actual (total) en segundos justo cuando se realizó la acción,
@@ -46,7 +46,7 @@ export class ECSManager {
 
   public agregarComponente(entidad: Entidad, componente: Componente): void {
     this.entidades.get(entidad)?.agregar(componente);
-    this.verificarEntidad(entidad);
+    // this.verificarEntidad(entidad);
   }
 
   public getComponentes(entidad: Entidad): ComponenteContainer | undefined {
@@ -58,25 +58,25 @@ export class ECSManager {
     claseComponente: ClaseComponente
   ): void {
     this.entidades.get(entidad)?.eliminar(claseComponente);
-    this.verificarEntidad(entidad);
+    // this.verificarEntidad(entidad);
   }
 
   // Para Sistemas
 
   public agregarSistema(sistema: Sistema): void {
-    if (sistema.componentesRequeridos.size == 0) {
+    /*if (sistema.componentesRequeridos.size == 0) {
       console.warn(
         `Sistema ${sistema} no agregado: lista de componentes vacía.`
       );
       return;
-    }
+    }*/
 
     sistema.ecsManager = this;
 
     this.sistemas.set(sistema, new Set());
-    for (const entidad of this.entidades.keys()) {
+    /*for (const entidad of this.entidades.keys()) {
       this.verificarEntidadSistema(entidad, sistema);
-    }
+    }*/
   }
 
   public removerSistema(sistema: Sistema): void {
@@ -126,13 +126,13 @@ export class ECSManager {
     }
   }*/
 
-  private verificarEntidad(entidad: Entidad): void {
+  /*private verificarEntidad(entidad: Entidad): void {
     for (const sistema of this.sistemas.keys()) {
       this.verificarEntidadSistema(entidad, sistema);
     }
-  }
+  }*/
 
-  private verificarEntidadSistema(entidad: Entidad, sistema: Sistema): void {
+  /*private verificarEntidadSistema(entidad: Entidad, sistema: Sistema): void {
     const componenteContainer = this.entidades.get(entidad);
     const componentesRequeridos = sistema.componentesRequeridos;
     if (componenteContainer?.tieneTodos(componentesRequeridos)) {
@@ -140,7 +140,7 @@ export class ECSManager {
     } else {
       this.sistemas.get(sistema)?.delete(entidad);
     }
-  }
+  }*/
 
   // Sistema de eventos
 
@@ -187,7 +187,7 @@ export class ECSManager {
   public registrarAccion(
     accion: string,
     objeto: string,
-    tiempo: number,
+    tiempo?: number,
     val?: unknown
   ): void {
     this.accionesSimulacion.push([accion, objeto, tiempo, val]);
@@ -195,14 +195,16 @@ export class ECSManager {
 
   public consultarAccion(
     accion: string,
-    objeto: string,
-    tiempo: number,
+    objeto: string, 
+    tiempo?: number,
     val?: unknown
-  ): [string, string, number, unknown?] | undefined {
+  ): [string, string, number | undefined, unknown?] | undefined { 
     return this.accionesSimulacion.find(
       ([a, o, t, v]) =>
-        JSON.stringify([a, o, t, v]) ===
-        JSON.stringify([accion, objeto, tiempo, val])
+        a === accion &&
+        o === objeto &&
+        (t === undefined ? true : t === tiempo) &&
+        JSON.stringify(v) === JSON.stringify(val)
     );
   }
 }

@@ -11,9 +11,12 @@ import {
     DEFAULT_ENVIRONMENT_CONFIG,
 } from '../config/scene3DConfig';
 import ECSSceneRenderer from './ECSSceneRenderer';
+import CameraZoomEffect from './CameraZoomEffect';
+import OfficeWalls from './OfficeWalls';
 import ZoneToast from './ZoneToast';
 import Controles3D from './Controles3D';
 import { useECSSceneContext } from '../context/ECSSceneContext';
+import { useScreenTransition } from '../../../common/contexts/ScreenTransitionContext';
 import { useModelsReady } from '../../../common/components/ModelPreloader';
 
 /**
@@ -28,6 +31,7 @@ const Escena3D: React.FC = () => {
         zoneToastName,
         hideZoneToast
     } = useECSSceneContext();
+    const { isZooming, desktopMode } = useScreenTransition();
 
     const modelsReady = useModelsReady();
     const [isReady, setIsReady] = React.useState(false);
@@ -44,6 +48,7 @@ const Escena3D: React.FC = () => {
         <section
             className={styles.vista3D}
             aria-label="Vista 3D de la escena"
+            data-tour="escena-3d"
         >
             {zonasDisponibles.length > 1 && zonaActual !== null && (
                 <>
@@ -64,7 +69,10 @@ const Escena3D: React.FC = () => {
                     enableShadows={DEFAULT_LIGHT_CONFIG.enableShadows}
                 />
                 <ECSSceneRenderer />
+                <CameraZoomEffect />
+                {/* <OfficeWalls /> */}
                 <CameraControls
+                    enabled={!isZooming && !desktopMode}
                     enableZoom={DEFAULT_CONTROLS_CONFIG.enableZoom}
                     enablePan={DEFAULT_CONTROLS_CONFIG.enablePan}
                     enableRotate={DEFAULT_CONTROLS_CONFIG.enableRotate}

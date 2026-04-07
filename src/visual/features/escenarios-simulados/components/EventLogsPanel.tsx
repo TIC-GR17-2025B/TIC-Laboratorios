@@ -35,6 +35,7 @@ const EventLogsPanel: React.FC = () => {
                 className={`${styles.logsPanel} ${!isOpen ? styles.hidden : ''}`}
                 aria-label="Panel de registros de eventos"
                 aria-hidden={!isOpen}
+                data-tour="logs-panel"
             >
                 <header className={styles.logsHeader}>
                     <h2 className={styles.logsTitle}>Logs</h2>

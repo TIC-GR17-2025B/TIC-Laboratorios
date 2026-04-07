@@ -10,13 +10,13 @@ interface FeedbackStatusResponse {
 
 export function useFeedback(
   idEstudiante: number | null,
-  idEscenario: number | null
+  slugEscenario: string | null
 ) {
   const [habilitado, setHabilitado] = useState(true);
   const [loading, setLoading] = useState(true);
 
   const checkStatus = useCallback(async () => {
-    if (!idEstudiante || !idEscenario) {
+    if (!idEstudiante || !slugEscenario) {
       setHabilitado(false);
       setLoading(false);
       return;
@@ -26,7 +26,7 @@ export function useFeedback(
 
     try {
       const response = await fetch(
-        `${API_BASE_URL}/feedback/check-status?id_estudiante=${idEstudiante}&id_escenario=${idEscenario}`
+        `${API_BASE_URL}/feedback/check-status?id_estudiante=${idEstudiante}&slug_escenario=${slugEscenario}`
       );
 
       if (response.ok) {
@@ -41,7 +41,7 @@ export function useFeedback(
     } finally {
       setLoading(false);
     }
-  }, [idEstudiante, idEscenario]);
+  }, [idEstudiante, slugEscenario]);
 
   useEffect(() => {
     checkStatus();

@@ -1,130 +1,177 @@
-.container {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  padding: 2rem;
-  min-height: 100vh;
-  background-color: var(--surface-primary);
-}
+/* ── Main wrapper ── */
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.header h1 {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 400;
-  color: var(--text-primary);
-}
-
-.title {
-  margin: 0;
-  padding: 0 0 1rem 0;
-  font-size: 2rem;
-  font-weight: 300;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  color: var(--text-primary);
-  border-bottom: 1px solid var(--border-primary);
-}
-
-.menuList {
+.main {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
+  grid-template-columns: 1fr 260px;
+  gap: 40px;
+  padding: 0;
 }
 
-.menuItem {
-  position: relative;
+/* ── Path ── */
+
+.path {
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  height: 70vh;
-  border-radius: var(--border-radius);
-  overflow: hidden;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: 1px solid var(--border-primary);
-  background-color: var(--surface-secondary);
+  align-items: center;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding-bottom: 64px;
+  position: relative;
 }
 
-.menuItem:hover {
-  border-color: var(--blue);
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-}
+/* ── Dashed curve SVG ── */
 
-.backgroundImage {
+.curveSvg {
   position: absolute;
   top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
   z-index: 0;
-  transition: transform 0.3s ease;
 }
 
-.menuItem:hover .backgroundImage {
-  transform: scale(1.05);
-}
+/* ── Section ── */
 
-.gradient {
-  position: absolute;
-  top: 0;
-  left: 0;
+.section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgba(0, 0, 0, 0.4) 50%,
-    rgba(0, 0, 0, 0.9) 100%
-  );
+}
+
+/* ── Banner (section header) ── */
+
+.banner {
+  width: 100%;
+  text-align: center;
+  padding: 4px 0;
+  position: relative;
+  z-index: 0;
+}
+
+.bannerTitle {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+/* ── Nodes container ── */
+
+.nodes {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 0;
+}
+
+/* ── Node row ── */
+
+.nodeRow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  padding: 24px 0;
   z-index: 1;
 }
 
-.content {
-  position: relative;
-  z-index: 2;
-  padding: 2rem;
+
+/* ── Node circle ── */
+
+.node {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
   display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.node:hover {
+  transform: scale(1.1);
+}
+
+.node:active {
+  transform: scale(0.95);
+}
+
+/* ── Node states ── */
+
+.done {
+  background: rgba(76, 175, 80, 0.12);
+  border: 2.5px solid #4caf50;
+  color: #4caf50;
+}
+
+.active {
+  background: rgba(65, 125, 255, 0.12);
+  border: 2.5px solid var(--blue);
+  color: var(--blue);
+}
+
+.available {
+  background: var(--surface-secondary);
+  border: 2.5px solid var(--border-primary);
+  color: var(--text-muted);
+}
+
+.available:hover {
+  border-color: var(--text-secondary);
   color: var(--text-primary);
 }
 
-.content h2 {
-  margin: 0;
-  font-size: 1.4rem;
-  font-weight: 400;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+/* ── Node label (always visible, next to circle) ── */
+
+.nodeLabel {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  line-height: 1.35;
+  pointer-events: none;
 }
 
-.description {
-  font-size: 0.9rem;
-  line-height: 1.5;
-  color: var(--text-muted);
-  margin: 0;
+.nodeLabelRight {
+  left: calc(100% + 14px);
+  text-align: left;
 }
 
-.statusBadge {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.85rem;
-  color: var(--text-muted);
+.nodeLabelLeft {
+  right: calc(100% + 14px);
+  text-align: right;
 }
 
-.locked {
-  color: var(--text-secondary);
-  font-style: italic;
+/* ── Responsive ── */
+
+@media (max-width: 768px) {
+  .main {
+    grid-template-columns: 1fr;
+    padding: 0 16px;
+  }
 }
 
-.unlocked {
-  color: var(--blue-lighter);
+@media (max-width: 640px) {
+  .path {
+    max-width: 100%;
+  }
+
+  .node {
+    width: 48px;
+    height: 48px;
+  }
+
+  .nodeLabel {
+    font-size: 12px;
+    max-width: 120px;
+  }
 }

@@ -5,13 +5,15 @@ import {
   EscenarioComponent,
   EventoComponent,
   FaseComponent,
-  PresupuestoComponent,
+  // PresupuestoComponent,
   TiempoComponent,
   WorkstationComponent,
+  PersonaComponent,
 } from "../components";
 import { ECSManager, type Entidad } from "../core";
 import {
     SistemaActivo,
+  SistemaComandos,
   SistemaEvento,
   SistemaFase,
   SistemaJerarquiaEscenario,
@@ -19,7 +21,7 @@ import {
   SistemaTiempo,
 } from "../systems";
 import { ScenarioBuilder } from "../utils/ScenarioBuilder";
-import type { Activo, Escenario, LogGeneral, SoftwareApp, RegistroVeredictoFirma } from "../../types/EscenarioTypes";
+import type { Activo, Escenario, LogGeneral, SoftwareApp, RegistroVeredictoFirma, InfoPersonaEncontrada, PlantillaCorreoPhishing, RespuestaComando } from "../../types/EscenarioTypes";
 import {
   EventosInternos,
   EventosPublicos,
@@ -27,6 +29,8 @@ import {
   TipoLogGeneral,
 } from "../../types/EventosEnums";
 import { ProgresoController } from "./ProgresoController";
+import { AccionesRealizables, ObjetosManejables } from "../../types/AccionesEnums";
+import { PlantillasCorreoPhishing } from "../../data/plantillas/Plantillas";
 
 export class EscenarioController {
   public escenario: Escenario;
@@ -38,35 +42,39 @@ export class EscenarioController {
   private sistemaTiempo?: SistemaTiempo;
   private sistemaPresupuesto?: SistemaPresupuesto;
   private sistemaJerarquiaEscenario?: SistemaJerarquiaEscenario;
-  private entidadPresupuesto?: Entidad;
+  // private entidadPresupuesto?: Entidad;
   private sistemaEvento?: SistemaEvento;
   private sistemaFase?: SistemaFase;
   private sistemaActivo?: SistemaActivo;
+  private sistemaComandos?: SistemaComandos;
   private progresoController?: ProgresoController;
   private escenarioIniciado: boolean = false; // FLAG PARA EVITAR MÚLTIPLES INICIALIZACIONES
 
   private static instance: EscenarioController | null = null;
 
-  private constructor(escenario: Escenario) {
+  private constructor(escenario: Escenario, em?: ECSManager) {
     this.escenario = escenario;
-    this.ecsManager = new ECSManager();
+    if (em) this.ecsManager = em;
+    else this.ecsManager = new ECSManager();
 
     this.sistemaJerarquiaEscenario = new SistemaJerarquiaEscenario();
     this.ecsManager.agregarSistema(this.sistemaJerarquiaEscenario);
   }
 
   // SINGLETON
-  public static getInstance(escenario?: Escenario): EscenarioController {
+  public static getInstance(escenario?: Escenario, em?: ECSManager): EscenarioController {
     if (!EscenarioController.instance) {
       if (!escenario) {
         throw new Error(
           "Debe proporcionar un escenario para inicializar el controlador la primera vez."
         );
       }
-      EscenarioController.instance = new EscenarioController(escenario);
+      if (!em) EscenarioController.instance = new EscenarioController(escenario);
+      else EscenarioController.instance = new EscenarioController(escenario, em);
     } else if (escenario && escenario.id !== EscenarioController.instance.escenario.id) {
       // Si es un escenario diferente, resetear completamente la instancia
-      EscenarioController.instance = new EscenarioController(escenario);
+      if (!em) EscenarioController.instance = new EscenarioController(escenario);
+      else EscenarioController.instance = new EscenarioController(escenario, em);
     } else if (escenario) {
       // Si es el mismo escenario, solo actualizar la referencia
       EscenarioController.instance.escenario = escenario;
@@ -99,11 +107,22 @@ export class EscenarioController {
       this.ecsManager.agregarSistema(this.sistemaActivo);
     }
 
+    if (!this.sistemaComandos) {
+      this.sistemaComandos = new SistemaComandos();
+      this.sistemaComandos.ecsManager = this.ecsManager;
+    }
+
     if (!this.progresoController) {
       this.progresoController = ProgresoController.getInstance();
     }
 
     // NO emitir el evento aquí - lo haremos después de que los sistemas se suscriban
+    this.iniciarEscuchaDeEventos();
+
+    this.escenarioIniciado = true;
+  }
+
+  public iniciarEscuchaDeEventos(): void {
     this.ecsManager.on(
       EventosPublicos.TIEMPO_NOTIFICACION_ATAQUE,
       (data: unknown) => {
@@ -172,18 +191,18 @@ export class EscenarioController {
       this.agregarLogGeneralEscenario(log);
     });
 
-    this.ecsManager.on(EventosPublicos.PRESUPUESTO_AGOTADO, () => {
-      this.sistemaTiempo?.pausar(this.entidadTiempo!);
-      const log = {
-        tipo: TipoLogGeneral.ADVERTENCIA,
-        mensaje: "Se agotó el presupuesto, fin de la partida.",
-        pausarTiempo: true,
-      };
-      this.agregarLogGeneralEscenario(log);
-      this.ecsManager.emit(EventosPublicos.FASE_NO_COMPLETADA,
-                           MensajesGenerales.MSJ_FASE_NO_COMPLETADA);
-      this.sistemaTiempo?.destruir();
-    });
+    // this.ecsManager.on(EventosPublicos.PRESUPUESTO_AGOTADO, () => {
+    //   this.sistemaTiempo?.pausar(this.entidadTiempo!);
+    //   const log = {
+    //     tipo: TipoLogGeneral.ADVERTENCIA,
+    //     mensaje: "Se agotó el presupuesto, fin de la partida.",
+    //     pausarTiempo: true,
+    //   };
+    //   this.agregarLogGeneralEscenario(log);
+    //   this.ecsManager.emit(EventosPublicos.FASE_NO_COMPLETADA,
+    //                        MensajesGenerales.MSJ_FASE_NO_COMPLETADA);
+    //   this.sistemaTiempo?.destruir();
+    // });
 
     this.ecsManager.on(EventosPublicos.FASE_COMPLETADA, (data: unknown) => {
       const descripcion = data as string;
@@ -193,7 +212,6 @@ export class EscenarioController {
         pausarTiempo: true,
       };
       this.ecsManager.emit(EventosInternos.OBJETIVO_COMPLETADO);
-      console.log("EscenarioController: on de FASE_COMPLETADA:",this.ecsManager.getEntidades());
       this.agregarLogGeneralEscenario(log);
     });
 
@@ -218,8 +236,6 @@ export class EscenarioController {
         this.progresoController?.guardarProgresoEstudiante(true, this.getTiempoTotalTranscurrido()); 
         this.sistemaTiempo?.destruir();
     });
-
-    this.escenarioIniciado = true;
   }
 
   private agregarLogGeneralEscenario(log: LogGeneral): void {
@@ -342,28 +358,28 @@ export class EscenarioController {
     return this.ecsManager.on(eventName, callback);
   }
 
-  public efectuarPresupuesto(montoInicial: number): void {
-    if (!this.entidadPresupuesto) {
-      this.entidadPresupuesto = this.ecsManager.agregarEntidad();
-      this.ecsManager.agregarComponente(
-        this.entidadPresupuesto,
-        new PresupuestoComponent(montoInicial)
-      );
+  public efectuarPresupuesto(/*montoInicial: number*/): void {
+    // if (!this.entidadPresupuesto) {
+    //   this.entidadPresupuesto = this.ecsManager.agregarEntidad();
+    //   this.ecsManager.agregarComponente(
+    //     this.entidadPresupuesto,
+    //     new PresupuestoComponent(montoInicial)
+    //   );
       this.sistemaPresupuesto = new SistemaPresupuesto();
       this.ecsManager.agregarSistema(this.sistemaPresupuesto);
-    }
+    // }
   }
 
   public toggleConfiguracionWorkstation(
     entidadWorkstation: Entidad,
     nombreConfig: string
   ): void {
-    if (!this.sistemaPresupuesto || !this.entidadPresupuesto) {
+    if (!this.sistemaPresupuesto /*|| !this.entidadPresupuesto*/) {
       console.error("Sistema de presupuesto no inicializado");
       return;
     }
     this.sistemaPresupuesto.toggleConfiguracionWorkstation(
-      this.entidadPresupuesto,
+      // this.entidadPresupuesto,
       entidadWorkstation,
       nombreConfig
     );
@@ -399,14 +415,15 @@ export class EscenarioController {
   }
 
   public getPresupuestoActual(): number {
-    if (!this.ecsManager || !this.entidadPresupuesto) {
+  //   if (!this.ecsManager || !this.entidadPresupuesto) {
+  //     return 0;
+  //   }
+  //   const cont = this.ecsManager.getComponentes(this.entidadPresupuesto);
+  //   if (!cont) return 0;
+  //
+  //   const presupuesto = cont.get(PresupuestoComponent);
+  //   return presupuesto?.monto ?? 0;
       return 0;
-    }
-    const cont = this.ecsManager.getComponentes(this.entidadPresupuesto);
-    if (!cont) return 0;
-
-    const presupuesto = cont.get(PresupuestoComponent);
-    return presupuesto?.monto ?? 0;
   }
 
   public getEventos(): EventoComponent[] {
@@ -493,24 +510,24 @@ export class EscenarioController {
   }
 
   public comprarApp(entidadDispositivo: Entidad, nombreApp: string): void {
-    if (!this.sistemaPresupuesto || !this.entidadPresupuesto) {
+    if (!this.sistemaPresupuesto /*|| !this.entidadPresupuesto*/) {
       console.error("Sistema de presupuesto no inicializado");
       return;
     }
     this.sistemaPresupuesto?.comprarApp(
-      this.entidadPresupuesto,
+      // this.entidadPresupuesto,
       entidadDispositivo,
       nombreApp
     );
   }
 
   public desinstalarApp(entidadDispositivo: Entidad, nombreApp: string): void {
-    if (!this.sistemaPresupuesto || !this.entidadPresupuesto) {
+    if (!this.sistemaPresupuesto /*|| !this.entidadPresupuesto*/) {
       console.error("Sistema de presupuesto no inicializado");
       return;
     }
     this.sistemaPresupuesto?.desinstalarApp(
-      this.entidadPresupuesto,
+      // this.entidadPresupuesto,
       entidadDispositivo,
       nombreApp
     );
@@ -537,6 +554,71 @@ export class EscenarioController {
     }
    
     return appsDisponiblesParaDispositivoActual;
+  }
+
+  // Devuelve el listado de información personas que trabajan en una empresa (zona)
+  public getInfoPersonasPorEmpresa(entidadZona: Entidad): InfoPersonaEncontrada[] | undefined {
+    const infoPersonasEmpresa: InfoPersonaEncontrada[] = [];
+    for (const entidadPersona of this.sistemaJerarquiaEscenario?.obtenerPersonasDeZona(
+      entidadZona
+    ) ?? []) {
+      const personaActual = this.ecsManager.getComponentes(entidadPersona)?.get(PersonaComponent);
+      const infoPersonaActual: InfoPersonaEncontrada = {
+        nombre: personaActual!.nombre!,
+        correo: personaActual!.correo!,
+        nivelConcienciaSeguridad: personaActual!.nivelConcienciaSeguridad!
+      };
+      infoPersonasEmpresa.push(infoPersonaActual);
+    }
+    return infoPersonasEmpresa;
+  }
+
+  public registrarEjecucionAplicacion(nombreAplicacion: string) {
+    this.ecsManager.registrarAccion(
+      AccionesRealizables.EJECUTAR,
+      ObjetosManejables.APLICACION,
+      0,
+      {
+        nombreAplicacion: nombreAplicacion
+      }
+    );
+  }
+
+  public registrarEnvioDeCorreo(nombreDispEmisor: string, correoDestinatario: string, asunto: string) {
+    this.ecsManager.registrarAccion(
+      AccionesRealizables.ENVIO,
+      ObjetosManejables.CORREO,
+      0,
+      {
+        dispositivoEmisor: nombreDispEmisor,
+        destinatario: correoDestinatario,
+        asunto: asunto
+      }
+    );
+  }
+
+  public getPlantillasCorreo(): PlantillaCorreoPhishing[] {
+    const plantillas: PlantillaCorreoPhishing[] = [];
+
+    for (const plantilla of PlantillasCorreoPhishing) {
+      plantillas.push(plantilla);
+    }
+
+    return plantillas;
+  }
+
+  /* Con esta función se indica el dispositivo en el que el sistema de comandos (la "consola")
+     quiere "abrirse". No hay que confundirse por el nombre de la función, ya que el sistema en
+     realidad ya está "iniciado" (o sea, ya existe) desde que se instancia el controller. Por lo
+     cual, esta función se debe ejecutar cada vez que el usuario decida abrir la consola en algún
+     dispositivo, pasándole a esta función la entidad de ese dispositivo actual.
+  */
+  public iniciarSistemaComandos(entidadDispositivo: Entidad) {
+    this.sistemaComandos?.iniciarSistemaComandos(entidadDispositivo);
+  }
+
+  public ejecutarComando(comando: string): RespuestaComando | undefined {
+    return this.sistemaComandos?.ejecutarComando(comando);
   }
 
   // MÉTODO PARA RESETEAR EL SINGLETON (útil para desarrollo/testing)

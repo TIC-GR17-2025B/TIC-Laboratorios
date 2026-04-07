@@ -1,0 +1,93 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 16px;
+    gap: 12px;
+    font-family: 'Inter', sans-serif;
+}
+
+.toolbar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.select {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-primary);
+    background: var(--surface-primary);
+    color: var(--text-primary);
+    font-size: 13px;
+    font-family: inherit;
+}
+
+.btnScan {
+    padding: 8px 20px;
+    border: none;
+    border-radius: var(--border-radius);
+    background: var(--blue);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.btnScan:hover {
+    background: var(--blue-lighter);
+}
+
+.btnScan:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.tableWrapper {
+    flex: 1;
+    overflow: auto;
+    border: 1px solid var(--border-primary);
+    border-radius: var(--border-radius);
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.table th {
+    position: sticky;
+    top: 0;
+    background: var(--surface-secondary);
+    color: var(--text-muted);
+    font-weight: 600;
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border-primary);
+}
+
+.table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border-primary);
+    color: var(--text-primary);
+}
+
+.table tr:last-child td {
+    border-bottom: none;
+}
+
+.table tr:hover td {
+    background: var(--surface-tertiary);
+}
+
+.emptyState {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: 14px;
+}

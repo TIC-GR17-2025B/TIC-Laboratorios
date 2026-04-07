@@ -3,22 +3,23 @@ import "./common/styles/global.css"
 import VistaOficina from './features/escenarios-simulados/pages/VistaOficina.tsx'
 import Dispositivos from './features/hardening-de-dispositivos/pages/Dispositivos.tsx'
 import { BrowserRouter, Route, Routes, useLocation, Outlet } from 'react-router'
-import Header from './common/components/Header.tsx'
-import { EscenarioProvider, ModalProvider, SelectedLevelProvider } from './common/contexts'
+import Sidebar from './common/components/Sidebar.tsx'
+import { EscenarioProvider, ModalProvider, SelectedLevelProvider, ScreenTransitionProvider } from './common/contexts'
 import { ECSSceneProvider } from './features/escenarios-simulados/context/ECSSceneContext.tsx'
 import TarjetaLogNuevo from './features/escenarios-simulados/components/TarjetaLogNuevo.tsx'
 import { ChatProvider } from './features/chat/context/ChatContext.tsx'
 import Redes from './features/simulacion-redes/pages/Redes.tsx'
 import Modal from './common/components/Modal.tsx'
 import ModelPreloader from './common/components/ModelPreloader.tsx'
-import Login from './features/admin-docente-y-estudiante/pages/Login.tsx'
-import Signup from './features/admin-docente-y-estudiante/pages/Signup.tsx'
+import AuthPage from './features/admin-docente-y-estudiante/pages/AuthPage.tsx'
 import NotFound from './features/admin-docente-y-estudiante/pages/NotFound.tsx'
 import ProtectedRoute from './features/admin-docente-y-estudiante/components/ProtectedRoute.tsx'
 import ProtectedRouteByRole from './features/admin-docente-y-estudiante/components/ProtectedRouteByRole.tsx'
 import VistaDocente from './features/admin-docente-y-estudiante/pages/VistaDocente.tsx'
 import DetalleGrupo from './features/admin-docente-y-estudiante/pages/DetalleGrupo.tsx'
 import VistaDetalleEstudiante from './features/admin-docente-y-estudiante/pages/VistaDetalleEstudiante.tsx'
+import DocenteLayout from './features/admin-docente-y-estudiante/components/DocenteLayout.tsx'
+import EstudianteLayout from './features/admin-docente-y-estudiante/components/EstudianteLayout.tsx'
 import VistaPerfil from './features/admin-docente-y-estudiante/pages/VistaPerfil.tsx'
 import { AnimatePresence } from 'framer-motion'
 import VistaFasesPartida from './features/escenarios-simulados/pages/VistaFasesPartida.tsx'
@@ -47,13 +48,15 @@ function GameProvidersLayout() {
           <ChatProvider>
             <FasesProvider>
               <ECSSceneProvider>
-                <ModelPreloader />
-                <Modal />
-                <Header />
-                <div className="content">
-                  <Outlet />
-                  <TarjetaLogNuevo />
-                </div>
+                <ScreenTransitionProvider>
+                  <ModelPreloader />
+                  <Modal />
+                  <Sidebar />
+                  <div className="content">
+                    <Outlet />
+                    <TarjetaLogNuevo />
+                  </div>
+                </ScreenTransitionProvider>
               </ECSSceneProvider>
             </FasesProvider>
           </ChatProvider>
@@ -69,38 +72,27 @@ function AnimatedRoutes() {
   return (
     <AnimatePresence mode="wait">
       <Routes location={location}>
-        <Route path='/login' element={<Login />} />
-        <Route path='/signup' element={<Signup />} />
+        <Route path='/login' element={<AuthPage />} />
+        <Route path='/signup' element={<AuthPage />} />
 
         <Route path='/docente' element={
           <ProtectedRouteByRole requiredRole="profesor">
-            <VistaDocente />
+            <DocenteLayout />
           </ProtectedRouteByRole>
-        } />
+        }>
+          <Route index element={<VistaDocente />} />
+          <Route path='grupo/:id' element={<DetalleGrupo />} />
+          <Route path='estudiante/:idEstudiante' element={<VistaDetalleEstudiante />} />
+        </Route>
 
-        <Route path='/docente/grupo/:id' element={
-          <ProtectedRouteByRole requiredRole="profesor">
-            <DetalleGrupo />
-          </ProtectedRouteByRole>
-        } />
-
-        <Route path='/docente/estudiante/:idEstudiante' element={
-          <ProtectedRouteByRole requiredRole="profesor">
-            <VistaDetalleEstudiante />
-          </ProtectedRouteByRole>
-        } />
-
-        <Route path='/seleccion-niveles' element={
+        <Route element={
           <ProtectedRouteByRole requiredRole="estudiante">
-            <VistaSeleccionNiveles />
+            <EstudianteLayout />
           </ProtectedRouteByRole>
-        } />
-
-        <Route path='/perfil' element={
-          <ProtectedRouteByRole requiredRole="estudiante">
-            <VistaPerfil />
-          </ProtectedRouteByRole>
-        } />
+        }>
+          <Route path='/seleccion-niveles' element={<VistaSeleccionNiveles />} />
+          <Route path='/perfil' element={<VistaPerfil />} />
+        </Route>
 
         {/* 
           Las rutas del juego comparten los mismos providers con Outlet

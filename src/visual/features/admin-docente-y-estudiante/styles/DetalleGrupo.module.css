@@ -1,168 +1,162 @@
-.container {
-  min-height: 100vh;
-  background-color: var(--surface-primary);
-  color: var(--text-primary);
-}
+/* ── Layout ── */
 
-.header {
-  padding: 16px 24px;
-  border-bottom: 1px solid var(--border-primary);
-}
-
-.backButton {
-  background: var(--surface-secondary);
-  border: 1px solid var(--border-primary);
-  border-radius: var(--border-radius);
-  padding: 0.5rem 1rem;
-  color: var(--text-primary);
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-weight: 500;
-}
-
-.backButton:hover {
-  background-color: rgb(50, 50, 50);
-  border-color: var(--blue);
-}
-
-.content {
-  padding: 40px 24px;
-  max-width: 900px;
+.layout {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  max-width: var(--content-width);
   margin: 0 auto;
+  width: 100%;
 }
 
-.grupoHeader {
-  margin-bottom: 1.5rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 2rem;
+.sidebar {
+  width: 200px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border-primary);
+  padding: 16px 0;
 }
 
-.grupoTitleSection {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.grupoTitle {
-  margin: 0;
-  font-size: 1.75rem;
-  color: var(--text-primary);
-  font-weight: 600;
-  line-height: 1.2;
-}
-
-.grupoSubtitle {
-  margin: 0;
-  font-size: 0.875rem;
-  color: var(--text-muted);
-}
-
-.codigoSection {
-  margin-bottom: 2rem;
-}
-
-.estudiantesSection {
-  margin-top: 0;
-}
-
-.estudiantesSection h3 {
-  margin: 0 0 1rem 0;
-  color: var(--text-primary);
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-.emptyState {
-  text-align: center;
-  padding: 3rem 2rem;
-  background: var(--surface-primary);
-  border: 1px dashed var(--border-primary);
-  border-radius: var(--border-radius);
-}
-
-.emptyState p {
-  color: var(--text-muted);
-  margin: 0.5rem 0;
-}
-
-.emptySubtext {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-}
-
-.estudiantesList {
+.sidebarNav {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 2px;
+  padding: 0 8px;
 }
 
-.estudianteCard {
+.navItem {
   display: flex;
   align-items: center;
-  padding: 0.875rem 1rem;
-  background: var(--surface-secondary);
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  color: var(--text-muted);
+  background: transparent;
+  cursor: pointer;
+  transition:
+    color 0.1s,
+    background 0.1s;
+  border-left: 2px solid transparent;
+  border-radius: 0;
+  justify-content: flex-start;
+}
+
+.navItem:hover {
+  color: var(--text-primary);
+  background: none !important;
+}
+
+.navItemActive {
+  color: var(--text-primary);
+  border-left-color: var(--blue);
+  background: transparent;
+}
+
+/* ── Main content ── */
+
+.main {
+  flex: 1;
+  min-width: 0;
+  padding: 32px 0px 32px 40px;
+}
+
+/* ── Panel header ── */
+
+.panelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 12px;
+}
+
+.panelTitle {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.badge {
+  font-size: 0.8rem;
+  line-height: 1;
+  color: var(--text-muted);
+  background: var(--surface-tertiary);
   border: 1px solid var(--border-primary);
-  border-radius: var(--border-radius);
-  transition: all 0.15s ease;
-  position: relative;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
 }
 
-.estudianteCard:hover {
-  border-color: var(--blue);
-  background: var(--surface-primary);
+/* ── Empty text ── */
+
+.emptyText {
+  color: var(--text-secondary);
+  margin: 0;
 }
 
-.estudianteClickable {
+/* ── Student list ── */
+
+.studentList {
+  display: flex;
+  flex-direction: column;
+}
+
+.studentRow {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-primary);
+  transition: background 0.1s;
+}
+
+.studentRow:last-child {
+  border-bottom: none;
+}
+
+.studentRow:hover {
+  background: none;
+}
+
+.studentClickable {
   flex: 1;
   display: flex;
   align-items: center;
   cursor: pointer;
   min-width: 0;
+  gap: 12px;
 }
 
-.estudianteAvatar {
-  width: 40px;
-  height: 40px;
+.avatar {
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background: var(--blue);
+  background: var(--surface-secondary);
+  border: 1px solid var(--border-primary);
   color: var(--text-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
-  margin-right: 0.875rem;
+  font-size: 13px;
   flex-shrink: 0;
-  font-size: 0.9rem;
 }
 
-.estudianteInfo {
-  flex: 1;
+.studentInfo {
+  display: flex;
+  flex-direction: column;
   min-width: 0;
 }
 
-.estudianteInfo h4 {
-  margin: 0 0 0.125rem 0;
-  color: var(--text-primary);
-  font-weight: 500;
-  font-size: 0.9375rem;
+.studentName {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.estudianteCodigo {
-  margin: 0.125rem 0;
-  color: var(--text-muted);
-  font-size: 0.8125rem;
-}
-
-.estudianteCorreo {
-  margin: 0.125rem 0 0 0;
+.studentMeta {
   color: var(--text-secondary);
-  font-size: 0.8125rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -170,20 +164,152 @@
 
 .removeButton {
   background: transparent;
-  border: 1px solid var(--border-primary);
-  cursor: pointer;
-  padding: 0.4rem 0.5rem;
-  border-radius: var(--border-radius);
-  transition: all 0.15s;
+  padding: 5px;
+  border-radius: 4px;
   flex-shrink: 0;
-  margin-left: 0.5rem;
-  color: var(--text-muted);
+  margin-left: 8px;
+  color: var(--text-secondary);
+  opacity: 0;
+  transition: opacity 0.1s;
+}
+
+.studentRow:hover .removeButton {
+  opacity: 1;
 }
 
 .removeButton:hover {
-  background-color: var(--surface-primary);
-  border-color: #ff6b6b;
   color: #ff6b6b;
+  background: transparent;
+}
+
+/* ── Analysis panel ── */
+
+.analysisPanel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.analysisDesc {
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Settings ── */
+
+.settingsSection {
+  padding-bottom: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.settingsSection:last-child {
+  margin-bottom: 0;
+}
+
+.settingsLabel {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  margin: 0 0 10px 0;
+}
+
+.renameRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.renameRow > *:first-child {
+  flex: 1;
+}
+
+.renameButton {
+  height: 36px;
+  padding: 0 16px;
+  font-size: 14px;
+  border: 1px solid var(--border-primary);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.1s;
+}
+
+.renameButton:hover:not(:disabled) {
+  color: var(--text-primary);
+  background: transparent;
+}
+
+.renameButton:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.settingsAction {
+  background: transparent;
+  padding: 0;
+  color: var(--text-muted);
+  justify-content: flex-start;
+  gap: 8px;
+  border-radius: 0;
+}
+
+.settingsAction:hover:not(:disabled) {
+  color: var(--text-primary);
+  background: transparent;
+}
+
+.settingsAction:disabled {
+  color: var(--text-secondary);
+  cursor: not-allowed;
+}
+
+.dangerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.dangerInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dangerHint {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.dangerButton {
+  background: transparent;
+  border: 1px solid rgba(255, 107, 107, 0.2);
+  color: #ff6b6b;
+  padding: 6px 14px;
+  border-radius: 6px;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.dangerButton:hover {
+  background: rgba(255, 107, 107, 0.06);
+}
+
+/* ── Utility ── */
+
+.backLink {
+  color: var(--text-muted);
+  background: transparent;
+  padding: 0;
+}
+
+.backLink:hover {
+  color: var(--text-primary);
+  background: transparent;
 }
 
 .loadingText,
@@ -191,7 +317,6 @@
   text-align: center;
   padding: 3rem;
   color: var(--text-muted);
-  font-size: 1rem;
 }
 
 .errorText {

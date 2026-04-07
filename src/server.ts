@@ -5,6 +5,10 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import authRouter from './auth/infrastructure/controllers/AuthController.js'
 import progresoRouter from './auth/infrastructure/controllers/ProgresoController.js'
+<<<<<<< HEAD
+=======
+import groupsRouter from './groups/infrastructure/controller/GroupsController.js'
+>>>>>>> origin/chore/union-sprint5
 import feedbackRouter from './feedback/infrastructure/controllers/FeedbackController.js'
 import courseAnalysisRouter from './course-analysis/infrastructure/controllers/CourseAnalysisController.js'
 import chatRouter from './chat/infrastructure/controllers/ChatController.js'
@@ -18,10 +22,14 @@ const PORT = Number(process.env.PORT) || 3000 // Azure asigna puerto dinámico
 
 const feedbackStateRepository = new InMemoryFeedbackStateRepository();
 
-// Middlewares - CORS configurado para permitir cualquier origen
+// CORS - restringido en producción al dominio del frontend
+const corsOrigin = process.env.NODE_ENV === 'production' && process.env.FRONTEND_URL
+  ? process.env.FRONTEND_URL
+  : '*';
+
 app.use(cors({
-  origin: '*',
-  credentials: false
+  origin: corsOrigin,
+  credentials: corsOrigin !== '*'
 }))
 
 app.use(express.json())

@@ -1,5 +1,6 @@
 import { ECSManager } from "../core/ECSManager";
 import { ColoresRed } from "../../data/colores";
+import { APPS } from "../../data/apps";
 import {
   Transform,
   DispositivoComponent,
@@ -15,6 +16,7 @@ import {
   EventoComponent,
   VPNGatewayComponent,
   ClienteVPNComponent,
+  PersonaComponent,
 } from "../components";
 import type { ComponenteContainer, Entidad } from "../core/Componente";
 import { type Activo, type Dispositivo, type Escenario, type ObjetivoFase, type SoftwareApp } from "../../types/EscenarioTypes";
@@ -24,10 +26,14 @@ import {
   TipoDispositivo,
   EstadoAtaqueDispositivo,
   TipoEvento,
+  NivelConcienciaSeguridad,
 } from "../../types/DeviceEnums";
 import { RedComponent } from "../components/RedComponent";
 import { FirewallBuilder } from "./FirewallBuilder";
 import { SistemaRelaciones } from "../systems";
+// import { TipoProtocolo } from "../../types/TrafficEnums";
+import { AccionFirewall, DireccionTrafico } from "../../types/FirewallTypes";
+import { FirewallConfigService } from "../systems/red";
 
 /**
  * Builder para crear escenarios de forma declarativa y simple
@@ -39,19 +45,16 @@ import { SistemaRelaciones } from "../systems";
 export class ScenarioBuilder {
   private ecsManager: ECSManager;
   private sistemaJerarquia: SistemaJerarquiaEscenario;
+  private entidadRedInternet: Entidad = -1;
 
   constructor(ecsManager: ECSManager) {
     this.ecsManager = ecsManager;
 
-    // Obtener o crear el sistema de jerarquía centralizado
-    let sistema = this.ecsManager.getSistema(SistemaJerarquiaEscenario);
-
+    // Obtener el sistema de jerarquía centralizado registrado por EscenarioController
+    const sistema = this.ecsManager.getSistema(SistemaJerarquiaEscenario);
     if (!sistema) {
-      // Si no existe, crearlo y agregarlo al ECSManager
-      sistema = new SistemaJerarquiaEscenario();
-      this.ecsManager.agregarSistema(sistema);
+      throw new Error("SistemaJerarquiaEscenario debe estar registrado antes de crear el builder.");
     }
-
     this.sistemaJerarquia = sistema;
   }
 
@@ -74,14 +77,14 @@ export class ScenarioBuilder {
       this.crearFase(escenarioPadre, fase);
     });
 
-    escenario.apps.forEach((app: unknown) => {
+    APPS.forEach((app) => {
       this.crearApp(escenarioPadre, app);
     });
 
     // Crear la red Internet UNA SOLA VEZ como red global
-    const entidadRedInternet = this.ecsManager.agregarEntidad();
+    this.entidadRedInternet = this.ecsManager.agregarEntidad();
     this.ecsManager.agregarComponente(
-      entidadRedInternet,
+      this.entidadRedInternet,
       new RedComponent("Internet", ColoresRed.ROJO)
     );
 
@@ -98,6 +101,7 @@ export class ScenarioBuilder {
       const z = zona as {
         oficinas?: unknown[];
         redes?: unknown[];
+        personas?: unknown[];
         nombre?: string;
       };
 
@@ -118,15 +122,21 @@ export class ScenarioBuilder {
           if (!tieneRouters) {
             return; // Saltar esta red
           }
-          redesConEntidades.set(entidadRedInternet, r);
+          redesConEntidades.set(this.entidadRedInternet, r);
           // Agregar relación entre esta zona e Internet usando el sistema ya creado
-          relacionZonaRed.agregar(zonaEntidad, entidadRedInternet);
+          relacionZonaRed.agregar(zonaEntidad, this.entidadRedInternet);
         } else {
           // Para otras redes, crear una nueva entidad
           const entidadRed = this.ecsManager.agregarEntidad();
           redesConEntidades.set(entidadRed, r);
           this.crearRed(zonaEntidad, entidadRed, red, relacionZonaRed);
         }
+      });
+
+      // Procesar personas por zona
+      (z.personas ?? []).forEach((persona) => {
+        const entidadPersona = this.ecsManager.agregarEntidad();
+        this.crearPersona(zonaEntidad, entidadPersona, persona);
       });
 
       (z.oficinas ?? []).forEach((oficina: unknown) => {
@@ -202,6 +212,7 @@ export class ScenarioBuilder {
       descripcion: string;
       fase: number;
       infoAdicional?: unknown;
+      ejecutarAlInstante?: boolean;
     };
     const entidadEvento = this.ecsManager.agregarEntidad();
     this.ecsManager.agregarComponente(
@@ -212,7 +223,8 @@ export class ScenarioBuilder {
         a.tiempoNotificacion,
         a.descripcion,
         a.fase,
-        a.infoAdicional
+        a.infoAdicional,
+        a.ejecutarAlInstante
       )
     );
   }
@@ -238,20 +250,18 @@ export class ScenarioBuilder {
     escenarioContainer?.get(EscenarioComponent)?.fases.push(faseAAgregar);
   }
 
-  crearApp(entidadEscenario: Entidad, app: unknown) {
-    const a = app as SoftwareApp;
-
+  crearApp(entidadEscenario: Entidad, app: SoftwareApp) {
     const escenarioContainer = this.ecsManager.getEntidades().get(entidadEscenario);
 
-    escenarioContainer?.get(EscenarioComponent)?.apps.push(a);
+    escenarioContainer?.get(EscenarioComponent)?.apps.push(app);
   }
 
   crearZona(zona: unknown, escenarioEntidad?: Entidad): Entidad {
     const entidadZona = this.ecsManager.agregarEntidad();
-    const z = zona as { id: number; nombre: string; dominio: string };
+    const z = zona as { id: number; nombre: string; dominio: string; esInteractiva: boolean; };
     this.ecsManager.agregarComponente(
       entidadZona,
-      new ZonaComponent(z.id, z.nombre, z.dominio)
+      new ZonaComponent(z.id, z.nombre, z.dominio, z.esInteractiva)
     );
     const escEntidad = escenarioEntidad;
     if (escEntidad != null) {
@@ -276,6 +286,26 @@ export class ScenarioBuilder {
 
     // Usar el sistema de relaciones que se pasó como parámetro
     relacionZonaRed.agregar(entidadZona, entidadRed);
+  }
+
+  crearPersona(
+    entidadZona: Entidad,
+    entidadPersona: Entidad,
+    persona: unknown,
+  ) {
+    const p = persona as {
+      nombre: string;
+      correo: string;
+      nivelConcienciaSeguridad: NivelConcienciaSeguridad;
+    };
+
+    const personaComponente = new PersonaComponent(
+      p.nombre, p.correo, p.nivelConcienciaSeguridad
+    );
+
+    this.ecsManager.agregarComponente(entidadPersona, personaComponente);
+
+    this.sistemaJerarquia.agregarPersonaAZona(entidadZona, entidadPersona);
   }
 
   crearOficina(oficina: unknown, zonaId: number): Entidad {
@@ -334,7 +364,11 @@ export class ScenarioBuilder {
       estadoAtaque?: unknown;
       posicion?: { x: number; y: number; z: number; rotacionY?: number };
       redes?: string[];
+      personaEncargada?: string;
       apps?: SoftwareApp[];
+      nombreEquipo?: string;
+      usuario?: string;
+      contrasenia?: string;
     };
 
     // Extraer entidades de redes
@@ -354,7 +388,11 @@ export class ScenarioBuilder {
         d.hardware ?? "",
         d.tipo as unknown as TipoDispositivo,
         d.estadoAtaque as EstadoAtaqueDispositivo,
+        d.nombreEquipo ?? "",
+        d.usuario ?? "",
+        d.contrasenia ?? "",
         entidadesRedesDispActual,
+        d.personaEncargada,
         d.apps
       )
     );
@@ -384,17 +422,38 @@ export class ScenarioBuilder {
         break;
       }
       case TipoDispositivo.ROUTER: {
-        // const r = dispositivo as {
-        //   nombre?: string;
-        //   conectadoAInternet?: boolean;
-        //   redes?: string[]; // Array de NOMBRES de redes (referencias)
-        // };
         // Agregar RouterComponent con firewall y referencias a redes
         const firewallConfig = new FirewallBuilder().build();
         this.ecsManager.agregarComponente(
           entidadDispositivo,
           new RouterComponent(firewallConfig, [])
         );
+
+        // Se agregan las reglas para cada red, protocolo, y dirección. Por defecto, todas las reglas están Permitidas para todas las redes y en las 2 direcciones
+        const firewallConfigService = new FirewallConfigService(this.ecsManager);
+        for (const entidadRed of entidadesRedesDispActual) {
+          // const accion = entidadRed == this.entidadRedInternet ? AccionFirewall.DENEGAR : AccionFirewall.PERMITIR; // Esto era porque tiene más sentido que no se permita ningún protocolo desde afuera (desde Internet), pero por cómo se comporta el frontend con los botones de las reglas, se lo deja todo en Permitir igualmente
+          for (const protocolo of FirewallConfigService.obtenerTodosLosProtocolos()){
+            firewallConfigService.agregarReglaFirewall(
+                                    entidadDispositivo,
+                                    entidadRed,
+                                    protocolo,
+                                    AccionFirewall.PERMITIR,
+                                    DireccionTrafico.DESDE
+                                 ); 
+          }
+        }
+        for (const entidadRed of entidadesRedesDispActual) {
+          for (const protocolo of FirewallConfigService.obtenerTodosLosProtocolos()){
+            firewallConfigService.agregarReglaFirewall(
+                                    entidadDispositivo,
+                                    entidadRed,
+                                    protocolo,
+                                    AccionFirewall.PERMITIR,
+                                    DireccionTrafico.HACIA
+                                 ); 
+          }
+        }
         break;
       }
       case TipoDispositivo.VPN: {
@@ -438,10 +497,10 @@ export class ScenarioBuilder {
   }
 
   /**
-   * Obtiene todas las zonas del escenario con su id y nombre
+   * Obtiene todas las zonas del escenario con su id, nombre y dominio
    */
-  public obtenerZonas(): Array<{ id: number; nombre: string }> {
-    const zonas: Array<{ id: number; nombre: string }> = [];
+  public obtenerZonas(): Array<{ id: number; nombre: string; dominio: string; esInteractiva: boolean; }> {
+    const zonas: Array<{ id: number; nombre: string; dominio: string; esInteractiva: boolean; }> = [];
 
     // Recorrer todas las entidades y buscar las que tienen ZonaComponent
     for (const [, container] of this.ecsManager.getEntidades()) {
@@ -450,6 +509,8 @@ export class ScenarioBuilder {
         zonas.push({
           id: zonaComponent.id,
           nombre: zonaComponent.nombre,
+          dominio: zonaComponent.dominio,
+          esInteractiva: zonaComponent.esInteractiva,
         });
       }
     }

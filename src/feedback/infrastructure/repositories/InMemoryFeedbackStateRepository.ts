@@ -2,19 +2,22 @@ import type { IFeedbackStateRepository } from '../../domain/repositories/IFeedba
 import type { FeedbackState } from '../../domain/models/FeedbackState.js';
 
 
+// Estado efímero: se pierde al reiniciar el servidor (redeploy en Render, etc.).
+// Consecuencia: tras un redeploy, el feedback se habilita de nuevo para todos los estudiantes.
+// Si esto es un problema, migrar a persistencia en DB (tabla feedback_state).
 export class InMemoryFeedbackStateRepository implements IFeedbackStateRepository {
   private states: Map<string, FeedbackState> = new Map();
 
-  private getKey(idEstudiante: number, idEscenario: number): string {
-    return `${idEstudiante}_${idEscenario}`;
+  private getKey(idEstudiante: number, slugEscenario: string): string {
+    return `${idEstudiante}_${slugEscenario}`;
   }
 
-  async guardar(idEstudiante: number, idEscenario: number, numIntentos: number): Promise<void> {
-    const key = this.getKey(idEstudiante, idEscenario);
-    
+  async guardar(idEstudiante: number, slugEscenario: string, numIntentos: number): Promise<void> {
+    const key = this.getKey(idEstudiante, slugEscenario);
+
     const state: FeedbackState = {
       id_estudiante: idEstudiante,
-      id_escenario: idEscenario,
+      slug_escenario: slugEscenario,
       num_intentos_al_generar: numIntentos,
       fecha_generacion: new Date(),
     };
@@ -22,23 +25,23 @@ export class InMemoryFeedbackStateRepository implements IFeedbackStateRepository
     this.states.set(key, state);
   }
 
-  async obtener(idEstudiante: number, idEscenario: number): Promise<FeedbackState | null> {
-    const key = this.getKey(idEstudiante, idEscenario);
+  async obtener(idEstudiante: number, slugEscenario: string): Promise<FeedbackState | null> {
+    const key = this.getKey(idEstudiante, slugEscenario);
     return this.states.get(key) || null;
   }
 
   async debeHabilitar(
     idEstudiante: number,
-    idEscenario: number,
+    slugEscenario: string,
     intentosActuales: number
   ): Promise<boolean> {
-    const estado = await this.obtener(idEstudiante, idEscenario);
+    const estado = await this.obtener(idEstudiante, slugEscenario);
 
     if (!estado) {
       return true;
     }
 
-   
+
     return intentosActuales > estado.num_intentos_al_generar;
   }
 }

@@ -23,12 +23,12 @@ export class ComponenteContainer {
     return this.map.has(claseComponente);
   }
 
-  public tieneTodos(clasesComponente: Iterable<ClaseComponente>): boolean {
+  /*public tieneTodos(clasesComponente: Iterable<ClaseComponente>): boolean {
     for (const clase of clasesComponente) {
       if (!this.map.has(clase)) return false;
     }
     return true;
-  }
+  }*/
 
   public eliminar(claseComponente: ClaseComponente): void {
     this.map.delete(claseComponente);

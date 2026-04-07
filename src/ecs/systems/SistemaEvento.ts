@@ -1,4 +1,4 @@
-import { ObjetosManejables } from "../../types/AccionesEnums";
+import { AccionesRealizables, ObjetosManejables } from "../../types/AccionesEnums";
 import { EstadoAtaqueDispositivo, TipoEvento } from "../../types/DeviceEnums";
 import type {
   PerfilClienteVPN,
@@ -15,17 +15,18 @@ import {
   AtaqueComponent,
   DispositivoComponent,
   EventoComponent,
+  RedComponent,
   RouterComponent,
   WorkstationComponent,
 } from "../components";
 import { Sistema, type Entidad } from "../core";
-import type { ClaseComponente } from "../core/Componente";
+// import type { ClaseComponente } from "../core/Componente";
 import { SistemaActivo } from "./SistemaActivo";
 
 export class SistemaEvento extends Sistema {
-  public componentesRequeridos: Set<ClaseComponente> = new Set([
-    AtaqueComponent,
-  ]);
+  // public componentesRequeridos: Set<ClaseComponente> = new Set([
+  //   AtaqueComponent,
+  // ]);
 
   public ejecutarAtaque(
     entidadDispositivo: Entidad,
@@ -76,37 +77,47 @@ export class SistemaEvento extends Sistema {
           val: {
             nombreConfig: string;
             activado: boolean;
-          };
+          }[];
         };
         const dispositivo = containerDispositivo.get(WorkstationComponent);
-        const config = dispositivo?.configuraciones.find(
-          (conf) => conf.nombreConfig == c?.val.nombreConfig
-        );
-        if (config?.activado == c?.val.activado) return true;
-        return false;
+        
+        for (const configItem of c.val) {
+          const config = dispositivo?.configuraciones.find(
+            (conf) => conf.nombreConfig == configItem.nombreConfig
+          );
+          if (config?.activado != configItem.activado) return false;
+        }
+        return true;
       }
       case ObjetosManejables.CONFIG_FIREWALL: {
         const c = condicionMitigacion as {
           val: {
+            nombreRed: string;
             accion: AccionFirewall;
             direccion: DireccionTrafico;
             protocolo: TipoProtocolo;
-          };
+          }[];
         };
         const router = containerDispositivo.get(RouterComponent);
         if (!router) return false;
-        
-        for (const [, reglas] of router.bloqueosFirewall.entries()) {
-          for (const regla of reglas) {
-            if (
-              regla.accion === c.val.accion &&
-              regla.direccion === c.val.direccion &&
-              regla.protocolo == c.val.protocolo
-            )
-              return true;
-          }
+
+        for (const configItem of c.val) {
+          const entidadRedEsperada = this.buscarRedPorNombre(configItem.nombreRed);
+          if(entidadRedEsperada == null) return false;
+
+          const reglas = router.bloqueosFirewall.get(entidadRedEsperada);
+          if(!reglas) return false;
+
+          const reglaItem = reglas.find(
+                                (regla) =>
+                                  regla.protocolo == configItem.protocolo &&
+                                  regla.direccion == configItem.direccion
+                              );
+
+          if (reglaItem && reglaItem.accion != configItem.accion) return false;
         }
-        return false;
+        
+        return true;
       }
       // Próximamente para otros dispositivos y/o configuraciones
     }
@@ -236,6 +247,42 @@ export class SistemaEvento extends Sistema {
         else this.ecsManager.emit(EventosPublicos.FASE_NO_COMPLETADA, MensajesGenerales.MSJ_FASE_NO_COMPLETADA);
         break;
       }
+      case TipoEvento.VERIFICACION_ACCION_JUGADOR: {
+        const info = evento.infoAdicional as {
+          accion: string;
+          objeto: string;
+          tiempo?: number;
+          val?: unknown;
+        };
+
+        const consultaAccion = this.ecsManager.consultarAccion(info.accion, info.objeto, info.tiempo, info.val);
+
+        if(!consultaAccion)
+          this.ecsManager.emit(EventosPublicos.FASE_NO_COMPLETADA, MensajesGenerales.MSJ_FASE_NO_COMPLETADA);
+        else this.ecsManager.emit(EventosInternos.OBJETIVO_COMPLETADO);
+
+        break;
+      }
+      case TipoEvento.ENVIO_CORREO: {
+        const info = evento.infoAdicional as {
+          dispositivoEmisor: string;
+          destinatario: string;
+          asunto: string;
+        };
+
+        const consultaEnvioCorreo = this.ecsManager.consultarAccion(
+          AccionesRealizables.ENVIO,
+          ObjetosManejables.CORREO,
+          undefined,
+          info
+        );
+
+        if (!consultaEnvioCorreo)
+          this.ecsManager.emit(EventosPublicos.FASE_NO_COMPLETADA, MensajesGenerales.MSJ_FASE_NO_COMPLETADA);
+        else this.ecsManager.emit(EventosInternos.OBJETIVO_COMPLETADO);
+
+        break;
+      }
       // Próximamente para futuros eventos
     }
   }
@@ -245,6 +292,16 @@ export class SistemaEvento extends Sistema {
     for (const [entidad, container] of this.ecsManager.getEntidades()) {
       const dispositivo = container.get(DispositivoComponent);
       if (dispositivo && dispositivo.nombre === nombre) {
+        return entidad;
+      }
+    }
+    return null;
+  }
+
+  private buscarRedPorNombre(nombreRed: string): Entidad | null {
+    for (const [entidad, container] of this.ecsManager.getEntidades()) {
+      const red = container.get(RedComponent);
+      if (red && red.nombre === nombreRed) {
         return entidad;
       }
     }

@@ -107,7 +107,7 @@ export class FirewallService {
         routerComponente,
         redDesdeViene,
         protocolo,
-        DireccionTrafico.ENTRANTE
+        DireccionTrafico.DESDE
       );
 
       if (!permitidoDesdeOrigen) {
@@ -120,7 +120,7 @@ export class FirewallService {
         routerComponente,
         redHaciaVa,
         protocolo,
-        DireccionTrafico.SALIENTE
+        DireccionTrafico.HACIA
       );
 
       if (!permitidoHaciaDestino) {

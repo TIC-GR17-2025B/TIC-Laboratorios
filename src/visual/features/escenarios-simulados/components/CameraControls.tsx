@@ -3,6 +3,7 @@ import { OrbitControls } from '@react-three/drei';
 import { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 
 interface CameraControlsProps {
+    enabled?: boolean;
     enableZoom?: boolean;
     enablePan?: boolean;
     enableRotate?: boolean;
@@ -19,6 +20,7 @@ interface CameraControlsProps {
  */
 
 const CameraControls: React.FC<CameraControlsProps> = ({
+    enabled = true,
     enableZoom = true,
     enablePan = true,
     enableRotate = true,
@@ -34,6 +36,7 @@ const CameraControls: React.FC<CameraControlsProps> = ({
     return (
         <OrbitControls
             ref={controlsRef}
+            enabled={enabled}
             enableZoom={enableZoom}
             enablePan={enablePan}
             enableRotate={enableRotate}

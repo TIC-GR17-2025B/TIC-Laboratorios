@@ -1,6 +1,7 @@
 import type { Progreso, ProgresoInput, ProgresoConNombreEscenario } from "../../domain/models/Progreso.js";
 import type { IProgresoRepository } from "../../domain/repositories/IProgresoRepository.js";
 import { prisma } from "../db/prisma.js";
+import { getNombreEscenario } from "../../../data/escenarios/registry.js";
 
 export class PrismaProgresoRepository implements IProgresoRepository {
 
@@ -8,7 +9,7 @@ export class PrismaProgresoRepository implements IProgresoRepository {
         const created = await prisma.progreso.create({
             data: {
                 id_estudiante: p.id_estudiante,
-                id_escenario: p.id_escenario,
+                slug_escenario: p.slug_escenario,
                 terminado: p.terminado,
                 tiempo: p.tiempo,
             },
@@ -17,11 +18,11 @@ export class PrismaProgresoRepository implements IProgresoRepository {
     }
 
     // Obtener el progreso de un estudiante en un escenario específico
-    async getProgresoEstudiante(idEstudiante: number, idEscenario: number): Promise<{ terminado: boolean; intentos: number; } | null> {
+    async getProgresoEstudiante(idEstudiante: number, slugEscenario: string): Promise<{ terminado: boolean; intentos: number; } | null> {
         const intentos = await prisma.progreso.count({
             where: {
                 id_estudiante: idEstudiante,
-                id_escenario: idEscenario,
+                slug_escenario: slugEscenario,
             },
         });
 
@@ -31,7 +32,7 @@ export class PrismaProgresoRepository implements IProgresoRepository {
             },
             where: {
                 id_estudiante: idEstudiante,
-                id_escenario: idEscenario,
+                slug_escenario: slugEscenario,
                 terminado: true,
             },
         });
@@ -49,39 +50,23 @@ export class PrismaProgresoRepository implements IProgresoRepository {
         idEstudiante: number
     ): Promise<ProgresoConNombreEscenario[]> {
 
-        // Obtener todos los progresos del estudiante con nombre de escenario
         const progresos = await prisma.progreso.findMany({
             where: { id_estudiante: idEstudiante },
-            include: {
-                escenario: {
-                    select: { nombre: true } // solo traer nombre
-                }
-            },
             orderBy: {
-                id_progreso: 'asc', // orden por intento
+                id_progreso: 'asc',
             },
         });
 
-        // Mapear los progresos al formato deseado
         const resultado: ProgresoConNombreEscenario[] = progresos.map(p => ({
             id_progreso: p.id_progreso,
             id_estudiante: p.id_estudiante,
-            id_escenario: p.id_escenario,
-            nombre_escenario: p.escenario.nombre,
+            slug_escenario: p.slug_escenario,
+            nombre_escenario: getNombreEscenario(p.slug_escenario),
             terminado: !!p.terminado,
             tiempo: p.tiempo,
+            fecha_creacion: p.fecha_creacion ? p.fecha_creacion.toISOString() : null,
         }));
 
         return resultado;
     }
-
-
-    /* Actualizar el progreso de un estudiante en un escenario específico
-    async actualizarProgreso(id_progreso: number, data: Partial<ProgresoInput>): Promise<Progreso> {
-        const updated = await prisma.progreso.update({
-            where: { id_progreso },
-            data,
-        });
-        return updated as Progreso;
-    }*/
 }

@@ -17,14 +17,10 @@ export class JoinGroupsUseCase {
             throw new Error("El código ha expirado");
         }
 
-        // 3. Validar matrícula duplicada
-        const exists = await this.repo.existsMatricula(
-            curso.id_curso,
-            payload.id_estudiante
-        );
-
-        if (exists) {
-            throw new Error("El estudiante ya está matriculado en este curso");
+        // 3. Validar que no pertenezca ya a algún grupo
+        const hasGroup = await this.repo.hasAnyMatricula(payload.id_estudiante);
+        if (hasGroup) {
+            throw new Error("Ya perteneces a un grupo. Debes salir del actual antes de unirte a otro");
         }
 
         // 4. Crear matrícula

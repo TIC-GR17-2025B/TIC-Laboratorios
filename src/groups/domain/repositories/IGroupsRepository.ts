@@ -14,6 +14,7 @@ export interface IGroupsRepository {
 
   findCursoByCodigo(codigo: string): Promise<Curso | null>;
   existsMatricula(id_curso: number, id_estudiante: number): Promise<boolean>;
+  hasAnyMatricula(id_estudiante: number): Promise<boolean>;
   createMatricula(data: MatriculaInput): Promise<Matricula>;
   updateCursoCodigo(
     id_curso: number,
@@ -26,5 +27,6 @@ export interface IGroupsRepository {
   ): Promise<DeleteResult>;
   findCursoById(id_curso: number): Promise<Curso | null>;
   findCursosByProfesor(id_profesor: number): Promise<Curso[]>;
+  findCursosByEstudiante(id_estudiante: number): Promise<(Curso & { nombre_profesor: string })[]>;
   findEstudiantesByCurso(id_curso: number): Promise<EstudiantePublic[]>;
 }

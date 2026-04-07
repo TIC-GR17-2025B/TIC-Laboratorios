@@ -1,6 +1,7 @@
 import type { LogGeneral, SoftwareApp } from "../../types/EscenarioTypes";
 import { Componente, type Entidad } from "../core/Componente";
 import type { AtaqueComponent } from "./AtaqueComponent";
+import type { EventoComponent } from "./EventoComponent";
 import type { FaseComponent } from "./FaseComponent";
 
 export class EscenarioComponent extends Componente {
@@ -14,7 +15,10 @@ export class EscenarioComponent extends Componente {
     public fases: FaseComponent[] = [],
     public tipo: string = "escenario",
     public logsGenerales: LogGeneral[] = [],
-    public apps: SoftwareApp[] = []
+    public apps: SoftwareApp[] = [],
+    public eventos: EventoComponent[] = [],
+    public redes: Entidad[] = [],
+    public slug: string = ""
   ) {
     super();
   }

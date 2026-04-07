@@ -3,14 +3,12 @@ import type { Reglas } from '../../types/FirewallTypes';
 import type { TipoProtocolo } from '../../types/TrafficEnums';
 import type { Entidad } from '../core/Componente';
 
-
 export class FirewallBuilder {
   private bloqueosFirewall: Map<Entidad, Reglas[]>;
 
-  constructor() {
+  constructor() { 
     this.bloqueosFirewall = new Map();
   }
-
  
   agregarRegla(
     entidadRed: Entidad,
@@ -23,7 +21,6 @@ export class FirewallBuilder {
     this.bloqueosFirewall.set(entidadRed, [...reglasExistentes, nuevaRegla]);
     return this;
   }
-
 
   agregarReglas(
     entidadRed: Entidad,
@@ -45,35 +42,29 @@ export class FirewallBuilder {
     return this.agregarReglas(entidadRed, protocolos, AccionFirewall.DENEGAR, direccion);
   }
 
-
   bloquearTodoSaliente(entidadRed: Entidad, protocolos: TipoProtocolo[]): this {
-    return this.bloquearProtocolos(entidadRed, protocolos, DireccionTrafico.SALIENTE);
+    return this.bloquearProtocolos(entidadRed, protocolos, DireccionTrafico.HACIA);
   }
 
-  
   bloquearTodoEntrante(entidadRed: Entidad, protocolos: TipoProtocolo[]): this {
-    return this.bloquearProtocolos(entidadRed, protocolos, DireccionTrafico.ENTRANTE);
+    return this.bloquearProtocolos(entidadRed, protocolos, DireccionTrafico.DESDE);
   }
-
  
   bloquearTodo(entidadRed: Entidad, protocolos: TipoProtocolo[]): this {
     return this.bloquearProtocolos(entidadRed, protocolos, DireccionTrafico.AMBAS);
   }
-
  
   limpiarRed(entidadRed: Entidad): this {
     this.bloqueosFirewall.delete(entidadRed);
     return this;
   }
-
  
   limpiarTodo(): this {
     this.bloqueosFirewall.clear();
     return this;
   }
-
  
   build(): Map<Entidad, Reglas[]> {
-    return new Map(this.bloqueosFirewall);
+    return this.bloqueosFirewall;
   }
 }

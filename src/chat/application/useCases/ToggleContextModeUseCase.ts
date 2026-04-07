@@ -1,5 +1,5 @@
-import type { IContextModeManager } from "../../domain/repositories/IContextModeManager";
-import type { GameContext } from "../../domain/models/Message";
+import type { IContextModeManager } from "../../domain/repositories/IContextModeManager.js";
+import type { GameContext } from "../../domain/models/Message.js";
 
 export interface ContextModeCallbacks {
   onActivate?: () => void;
