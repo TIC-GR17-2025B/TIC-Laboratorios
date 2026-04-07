@@ -8,6 +8,7 @@ import progresoRouter from './auth/infrastructure/controllers/ProgresoController
 import groupsRouter from './groups/infrastructure/controller/GroupsController.js'
 import feedbackRouter from './feedback/infrastructure/controllers/FeedbackController.js'
 import courseAnalysisRouter from './course-analysis/infrastructure/controllers/CourseAnalysisController.js'
+import chatRouter from './chat/infrastructure/controllers/ChatController.js'
 import { InMemoryFeedbackStateRepository } from './feedback/infrastructure/repositories/InMemoryFeedbackStateRepository.js'
 
 // Cargar variables de entorno
@@ -47,6 +48,7 @@ app.get('/', (_req: Request, res: Response) => {
       groups: '/groups',
       feedback: '/feedback',
       courseAnalysis: '/course-analysis',
+      chat: '/api/chat',
       health: '/health'
     }
   })
@@ -59,9 +61,9 @@ initializeFeedbackController(feedbackStateRepository);
 // Montar rutas de autenticación
 app.use('/auth', authRouter)
 app.use('/progreso', progresoRouter)
-app.use('/groups', groupsRouter)
 app.use('/feedback', feedbackRouter)
 app.use('/course-analysis', courseAnalysisRouter)
+app.use('/api/chat', chatRouter)
 
 // Manejo de rutas no encontradas
 app.use((_req: Request, res: Response) => {

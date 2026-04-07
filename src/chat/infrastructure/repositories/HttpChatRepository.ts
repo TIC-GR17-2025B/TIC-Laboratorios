@@ -1,19 +1,15 @@
-/**
- * Usar el webhook de n8n
- */
-
 import type {
   IChatRepository,
   ChatMessagePayload,
   ChatResponse,
 } from "../../domain/repositories/IChatRepository.js";
 
-export class N8nChatRepository implements IChatRepository {
-  constructor(private readonly webhookUrl: string) {}
+export class HttpChatRepository implements IChatRepository {
+  constructor(private readonly baseUrl: string) {}
 
   async sendMessage(payload: ChatMessagePayload): Promise<ChatResponse> {
     try {
-      const response = await fetch(this.webhookUrl, {
+      const response = await fetch(`${this.baseUrl}/api/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -28,18 +24,16 @@ export class N8nChatRepository implements IChatRepository {
       const data: ChatResponse = await response.json();
       return data;
     } catch (error) {
-      console.error("Error comunicándose con n8n:", error);
+      console.error("Error communicating with chat API:", error);
       throw new Error(
-        "No se pudo enviar el mensaje. Por favor, intenta de nuevo."
+        "Failed to send message. Please try again."
       );
     }
   }
 
   async checkHealth(): Promise<boolean> {
     try {
-      const response = await fetch(this.webhookUrl, {
-        method: "HEAD",
-      });
+      const response = await fetch(`${this.baseUrl}/api/chat/health`);
       return response.ok;
     } catch {
       return false;

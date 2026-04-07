@@ -15,10 +15,7 @@ const ChatLauncher: React.FC = () => {
       >
         Chatbot <EstrellasIcon />
       </button>
-      <ChatContainer
-        isOpen={isChatOpen}
-        webhookUrl="https://pymwebhooks.pymbots.com/webhook/5b947366-065c-4f88-878b-176f8ebdf392"
-      />
+      <ChatContainer isOpen={isChatOpen} />
     </div>
   );
 };
