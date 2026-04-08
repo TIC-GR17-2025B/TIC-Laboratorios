@@ -9,6 +9,7 @@ import {
   AccionesRealizables,
   ObjetosManejables,
 } from "../../types/AccionesEnums";
+import { SistemaTiempo } from "./SistemaTiempo";
 // import { EventosPublicos } from "../../types/EventosEnums";
 
 export class SistemaPresupuesto extends Sistema {
@@ -19,16 +20,15 @@ export class SistemaPresupuesto extends Sistema {
     entidadWorkstation: Entidad,
     config: string
   ) {
-    const componentesEntidadWorkstation =
-      this.ecsManager.getComponentes(entidadWorkstation);
-    const componenteConfigWorkstaion =
-      componentesEntidadWorkstation?.get(WorkstationComponent);
+    const componentesEntidadWorkstation = this.ecsManager.getComponentes(entidadWorkstation);
+    const componenteConfigWorkstaion = componentesEntidadWorkstation?.get(WorkstationComponent);
     const listaConfigsWorkstation = componenteConfigWorkstaion?.configuraciones;
 
     if (!listaConfigsWorkstation)
       throw new Error(
         `No existe lista de configuraciones en la Entidad ${entidadWorkstation}`
       );
+
     for (let i = 0; i < listaConfigsWorkstation.length; i++) {
       if (listaConfigsWorkstation[i].nombreConfig != config) continue;
 
@@ -41,8 +41,7 @@ export class SistemaPresupuesto extends Sistema {
         //   )
         // ) {
           // Aquí recién se hace el toggle
-          listaConfigsWorkstation[i].activado =
-            !listaConfigsWorkstation[i].activado;
+          listaConfigsWorkstation[i].activado = !listaConfigsWorkstation[i].activado;
 
           // const presupuestoComp = this.ecsManager
           //   .getComponentes(entidadPresupuesto)
@@ -52,18 +51,18 @@ export class SistemaPresupuesto extends Sistema {
           // }
         // } else break;
 
-        const dispositivoComp =
-          componentesEntidadWorkstation?.get(DispositivoComponent);
+        const dispositivoComp = componentesEntidadWorkstation?.get(DispositivoComponent);
         this.ecsManager.registrarAccion(
           AccionesRealizables.CLICK,
           ObjetosManejables.CONFIG_WORKSTATION,
-          -1,
+          this.getTiempoSimulacion(),
           {
             nombreConfig: listaConfigsWorkstation[i].nombreConfig,
             dispositivoAAtacar: dispositivoComp?.nombre,
             activado: listaConfigsWorkstation[i].activado,
           }
         );
+
         break;
         // Caso contrario significa que está activada
       } else {
@@ -73,8 +72,7 @@ export class SistemaPresupuesto extends Sistema {
         //     listaConfigsWorkstation[i].costoActivacion * 0.5
         //   )
         // ) {
-          listaConfigsWorkstation[i].activado =
-            !listaConfigsWorkstation[i].activado;
+          listaConfigsWorkstation[i].activado = !listaConfigsWorkstation[i].activado;
 
           // const presupuestoComp = this.ecsManager
           //   .getComponentes(entidadPresupuesto)
@@ -85,18 +83,18 @@ export class SistemaPresupuesto extends Sistema {
           // }
         // } else break;
 
-        const dispositivoComp =
-          componentesEntidadWorkstation?.get(DispositivoComponent);
+        const dispositivoComp = componentesEntidadWorkstation?.get(DispositivoComponent);
         this.ecsManager.registrarAccion(
           AccionesRealizables.CLICK,
           ObjetosManejables.CONFIG_WORKSTATION,
-          -1,
+          this.getTiempoSimulacion(),
           {
             nombreConfig: listaConfigsWorkstation[i].nombreConfig,
             dispositivoAAtacar: dispositivoComp?.nombre,
             activado: listaConfigsWorkstation[i].activado,
           }
         );
+
         break;
       }
     }
@@ -115,9 +113,7 @@ export class SistemaPresupuesto extends Sistema {
     entidadDispoitivo: Entidad,
     nombreApp: string
   ) {
-    const dispositivo = this.ecsManager
-      .getComponentes(entidadDispoitivo)
-      ?.get(DispositivoComponent);
+    const dispositivo = this.ecsManager.getComponentes(entidadDispoitivo)?.get(DispositivoComponent);
 
     let escenario;
     for (const [, c] of this.ecsManager.getEntidades()) {
@@ -136,9 +132,19 @@ export class SistemaPresupuesto extends Sistema {
           if (!dispositivo) break;
           if (!dispositivo.apps) {
             dispositivo.apps = [];
-          }
+          } 
 
           dispositivo.apps.push(app);
+
+          this.ecsManager.registrarAccion(
+            AccionesRealizables.AGREGAR,
+            ObjetosManejables.APLICACION,
+            this.getTiempoSimulacion(),
+            {
+              nombreDispositivo: dispositivo.nombre,
+              aplicacionAgregada: app.nombre
+            }
+          );
           // const presupuestoComp = this.ecsManager
           //   .getComponentes(entidadPresupuesto)
           //   ?.get(PresupuestoComponent);
@@ -161,9 +167,7 @@ export class SistemaPresupuesto extends Sistema {
     entidadDispoitivo: Entidad,
     nombreApp: string
   ) {
-    const dispositivo = this.ecsManager
-      .getComponentes(entidadDispoitivo)
-      ?.get(DispositivoComponent);
+    const dispositivo = this.ecsManager.getComponentes(entidadDispoitivo)?.get(DispositivoComponent);
 
     const appsDispositivo = dispositivo?.apps ?? [];
 
@@ -174,6 +178,15 @@ export class SistemaPresupuesto extends Sistema {
         // const precioApp = app.precio;
         dispositivo?.apps?.splice(i, 1);
 
+        this.ecsManager.registrarAccion(
+          AccionesRealizables.ELIMINAR,
+          ObjetosManejables.APLICACION,
+          this.getTiempoSimulacion(),
+          {
+            nombreDispositivo: dispositivo?.nombre ?? "",
+            aplicacionAgregada: app.nombre
+          }
+        );
         // const presupuestoComp = this.ecsManager
         //   .getComponentes(entidadPresupuesto)
         //   ?.get(PresupuestoComponent);
@@ -186,6 +199,10 @@ export class SistemaPresupuesto extends Sistema {
         break;
       }
     }
+  }
+
+  private getTiempoSimulacion(): number | undefined {
+    return this.ecsManager.getSistema(SistemaTiempo)?.getTiempoSimulacion();
   }
 
   // private hayPresupuestoSuficiente(

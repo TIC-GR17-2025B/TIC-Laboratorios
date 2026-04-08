@@ -255,7 +255,7 @@ export class SistemaEvento extends Sistema {
           val?: unknown;
         };
 
-        const consultaAccion = this.ecsManager.consultarAccion(info.accion, info.objeto, info.tiempo, info.val);
+        const consultaAccion = this.ecsManager.consultarAccion(info.accion, info.objeto, undefined, info.val);
 
         if(!consultaAccion)
           this.ecsManager.emit(EventosPublicos.FASE_NO_COMPLETADA, MensajesGenerales.MSJ_FASE_NO_COMPLETADA);

@@ -1,9 +1,11 @@
 import type { ECSManager } from "../../core/ECSManager";
 import type { Entidad } from "../../core";
-import { DispositivoComponent, RouterComponent } from "../../components";
+import { DispositivoComponent, RedComponent, RouterComponent } from "../../components";
 import { TipoProtocolo } from "../../../types/TrafficEnums";
 import { DireccionTrafico, AccionFirewall } from "../../../types/FirewallTypes";
 import type { Reglas } from "../../../types/FirewallTypes";
+import { AccionesRealizables, ObjetosManejables } from "../../../types/AccionesEnums";
+import { SistemaTiempo } from "../SistemaTiempo";
 
 export class FirewallConfigService {
     constructor(private ecsManager: ECSManager) {}
@@ -39,6 +41,22 @@ export class FirewallConfigService {
         // Agregar la nueva regla
         const nuevaRegla: Reglas = { accion, direccion, protocolo };
         router.bloqueosFirewall.set(entidadRed, [...reglasFiltradas, nuevaRegla]);
+
+        const tiempoSimulacion = this.getTiempoSimulacion();
+        if (!(tiempoSimulacion == undefined || tiempoSimulacion <= 0 || tiempoSimulacion == null)){
+            this.ecsManager.registrarAccion(
+                AccionesRealizables.CLICK,
+                ObjetosManejables.CONFIG_FIREWALL,
+                this.getTiempoSimulacion(),
+                {
+                    nombreRouter: dispositivo.nombre,
+                    nombreRed: this.ecsManager.getComponentes(entidadRed)?.get(RedComponent)?.nombre ?? "",
+                    accion: accion,
+                    direccion: direccion,
+                    protocolo: protocolo
+                }
+            );
+        }
     }
 
     bloquearProtocolosEnRed(
@@ -130,5 +148,9 @@ export class FirewallConfigService {
         }
 
         return Array.from(router.bloqueosFirewall.keys());
+    }
+
+    private getTiempoSimulacion(): number | undefined {
+        return this.ecsManager.getSistema(SistemaTiempo)?.getTiempoSimulacion();
     }
 }

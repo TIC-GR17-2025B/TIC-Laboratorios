@@ -3,12 +3,17 @@ export enum AccionesRealizables {
     ABRIR = "abrir",
     EJECUTAR = "ejecutar",
     ENVIO = "envio",
+    AGREGAR = "agregar",
+    ELIMINAR = "eliminar",
 }
 
 export enum ObjetosManejables {
-    CONFIG_WORKSTATION = "configuracion workstation",
-    CONFIG_FIREWALL = "configuracion firewall",
-    APLICACION = "aplicacion",
+    CONFIG_WORKSTATION = "configuración workstation",
+    CONFIG_FIREWALL = "configuración individual firewall",
+    APLICACION = "aplicación",
     CORREO = "correo",
     COMANDO = "comando",
+    PERFIL_CLIENTE_VPN = "perfil de cliente VPN",
+    PERFIL_VPN_GATEWAY = "perfil de VPN gateway",
+    OPCION_TOOLBAR = "opción del toolbar de la simulación",
 }

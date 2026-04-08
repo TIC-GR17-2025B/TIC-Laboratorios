@@ -22,6 +22,8 @@ import type {
   PerfilVPNGateway,
 } from "../../types/EscenarioTypes";
 import { EventosPublicos, MensajesGenerales } from "../../types/EventosEnums";
+import { AccionesRealizables, ObjetosManejables } from "../../types/AccionesEnums";
+import { SistemaTiempo } from "./SistemaTiempo";
 
 // Sistema encargado de gestionar redes, conectividad y firewalls
 export class SistemaRed extends Sistema {
@@ -371,6 +373,20 @@ export class SistemaRed extends Sistema {
       .getComponentes(entidadVpnGateway)
       ?.get(DispositivoComponent)?.nombre;
 
+    this.ecsManager.registrarAccion(
+      AccionesRealizables.AGREGAR,
+      ObjetosManejables.PERFIL_VPN_GATEWAY,
+      this.getTiempoSimulacion(),
+      {
+        nombreVPNGateway: nombreVPN,
+        lanLocal: perfil.lanLocal,
+        hostLan: perfil.hostLan,
+        proteccion: perfil.proteccion,
+        dominioRemoto: perfil.dominioRemoto,
+        hostRemoto: perfil.hostRemoto
+      }
+    );
+
     this.ecsManager.emit(
       EventosPublicos.VPN_GATEWAY_PERFIL_AGREGADO,
       `Se agregó correctamente un nuevo perfil de conexión VPN en ${nombreVPN}`
@@ -383,16 +399,32 @@ export class SistemaRed extends Sistema {
     entidadVpnGateway: Entidad,
     indexEnTabla: number
   ): void {
-    const actualVPNGateway = this.ecsManager
-      .getComponentes(entidadVpnGateway)
-      ?.get(VPNGatewayComponent);
-    if (actualVPNGateway) {
-      actualVPNGateway.perfilesVPNGateway.splice(indexEnTabla, 1);
-    }
-
     const nombreVPN = this.ecsManager
       .getComponentes(entidadVpnGateway)
       ?.get(DispositivoComponent)?.nombre;
+
+    const actualVPNGateway = this.ecsManager
+      .getComponentes(entidadVpnGateway)
+      ?.get(VPNGatewayComponent);
+
+    const perfilAEliminar = actualVPNGateway?.perfilesVPNGateway.at(indexEnTabla);
+    this.ecsManager.registrarAccion(
+      AccionesRealizables.ELIMINAR,
+      ObjetosManejables.PERFIL_VPN_GATEWAY,
+      this.getTiempoSimulacion(),
+      {
+        nombreVPNGateway: nombreVPN,
+        lanLocal: perfilAEliminar?.lanLocal ?? "",
+        hostLan: perfilAEliminar?.hostLan ?? "",
+        proteccion: perfilAEliminar?.proteccion ?? "",
+        dominioRemoto: perfilAEliminar?.dominioRemoto ?? "",
+        hostRemoto: perfilAEliminar?.hostRemoto ?? ""
+      }
+    );
+ 
+    if (actualVPNGateway) {
+      actualVPNGateway.perfilesVPNGateway.splice(indexEnTabla, 1);
+    }
 
     this.ecsManager.emit(
       EventosPublicos.VPN_GATEWAY_PERFIL_ELIMINADO,
@@ -413,6 +445,18 @@ export class SistemaRed extends Sistema {
       .getComponentes(entidadClienteVpn)
       ?.get(DispositivoComponent)?.nombre;
 
+    this.ecsManager.registrarAccion(
+      AccionesRealizables.AGREGAR,
+      ObjetosManejables.PERFIL_CLIENTE_VPN,
+      this.getTiempoSimulacion(),
+      {
+        nombreCliente: nombreCliente,
+        proteccion: perfil.proteccion,
+        dominioRemoto: perfil.dominioRemoto,
+        hostRemoto: perfil.hostRemoto
+      }
+    );    
+
     this.ecsManager.emit(
       EventosPublicos.VPN_CLIENTE_PERFIL_AGREGADO,
       `Se agregó correctamente un nuevo perfil de conexión VPN en ${nombreCliente}`
@@ -423,18 +467,36 @@ export class SistemaRed extends Sistema {
     entidadClienteVpn: Entidad,
     indexEnTabla: number
   ): void {
-    const actualClienteVPN = this.ecsManager
-      .getComponentes(entidadClienteVpn)
-      ?.get(ClienteVPNComponent);
-    if (actualClienteVPN) actualClienteVPN.perfilesClienteVPN.splice(indexEnTabla, 1);
-
     const nombreCliente = this.ecsManager
       .getComponentes(entidadClienteVpn)
       ?.get(DispositivoComponent)?.nombre;
+
+    const actualClienteVPN = this.ecsManager
+      .getComponentes(entidadClienteVpn)
+      ?.get(ClienteVPNComponent);
+
+    const perfilAEliminar = actualClienteVPN?.perfilesClienteVPN.at(indexEnTabla);
+    this.ecsManager.registrarAccion(
+      AccionesRealizables.ELIMINAR,
+      ObjetosManejables.PERFIL_CLIENTE_VPN,
+      this.getTiempoSimulacion(),
+      {
+        nombreCliente: nombreCliente,
+        proteccion: perfilAEliminar?.proteccion ?? "",
+        dominioRemoto: perfilAEliminar?.dominioRemoto ?? "",
+        hostRemoto: perfilAEliminar?.hostRemoto ?? ""
+      }
+    );
+ 
+    if (actualClienteVPN) actualClienteVPN.perfilesClienteVPN.splice(indexEnTabla, 1); 
 
     this.ecsManager.emit(
       EventosPublicos.VPN_GATEWAY_PERFIL_ELIMINADO,
       `Se eliminó correctamente un perfil de conexión VPN en ${nombreCliente}`
     );
+  }
+
+  private getTiempoSimulacion(): number | undefined {
+    return this.ecsManager.getSistema(SistemaTiempo)?.getTiempoSimulacion();
   }
 }

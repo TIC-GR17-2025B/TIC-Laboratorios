@@ -3,11 +3,11 @@ import { ComandoTerminal } from "../../types/DeviceEnums";
 import type { RespuestaComando } from "../../types/EscenarioTypes";
 import { TipoProtocolo } from "../../types/TrafficEnums";
 import { ActivoComponent, DispositivoComponent } from "../components";
-import { Sistema, /*type ClaseComponente,*/ type Entidad } from "../core";
+import { Sistema, type Entidad } from "../core";
 import { ConectividadService, FirewallService } from "./red";
+import { SistemaTiempo } from "./SistemaTiempo";
 
 export class SistemaComandos extends Sistema {
-    // public componentesRequeridos: Set<ClaseComponente> = new Set();
     private MENSAJE_AYUDA: string = "Parece que el comando ingresado no existe o tiene un formato inválido. Ingresa 'h' para ver todos los comandos disponibles.";
     private entidadDispAnterior: Entidad = -1;
     private entidadDispActual: Entidad = -1;
@@ -69,9 +69,9 @@ export class SistemaComandos extends Sistema {
         this.ecsManager.registrarAccion(
             AccionesRealizables.EJECUTAR,
             ObjetosManejables.COMANDO,
-            0,
+            this.getTiempoSimulacion(),
             {
-                comando: "ls",
+                comando: ComandoTerminal.LS,
                 nombreDispositivo: nombreDisp
             }
         );
@@ -88,9 +88,9 @@ export class SistemaComandos extends Sistema {
                 this.ecsManager.registrarAccion(
                     AccionesRealizables.EJECUTAR,
                     ObjetosManejables.COMANDO,
-                    0,
+                    this.getTiempoSimulacion(),
                     {
-                        comando: "cat",
+                        comando: ComandoTerminal.CAT,
                         nombreArchivo: nombreArchivo,
                         nombreDispositivo: nombreDisp
                     }
@@ -151,9 +151,9 @@ export class SistemaComandos extends Sistema {
         this.ecsManager.registrarAccion(
             AccionesRealizables.EJECUTAR,
             ObjetosManejables.COMANDO,
-            0,
+            this.getTiempoSimulacion(),
             {
-                comando: "ssh",
+                comando: ComandoTerminal.SSH,
                 nombreEquipo: nombreEquipo,
                 usuario: usuario,
                 contrasenia: contrasenia,
@@ -168,6 +168,17 @@ export class SistemaComandos extends Sistema {
     }
 
     private ejecutarH(): RespuestaComando {
+        const nombreDisp = this.ecsManager.getComponentes(this.entidadDispActual)?.get(DispositivoComponent)?.nombre;
+        this.ecsManager.registrarAccion(
+            AccionesRealizables.EJECUTAR,
+            ObjetosManejables.COMANDO,
+            this.getTiempoSimulacion(),
+            {
+                comando: ComandoTerminal.H,
+                nombreDispositivo: nombreDisp
+            }
+        );
+
         return {
             texto: "Comandos disponibles:\n"+
                    "  h\tVer este mensaje de ayuda\n"+
@@ -187,5 +198,9 @@ export class SistemaComandos extends Sistema {
         const spaceIdx = trimmed.search(/\s/);
         if (spaceIdx === -1) return [trimmed];
         return [trimmed.substring(0, spaceIdx), trimmed.substring(spaceIdx).trim()];
+    }
+
+    private getTiempoSimulacion(): number | undefined {
+        return this.ecsManager.getSistema(SistemaTiempo)?.getTiempoSimulacion();
     }
 }

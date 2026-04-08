@@ -577,7 +577,7 @@ export class EscenarioController {
     this.ecsManager.registrarAccion(
       AccionesRealizables.EJECUTAR,
       ObjetosManejables.APLICACION,
-      0,
+      this.tiempoTranscurrido,
       {
         nombreAplicacion: nombreAplicacion
       }
@@ -588,7 +588,7 @@ export class EscenarioController {
     this.ecsManager.registrarAccion(
       AccionesRealizables.ENVIO,
       ObjetosManejables.CORREO,
-      0,
+      this.tiempoTranscurrido,
       {
         dispositivoEmisor: nombreDispEmisor,
         destinatario: correoDestinatario,

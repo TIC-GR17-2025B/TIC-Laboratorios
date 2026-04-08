@@ -127,6 +127,16 @@ export class SistemaTiempo extends Sistema {
     }, 1000);
   }
 
+  /** Se devuelve el tiempo mostrado de la simulación, no el tiempo total.
+   *  Como la primera entidad de tiempo que se añade es la de la simulación, no hay 
+   *  problema en que la búsqueda se detenga en el primer TiempoComponent que encuentre
+   **/
+  public getTiempoSimulacion(): number | undefined{
+    for (const [, container] of this.ecsManager.getEntidades().entries()) {
+      if (container.tiene(TiempoComponent)) return container.get(TiempoComponent)?.transcurrido;
+    }
+  }
+
   // Método para limpiar el intervalo cuando se destruye el sistema
   public destruir() {
     if (this.intervalo) {
