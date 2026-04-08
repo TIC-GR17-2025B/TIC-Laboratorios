@@ -184,7 +184,7 @@ export class SistemaPresupuesto extends Sistema {
           this.getTiempoSimulacion(),
           {
             nombreDispositivo: dispositivo?.nombre ?? "",
-            aplicacionAgregada: app.nombre
+            aplicacionEliminada: app.nombre
           }
         );
         // const presupuestoComp = this.ecsManager
