@@ -1,4 +1,4 @@
-import { describe, test, it, beforeEach, expect } from "vitest";
+import { describe, it, beforeEach, expect } from "vitest";
 import { SistemaJerarquiaEscenario } from "../src/ecs/systems";
 import { ECSManager, Entidad } from "../src/ecs/core";
 import { DispositivoComponent, EscenarioComponent, EspacioComponent, OficinaComponent, PersonaComponent, RedComponent, ZonaComponent } from "../src/ecs/components";

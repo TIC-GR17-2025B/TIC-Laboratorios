@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 
-import { CambiarContraseniaUseCase } from "../src/auth/application/usecases/CambiarContraseniaUseCase"
-import { ConfirmarEmailUseCase } from "../src/auth/application/usecases/ConfirmarEmailUseCase"
-import { ReenviarConfirmacionEmailUseCase } from "../src/auth/application/usecases/ReenviarConfirmacionEmailUseCase"
-import { SolicitudCambioContraseniaUseCase } from "../src/auth/application/usecases/SolicitudCambioContraseniaUseCase"
+import { CambiarContraseniaUseCase } from "../src/auth/application/useCases/CambiarContraseniaUseCase"
+import { ConfirmarEmailUseCase } from "../src/auth/application/useCases/ConfirmarEmailUseCase"
+import { ReenviarConfirmacionEmailUseCase } from "../src/auth/application/useCases/ReenviarConfirmacionEmailUseCase"
+import { SolicitudCambioContraseniaUseCase } from "../src/auth/application/useCases/SolicitudCambioContraseniaUseCase"
 
 vi.mock("bcrypt", async (importOriginal) => {
   const actual = await importOriginal<any>()

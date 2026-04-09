@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 
-import { GuardarProgresoUseCase } from "../src/auth/application/usecases/GuardarProgresoUseCase"
-import { ObtenerProgresoUseCase } from "../src/auth/application/usecases/ObtenerProgresoUseCase"
-import { ObtenerTodosProgresosUseCase } from "../src/auth/application/usecases/ObtenerTodosProgresosUseCase"
-import { ObtenerEstudianteProfesorUseCase } from "../src/auth/application/usecases/ObtenerEstudianteProfesorUseCase"
+import { GuardarProgresoUseCase } from "../src/auth/application/useCases/GuardarProgresoUseCase"
+import { ObtenerProgresoUseCase } from "../src/auth/application/useCases/ObtenerProgresoUseCase"
+import { ObtenerTodosProgresosUseCase } from "../src/auth/application/useCases/ObtenerTodosProgresosUseCase"
+import { ObtenerEstudianteProfesorUseCase } from "../src/auth/application/useCases/ObtenerEstudianteProfesorUseCase"
 
 import type { IProgresoRepository } from "../src/auth/domain/repositories/IProgresoRepository"
 import type { IAuthRepository } from "../src/auth/domain/repositories/IAuthRepository"

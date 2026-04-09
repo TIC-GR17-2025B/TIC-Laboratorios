@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
-import { LoginUseCase } from "../src/auth/application/usecases/LoginUseCase"
+import { LoginUseCase } from "../src/auth/application/useCases/LoginUseCase"
 
 vi.mock("bcrypt", async (importOriginal) => {
     const actual = await importOriginal<any>()

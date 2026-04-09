@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { ECSManager } from "../src/ecs/core";
 import { SistemaPresupuesto } from "../src/ecs/systems";
-import { DispositivoComponent, EscenarioComponent, PresupuestoComponent, WorkstationComponent } from "../src/ecs/components";
+import { DispositivoComponent, EscenarioComponent, /*PresupuestoComponent,*/ WorkstationComponent } from "../src/ecs/components";
 import { ConfiguracionWorkstation } from "../src/data/configuraciones/configWorkstation";
 import { EstadoAtaqueDispositivo, TipoDispositivo } from "../src/types/DeviceEnums";
 import { APPS } from "../src/data/apps";
