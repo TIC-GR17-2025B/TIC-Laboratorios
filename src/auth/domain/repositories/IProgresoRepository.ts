@@ -1,7 +1,7 @@
-import type { Progreso, ProgresoInput, ProgresoConNombreEscenario} from "../models/Progreso.js"
+import type { Progreso, ProgresoInput, ProgresoConNombreEscenario, ProgresoResumen} from "../models/Progreso.js"
 
 export interface IProgresoRepository {
   guardarProgresoEstudiante(data: ProgresoInput): Promise<Progreso>
-  getProgresoEstudiante(idEstudiante: number, slugEscenario: string): Promise<{terminado: boolean; intentos: number;} | null>
+  getProgresoEstudiante(idEstudiante: number, escenario: string): Promise<ProgresoResumen | null>
   getTodosProgresosEstudiante(idEstudiante: number): Promise<ProgresoConNombreEscenario[]>
 }

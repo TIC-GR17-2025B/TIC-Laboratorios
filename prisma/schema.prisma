@@ -40,7 +40,7 @@ model matricula {
   id_curso      Int
   id_estudiante Int
   fecha         DateTime   @default(dbgenerated("CURRENT_DATE")) @db.Date
-  curso         curso      @relation(fields: [id_curso], references: [id_curso], onDelete: Cascade, onUpdate: NoAction, map: "fk_matricula_curso")
+  curso         curso      @relation(fields: [id_curso], references: [id_curso], onDelete: NoAction, onUpdate: NoAction, map: "fk_matricula_curso")
   estudiante    estudiante @relation(fields: [id_estudiante], references: [id_estudiante], onDelete: NoAction, onUpdate: NoAction, map: "fk_matricula_estudiante")
 }
 
@@ -56,13 +56,14 @@ model profesor {
 }
 
 model progreso {
-  id_progreso    Int        @id @default(autoincrement())
-  id_estudiante  Int
-  slug_escenario String      @db.VarChar
-  terminado      Boolean?   @default(false)
-  tiempo         Float?
-  fecha_creacion DateTime   @default(now())
-  estudiante     estudiante @relation(fields: [id_estudiante], references: [id_estudiante], onDelete: NoAction, onUpdate: NoAction, map: "fk_progreso_estudiante")
+  id_progreso   Int        @id @default(autoincrement())
+  id_estudiante Int
+  id_escenario  Int
+  terminado     Boolean?   @default(false)
+  tiempo        Float?
+  acciones      String?
+  escenario     escenario  @relation(fields: [id_escenario], references: [id_escenario], onDelete: NoAction, onUpdate: NoAction, map: "fk_progreso_escenario")
+  estudiante    estudiante @relation(fields: [id_estudiante], references: [id_estudiante], onDelete: NoAction, onUpdate: NoAction, map: "fk_progreso_estudiante")
 }
 
 model usuario_auth {
@@ -78,3 +79,8 @@ model usuario_auth {
   profesor           profesor?
 }
 
+model escenario {
+  id_escenario Int        @id @default(autoincrement())
+  nombre       String     @db.VarChar
+  progreso     progreso[]
+}
