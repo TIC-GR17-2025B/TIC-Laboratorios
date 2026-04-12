@@ -53,7 +53,6 @@ export const useAuth = () => {
     setError(null);
 
     try {
-      console.log("Enviando datos:", data);
       const response = await fetch(`${API_URL}/auth/register/estudiante`, {
         method: "POST",
         headers: {
@@ -61,8 +60,6 @@ export const useAuth = () => {
         },
         body: JSON.stringify(data),
       });
-
-      console.log("Response status:", response.status);
 
       const contentType = response.headers.get("content-type");
       if (!contentType || !contentType.includes("application/json")) {

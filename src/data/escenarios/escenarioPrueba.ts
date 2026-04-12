@@ -85,6 +85,56 @@ export const escenarioPrueba: unknown = {
       fase: 1,
     },
   ],
+  accionesEsperadas: [
+    {
+      accion: AccionesRealizables.CLICK,
+      objeto: ObjetosManejables.CONFIG_FIREWALL,
+      inicioTiempoEsperado: 5,
+      finTiempoEsperado: 15,
+      val: {
+            nombreRouter: "Router Principal",
+            nombreRed: "LAN1",
+            accion: AccionFirewall.DENEGAR,
+            direccion: DireccionTrafico.HACIA,
+            protocolo: TipoProtocolo.SSH,
+          }
+    },
+    {
+      accion: AccionesRealizables.CLICK,
+      objeto: ObjetosManejables.CONFIG_FIREWALL,
+      inicioTiempoEsperado: 5,
+      finTiempoEsperado: 15,
+      val: {
+            nombreRouter: "Router Principal",
+            nombreRed: "LAN1",
+            accion: AccionFirewall.DENEGAR,
+            direccion: DireccionTrafico.HACIA,
+            protocolo: TipoProtocolo.FTP,
+          }
+    },
+    {
+      accion: AccionesRealizables.CLICK,
+      objeto: ObjetosManejables.CONFIG_WORKSTATION,
+      inicioTiempoEsperado: 20,
+      finTiempoEsperado: 30,
+      val:{
+          nombreConfig: "Actualizaciones automáticas de antivirus",
+          dispositivoAAtacar: "Computadora Jacob",
+          activado: true,
+        },
+    },
+    {
+      accion: AccionesRealizables.CLICK,
+      objeto: ObjetosManejables.CONFIG_WORKSTATION,
+      inicioTiempoEsperado: 20,
+      finTiempoEsperado: 30,
+      val:{
+          nombreConfig: "Antivirus gestionado",
+          dispositivoAAtacar: "Computadora Jacob",
+          activado: true,
+        }
+    },
+  ],
   fases: [
     {
       id: 1,

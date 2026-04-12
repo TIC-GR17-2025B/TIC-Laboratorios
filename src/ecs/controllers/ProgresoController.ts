@@ -13,14 +13,21 @@ export class ProgresoController {
     return ProgresoController.instance;
   }
 
-  public async guardarProgresoEstudiante(terminado: boolean, tiempo: number) {
+  public async guardarProgresoEstudiante(
+      terminado: boolean,
+      tiempo: number,
+      accionesEsperadas: unknown[],
+      accionesRealizadas: [string, string, number | undefined, unknown?][]
+  ) {
 
     const {id_estudiante, slug_escenario} = await this.getDatosSesion();
+    const acciones = this.formatearAcciones(accionesEsperadas, accionesRealizadas);
     const data = {
       id_estudiante: id_estudiante,
       slug_escenario: slug_escenario,
       terminado: terminado,
-      tiempo: tiempo
+      tiempo: tiempo,
+      acciones: acciones
     };
 
     try {
@@ -91,5 +98,32 @@ export class ProgresoController {
     const id_estudiante = JSON.parse(localStorage.getItem("user")!).id_estudiante;
     const slug_escenario = localStorage.getItem("slug_escenario_actual")!;
     return { id_estudiante, slug_escenario };
+  }
+
+  private formatearAcciones(
+      accionesEsperadas: unknown[],
+      accionesRealizadas: [string, string, number | undefined, unknown?][]
+  ) {
+    let resultado = "{\"accionesEsperadas\":[";
+
+    for (let i = 0; i < accionesEsperadas.length; i++) {
+      if (i < accionesEsperadas.length - 1) resultado += `${JSON.stringify(accionesEsperadas[i])},`;
+      else resultado += `${JSON.stringify(accionesEsperadas[i])}`;
+    }
+
+    resultado += "],\"accionesRealizadas\":[";
+
+    for (let i = 0; i < accionesRealizadas.length; i++) {
+      resultado += `{\"accion\":\"${accionesRealizadas[i][0]}\",`;
+      resultado += `\"objeto\":\"${accionesRealizadas[i][1]}\",`;
+      resultado += `\"tiempo\":${accionesRealizadas[i][2]},`;
+
+      if (i < accionesRealizadas.length - 1) resultado += `\"val\":${JSON.stringify(accionesRealizadas[i][3])}},`;
+      else resultado += `\"val\":${JSON.stringify(accionesRealizadas[i][3])}}`;
+    }
+
+    resultado += "]}";
+
+    return resultado;
   }
 }

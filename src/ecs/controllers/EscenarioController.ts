@@ -228,12 +228,22 @@ export class EscenarioController {
 
     // Oyentes para guardar el progreso
     this.ecsManager.on(EventosPublicos.FASE_NO_COMPLETADA, () => {
-        this.progresoController?.guardarProgresoEstudiante(false, this.getTiempoTotalTranscurrido()); 
+        this.progresoController?.guardarProgresoEstudiante(
+            false,
+            this.getTiempoTotalTranscurrido(),
+            this.escenario.accionesEsperadas,
+            this.ecsManager.getAccionesSimulacion()
+        ); 
         this.sistemaTiempo?.destruir();
     });
 
     this.ecsManager.on(EventosPublicos.ESCENARIO_COMPLETADO, () => {
-        this.progresoController?.guardarProgresoEstudiante(true, this.getTiempoTotalTranscurrido()); 
+        this.progresoController?.guardarProgresoEstudiante(
+            true,
+            this.getTiempoTotalTranscurrido(),
+            this.escenario.accionesEsperadas,
+            this.ecsManager.getAccionesSimulacion()
+        ); 
         this.sistemaTiempo?.destruir();
     });
   }

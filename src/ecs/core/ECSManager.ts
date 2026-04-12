@@ -207,4 +207,8 @@ export class ECSManager {
         JSON.stringify(v) === JSON.stringify(val)
     );
   }
+
+  public getAccionesSimulacion() {
+    return this.accionesSimulacion;
+  }
 }

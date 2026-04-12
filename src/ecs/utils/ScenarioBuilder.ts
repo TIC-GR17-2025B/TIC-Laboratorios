@@ -171,6 +171,8 @@ export class ScenarioBuilder {
         escenario.presupuestoInicial
       )
     );
+    this.ecsManager.getComponentes(entidadEscenario)!
+                   .get(EscenarioComponent)!.accionesEsperadas = escenario.accionesEsperadas;
     return entidadEscenario;
   }
 

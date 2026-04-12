@@ -18,7 +18,8 @@ export class EscenarioComponent extends Componente {
     public apps: SoftwareApp[] = [],
     public eventos: EventoComponent[] = [],
     public redes: Entidad[] = [],
-    public slug: string = ""
+    public slug: string = "",
+    public accionesEsperadas: unknown[] = [],
   ) {
     super();
   }

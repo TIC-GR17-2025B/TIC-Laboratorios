@@ -26,6 +26,7 @@ export interface Escenario {
   eventos: EventoComponent[];
   fases: FaseComponent[];
   redes: Entidad[];
+  accionesEsperadas: unknown[];
 }
 
 export interface EscenarioPreview {

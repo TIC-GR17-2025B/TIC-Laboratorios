@@ -9,7 +9,7 @@ export enum AccionesRealizables {
 
 export enum ObjetosManejables {
     CONFIG_WORKSTATION = "configuración workstation",
-    CONFIG_FIREWALL = "configuración individual firewall",
+    CONFIG_FIREWALL = "configuración firewall",
     APLICACION = "aplicación",
     CORREO = "correo",
     COMANDO = "comando",

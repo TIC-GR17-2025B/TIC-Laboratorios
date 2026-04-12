@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:full": "concurrently \"npm run dev:server\" \"vite\"",
     "dev:server": "nodemon --watch src --exec tsx src/server.ts",
+    "dev:full": "concurrently \"npm run dev:server\" \"vite\"",
     "start": "node dist/server/server.js",
     "build": "vite build",
     "build:server": "tsc --project tsconfig.server.json",

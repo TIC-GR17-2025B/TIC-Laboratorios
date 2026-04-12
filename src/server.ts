@@ -64,6 +64,7 @@ app.use('/progreso', progresoRouter)
 app.use('/feedback', feedbackRouter)
 app.use('/course-analysis', courseAnalysisRouter)
 app.use('/api/chat', chatRouter)
+app.use('/groups', groupsRouter)
 
 // Manejo de rutas no encontradas
 app.use((_req: Request, res: Response) => {
