@@ -70,7 +70,7 @@ model usuario_auth {
   id_usuario_auth    Int         @id @default(autoincrement())
   correo_electronico String      @unique @db.VarChar
   contrasenia_hash   String      @db.VarChar
-  confirmado         Boolean     @default(false)
+  confirmado         Boolean     @default(false) 
   token_confirmacion String?     @db.VarChar
   token_recuperacion String?     @db.VarChar
   token_expira       DateTime?   @db.Timestamp(6)

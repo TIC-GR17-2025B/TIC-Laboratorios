@@ -7,6 +7,14 @@
   padding: 0;
 }
 
+/* ── Sidebar (leaderboard + AI level) ── */
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
 /* ── Path ── */
 
 .path {

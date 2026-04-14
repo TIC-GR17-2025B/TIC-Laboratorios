@@ -25,7 +25,15 @@ export default function ModalFirewall() {
         }));
     }, [redesRouter]);
 
-    const [redSeleccionada, setRedSeleccionada] = useState<Entidad>(REDES[0].value);
+    const [redSeleccionada, setRedSeleccionada] = useState<Entidad | null>(REDES[0]?.value || null);
+
+    if (!redSeleccionada) {
+        return (
+            <div className={styles.modalFirewallContainer}>
+                <p style={{ color: 'white', padding: '1rem' }}>No hay redes disponibles para configurar en este firewall.</p>
+            </div>
+        );
+    }
 
     return (
         <div className={styles.modalFirewallContainer}>

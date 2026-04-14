@@ -9,6 +9,7 @@ import groupsRouter from './groups/infrastructure/controller/GroupsController.js
 import feedbackRouter from './feedback/infrastructure/controllers/FeedbackController.js'
 import courseAnalysisRouter from './course-analysis/infrastructure/controllers/CourseAnalysisController.js'
 import chatRouter from './chat/infrastructure/controllers/ChatController.js'
+import agentMalvadoRouter from './agent-malvado/infrastructure/controllers/ScenarioBuilderController.js'
 import { InMemoryFeedbackStateRepository } from './feedback/infrastructure/repositories/InMemoryFeedbackStateRepository.js'
 
 // Cargar variables de entorno
@@ -49,6 +50,7 @@ app.get('/', (_req: Request, res: Response) => {
       feedback: '/feedback',
       courseAnalysis: '/course-analysis',
       chat: '/api/chat',
+      agentMalvado: '/api/agent-malvado',
       health: '/health'
     }
   })
@@ -64,6 +66,7 @@ app.use('/progreso', progresoRouter)
 app.use('/feedback', feedbackRouter)
 app.use('/course-analysis', courseAnalysisRouter)
 app.use('/api/chat', chatRouter)
+app.use('/api/agent-malvado', agentMalvadoRouter)
 app.use('/groups', groupsRouter)
 
 // Manejo de rutas no encontradas

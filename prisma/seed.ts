@@ -25,19 +25,19 @@ async function main() {
       segundo_nombre: 'Carlos',
       primer_apellido: 'García',
       segundo_apellido: 'López',
-      correo_electronico: 'profesor@test.com',
-      contrasenia: hashedPassword,
+      usuario_auth: {
+        create: {
+          correo_electronico: 'profesor@test.com',
+          contrasenia_hash: hashedPassword,
+          confirmado: true,
+        }
+      }
     },
+    include: { usuario_auth: true } // Para poder mostrar el correo en el log
   });
-  console.log(`✅ Profesor creado: ${profesor.correo_electronico}`);
+  console.log(`✅ Profesor creado: ${profesor.usuario_auth?.correo_electronico}`);
 
-  console.log('\n📚 Creando escenario...');
-  const escenario = await prisma.escenario.create({
-    data: {
-      nombre: 'Laboratorio de Ciberseguridad Básica',
-    },
-  });
-  console.log(`✅ Escenario creado: ${escenario.nombre}`);
+  // Eliminamos la creación del escenario porque la tabla ya no existe en el esquema.
 
   console.log('\n📖 Creando curso...');
   const expiracion = new Date();
@@ -61,11 +61,17 @@ async function main() {
       segundo_nombre: 'Fernanda',
       primer_apellido: 'Rodríguez',
       segundo_apellido: 'Martínez',
-      correo_electronico: 'estudiante1@test.com',
-      contrasenia: hashedPassword,
+      usuario_auth: {
+        create: {
+          correo_electronico: 'estudiante1@test.com',
+          contrasenia_hash: hashedPassword,
+          confirmado: true,
+        }
+      }
     },
+    include: { usuario_auth: true }
   });
-  console.log(`✅ Estudiante 1: ${estudiante1.correo_electronico}`);
+  console.log(`✅ Estudiante 1: ${estudiante1.usuario_auth?.correo_electronico}`);
 
   const estudiante2 = await prisma.estudiante.create({
     data: {
@@ -74,11 +80,17 @@ async function main() {
       segundo_nombre: 'Antonio',
       primer_apellido: 'Sánchez',
       segundo_apellido: 'Torres',
-      correo_electronico: 'estudiante2@test.com',
-      contrasenia: hashedPassword,
+      usuario_auth: {
+        create: {
+          correo_electronico: 'estudiante2@test.com',
+          contrasenia_hash: hashedPassword,
+          confirmado: true,
+        }
+      }
     },
+    include: { usuario_auth: true }
   });
-  console.log(`✅ Estudiante 2: ${estudiante2.correo_electronico}`);
+  console.log(`✅ Estudiante 2: ${estudiante2.usuario_auth?.correo_electronico}`);
 
   console.log('\n📝 Matriculando estudiantes en el curso...');
   await prisma.matricula.create({
@@ -101,7 +113,7 @@ async function main() {
   await prisma.progreso.create({
     data: {
       id_estudiante: estudiante1.id_estudiante,
-      id_escenario: escenario.id_escenario,
+      slug_escenario: 'control-acceso', // Ahora usamos el slug en lugar de ID
       terminado: false,
       tiempo: 0,
     },

@@ -2,6 +2,7 @@ import LevelSelectionMenuList from "../components/LevelSelectionMenuList";
 import Leaderboard from "../components/Leaderboard";
 import { useLeaderboard } from "../hooks/useLeaderboard";
 import styles from "../styles/VistaSeleccionNiveles.module.css";
+import AgentMalvadoUI from "../../agent-malvado/presentation/components/AgentMalvadoUI";
 
 function getStudentId(): number | null {
     try {
@@ -20,14 +21,19 @@ export default function VistaSeleccionNiveles() {
 
     return (
         <div className={styles.main}>
-            <LevelSelectionMenuList />
-            <Leaderboard
-                entries={entries}
-                groupName={groupName}
-                loading={loading}
-                error={error}
-                currentStudentId={idEstudiante}
-            />
+            <div className={styles.path}>
+                <LevelSelectionMenuList />
+            </div>
+            <div className={styles.sidebar}>
+                <Leaderboard
+                    entries={entries}
+                    groupName={groupName}
+                    loading={loading}
+                    error={error}
+                    currentStudentId={idEstudiante}
+                />
+                <AgentMalvadoUI />
+            </div>
         </div>
     );
 }

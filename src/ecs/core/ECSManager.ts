@@ -195,15 +195,15 @@ export class ECSManager {
 
   public consultarAccion(
     accion: string,
-    objeto: string, 
+    objeto: string,
     tiempo?: number,
     val?: unknown
-  ): [string, string, number | undefined, unknown?] | undefined { 
+  ): [string, string, number | undefined, unknown?] | undefined {
     return this.accionesSimulacion.find(
       ([a, o, t, v]) =>
         a === accion &&
         o === objeto &&
-        (t === undefined ? true : t === tiempo) &&
+        (tiempo === undefined ? true : t === tiempo) &&
         JSON.stringify(v) === JSON.stringify(val)
     );
   }

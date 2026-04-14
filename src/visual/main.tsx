@@ -8,6 +8,7 @@ import { EscenarioProvider, ModalProvider, SelectedLevelProvider, ScreenTransiti
 import { ECSSceneProvider } from './features/escenarios-simulados/context/ECSSceneContext.tsx'
 import TarjetaLogNuevo from './features/escenarios-simulados/components/TarjetaLogNuevo.tsx'
 import { ChatProvider } from './features/chat/context/ChatContext.tsx'
+import { AgentMalvadoProvider } from './features/agent-malvado/presentation/context/AgentMalvadoContext.tsx'
 import Redes from './features/simulacion-redes/pages/Redes.tsx'
 import Modal from './common/components/Modal.tsx'
 import ModelPreloader from './common/components/ModelPreloader.tsx'
@@ -43,8 +44,8 @@ window.addEventListener('beforeunload', () => {
 function GameProvidersLayout() {
   return (
     <ProtectedRoute>
-      <EscenarioProvider>
-        <ModalProvider>
+        <EscenarioProvider>
+          <ModalProvider>
           <ChatProvider>
             <FasesProvider>
               <ECSSceneProvider>
@@ -70,9 +71,10 @@ function AnimatedRoutes() {
   const location = useLocation();
 
   return (
-    <AnimatePresence mode="wait">
-      <Routes location={location}>
-        <Route path='/login' element={<AuthPage />} />
+    <>
+      <AnimatePresence mode="wait">
+        <Routes location={location}>
+          <Route path='/login' element={<AuthPage />} />
         <Route path='/signup' element={<AuthPage />} />
 
         <Route path='/docente' element={
@@ -108,13 +110,16 @@ function AnimatedRoutes() {
         <Route path='*' element={<NotFound />} />
       </Routes>
     </AnimatePresence>
+    </>
   );
 }
 
 createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
-    <SelectedLevelProvider>
-      <AnimatedRoutes />
-    </SelectedLevelProvider>
+    <AgentMalvadoProvider>
+      <SelectedLevelProvider>
+        <AnimatedRoutes />
+      </SelectedLevelProvider>
+    </AgentMalvadoProvider>
   </BrowserRouter>,
 )
