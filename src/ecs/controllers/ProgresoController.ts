@@ -114,12 +114,12 @@ export class ProgresoController {
     resultado += "],\"accionesRealizadas\":[";
 
     for (let i = 0; i < accionesRealizadas.length; i++) {
-      resultado += `{\"accion\":\"${accionesRealizadas[i][0]}\",`;
-      resultado += `\"objeto\":\"${accionesRealizadas[i][1]}\",`;
-      resultado += `\"tiempo\":${accionesRealizadas[i][2]},`;
+      resultado += `{"accion":"${accionesRealizadas[i][0]}",`;
+      resultado += `"objeto":"${accionesRealizadas[i][1]}",`;
+      resultado += `"tiempo":${accionesRealizadas[i][2]},`;
 
-      if (i < accionesRealizadas.length - 1) resultado += `\"val\":${JSON.stringify(accionesRealizadas[i][3])}},`;
-      else resultado += `\"val\":${JSON.stringify(accionesRealizadas[i][3])}}`;
+      if (i < accionesRealizadas.length - 1) resultado += `"val":${JSON.stringify(accionesRealizadas[i][3])}},`;
+      else resultado += `"val":${JSON.stringify(accionesRealizadas[i][3])}}`;
     }
 
     resultado += "]}";
