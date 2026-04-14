@@ -13,6 +13,7 @@ import {
   ObjetosManejables,
 } from "../../types/AccionesEnums";
 import { ColoresRed } from "../colores";
+import { AccionFirewall, DireccionTrafico } from "../../types/FirewallTypes";
 
 /**
  * Escenario 8 — Amenazas y Ataques Comunes
@@ -37,22 +38,26 @@ export const escenarioAmenazas: unknown = {
     "y prevenir un ataque de troyano configurando correctamente los workstations.",
   presupuestoInicial: 1000,
   ataques: [
+    // ── FASE 2: Hardening contra amenaza interna ──
     {
-      nombreAtaque: "Troyano vía USB infectado",
-      tiempoNotificacion: 50,
+      nombreAtaque: "Bloqueo de Troyano vía USB infectado",
+      tiempoNotificacion: 25,
+      tiempoEnOcurrir: 30,
       tipoAtaque: TipoAtaque.INFECCION_TROYANO,
       dispositivoAAtacar: "PC Secretaría",
       descripcion:
         "¡ALERTA! Se detectó un intento de ejecución de malware desde un dispositivo USB en 'PC Secretaría'. " +
-        "Si la configuración 'Bloquear medios extraíbles' está activada, el ataque será mitigado.",
+        "Si el equipo está configurado correctamente, el ataque será mitigado.",
       fase: 2,
       condicionMitigacion: {
-        accion: AccionesRealizables.EJECUTAR,
+        accion: AccionesRealizables.CLICK,
         objeto: ObjetosManejables.CONFIG_WORKSTATION,
-        val: {
-          nombreConfig: "Bloquear medios extraíbles",
-          activado: true,
-        },
+        val:[
+          {
+            nombreConfig: "Bloquear medios extraíbles",
+            activado: true,
+          },
+        ],
       },
     },
   ],
@@ -61,7 +66,7 @@ export const escenarioAmenazas: unknown = {
     {
       nombreEvento: "Bloquear acceso SSH externo",
       tipoEvento: TipoEvento.TRAFICO_RED,
-      tiempoNotificacion: 10,
+      tiempoNotificacion: 5,
       descripcion:
         "Una AMENAZA es cualquier evento que puede causar daño. Se detectó un intento de conexión SSH " +
         "desde Internet: esto explota una VULNERABILIDAD (puerto SSH abierto) generando un RIESGO. " +
@@ -78,39 +83,45 @@ export const escenarioAmenazas: unknown = {
     {
       nombreEvento: "Completación Fase 1",
       tipoEvento: TipoEvento.COMPLETACION_FASE,
-      tiempoNotificacion: 30,
+      tiempoNotificacion: 20,
       descripcion:
         "¡Bien! Has bloqueado la amenaza externa. Ahora protege los equipos contra amenazas internas.",
       fase: 1,
-    },
-    // ── FASE 2: Hardening contra amenaza interna ──
-    {
-      nombreEvento: "Activar bloqueo de medios extraíbles",
-      tipoEvento: TipoEvento.VERIFICACION_ACCION_JUGADOR,
-      tiempoNotificacion: 35,
-      descripcion:
-        "Los dispositivos USB son un vector de ATAQUE común para introducir malware (troyanos). " +
-        "Un empleado podría conectar una USB infectada sin saberlo. " +
-        "Activa 'Bloquear medios extraíbles' en el 'PC Secretaría' para reducir este RIESGO.",
-      fase: 2,
-      infoAdicional: {
-        accion: AccionesRealizables.EJECUTAR,
-        objeto: ObjetosManejables.CONFIG_WORKSTATION,
-        tiempo: 0,
-        val: {
-          nombreConfig: "Bloquear medios extraíbles",
-          activado: true,
-        },
-      },
-    },
+    }, 
     {
       nombreEvento: "Completación Escenario",
       tipoEvento: TipoEvento.COMPLETACION_ESCENARIO,
-      tiempoNotificacion: 65,
+      tiempoNotificacion: 35,
       descripcion:
         "¡Felicidades! Has protegido la empresa contra amenazas externas (firewall) e internas (hardening). " +
         "Recuerda: Amenaza + Vulnerabilidad = Riesgo. Tu trabajo es reducir las vulnerabilidades.",
       fase: 2,
+    },
+  ],
+  accionesEsperadas: [
+    {
+      accion: AccionesRealizables.CLICK,
+      objeto: ObjetosManejables.CONFIG_FIREWALL,
+      inicioTiempoEsperado: 5,
+      finTiempoEsperado: 15,
+      val: {
+        nombreRouter: "Router Oficina",
+        nombreRed: "LAN-Oficina",
+        accion: AccionFirewall.DENEGAR,
+        direccion: DireccionTrafico.HACIA,
+        protocolo: TipoProtocolo.SSH,
+      },
+    },
+    {
+      accion: AccionesRealizables.CLICK,
+      objeto: ObjetosManejables.CONFIG_WORKSTATION,
+      inicioTiempoEsperado: 25,
+      finTiempoEsperado: 30,
+      val:{
+        nombreConfig: "Bloquear medios extraíbles",
+        dispositivoAAtacar: "PC Secretaría",
+        activado: true,
+      },
     },
   ],
   fases: [
@@ -135,7 +146,7 @@ export const escenarioAmenazas: unknown = {
       faseActual: false,
       completada: false,
       objetivos: [
-        { descripcion: "Activar bloqueo de medios extraíbles", completado: false },
+        { descripcion: "Bloqueo de Troyano vía USB infectado", completado: false },
       ],
     },
   ],

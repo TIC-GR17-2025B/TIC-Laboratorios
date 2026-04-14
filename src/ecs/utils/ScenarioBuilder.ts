@@ -190,6 +190,7 @@ export class ScenarioBuilder {
         tiempo?: number;
         val?: unknown;
       };
+      tiempoEnOcurrir?: number;
     };
     const entidadAtaque = this.ecsManager.agregarEntidad();
     this.ecsManager.agregarComponente(
@@ -201,7 +202,8 @@ export class ScenarioBuilder {
         a.dispositivoAAtacar,
         a.descripcion,
         a.fase,
-        a.condicionMitigacion
+        a.condicionMitigacion,
+        a.tiempoEnOcurrir ?? undefined
       )
     );
   }
@@ -215,6 +217,7 @@ export class ScenarioBuilder {
       fase: number;
       infoAdicional?: unknown;
       ejecutarAlInstante?: boolean;
+      tiempoEnOcurrir?: number;
     };
     const entidadEvento = this.ecsManager.agregarEntidad();
     this.ecsManager.agregarComponente(
@@ -226,7 +229,8 @@ export class ScenarioBuilder {
         a.descripcion,
         a.fase,
         a.infoAdicional,
-        a.ejecutarAlInstante
+        a.ejecutarAlInstante,
+        a.tiempoEnOcurrir ?? undefined
       )
     );
   }

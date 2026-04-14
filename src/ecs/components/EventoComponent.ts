@@ -18,9 +18,10 @@ export class EventoComponent extends Componente {
         // Similar a condicionAMitigar en AtaqueComponent, pero en este caso es para brindar cualquier infor útil adicional
         public infoAdicional?: unknown,
         public ejecutarAlInstante?: boolean,
-        public tiempoEnOcurrir: number = tiempoNotificacion + 10
+        public tiempoEnOcurrir?: number
     ) {
         super();
+        if (!this.tiempoEnOcurrir) this.tiempoEnOcurrir = this.tiempoNotificacion + 10;
         // Excepción: si el evento es una completación de fase entonces el tiempo en ocurrir es el mismo que de notificación
         if(this.tipoEvento == TipoEvento.COMPLETACION_FASE || this.tipoEvento == TipoEvento.COMPLETACION_ESCENARIO || this.ejecutarAlInstante == true)
             this.tiempoEnOcurrir = this.tiempoNotificacion;

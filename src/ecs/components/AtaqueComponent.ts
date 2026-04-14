@@ -25,8 +25,9 @@ export class AtaqueComponent extends EventoComponent {
      * Tiempo en segundos en el que ocurrirá el ataque desde que se notificó. La condición de pausa también aplica
      * Es como un tiempo "de gracia" hasta que ocurra el ataque. De momento se define en 10 segundos luego de la notificacion:
      */
-    public tiempoEnOcurrir: number = tiempoNotificacion + 10
+    public tiempoEnOcurrir?: number
   ) {
-    super(nombreAtaque, TipoEvento.NO_APLICA, tiempoNotificacion, descripcion, fase);
+    super(nombreAtaque, TipoEvento.NO_APLICA, tiempoNotificacion, descripcion, fase); 
+    if (!this.tiempoEnOcurrir) this.tiempoEnOcurrir = this.tiempoNotificacion + 10;
   }
 }
