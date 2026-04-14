@@ -46,8 +46,9 @@ export const escenarioAmenazas: unknown = {
       tipoAtaque: TipoAtaque.INFECCION_TROYANO,
       dispositivoAAtacar: "PC Secretaría",
       descripcion:
-        "¡ALERTA! Se detectó un intento de ejecución de malware desde un dispositivo USB en 'PC Secretaría'. " +
-        "Si el equipo está configurado correctamente, el ataque será mitigado.",
+        "Los dispositivos USB son un vector de ATAQUE común para introducir malware (troyanos). " +
+        "Un empleado podría conectar una USB infectada sin saberlo. " +
+        "Activa la configuración 'Bloquear medios extraíbles' en el 'PC Secretaría' para reducir este RIESGO.",
       fase: 2,
       condicionMitigacion: {
         accion: AccionesRealizables.CLICK,
