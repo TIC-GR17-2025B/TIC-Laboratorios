@@ -1,11 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
 import { API_BASE_URL } from "../../../common/utils/apiConfig";
+import type { FeedbackData } from '../types/feedback.types';
 
 interface FeedbackStatusResponse {
   success: boolean;
   habilitado: boolean;
   intentos_actuales: number;
   intentos_al_generar: number | null;
+  ultima_retroalimentacion: FeedbackData | null;
 }
 
 export function useFeedback(
@@ -14,6 +16,7 @@ export function useFeedback(
 ) {
   const [habilitado, setHabilitado] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [ultimaRetroalimentacion, setUltimaRetroalimentacion] = useState<FeedbackData | null>(null);
 
   const checkStatus = useCallback(async () => {
     if (!idEstudiante || !slugEscenario) {
@@ -32,6 +35,7 @@ export function useFeedback(
       if (response.ok) {
         const data: FeedbackStatusResponse = await response.json();
         setHabilitado(data.habilitado);
+        setUltimaRetroalimentacion(data.ultima_retroalimentacion || null);
       } else {
         setHabilitado(true);
       }
@@ -51,5 +55,6 @@ export function useFeedback(
     habilitado,
     loading,
     refetch: checkStatus,
+    ultimaRetroalimentacion
   };
 }

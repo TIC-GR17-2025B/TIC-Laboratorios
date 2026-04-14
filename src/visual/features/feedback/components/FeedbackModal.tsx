@@ -1,12 +1,6 @@
 import { useEffect } from 'react';
+import type { FeedbackData } from '../types/feedback.types';
 import styles from './FeedbackModal.module.css';
-
-interface FeedbackData {
-    analisis: string;
-    fortaleza: string;
-    area_mejora: string;
-    consejo: string;
-}
 
 interface FeedbackModalProps {
     isOpen: boolean;

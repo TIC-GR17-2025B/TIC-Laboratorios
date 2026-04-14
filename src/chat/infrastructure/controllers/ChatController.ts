@@ -22,7 +22,7 @@ const router = Router();
 const chatRepository = new NativeChatRepository();
 
 
-router.post("/", async (req: Request<{}, {}, ChatRequestBody>, res: Response) => {
+router.post("/", async (req: Request<Record<string, unknown>, Record<string, unknown>, ChatRequestBody>, res: Response) => {
   try {
 
     const { 
@@ -80,7 +80,7 @@ router.get("/health", async (_req: Request, res: Response) => {
   }
 });
 
-router.delete("/session/:sessionId", (req: Request, res: Response) => {
+router.delete("/session/:sessionId", (req: Request<{ sessionId: string }>, res: Response) => {
   try {
     const { sessionId } = req.params;
     const memoryManager = getMemoryManager();

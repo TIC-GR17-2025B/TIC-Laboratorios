@@ -1,16 +1,10 @@
 import { useState } from "react";
 import { API_BASE_URL } from "../../../common/utils/apiConfig";
-
-export interface FeedbackResponse {
-  analisis: string;
-  fortaleza: string;
-  area_mejora: string;
-  consejo: string;
-}
+import type { FeedbackData } from '../types/feedback.types';
 
 interface FeedbackAPIResponse {
   success: boolean;
-  data: FeedbackResponse;
+  data: FeedbackData;
 }
 
 export const useGenerateFeedback = () => {
@@ -19,7 +13,7 @@ export const useGenerateFeedback = () => {
   const generateFeedback = async (
     idEstudiante: number,
     slugEscenario: string
-  ): Promise<{ feedback: FeedbackResponse } | null> => {
+  ): Promise<{ feedback: FeedbackData } | null> => {
     setLoading(true);
 
     try {

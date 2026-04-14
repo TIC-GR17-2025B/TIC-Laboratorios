@@ -10,7 +10,8 @@ import feedbackRouter from './feedback/infrastructure/controllers/FeedbackContro
 import courseAnalysisRouter from './course-analysis/infrastructure/controllers/CourseAnalysisController.js'
 import chatRouter from './chat/infrastructure/controllers/ChatController.js'
 import agentMalvadoRouter from './agent-malvado/infrastructure/controllers/ScenarioBuilderController.js'
-import { InMemoryFeedbackStateRepository } from './feedback/infrastructure/repositories/InMemoryFeedbackStateRepository.js'
+import { PrismaFeedbackPersistenceRepository } from './feedback/infrastructure/repositories/PrismaFeedbackPersistenceRepository.js'
+import { prisma } from './auth/infrastructure/db/prisma.js'
 
 // Cargar variables de entorno
 dotenv.config()
@@ -18,7 +19,7 @@ dotenv.config()
 const app = express()
 const PORT = Number(process.env.PORT) || 3000 // Azure asigna puerto dinámico
 
-const feedbackStateRepository = new InMemoryFeedbackStateRepository();
+const feedbackPersistenceRepository = new PrismaFeedbackPersistenceRepository(prisma);
 
 // CORS - restringido en producción al dominio del frontend
 const corsOrigin = process.env.NODE_ENV === 'production' && process.env.FRONTEND_URL
@@ -58,7 +59,7 @@ app.get('/', (_req: Request, res: Response) => {
 
 
 import { initializeFeedbackController } from './feedback/infrastructure/controllers/FeedbackController.js';
-initializeFeedbackController(feedbackStateRepository);
+initializeFeedbackController(feedbackPersistenceRepository);
 
 // Montar rutas de autenticación
 app.use('/auth', authRouter)

@@ -4,6 +4,7 @@ import styles from '../styles/CourseAnalysisButton.module.css';
 
 interface CourseAnalysisButtonProps {
   idCurso: number;
+  idProfesor: number;
   onAnalysisGenerated?: (analysis: CourseAnalysisResponse) => void;
   onError?: (error: string) => void;
   className?: string;
@@ -11,6 +12,7 @@ interface CourseAnalysisButtonProps {
 
 export function CourseAnalysisButton({ 
   idCurso, 
+  idProfesor,
   onAnalysisGenerated, 
   onError,
   className 
@@ -20,7 +22,7 @@ export function CourseAnalysisButton({
   const handleClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
 
-    const response = await generateAnalysis(idCurso);
+    const response = await generateAnalysis(idCurso, idProfesor);
 
     if (response.success && response.analysis) {
       onAnalysisGenerated?.(response.analysis);

@@ -3,12 +3,12 @@ import express from "express";
 import type { Request, Response } from "express";
 import { prisma } from "../../../auth/infrastructure/db/prisma.js";
 import { N8nFeedbackRepository } from "../repositories/N8nFeedbackRepository.js";
+import { PrismaProgresoRepository } from "../repositories/PrismaProgresoRepository.js";
 import { GenerateFeedbackUseCase } from "../../application/useCases/GenerateFeedbackUseCase.js";
 import { CheckFeedbackStatusUseCase } from "../../application/useCases/CheckFeedbackStatusUseCase.js";
-import type { IFeedbackStateRepository } from "../../domain/repositories/IFeedbackStateRepository.js";
+import type { IFeedbackPersistenceRepository } from "../../domain/repositories/IFeedbackPersistenceRepository.js";
 
 const router = express.Router();
-
 
 const webhookUrl = process.env.N8N_FEEDBACK_WEBHOOK_URL;
 
@@ -16,25 +16,23 @@ if (!webhookUrl) {
   throw new Error("Falta la variable de entorno N8N_FEEDBACK_WEBHOOK_URL");
 }
 
-
 const feedbackRepository = new N8nFeedbackRepository(webhookUrl);
 
-
-let feedbackStateRepository: IFeedbackStateRepository;
+let feedbackPersistenceRepository: IFeedbackPersistenceRepository;
 let generateFeedbackUseCase: GenerateFeedbackUseCase;
 let checkFeedbackStatusUseCase: CheckFeedbackStatusUseCase;
 
-
-export function initializeFeedbackController(stateRepo: IFeedbackStateRepository) {
-  feedbackStateRepository = stateRepo;
+export function initializeFeedbackController(persistenceRepo: IFeedbackPersistenceRepository) {
+  feedbackPersistenceRepository = persistenceRepo;
+  const progresoRepository = new PrismaProgresoRepository(prisma);
   generateFeedbackUseCase = new GenerateFeedbackUseCase(
     feedbackRepository,
-    feedbackStateRepository,
-    prisma
+    feedbackPersistenceRepository,
+    progresoRepository
   );
   checkFeedbackStatusUseCase = new CheckFeedbackStatusUseCase(
-    feedbackStateRepository,
-    prisma
+    feedbackPersistenceRepository,
+    progresoRepository
   );
 }
 
@@ -58,6 +56,7 @@ router.get('/check-status', async (req: Request, res: Response) => {
       habilitado: result.habilitado,
       intentos_actuales: result.intentosActuales,
       intentos_al_generar: result.intentosAlGenerar,
+      ultima_retroalimentacion: result.ultimaRetroalimentacion
     });
   } catch (err) {
     if (err instanceof Error) {

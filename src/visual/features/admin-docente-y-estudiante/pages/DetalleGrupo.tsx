@@ -7,7 +7,8 @@ import CodigoInvitacion from '../components/CodigoInvitacion';
 import SearchBar from '../../../common/components/SearchBar';
 import TextInput from '../../../common/components/TextInput';
 import { CourseAnalysisButton } from '../../course-analysis/components/CourseAnalysisButton';
-import { CourseAnalysisModal } from '../../course-analysis/components/CourseAnalysisModal';
+import { CourseAnalysisView } from '../../course-analysis/components/CourseAnalysisView';
+import { useGenerateCourseAnalysis } from '../../course-analysis/hooks/useGenerateCourseAnalysis';
 import type { CourseAnalysisResponse } from '../../course-analysis/types/courseAnalysis.types';
 import styles from '../styles/DetalleGrupo.module.css';
 import Breadcrumb from '../components/Breadcrumb';
@@ -31,13 +32,9 @@ export default function DetalleGrupo() {
   const [searchQuery, setSearchQuery] = useState('');
   const [editName, setEditName] = useState('');
   const [renameSaving, setRenameSaving] = useState(false);
-  const [analysisModal, setAnalysisModal] = useState<{
-    isOpen: boolean;
-    analysis: CourseAnalysisResponse | null;
-  }>({
-    isOpen: false,
-    analysis: null
-  });
+  const [isCheckingAnalysis, setIsCheckingAnalysis] = useState(false);
+  const [analysis, setAnalysis] = useState<CourseAnalysisResponse | null>(null);
+  const { checkLatestAnalysis } = useGenerateCourseAnalysis();
 
   useEffect(() => {
     const loadGrupo = async () => {
@@ -163,7 +160,17 @@ export default function DetalleGrupo() {
             </button>
             <button
               className={`${styles.navItem} ${activeTab === 'analysis' ? styles.navItemActive : ''}`}
-              onClick={() => setActiveTab('analysis')}
+              onClick={async () => {
+                setActiveTab('analysis');
+                if (grupo && !analysis) {
+                   setIsCheckingAnalysis(true);
+                   const result = await checkLatestAnalysis(grupo.id_curso);
+                   if (result.success && result.analysis) {
+                     setAnalysis(result.analysis);
+                   }
+                   setIsCheckingAnalysis(false);
+                }
+              }}
             >
               <BarChart3 size={18} />
               Análisis
@@ -244,17 +251,36 @@ export default function DetalleGrupo() {
                 <h2 className={styles.panelTitle}>Análisis del curso</h2>
               </div>
 
-              <div className={styles.analysisPanel}>
-                <p className={styles.analysisDesc}>
-                  Genera un análisis con IA sobre el rendimiento y participación de los estudiantes en este grupo.
-                </p>
-                <CourseAnalysisButton
+              {!analysis ? (
+                isCheckingAnalysis ? (
+                  <div className={styles.analysisPanel} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1rem', padding: '3rem' }}>
+                    <p style={{ color: 'var(--text-2)' }}>Buscando informe de análisis previo...</p>
+                  </div>
+                ) : (
+                  <div className={styles.analysisPanel}>
+                    <p className={styles.analysisDesc}>
+                      Genera un análisis con IA sobre el rendimiento y participación de los estudiantes en este grupo.
+                    </p>
+                    <CourseAnalysisButton
+                      idCurso={grupo.id_curso}
+                      idProfesor={idProfesor || 0}
+                      onAnalysisGenerated={(newAnalysis) => {
+                        setAnalysis(newAnalysis);
+                      }}
+                    />
+                  </div>
+                )
+              ) : (
+                <CourseAnalysisView
+                  analysis={analysis}
+                  cursoNombre={grupo.nombre}
                   idCurso={grupo.id_curso}
-                  onAnalysisGenerated={(analysis) => {
-                    setAnalysisModal({ isOpen: true, analysis });
+                  idProfesor={idProfesor || 0}
+                  onAnalysisGenerated={(newAnalysis) => {
+                     setAnalysis(newAnalysis);
                   }}
                 />
-              </div>
+              )}
             </>
           )}
 
@@ -315,14 +341,6 @@ export default function DetalleGrupo() {
         </main>
       </div>
 
-      {analysisModal.analysis && (
-        <CourseAnalysisModal
-          isOpen={analysisModal.isOpen}
-          onClose={() => setAnalysisModal({ ...analysisModal, isOpen: false })}
-          analysis={analysisModal.analysis}
-          cursoNombre={grupo.nombre}
-        />
-      )}
     </>
   );
 }

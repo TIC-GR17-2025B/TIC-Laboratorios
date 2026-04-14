@@ -11,7 +11,7 @@ const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! })
 
 const clientOptions: Prisma.PrismaClientOptions = {
   adapter,
-  log: process.env.NODE_ENV === 'development' 
+  log: process.env.NODE_ENV === 'development'
     ? ['query', 'error', 'warn'] as Prisma.LogLevel[]
     : ['error'] as Prisma.LogLevel[],
 }

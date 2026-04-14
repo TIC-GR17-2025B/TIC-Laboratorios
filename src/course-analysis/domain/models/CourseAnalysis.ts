@@ -1,5 +1,6 @@
 export interface CourseAnalysisPayload {
   id_curso: number;
+  id_profesor: number;
 }
 
 export interface CourseAnalysisSection {

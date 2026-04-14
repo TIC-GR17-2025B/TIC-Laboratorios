@@ -4,7 +4,8 @@ import type { CourseAnalysisResponse } from '../types/courseAnalysis.types';
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 interface UseGenerateCourseAnalysisResult {
-  generateAnalysis: (idCurso: number) => Promise<{ success: boolean; analysis?: CourseAnalysisResponse; error?: string }>;
+  generateAnalysis: (idCurso: number, idProfesor: number) => Promise<{ success: boolean; analysis?: CourseAnalysisResponse; error?: string }>;
+  checkLatestAnalysis: (idCurso: number) => Promise<{ success: boolean; analysis?: CourseAnalysisResponse }>;
   loading: boolean;
   error: string | null;
 }
@@ -13,7 +14,7 @@ export function useGenerateCourseAnalysis(): UseGenerateCourseAnalysisResult {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const generateAnalysis = async (idCurso: number) => {
+  const generateAnalysis = async (idCurso: number, idProfesor: number) => {
     setLoading(true);
     setError(null);
 
@@ -23,7 +24,7 @@ export function useGenerateCourseAnalysis(): UseGenerateCourseAnalysisResult {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ id_curso: idCurso }),
+        body: JSON.stringify({ id_curso: idCurso, id_profesor: idProfesor }),
       });
 
       const data = await response.json();
@@ -50,5 +51,23 @@ export function useGenerateCourseAnalysis(): UseGenerateCourseAnalysisResult {
     }
   };
 
-  return { generateAnalysis, loading, error };
+  const checkLatestAnalysis = async (idCurso: number) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`${API_BASE_URL}/course-analysis/latest/${idCurso}`);
+      const data = await response.json();
+      
+      if (response.ok && data.success && data.data) {
+        return { success: true, analysis: data.data };
+      }
+      return { success: false };
+    } catch {
+      return { success: false };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { generateAnalysis, checkLatestAnalysis, loading, error };
 }

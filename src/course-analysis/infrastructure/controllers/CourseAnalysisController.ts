@@ -1,7 +1,9 @@
 import express from "express";
 import type { Request, Response } from "express";
 import { N8nCourseAnalysisRepository } from "../repositories/N8nCourseAnalysisRepository.js";
+import { PrismaCourseAnalysisRepository } from "../repositories/PrismaCourseAnalysisRepository.js";
 import { GenerateCourseAnalysisUseCase } from "../../application/useCases/GenerateCourseAnalysisUseCase.js";
+import { prisma } from "../../../auth/infrastructure/db/prisma.js";
 
 const router = express.Router();
 
@@ -16,12 +18,12 @@ export function createCourseAnalysisController(webhookUrl?: string) {
 
   // Inicializar repositorio y caso de uso con inyección de dependencias
   const analysisRepository = new N8nCourseAnalysisRepository(url || '');
-  const generateAnalysisUseCase = new GenerateCourseAnalysisUseCase(analysisRepository);
-
+  const persistenceRepository = new PrismaCourseAnalysisRepository(prisma);
+  const generateAnalysisUseCase = new GenerateCourseAnalysisUseCase(analysisRepository, persistenceRepository);
 
   router.post('/generate', async (req: Request, res: Response) => {
     try {
-      const { id_curso } = req.body;
+      const { id_curso, id_profesor } = req.body;
 
       // Validación
       if (!id_curso) {
@@ -38,8 +40,16 @@ export function createCourseAnalysisController(webhookUrl?: string) {
         });
       }
 
+      if (!id_profesor || typeof id_profesor !== 'number' || id_profesor <= 0) {
+        return res.status(400).json({
+          success: false,
+          error: 'El id_profesor es requerido y debe ser un número válido mayor que 0'
+        });
+      }
+
       // Verificar que el webhook esté configurado
       if (!url) {
+
         return res.status(503).json({
           success: false,
           error: 'El servicio de análisis no está configurado correctamente'
@@ -47,8 +57,7 @@ export function createCourseAnalysisController(webhookUrl?: string) {
       }
 
       // Ejecutar caso de uso
-      const analysis = await generateAnalysisUseCase.execute({ id_curso });
-
+      const analysis = await generateAnalysisUseCase.execute({ id_curso, id_profesor });
 
       res.status(200).json({
         success: true,
@@ -71,6 +80,27 @@ export function createCourseAnalysisController(webhookUrl?: string) {
     }
   });
 
+
+  router.get('/latest/:id_curso', async (req: Request, res: Response) => {
+    try {
+      const id_curso = parseInt(req.params.id_curso as string);
+      if (!id_curso || isNaN(id_curso)) {
+        return res.status(400).json({ success: false, error: 'id_curso inválido' });
+      }
+
+      const analysis = await persistenceRepository.findLatestByCurso(id_curso);
+      
+      res.status(200).json({
+        success: true,
+        data: analysis
+      });
+    } catch {
+      res.status(500).json({
+        success: false,
+        error: 'Error al recuperar el análisis del curso'
+      });
+    }
+  });
 
   router.get('/health', (_req: Request, res: Response) => {
     const isConfigured = !!url;
