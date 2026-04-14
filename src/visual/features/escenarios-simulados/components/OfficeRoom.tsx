@@ -14,7 +14,7 @@ export interface OfficeBounds {
     maxZ: number;
 }
 
-const FLOOR_COLORS = ['#d8d2ca', '#d0d4cc', '#d4ced2', '#ccd4d0'];
+const FLOOR_COLORS = ['#ddd8d0', '#d5d9d1', '#d9d3d7', '#d1d9d5'];
 
 interface OfficeRoomProps {
     bounds: OfficeBounds;

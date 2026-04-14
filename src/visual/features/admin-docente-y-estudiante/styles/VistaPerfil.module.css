@@ -155,6 +155,7 @@
   font-weight: 600;
   color: var(--text-primary);
   min-width: 28px;
+  flex: 1;
 }
 
 .intentoFecha {

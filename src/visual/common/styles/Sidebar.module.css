@@ -1,4 +1,4 @@
-.dock {
+.dockWrapper {
   position: fixed;
   bottom: 12px;
   left: 50%;
@@ -6,14 +6,32 @@
   z-index: 99900;
   display: flex;
   align-items: center;
+  gap: 8px;
+}
+
+.dock {
+  display: flex;
+  align-items: center;
   padding: 6px 8px;
   gap: 4px;
-  background: rgba(41, 41, 41, 0.85);
+  background: var(--surface-secondary);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border-primary);
   border-radius: 16px;
   user-select: none;
+  transition: opacity 0.3s ease;
+}
+
+
+/* Override global button styles inside dock */
+.dock button {
+  background: transparent;
+  padding: 0;
+}
+
+.dock button:hover:not(:disabled):not(.dockItem):not(.controlBtn):not(.chatBtn) {
+  background-color: transparent;
 }
 
 /* Navigation section */
@@ -26,9 +44,9 @@
 /* Vertical divider between nav and controls */
 .spacer {
   width: 1px;
-  height: 28px;
+  align-self: stretch;
   background: var(--border-primary);
-  margin: 0 6px;
+  margin: -6px 6px;
 }
 
 /* Controls section (timer, pause, chat) */
@@ -44,8 +62,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 10px;
   background: transparent;
   border: none;
@@ -56,12 +74,13 @@
   transition: all 0.15s ease;
 }
 
-.dockItem:hover {
+.dock .dockItem:hover {
   background: rgba(255, 255, 255, 0.08);
   color: var(--text-primary);
 }
 
-.dockItem.active {
+.dock .dockItem.active,
+.dock .dockItem.active:hover {
   background: var(--blue-transparent);
   color: var(--blue);
 }
@@ -93,7 +112,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 40px;
+  height: 36px;
   padding: 0 10px;
   border-radius: 10px;
   font-size: 13px;
@@ -108,8 +127,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 10px;
   background: transparent;
   border: none;
@@ -118,7 +137,7 @@
   transition: all 0.15s ease;
 }
 
-.controlBtn:hover {
+.dock .controlBtn:hover {
   background: rgba(255, 255, 255, 0.08);
   color: var(--text-primary);
 }
@@ -148,4 +167,97 @@
   right: 12px;
   left: auto;
   top: auto;
+}
+
+/* Exit button — round floating button to the left of the dock */
+.exitBtn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--surface-secondary);
+  border: 1px solid var(--border-primary);
+  padding: 0;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: all 0.15s ease;
+}
+
+.exitBtn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.exitBtn:hover .tooltip {
+  opacity: 1;
+}
+
+/* Exit confirmation dialog */
+.exitOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 99999;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.exitDialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100000;
+  background: var(--surface-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  padding: 24px;
+  width: 340px;
+  max-width: 90vw;
+  animation: modalSlideIn 0.2s ease-out;
+}
+
+.exitDialogText {
+  margin: 0 0 20px;
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.exitDialogActions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.exitDialogCancel,
+.exitDialogConfirm {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.exitDialogCancel {
+  background: var(--surface-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-primary);
+}
+
+.exitDialogCancel:hover {
+  background: var(--surface-tertiary);
+}
+
+.exitDialogConfirm {
+  background: var(--error);
+  color: #ffffff;
+}
+
+.exitDialogConfirm:hover {
+  background: #b91c1c;
 }

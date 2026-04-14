@@ -251,16 +251,20 @@ export const escenarioControlAcceso: unknown = {
           posicion: { x: 6, y: 0, z: 0, rotacionY: 0 },
           espacios: [
             {
-              id: 5, mueble: Mueble.MESA, posicion: { x: 0, y: 0, z: 0, rotacionY: 0 },
+              id: 5, mueble: Mueble.MESA, posicion: { x: 2, y: 0, z: 0, rotacionY: 0 },
               dispositivos: [{
                 id: 10005, tipo: TipoDispositivo.WORKSTATION, nombre: "PC Estudiante",
                 sistemaOperativo: "Windows 10 Pro", hardware: "HP ProDesk 400 G7",
                 software: "Office 365, Navegador Web",
-                posicion: { x: 0, y: 0, z: 0, rotacionY: 0 },
+                posicion: { x: 2, y: 0, z: 0, rotacionY: 0 },
                 estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
                 personaEncargada: "Estudiante Martín",
                 activos: [], redes: ["LAN-Aula"],
               }],
+            },
+            {
+              id: 6, mueble: Mueble.MESA, posicion: { x: 4, y: 0, z: 2.5, rotacionY: 180 },
+              dispositivos: [],
             },
           ],
         },

@@ -1,4 +1,7 @@
 .vistaFases {
+    width: 100%;
+    max-width: var(--content-width);
+    margin: 0 auto;
     padding: 24px;
     flex: 1;
     overflow-y: auto;

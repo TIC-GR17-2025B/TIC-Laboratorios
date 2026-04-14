@@ -24,7 +24,9 @@ export default function EstudianteLayout() {
       </header>
 
       <main className={styles.content}>
-        <Outlet />
+        <div className={styles.contentInner}>
+          <Outlet />
+        </div>
       </main>
     </motion.div>
   );

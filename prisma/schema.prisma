@@ -65,6 +65,7 @@ model progreso {
   terminado     Boolean?   @default(false)
   tiempo        Float?
   acciones      String?    @db.Text
+  fecha_creacion DateTime?  @default(now())
   // escenario     escenario  @relation(fields: [id_escenario], references: [id_escenario], onDelete: NoAction, onUpdate: NoAction, map: "fk_progreso_escenario")
   estudiante    estudiante @relation(fields: [id_estudiante], references: [id_estudiante], onDelete: NoAction, onUpdate: NoAction, map: "fk_progreso_estudiante")
 }

@@ -261,16 +261,20 @@ export const escenarioIoT: unknown = {
           posicion: { x: 6, y: 0, z: 0, rotacionY: 0 },
           espacios: [
             {
-              id: 5, mueble: Mueble.MESA, posicion: { x: 0, y: 0, z: 0, rotacionY: 0 },
+              id: 5, mueble: Mueble.MESA, posicion: { x: 2, y: 0, z: 0, rotacionY: 0 },
               dispositivos: [{
                 id: 13005, tipo: TipoDispositivo.WORKSTATION, nombre: "Controlador IoT",
                 sistemaOperativo: "Raspberry Pi OS", hardware: "Raspberry Pi 4 Industrial",
                 software: "MQTT Client, Sensor Gateway, Edge Computing",
-                posicion: { x: 0, y: 0, z: 0, rotacionY: 0 },
+                posicion: { x: 2, y: 0, z: 0, rotacionY: 0 },
                 estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
                 personaEncargada: "Técnico Carlos Luna",
                 activos: [], redes: [],
               }],
+            },
+            {
+              id: 6, mueble: Mueble.MESA, posicion: { x: 4, y: 0, z: 2.5, rotacionY: 180 },
+              dispositivos: [],
             },
           ],
         },

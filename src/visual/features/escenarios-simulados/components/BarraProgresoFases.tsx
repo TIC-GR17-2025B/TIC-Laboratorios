@@ -1,4 +1,3 @@
-import GreenCheckBox from '../../../common/components/GreenCheckBox';
 import styles from '../styles/BarraProgresoFases.module.css';
 
 interface BarraProgresoFasesProps {
@@ -18,22 +17,28 @@ export default function BarraProgresoFases({ totalFases, faseActual, fasesComple
 
                 return (
                     <div key={index} className={styles.faseItem}>
-                        <div
-                            className={`${styles.circulo} ${
+                        <button
+                            type="button"
+                            className={`${styles.step} ${
                                 esCompletada
                                     ? styles.completada
                                     : esActual
                                     ? styles.actual
                                     : styles.futura
-                            } ${esNavegable ? styles.navegable : styles.bloqueada}`}
+                            }`}
+                            disabled={!esNavegable}
                             onClick={() => esNavegable && onFaseClick(index)}
                         >
-                            <GreenCheckBox checked={esCompletada} />
-                        </div>
+                            {esCompletada && (
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                    <path d="M2.5 6.5L4.5 8.5L9.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                            )}
+                        </button>
                         {index < totalFases - 1 && (
                             <div
                                 className={`${styles.linea} ${
-                                    esCompletada ? styles.lineaCompletada : styles.lineaIncompleta
+                                    esCompletada ? styles.lineaCompletada : styles.lineaPendiente
                                 }`}
                             />
                         )}

@@ -21,7 +21,7 @@ export class ProgresoController {
   ) {
 
     const {id_estudiante, slug_escenario} = await this.getDatosSesion();
-    const acciones = this.formatearAcciones(accionesEsperadas, accionesRealizadas);
+    const acciones = this.formatearAcciones(accionesEsperadas ?? [], accionesRealizadas ?? []);
     const data = {
       id_estudiante: id_estudiante,
       slug_escenario: slug_escenario,

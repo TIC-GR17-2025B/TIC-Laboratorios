@@ -347,7 +347,7 @@ export const escenarioAutenticacion: unknown = {
             {
               id: 5,
               mueble: Mueble.MESA,
-              posicion: { x: 0, y: 0, z: 0, rotacionY: 0 },
+              posicion: { x: 2, y: 0, z: 0, rotacionY: 0 },
               dispositivos: [
                 {
                   id: 3005,
@@ -356,7 +356,7 @@ export const escenarioAutenticacion: unknown = {
                   sistemaOperativo: "Windows 10 Pro",
                   hardware: "HP ProDesk 400 G7",
                   software: "Office 365, Outlook, Navegador Web",
-                  posicion: { x: 0, y: 0, z: 0, rotacionY: 0 },
+                  posicion: { x: 2, y: 0, z: 0, rotacionY: 0 },
                   estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
                   personaEncargada: "Laura Vega",
                   activos: [
@@ -369,6 +369,12 @@ export const escenarioAutenticacion: unknown = {
                   redes: ["LAN-Corp"],
                 },
               ],
+            },
+            {
+              id: 6,
+              mueble: Mueble.MESA,
+              posicion: { x: 4, y: 0, z: 2.5, rotacionY: 180 },
+              dispositivos: [],
             },
           ],
         },

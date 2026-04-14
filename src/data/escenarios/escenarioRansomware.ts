@@ -255,7 +255,7 @@ export const escenarioRansomware: unknown = {
             {
               id: 5,
               mueble: Mueble.MESA,
-              posicion: { x: 0, y: 0, z: 0, rotacionY: 0 },
+              posicion: { x: 2, y: 0, z: 0, rotacionY: 0 },
               dispositivos: [
                 {
                   id: 6005,
@@ -264,7 +264,7 @@ export const escenarioRansomware: unknown = {
                   sistemaOperativo: "Ubuntu 24.04",
                   hardware: "Lenovo ThinkStation P360",
                   software: "Wireshark, Nessus, Ansible",
-                  posicion: { x: 0, y: 0, z: 0, rotacionY: 0 },
+                  posicion: { x: 2, y: 0, z: 0, rotacionY: 0 },
                   estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
                   personaEncargada: "Ing. Fernando Reyes",
                   activos: [
@@ -277,6 +277,12 @@ export const escenarioRansomware: unknown = {
                   redes: ["LAN-Admin"],
                 },
               ],
+            },
+            {
+              id: 6,
+              mueble: Mueble.MESA,
+              posicion: { x: 4, y: 0, z: 2.5, rotacionY: 180 },
+              dispositivos: [],
             },
           ],
         },

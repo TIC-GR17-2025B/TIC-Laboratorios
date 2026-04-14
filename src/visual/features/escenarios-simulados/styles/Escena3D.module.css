@@ -1,6 +1,6 @@
 .vista3D {
   flex: 1;
-  background-color: var(--border-primary);
+  background-color: var(--surface-primary);
   display: flex;
   align-items: center;
   justify-content: center;

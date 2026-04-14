@@ -211,8 +211,7 @@ export default function VistaPerfil() {
                                                         transition={{ duration: 0.12, delay: i * 0.025 }}
                                                     >
                                                         <span className={`${styles.intentoDot} ${intento.terminado ? styles.dotOk : styles.dotFail}`} />
-                                                        <span className={styles.intentoNum}>#{esc.intentos.length - i}</span>
-                                                        <span className={styles.intentoFecha}>{formatFecha(intento.fecha_creacion)}</span>
+                                                        <span className={styles.intentoNum}>{formatFecha(intento.fecha_creacion) || `Intento ${esc.intentos.length - i}`}</span>
                                                         <span className={styles.intentoTiempo}>{formatTiempo(intento.tiempo)}</span>
                                                         <span className={intento.terminado ? styles.intentoStatusOk : styles.intentoStatusFail}>
                                                             {intento.terminado ? 'Completado' : 'Fallido'}

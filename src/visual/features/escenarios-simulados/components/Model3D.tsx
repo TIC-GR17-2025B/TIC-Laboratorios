@@ -125,13 +125,14 @@ const Model3D: React.FC<Model3DProps> = React.memo(({
             scale={scale}
             onClick={(e) => {
                 e.stopPropagation();
-                onClick?.();
+                if (onContextMenu) {
+                    onContextMenu();
+                } else {
+                    onClick?.();
+                }
             }}
             onContextMenu={(e) => {
                 e.stopPropagation();
-                if (onContextMenu) {
-                    onContextMenu();
-                }
             }}
             onPointerOver={(e) => {
                 e.stopPropagation();

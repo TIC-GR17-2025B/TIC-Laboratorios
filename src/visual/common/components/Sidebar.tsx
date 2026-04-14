@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import styles from '../styles/Sidebar.module.css';
 import NavigationLink from './Navigation';
@@ -21,6 +21,7 @@ const Sidebar: React.FC = () => {
     const { entidadSeleccionadaId } = useEscenario();
     const location = useLocation();
     const navigate = useNavigate();
+    const [showExitConfirm, setShowExitConfirm] = useState(false);
 
     const handleDispositivosClick = () => {
         if (isZooming || desktopMode) return;
@@ -59,10 +60,43 @@ const Sidebar: React.FC = () => {
         }
     };
 
+    const handleExitClick = () => {
+        setShowExitConfirm(true);
+    };
+
+    const handleConfirmExit = () => {
+        setShowExitConfirm(false);
+        navigate('/seleccion-niveles');
+    };
+
+    const handleCancelExit = () => {
+        setShowExitConfirm(false);
+    };
+
     return (
-        <nav className={styles.dock} data-tour="dock">
-            <div className={styles.navSection}>
-                {desktopMode && !isZooming ? (
+        <>
+            {showExitConfirm && (
+                <>
+                    <div className={styles.exitOverlay} onClick={handleCancelExit} />
+                    <div className={styles.exitDialog}>
+                        <p className={styles.exitDialogText}>
+                            Se perdera el progreso del escenario actual.
+                        </p>
+                        <div className={styles.exitDialogActions}>
+                            <button className={styles.exitDialogCancel} onClick={handleCancelExit}>
+                                Cancelar
+                            </button>
+                            <button className={styles.exitDialogConfirm} onClick={handleConfirmExit}>
+                                Salir
+                            </button>
+                        </div>
+                    </div>
+                </>
+            )}
+            <div className={styles.dockWrapper}>
+            <nav className={styles.dock} data-tour="dock">
+                <div className={styles.navSection}>
+                    {desktopMode && !isZooming ? (
                     <button
                         className={styles.dockItem}
                         onClick={exitDesktopMode}
@@ -126,7 +160,17 @@ const Sidebar: React.FC = () => {
                     />
                 </div>
             </div>
-        </nav>
+            </nav>
+            <button className={styles.exitBtn} onClick={handleExitClick}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <polyline points="16 17 21 12 16 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                <span className={styles.tooltip}>Salir</span>
+            </button>
+            </div>
+        </>
     );
 };
 

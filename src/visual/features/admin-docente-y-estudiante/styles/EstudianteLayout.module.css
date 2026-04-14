@@ -32,16 +32,19 @@
 .content {
   flex: 1;
   overflow-y: auto;
-  padding: 48px;
+  width: 100%;
+}
+
+.contentInner {
   max-width: 1280px;
   margin: 0 auto;
-  width: 100%;
+  padding: 48px;
 }
 
 /* ── Responsive ── */
 
 @media (max-width: 640px) {
-  .content {
+  .contentInner {
     padding: 24px 16px;
   }
 }

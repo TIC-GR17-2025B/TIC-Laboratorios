@@ -193,17 +193,21 @@ export const escenarioSegmentacionPCI: unknown = {
           posicion: { x: 6, y: 0, z: 0, rotacionY: 0 },
           espacios: [
             {
-              id: 5, mueble: Mueble.MESA, posicion: { x: 0, y: 0, z: 0, rotacionY: 0 },
+              id: 5, mueble: Mueble.MESA, posicion: { x: 2, y: 0, z: 0, rotacionY: 0 },
               dispositivos: [{
                 id: 11005, tipo: TipoDispositivo.WORKSTATION, nombre: "Servidor de Inventario",
                 sistemaOperativo: "Ubuntu Server 22.04", hardware: "Dell PowerEdge R660",
                 software: "ERP, Inventory Management",
-                posicion: { x: 0, y: 0, z: 0, rotacionY: 0 },
+                posicion: { x: 2, y: 0, z: 0, rotacionY: 0 },
                 estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
                 personaEncargada: "Marta Ruiz",
                 activos: [{ nombre: "inventario_actual.csv", contenido: "Listado de inventario actualizado", tipo: TipoActivo.DOCUMENTO }],
                 redes: ["LAN-Inventario"],
               }],
+            },
+            {
+              id: 6, mueble: Mueble.MESA, posicion: { x: 4, y: 0, z: 2.5, rotacionY: 180 },
+              dispositivos: [],
             },
           ],
         },

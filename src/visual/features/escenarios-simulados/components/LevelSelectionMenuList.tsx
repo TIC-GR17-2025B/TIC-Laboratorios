@@ -1,7 +1,7 @@
 import { NivelController } from "../../../../ecs/controllers/NivelController";
 import type { EscenarioPreview } from "../../../../types/EscenarioTypes";
 import styles from "../styles/VistaSeleccionNiveles.module.css";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 import { useSelectedLevel } from "../../../common/contexts/SelectedLevelContext";
 import type { Escenario } from "../../../../types/EscenarioTypes";
@@ -23,77 +23,53 @@ interface CategoriaGroup {
     escenarios: EscenarioPreview[];
 }
 
-// Zigzag: consistent left-right alternation
-const ZIGZAG = [-90, 90] as const;
-
-// Layout constants (must match CSS)
+const SINE_AMPLITUDE = 80;
+const SINE_STEP = (2 * Math.PI) / 5; // ~5 nodes per full cycle
 const NODE_SIZE = 56;
-const NODE_ROW_PADDING = 24; // padding top+bottom per nodeRow
-const NODE_ROW_HEIGHT = NODE_SIZE + NODE_ROW_PADDING * 2; // 104px
-const NODES_PADDING_TOP = 28; // .nodes padding-top
-const BANNER_HEIGHT = 34; // banner approximate height (padding 4+4 + font ~26)
+const TARGET_ARC = 82; // desired arc length between node centers
+const sineOffset = (index: number) => Math.sin(index * SINE_STEP) * SINE_AMPLITUDE;
 
+/** Compute marginTop for a node so arc distance from previous node is constant */
+function nodeMarginTop(index: number): number {
+    if (index === 0) return 0;
+    const dx = sineOffset(index) - sineOffset(index - 1);
+    const dy = Math.sqrt(Math.max(0, TARGET_ARC * TARGET_ARC - dx * dx));
+    return Math.max(4, dy - NODE_SIZE);
+}
 
-// Category display order (reversed: Cap. 6 at top, Cap. 1 at bottom)
+// Category display order (Cap. 1 at top, Cap. 6 at bottom)
 const CATEGORY_ORDER = [
-    'Cap. 6 — Tendencias Actuales',
-    'Cap. 5 — Administración de Riesgos',
-    'Cap. 4 — Seguridad de Redes',
-    'Cap. 3 — Autenticación',
-    'Cap. 2 — Criptografía',
     'Cap. 1 — Introducción',
+    'Cap. 2 — Criptografía',
+    'Cap. 3 — Autenticación',
+    'Cap. 4 — Seguridad de Redes',
+    'Cap. 5 — Administración de Riesgos',
+    'Cap. 6 — Tendencias Actuales',
 ];
 
-/** Build an SVG path string with smooth quadratic curves through all node centers */
-function buildCurvePath(
-    groups: CategoriaGroup[],
-): { path: string; width: number; height: number } {
-    // Collect all node center positions (x, y) relative to the path container
-    const centers: { x: number; y: number }[] = [];
-    const pathWidth = 480;
-    const cx = pathWidth / 2; // center x
+/** Build a smooth SVG path through node centers using S-curve beziers */
+function buildSmoothPath(centers: { x: number; y: number }[]): string {
+    if (centers.length < 2) return '';
 
-    let y = 0;
-    let globalIdx = 0;
-
-    for (const group of groups) {
-        // Banner
-        y += BANNER_HEIGHT;
-        // Nodes container padding top
-        y += NODES_PADDING_TOP;
-
-        for (let i = 0; i < group.escenarios.length; i++) {
-            const offset = ZIGZAG[globalIdx % ZIGZAG.length];
-            // Center of this node
-            const nodeCenterY = y + NODE_ROW_PADDING + NODE_SIZE / 2;
-            centers.push({ x: cx + offset, y: nodeCenterY });
-            y += NODE_ROW_HEIGHT;
-            globalIdx++;
-        }
-
-        // Nodes container padding bottom
-        y += NODES_PADDING_TOP; // symmetric
-    }
-
-    if (centers.length < 2) return { path: '', width: pathWidth, height: y };
-
-    // Build smooth path using quadratic beziers through midpoints
     let d = `M ${centers[0].x} ${centers[0].y}`;
 
     for (let i = 0; i < centers.length - 1; i++) {
         const curr = centers[i];
         const next = centers[i + 1];
-        // Control point: midpoint x uses current node's x for a nice curve
         const midY = (curr.y + next.y) / 2;
-        d += ` Q ${curr.x} ${midY}, ${next.x} ${next.y}`;
+
+        // S-curve: hold current x until midpoint, then transition to next x
+        d += ` C ${curr.x} ${midY}, ${next.x} ${midY}, ${next.x} ${next.y}`;
     }
 
-    return { path: d, width: pathWidth, height: y };
+    return d;
 }
 
 export default function LevelSelectionMenuList() {
     const [escenarios, setEscenarios] = useState<EscenarioPreview[]>([]);
     const [progresos, setProgresos] = useState<Progreso[]>([]);
+    const [curvePath, setCurvePath] = useState('');
+    const containerRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
     const { setSelectedEscenario } = useSelectedLevel();
     const nivelController = new NivelController();
@@ -144,23 +120,45 @@ export default function LevelSelectionMenuList() {
         })
         .map(([categoria, escenarios]) => ({ categoria, escenarios }));
 
-    const curve = useMemo(() => buildCurvePath(groups), [groups]);
+    // Measure actual node positions after render and build SVG path
+    useLayoutEffect(() => {
+        const container = containerRef.current;
+        if (!container) return;
+
+        // Small delay to let framer-motion animations settle into final positions
+        const timer = setTimeout(() => {
+            const nodeEls = container.querySelectorAll<HTMLElement>('[data-node]');
+            if (nodeEls.length < 2) return;
+
+            const containerRect = container.getBoundingClientRect();
+            const centers = Array.from(nodeEls).map(el => {
+                const rect = el.getBoundingClientRect();
+                return {
+                    x: rect.left + rect.width / 2 - containerRect.left,
+                    y: rect.top + rect.height / 2 - containerRect.top,
+                };
+            });
+
+            setCurvePath(buildSmoothPath(centers));
+        }, 350);
+
+        return () => clearTimeout(timer);
+    }, [escenarios, progresos]);
 
     let globalIndex = 0;
 
     return (
-        <div className={styles.path}>
+        <div className={styles.path} ref={containerRef}>
             {/* Dashed curve SVG behind everything */}
-            {curve.path && (
+            {curvePath && (
                 <svg
                     className={styles.curveSvg}
-                    width={curve.width}
-                    height={curve.height}
-                    viewBox={`0 0 ${curve.width} ${curve.height}`}
+                    width="100%"
+                    height="100%"
                     fill="none"
                 >
                     <path
-                        d={curve.path}
+                        d={curvePath}
                         stroke="var(--border-primary)"
                         strokeWidth="2"
                         strokeDasharray="6 6"
@@ -185,21 +183,25 @@ export default function LevelSelectionMenuList() {
                         {group.escenarios.map((esc) => {
                             const completado = isCompletado(esc.slug);
                             const attempted = hasIntentos(esc.slug);
-                            const offset = ZIGZAG[globalIndex % ZIGZAG.length];
+                            const offset = sineOffset(globalIndex);
                             const isLeft = offset < 0;
                             const idx = globalIndex++;
 
                             const nodeState = completado ? 'done' : attempted ? 'active' : 'available';
 
+                            const mt = nodeMarginTop(idx);
+
                             return (
                                 <motion.div
                                     key={esc.id}
                                     className={styles.nodeRow}
+                                    style={{ marginTop: mt }}
                                     initial={{ opacity: 0, y: 20, x: offset }}
                                     animate={{ opacity: 1, y: 0, x: offset }}
                                     transition={{ duration: 0.25, delay: idx * 0.05 }}
                                 >
                                     <div
+                                        data-node
                                         className={`${styles.node} ${styles[nodeState]}`}
                                         onClick={() => handleSelectLevel(esc)}
                                     >

@@ -62,6 +62,7 @@ const ECSSceneRenderer: React.FC = () => {
     const handleContextMenu = (entity: unknown) => {
         const e = entity as { objetoConTipo?: { tipo?: string }; entidadId?: number };
         if (e.objetoConTipo?.tipo !== 'espacio') {
+            setClickedEntityId(e.entidadId ?? null);
             setDispositivoSeleccionado(entity);
             setMenuOpenForEntity(e.entidadId ?? null);
         }
@@ -139,8 +140,7 @@ const ECSSceneRenderer: React.FC = () => {
                         position={position}
                         rotation={[0, rotacionY, 0]}
                         scale={1}
-                        onClick={isEspacio ? undefined : () => handleEntityClick({ objetoConTipo, entidadId, entidadCompleta })}
-                        onContextMenu={isEspacio ? undefined : () => handleContextMenu({ objetoConTipo, entidadId, entidadCompleta })}
+                        onClick={isEspacio ? undefined : () => handleContextMenu({ objetoConTipo, entidadId, entidadCompleta })}
                         onHover={isEspacio ? undefined : () => handleEntityHover({ objetoConTipo, entidadId, entidadCompleta })}
                         onHoverEnd={isEspacio ? undefined : handleEntityHoverEnd}
                         isSelected={!isEspacio && entidadSeleccionadaId === entidadId}

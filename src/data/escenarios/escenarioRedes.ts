@@ -311,7 +311,7 @@ export const escenarioRedes: unknown = {
             {
               id: 5,
               mueble: Mueble.MESA,
-              posicion: { x: 0, y: 0, z: 0, rotacionY: 0 },
+              posicion: { x: 2, y: 0, z: 0, rotacionY: 0 },
               dispositivos: [
                 {
                   id: 4005,
@@ -320,7 +320,7 @@ export const escenarioRedes: unknown = {
                   sistemaOperativo: "Windows 11 Pro",
                   hardware: "Lenovo ThinkCentre M90q",
                   software: "Office 365, SAP, Navegador Web",
-                  posicion: { x: 0, y: 0, z: 0, rotacionY: 0 },
+                  posicion: { x: 2, y: 0, z: 0, rotacionY: 0 },
                   estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
                   personaEncargada: "Ing. Marcos Díaz",
                   activos: [],
@@ -331,7 +331,7 @@ export const escenarioRedes: unknown = {
             {
               id: 6,
               mueble: Mueble.MESA,
-              posicion: { x: -3, y: 0, z: 0, rotacionY: 0 },
+              posicion: { x: 4, y: 0, z: 2.5, rotacionY: 0 },
               dispositivos: [
                 {
                   id: 4006,
@@ -340,7 +340,7 @@ export const escenarioRedes: unknown = {
                   sistemaOperativo: "Ubuntu Server 22.04",
                   hardware: "Dell PowerEdge R660",
                   software: "Nginx, Portal de Citas Online",
-                  posicion: { x: -3, y: 0, z: 0, rotacionY: 180 },
+                  posicion: { x: 4, y: 0, z: 2.5, rotacionY: 180 },
                   estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
                   activos: [],
                   redes: ["LAN-Admin"],
