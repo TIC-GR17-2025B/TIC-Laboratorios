@@ -10,14 +10,8 @@ export interface LeaderboardEntry {
 
 interface UseLeaderboardResult {
     entries: LeaderboardEntry[];
-    groupName: string | null;
     loading: boolean;
     error: string | null;
-}
-
-interface GrupoAPI {
-    id_curso: number;
-    nombre: string;
 }
 
 interface EstudianteAPI {
@@ -32,14 +26,17 @@ interface ProgresoAPI {
     tiempo: number | null;
 }
 
-export function useLeaderboard(idEstudiante: number | null): UseLeaderboardResult {
+export function useLeaderboard(idCurso: number | null): UseLeaderboardResult {
     const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
-    const [groupName, setGroupName] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        if (!idEstudiante) return;
+        if (!idCurso) {
+            setEntries([]);
+            setLoading(false);
+            return;
+        }
 
         let cancelled = false;
         setLoading(true);
@@ -47,25 +44,8 @@ export function useLeaderboard(idEstudiante: number | null): UseLeaderboardResul
 
         (async () => {
             try {
-                // 1. Get student's group
-                const gruposRes = await fetch(`${API_BASE_URL}/groups/estudiante/${idEstudiante}`);
-                if (!gruposRes.ok) throw new Error("Error al obtener grupo");
-                const gruposData = await gruposRes.json();
-                const grupos: GrupoAPI[] = gruposData.data || [];
-                if (grupos.length === 0) {
-                    if (!cancelled) {
-                        setGroupName(null);
-                        setEntries([]);
-                        setLoading(false);
-                    }
-                    return;
-                }
-
-                const grupo = grupos[0];
-                if (!cancelled) setGroupName(grupo.nombre);
-
-                // 2. Get classmates in the group
-                const estRes = await fetch(`${API_BASE_URL}/groups/${grupo.id_curso}/estudiantes`);
+                // Get classmates in the group
+                const estRes = await fetch(`${API_BASE_URL}/groups/${idCurso}/estudiantes`);
                 if (!estRes.ok) throw new Error("Error al obtener estudiantes");
                 const estData = await estRes.json();
                 const estudiantes: EstudianteAPI[] = estData.data || [];
@@ -152,7 +132,7 @@ export function useLeaderboard(idEstudiante: number | null): UseLeaderboardResul
         })();
 
         return () => { cancelled = true; };
-    }, [idEstudiante]);
+    }, [idCurso]);
 
-    return { entries, groupName, loading, error };
+    return { entries, loading, error };
 }

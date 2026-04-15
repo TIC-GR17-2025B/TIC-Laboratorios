@@ -160,11 +160,12 @@
 .chatWrapper {
   position: static;
 }
-
+.chatWrapper p{
+  color: var(--text-primary);
+}
 .chatWrapper > div:last-child {
   position: fixed;
   bottom: 68px;
-  right: 12px;
   left: auto;
   top: auto;
 }

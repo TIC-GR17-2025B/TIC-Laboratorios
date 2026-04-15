@@ -48,7 +48,13 @@ export function FeedbackButton({ idEstudiante, slugEscenario, disabled, onFeedba
         }
     };
 
-    const isDisabled = loading || disabled || checkingStatus || (!habilitado && !ultimaRetroalimentacion);
+    // Ocultar el botón hasta saber el estado real de la retroalimentación.
+    // Evita mostrar un botón deshabilitado mientras se resuelve el check-status.
+    if (checkingStatus) {
+        return null;
+    }
+
+    const isDisabled = loading || disabled || (!habilitado && !ultimaRetroalimentacion);
 
     const tooltipText = !habilitado && ultimaRetroalimentacion
         ? "Ver última retroalimentación"

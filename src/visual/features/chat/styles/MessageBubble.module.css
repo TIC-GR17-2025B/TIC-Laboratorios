@@ -13,6 +13,7 @@
 }
 
 .messageContent {
+  min-width: 30%; 
   max-width: 80%;
   padding: 12px;
   border-radius: 12px;
@@ -39,10 +40,14 @@
   line-height: 1.5;
   font-size: 0.95rem;
 }
+.messageFooter > span{
+  display: flex;
+  align-items: flex-end;
+}
 
 .messageFooter {
   display: flex;
-  align-items: flex-end;
+  align-items: flext-end;
   justify-content: space-between;
   gap: 8px;
   margin-top: 4px;

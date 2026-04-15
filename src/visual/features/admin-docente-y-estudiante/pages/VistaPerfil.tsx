@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../hooks/useAuth';
 import { useProgresoEstudiante } from '../hooks/useEstudiantes';
+import { useEstudianteGrupo } from '../contexts/EstudianteGrupoContext';
 import { FeedbackButton } from '../../feedback/components/FeedbackButton';
 import { FeedbackModal } from '../../feedback/components/FeedbackModal';
 import ModalUnirseGrupo from '../components/ModalUnirseGrupo';
@@ -17,12 +18,6 @@ interface FeedbackData {
     consejo: string;
 }
 
-interface GrupoInfo {
-    id_curso: number;
-    nombre: string;
-    nombre_profesor: string;
-}
-
 export default function VistaPerfil() {
     const navigate = useNavigate();
     const { getUser, getUserRole } = useAuth();
@@ -31,6 +26,7 @@ export default function VistaPerfil() {
     const idEstudiante = role === 'estudiante' && user ? (user as { id_estudiante: number }).id_estudiante : null;
 
     const { progresos, loading } = useProgresoEstudiante(user?.id_estudiante || null);
+    const { grupo, loading: grupoLoading, refetch: refetchGrupo } = useEstudianteGrupo();
     const [expandedEscenarios, setExpandedEscenarios] = useState<Set<string>>(new Set());
     const [feedbackModal, setFeedbackModal] = useState<{
         isOpen: boolean;
@@ -38,23 +34,7 @@ export default function VistaPerfil() {
         escenarioNombre: string;
     }>({ isOpen: false, feedback: null, escenarioNombre: '' });
 
-    // ── Grupo (uno solo) ──
-    const [grupo, setGrupo] = useState<GrupoInfo | null>(null);
-    const [grupoLoading, setGrupoLoading] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
-
-    useEffect(() => {
-        if (!idEstudiante) return;
-        setGrupoLoading(true);
-        fetch(`${API_BASE_URL}/groups/estudiante/${idEstudiante}`)
-            .then(res => res.ok ? res.json() : Promise.reject())
-            .then(result => {
-                const list = result.data || [];
-                setGrupo(list.length > 0 ? list[0] : null);
-            })
-            .catch(() => setGrupo(null))
-            .finally(() => setGrupoLoading(false));
-    }, [idEstudiante]);
 
     const handleJoinGroup = async (codigo: string): Promise<{ success: boolean; error?: string }> => {
         if (!idEstudiante) return { success: false, error: 'No se pudo identificar al estudiante' };
@@ -75,12 +55,7 @@ export default function VistaPerfil() {
                     return { success: false, error: 'El código de invitación ha expirado' };
                 return { success: false, error: msg };
             }
-            const refreshRes = await fetch(`${API_BASE_URL}/groups/estudiante/${idEstudiante}`);
-            if (refreshRes.ok) {
-                const refreshData = await refreshRes.json();
-                const list = refreshData.data || [];
-                setGrupo(list.length > 0 ? list[0] : null);
-            }
+            await refetchGrupo();
             return { success: true };
         } catch {
             return { success: false, error: 'Error de conexión. Inténtalo nuevamente' };
@@ -146,7 +121,11 @@ export default function VistaPerfil() {
                 <h2 className={styles.historialTitle}>Historial de evaluaciones</h2>
 
                 {loading ? (
-                    <p className={styles.muted}>Cargando...</p>
+                    <div className={styles.historialList}>
+                        {Array.from({ length: 4 }).map((_, i) => (
+                            <div key={i} className={styles.skeletonItem} aria-hidden="true" />
+                        ))}
+                    </div>
                 ) : escenarios.length === 0 ? (
                     <div className={styles.empty}>
                         <p className={styles.muted}>Aun no has jugado ningun escenario</p>

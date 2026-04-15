@@ -217,6 +217,31 @@
   margin: 0;
 }
 
+/* ── Skeleton ── */
+
+.skeletonItem {
+  height: 86.72px;
+  border: 1px solid var(--border-primary);
+  border-radius: var(--border-radius);
+  background: linear-gradient(
+    90deg,
+    var(--surface-secondary) 0%,
+    var(--surface-tertiary) 50%,
+    var(--surface-secondary) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes skeletonShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
 /* ── Responsive ── */
 
 @media (max-width: 640px) {
