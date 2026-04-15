@@ -77,7 +77,7 @@ export default function ModalSocialSearcher() {
                                     <div className={styles.personName}>{persona.nombre}</div>
                                     <div className={styles.personEmail}>{persona.correo}</div>
                                 </div>
-                                <span className={`${getBadgeClass(persona.nivelConcienciaSeguridad)}`}>
+                                <span className={`${styles.badge} ${getBadgeClass(persona.nivelConcienciaSeguridad)}`}>
                                     Conciencia de seguridad: {persona.nivelConcienciaSeguridad}
                                 </span>
                             </div>
