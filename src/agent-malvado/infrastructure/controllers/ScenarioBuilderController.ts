@@ -34,7 +34,7 @@ export class ScenarioBuilderController {
       } else {
         res.status(400).json(result);
       }
-    } catch (error) {
+    } catch {
       res.status(500).json({ success: false, data: null, error: 'Internal server error' });
     }
   }
