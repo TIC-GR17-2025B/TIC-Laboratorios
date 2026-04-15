@@ -55,7 +55,7 @@ export const escenarioTutorial: unknown = {
       descripcion:
         "¡Bienvenido! Tu primera tarea como administrador de seguridad es garantizar la DISPONIBILIDAD de los sistemas. " +
         "El 'PC Empleado' no puede comunicarse con el 'Servidor Interno' porque no está conectado a ninguna red. " +
-        "Dirírgete a la vista de Redes y asígnalo a la red 'LAN-Oficina'.",
+        "Dirígete a la vista de Redes y asígnalo a la red 'LAN-Oficina'.",
       fase: 1,
       infoAdicional: {
         dispositivoOrigen: "PC Empleado",
