@@ -1,6 +1,7 @@
 import { useGenerateFeedback } from '../hooks/useGenerateFeedback';
 import { useFeedback } from '../hooks/useFeedback';
 import type { FeedbackData } from '../types/feedback.types';
+import Tooltip from '../../../common/components/Tooltip';
 import styles from './FeedbackButton.module.css';
 
 interface FeedbackButtonProps {
@@ -49,24 +50,20 @@ export function FeedbackButton({ idEstudiante, slugEscenario, disabled, onFeedba
 
     const isDisabled = loading || disabled || checkingStatus || (!habilitado && !ultimaRetroalimentacion);
 
+    const tooltipText = !habilitado && ultimaRetroalimentacion
+        ? "Ver última retroalimentación"
+        : "Generar retroalimentación con IA";
+
     return (
-        <button
-            className={styles.feedbackButton}
-            onClick={handleClick}
-            disabled={isDisabled}
-            title={
-                !habilitado && ultimaRetroalimentacion
-                    ? "Ver última retroalimentación"
-                    : "Generar retroalimentación con IA"
-            }
-        >
-            {loading ? (
-                <>
+        <Tooltip text={tooltipText}>
+            <button
+                className={styles.feedbackButton}
+                onClick={handleClick}
+                disabled={isDisabled}
+            >
+                {loading ? (
                     <span className={styles.spinner}></span>
-                </>
-            ) : (!habilitado && ultimaRetroalimentacion) ? (
-                <>
-                    {/* Icono de Ver (Ojo) */}
+                ) : (!habilitado && ultimaRetroalimentacion) ? (
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="18"
@@ -81,9 +78,7 @@ export function FeedbackButton({ idEstudiante, slugEscenario, disabled, onFeedba
                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                         <circle cx="12" cy="12" r="3" />
                     </svg>
-                </>
-            ) : (
-                <>
+                ) : (
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="18"
@@ -98,8 +93,8 @@ export function FeedbackButton({ idEstudiante, slugEscenario, disabled, onFeedba
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                         <path d="M8 10h.01M12 10h.01M16 10h.01" />
                     </svg>
-                </>
-            )}
-        </button>
+                )}
+            </button>
+        </Tooltip>
     );
 }
