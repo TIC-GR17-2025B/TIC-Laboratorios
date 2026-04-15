@@ -1,13 +1,14 @@
 import { NivelController } from "../../../../ecs/controllers/NivelController";
 import type { EscenarioPreview } from "../../../../types/EscenarioTypes";
 import styles from "../styles/VistaSeleccionNiveles.module.css";
-import { useState, useEffect, useLayoutEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 import { useSelectedLevel } from "../../../common/contexts/SelectedLevelContext";
 import type { Escenario } from "../../../../types/EscenarioTypes";
 import { API_BASE_URL } from "../../../common/utils/apiConfig";
 import { motion } from "framer-motion";
 import { Check, Play } from "lucide-react";
+import { AnimatePresence } from "framer-motion";
 
 interface Progreso {
     id_progreso: number;
@@ -23,16 +24,17 @@ interface CategoriaGroup {
     escenarios: EscenarioPreview[];
 }
 
-const SINE_AMPLITUDE = 80;
-const SINE_STEP = (2 * Math.PI) / 5; // ~5 nodes per full cycle
-const NODE_SIZE = 56;
-const TARGET_ARC = 82; // desired arc length between node centers
-const sineOffset = (index: number) => Math.sin(index * SINE_STEP) * SINE_AMPLITUDE;
+// Zigzag pattern: horizontal positions as % from left (50 = center)
+// 50 → 60 → 70 → 60 → 50 → 40 → 30 → 40 → repeat
+const ZIGZAG_PATTERN = [50, 60, 70, 60, 50, 40, 30, 40];
+const NODE_SIZE = 64;
+const TARGET_ARC = 100;
+const zigzagOffset = (index: number): number =>
+    (ZIGZAG_PATTERN[index % ZIGZAG_PATTERN.length] - 50) * 4;
 
-/** Compute marginTop for a node so arc distance from previous node is constant */
 function nodeMarginTop(index: number): number {
     if (index === 0) return 0;
-    const dx = sineOffset(index) - sineOffset(index - 1);
+    const dx = zigzagOffset(index) - zigzagOffset(index - 1);
     const dy = Math.sqrt(Math.max(0, TARGET_ARC * TARGET_ARC - dx * dx));
     return Math.max(4, dy - NODE_SIZE);
 }
@@ -47,28 +49,10 @@ const CATEGORY_ORDER = [
     'Cap. 6 — Tendencias Actuales',
 ];
 
-/** Build a smooth SVG path through node centers using S-curve beziers */
-function buildSmoothPath(centers: { x: number; y: number }[]): string {
-    if (centers.length < 2) return '';
-
-    let d = `M ${centers[0].x} ${centers[0].y}`;
-
-    for (let i = 0; i < centers.length - 1; i++) {
-        const curr = centers[i];
-        const next = centers[i + 1];
-        const midY = (curr.y + next.y) / 2;
-
-        // S-curve: hold current x until midpoint, then transition to next x
-        d += ` C ${curr.x} ${midY}, ${next.x} ${midY}, ${next.x} ${next.y}`;
-    }
-
-    return d;
-}
-
 export default function LevelSelectionMenuList() {
     const [escenarios, setEscenarios] = useState<EscenarioPreview[]>([]);
     const [progresos, setProgresos] = useState<Progreso[]>([]);
-    const [curvePath, setCurvePath] = useState('');
+    const [openTooltip, setOpenTooltip] = useState<number | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
     const { setSelectedEscenario } = useSelectedLevel();
@@ -102,6 +86,17 @@ export default function LevelSelectionMenuList() {
         }
     };
 
+    // Close tooltip when clicking outside
+    useEffect(() => {
+        if (openTooltip === null) return;
+        const handleClick = (e: MouseEvent) => {
+            const target = e.target as HTMLElement;
+            if (!target.closest(`.${styles.nodeRow}`)) setOpenTooltip(null);
+        };
+        document.addEventListener('click', handleClick);
+        return () => document.removeEventListener('click', handleClick);
+    }, [openTooltip]);
+
     const isCompletado = (slug: string) => progresos.some(p => p.slug_escenario === slug && p.terminado);
     const hasIntentos = (slug: string) => progresos.some(p => p.slug_escenario === slug);
 
@@ -120,54 +115,18 @@ export default function LevelSelectionMenuList() {
         })
         .map(([categoria, escenarios]) => ({ categoria, escenarios }));
 
-    // Measure actual node positions after render and build SVG path
-    useLayoutEffect(() => {
-        const container = containerRef.current;
-        if (!container) return;
+    // Flat ordered list of all scenario slugs to determine unlock state
+    const allSlugs = groups.flatMap(g => g.escenarios.map(e => e.slug));
 
-        // Small delay to let framer-motion animations settle into final positions
-        const timer = setTimeout(() => {
-            const nodeEls = container.querySelectorAll<HTMLElement>('[data-node]');
-            if (nodeEls.length < 2) return;
-
-            const containerRect = container.getBoundingClientRect();
-            const centers = Array.from(nodeEls).map(el => {
-                const rect = el.getBoundingClientRect();
-                return {
-                    x: rect.left + rect.width / 2 - containerRect.left,
-                    y: rect.top + rect.height / 2 - containerRect.top,
-                };
-            });
-
-            setCurvePath(buildSmoothPath(centers));
-        }, 350);
-
-        return () => clearTimeout(timer);
-    }, [escenarios, progresos]);
+    const isUnlocked = (flatIndex: number): boolean => {
+        if (flatIndex === 0) return true;
+        return allSlugs.slice(0, flatIndex).every(slug => isCompletado(slug));
+    };
 
     let globalIndex = 0;
 
     return (
         <div className={styles.path} ref={containerRef}>
-            {/* Dashed curve SVG behind everything */}
-            {curvePath && (
-                <svg
-                    className={styles.curveSvg}
-                    width="100%"
-                    height="100%"
-                    fill="none"
-                >
-                    <path
-                        d={curvePath}
-                        stroke="var(--border-primary)"
-                        strokeWidth="2"
-                        strokeDasharray="6 6"
-                        strokeLinecap="round"
-                        fill="none"
-                    />
-                </svg>
-            )}
-
             {groups.map((group, gi) => (
                 <div key={group.categoria} className={styles.section}>
                     <motion.div
@@ -183,38 +142,69 @@ export default function LevelSelectionMenuList() {
                         {group.escenarios.map((esc) => {
                             const completado = isCompletado(esc.slug);
                             const attempted = hasIntentos(esc.slug);
-                            const offset = sineOffset(globalIndex);
-                            const isLeft = offset < 0;
+                            const offset = zigzagOffset(globalIndex);
                             const idx = globalIndex++;
+                            const unlocked = isUnlocked(idx);
 
                             const nodeState = completado ? 'done' : attempted ? 'active' : 'available';
 
                             const mt = nodeMarginTop(idx);
 
+                            const isOpen = openTooltip === esc.id;
+                            const dimmed = !(unlocked || attempted || completado);
+
                             return (
                                 <motion.div
                                     key={esc.id}
                                     className={styles.nodeRow}
-                                    style={{ marginTop: mt }}
-                                    initial={{ opacity: 0, y: 20, x: offset }}
-                                    animate={{ opacity: 1, y: 0, x: offset }}
+                                    style={{ marginTop: mt, zIndex: isOpen ? 10 : 1 }}
+                                    initial={{ y: 20, x: offset }}
+                                    animate={{ y: 0, x: offset }}
                                     transition={{ duration: 0.25, delay: idx * 0.05 }}
                                 >
-                                    <div
+                                    <motion.div
                                         data-node
                                         className={`${styles.node} ${styles[nodeState]}`}
-                                        onClick={() => handleSelectLevel(esc)}
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: (dimmed && !isOpen) ? 0.4 : 1 }}
+                                        transition={{ duration: 0.25, delay: idx * 0.05 }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setOpenTooltip(isOpen ? null : esc.id);
+                                        }}
                                     >
                                         {completado ? (
-                                            <Check size={20} strokeWidth={3} />
+                                            <Check size={24} strokeWidth={3} />
                                         ) : (
-                                            <Play size={16} fill="currentColor" />
+                                            <Play size={20} fill="currentColor" />
                                         )}
-                                    </div>
+                                    </motion.div>
 
-                                    <span className={`${styles.nodeLabel} ${isLeft ? styles.nodeLabelRight : styles.nodeLabelLeft}`}>
-                                        {esc.titulo}
-                                    </span>
+                                    <AnimatePresence>
+                                        {isOpen && (
+                                            <motion.div
+                                                className={styles.tooltip}
+                                                style={{ transform: `translateX(calc(-50% - ${offset}px))` }}
+                                                initial={{ opacity: 0, scale: 0.9 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                exit={{ opacity: 0, scale: 0.9 }}
+                                                transition={{ duration: 0.15 }}
+                                            >
+                                                <div className={styles.tooltipArrow} />
+                                                <span className={styles.tooltipTitle}>{esc.titulo}</span>
+                                                <p className={styles.tooltipDesc}>{esc.descripcion}</p>
+                                                <button
+                                                    className={`${styles.tooltipBtn} ${styles[`tooltipBtn--${nodeState}`]}`}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleSelectLevel(esc);
+                                                    }}
+                                                >
+                                                    {completado ? 'Repetir' : attempted ? 'Continuar' : 'Empezar'}
+                                                </button>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
                                 </motion.div>
                             );
                         })}

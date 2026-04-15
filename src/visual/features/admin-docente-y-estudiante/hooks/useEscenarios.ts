@@ -5,7 +5,6 @@ interface Escenario {
   id: number;
   titulo: string;
   descripcion: string;
-  imagenPreview?: string;
 }
 
 export const useEscenarios = () => {

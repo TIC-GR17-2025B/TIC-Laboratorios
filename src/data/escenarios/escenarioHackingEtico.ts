@@ -34,7 +34,6 @@ export const escenarioHackingEtico: unknown = {
   slug: "hacking-etico",
   titulo: "Hacking Ético y Análisis de Vulnerabilidades",
   categoria: "Cap. 5 — Administración de Riesgos",
-  imagenPreview: "/redFirewallVPN.webp",
   descripcion:
     "En este escenario eres Lisa Rodríguez, una aficionada del Hacking Ético que está poniendo en práctica técnicas de ingeniería social "+
     "para hackear un dipositivo y obtener información de la empresa 'Corporación'. Siguiendo las distintas fases para realizar un proceso "+

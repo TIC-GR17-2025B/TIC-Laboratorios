@@ -31,7 +31,6 @@ export const escenarioAmenazas: unknown = {
   slug: "amenazas",
   titulo: "Amenazas y Ataques Comunes",
   categoria: "Cap. 1 — Introducción",
-  imagenPreview: "/redFirewallVPN.webp",
   descripcion:
     "Una pequeña consultora ha recibido alertas de seguridad. Como administrador, debes proteger " +
     "los equipos contra amenazas comunes: bloquear accesos no autorizados con firewall " +

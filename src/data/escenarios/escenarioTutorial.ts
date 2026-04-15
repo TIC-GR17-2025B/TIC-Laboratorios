@@ -37,7 +37,6 @@ export const escenarioTutorial: unknown = {
   slug: "tutorial",
   titulo: "Tutorial: Introducción a la Seguridad",
   categoria: "Cap. 1 — Introducción",
-  imagenPreview: "/redFirewallVPN.webp",
   descripcion:
     "Bienvenido a tu primer día como administrador de seguridad en TechStart. " +
     "Aprenderás los conceptos fundamentales: Disponibilidad (que los sistemas estén accesibles), " +

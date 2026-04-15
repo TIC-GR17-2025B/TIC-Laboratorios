@@ -50,7 +50,6 @@ export const escenarioRedes: unknown = {
   slug: "redes",
   titulo: "Seguridad de Redes: Firewall, Segmentación y VPN",
   categoria: "Cap. 4 — Seguridad de Redes",
-  imagenPreview: "/redFirewallVPN.webp",
   descripcion:
     "La clínica MediSalud necesita segmentar su red para proteger los historiales médicos, " +
     "configurar firewalls para controlar el tráfico y establecer una VPN segura con su laboratorio externo. " +

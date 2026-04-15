@@ -19,7 +19,6 @@ export interface Escenario {
   slug: string;
   titulo: string;
   descripcion: string;
-  imagenPreview?: string;
   presupuestoInicial: number;
   zonas: Entidad[];
   ataques: AtaqueComponent[];
@@ -34,7 +33,6 @@ export interface EscenarioPreview {
   slug: string;
   titulo: string;
   descripcion: string;
-  imagenPreview?: string;
   categoria?: string;
 }
 

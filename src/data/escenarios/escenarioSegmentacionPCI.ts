@@ -26,7 +26,6 @@ export const escenarioSegmentacionPCI: unknown = {
   slug: "segmentacion-pci",
   titulo: "Segmentación PCI-DSS: Empresa Retail",
   categoria: "Cap. 4 — Seguridad de Redes",
-  imagenPreview: "/redFirewallVPN.webp",
   descripcion:
     "Una cadena de retail necesita cumplir con la normativa PCI-DSS para proteger datos de pago. " +
     "Segmenta la red, configura firewalls con múltiples reglas y establece " +

@@ -33,7 +33,6 @@ export const escenarioControlAcceso: unknown = {
   slug: "control-acceso",
   titulo: "Control de Acceso y Protocolos Seguros",
   categoria: "Cap. 3 — Autenticación",
-  imagenPreview: "/redFirewallVPN.webp",
   descripcion:
     "La universidad TechU necesita controlar el acceso a sus laboratorios de investigación. " +
     "Implementa políticas de hardening, segmenta la red para aislar los laboratorios, " +

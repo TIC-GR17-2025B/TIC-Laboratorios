@@ -32,7 +32,6 @@ export const escenarioIoT: unknown = {
   slug: "iot",
   titulo: "Seguridad IoT e Infraestructura Crítica",
   categoria: "Cap. 6 — Tendencias Actuales",
-  imagenPreview: "/redFirewallVPN.webp",
   descripcion:
     "La planta SmartFactory ha integrado sensores IoT en su red de producción. " +
     "Un ataque dirigido podría comprometer la infraestructura crítica. " +

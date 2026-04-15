@@ -36,7 +36,6 @@ interface Escenario {
     slug: string;
     titulo: string;
     descripcion: string;
-    imagenPreview?: string;
 }
 
 export default function VistaDetalleEstudiante() {

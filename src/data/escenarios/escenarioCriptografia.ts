@@ -37,7 +37,6 @@ export const escenarioCriptografia: unknown = {
   slug: "criptografia",
   titulo: "Criptografía: Firma Digital y Comunicación Segura",
   categoria: "Cap. 2 — Criptografía",
-  imagenPreview: "/redFirewallVPN.webp",
   descripcion:
     "El bufete legal Mendoza & Asociados recibe contratos firmados digitalmente por sus clientes. " +
     "Deberás verificar la autenticidad de documentos mediante firmas digitales y claves públicas (PKI), " +

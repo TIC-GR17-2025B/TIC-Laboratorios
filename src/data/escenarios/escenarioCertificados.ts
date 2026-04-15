@@ -26,7 +26,6 @@ export const escenarioCertificados: unknown = {
   slug: "certificados",
   titulo: "Certificados Digitales y PKI",
   categoria: "Cap. 2 — Criptografía",
-  imagenPreview: "/redFirewallVPN.webp",
   descripcion:
     "La Autoridad Certificadora InternalCA emite certificados digitales para la organización. " +
     "Verifica documentos firmados, protege el servidor de certificados con firewall, " +

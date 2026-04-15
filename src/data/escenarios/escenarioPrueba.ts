@@ -20,7 +20,6 @@ export const escenarioPrueba: unknown = {
   slug: "Prueba",
   titulo: "Prueba",
   categoria: "Prueba",
-  imagenPreview: "/redFirewallVPN.webp",
   descripcion:
     "Un escenario en el que se aplica técnicas de ingeniería social para hackear un dipositivo y obtener información.",
   presupuestoInicial: 1000,

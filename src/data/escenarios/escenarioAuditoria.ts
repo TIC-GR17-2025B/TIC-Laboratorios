@@ -31,7 +31,6 @@ export const escenarioAuditoria: unknown = {
   slug: "auditoria",
   titulo: "Auditoría de Seguridad Empresarial",
   categoria: "Cap. 5 — Administración de Riesgos",
-  imagenPreview: "/redFirewallVPN.webp",
   descripcion:
     "Como auditor de seguridad contratado por LogiCorp, debes evaluar la postura de seguridad de la empresa. " +
     "Escanea la infraestructura, identifica vulnerabilidades humanas, " +

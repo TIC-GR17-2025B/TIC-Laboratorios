@@ -46,7 +46,6 @@ export const escenarioAutenticacion: unknown = {
   slug: "autenticacion",
   titulo: "Autenticación y Control de Acceso",
   categoria: "Cap. 3 — Autenticación",
-  imagenPreview: "/redFirewallVPN.webp",
   descripcion:
     "La empresa DataCorp ha recibido alertas de intentos de acceso no autorizado. " +
     "Como administrador de seguridad, debes fortalecer la autenticación de los dispositivos, " +
