@@ -1,3 +1,4 @@
+import { AccionesRealizables, ObjetosManejables } from "../../types/AccionesEnums";
 import {
   EstadoAtaqueDispositivo,
   Mueble,
@@ -6,6 +7,7 @@ import {
   TipoDispositivo,
   TipoEvento,
 } from "../../types/DeviceEnums";
+import { AccionFirewall, DireccionTrafico } from "../../types/FirewallTypes";
 import { TipoProtocolo } from "../../types/TrafficEnums";
 import { ColoresRed } from "../colores";
 
@@ -48,11 +50,12 @@ export const escenarioTutorial: unknown = {
     {
       nombreEvento: "Restaurar conectividad interna",
       tipoEvento: TipoEvento.TRAFICO_RED,
-      tiempoNotificacion: 10,
+      tiempoNotificacion: 5,
+      tiempoEnOcurrir: 10,
       descripcion:
         "¡Bienvenido! Tu primera tarea como administrador de seguridad es garantizar la DISPONIBILIDAD de los sistemas. " +
         "El 'PC Empleado' no puede comunicarse con el 'Servidor Interno' porque no está conectado a ninguna red. " +
-        "Haz clic en el 'PC Empleado' en la oficina 3D, luego ve a la vista de red y asígnalo a la red 'LAN-Oficina'.",
+        "Dirírgete a la vista de Redes y asígnalo a la red 'LAN-Oficina'.",
       fase: 1,
       infoAdicional: {
         dispositivoOrigen: "PC Empleado",
@@ -65,7 +68,7 @@ export const escenarioTutorial: unknown = {
     {
       nombreEvento: "Completación Fase 1",
       tipoEvento: TipoEvento.COMPLETACION_FASE,
-      tiempoNotificacion: 25,
+      tiempoNotificacion: 15,
       descripcion:
         "¡Excelente! Has restaurado la disponibilidad del sistema. " +
         "Ahora pasemos a proteger la CONFIDENCIALIDAD de los datos.",
@@ -75,7 +78,8 @@ export const escenarioTutorial: unknown = {
     {
       nombreEvento: "Bloquear acceso SSH externo",
       tipoEvento: TipoEvento.TRAFICO_RED,
-      tiempoNotificacion: 30,
+      tiempoNotificacion: 20,
+      tiempoEnOcurrir: 25,
       descripcion:
         "Se ha detectado un intento de conexión SSH desde Internet hacia tu red interna. " +
         "Esto es una AMENAZA a la CONFIDENCIALIDAD: un atacante externo intenta acceder a tus sistemas. " +
@@ -93,12 +97,37 @@ export const escenarioTutorial: unknown = {
     {
       nombreEvento: "Completación Escenario",
       tipoEvento: TipoEvento.COMPLETACION_ESCENARIO,
-      tiempoNotificacion: 45,
+      tiempoNotificacion: 30,
       descripcion:
         "¡Felicidades! Has completado el tutorial. Aprendiste sobre Disponibilidad (conectar sistemas) " +
         "y Confidencialidad (bloquear accesos no autorizados). " +
         "En los siguientes escenarios explorarás la Integridad, la criptografía, la autenticación y más.",
       fase: 2,
+    },
+  ],
+  accionesEsperadas: [
+    {
+      accion: AccionesRealizables.AGREGAR,
+      objeto: ObjetosManejables.RED,
+      inicioTiempoEsperado: 5,
+      finTiempoEsperado: 10,
+      val: {
+        nombreDispositivo: "PC Empleado",
+        nombreRed: "LAN-Oficina"
+      }
+    },
+    {
+      accion: AccionesRealizables.CLICK,
+      objeto: ObjetosManejables.CONFIG_FIREWALL,
+      inicioTiempoEsperado: 20,
+      finTiempoEsperado: 25,
+      val: {
+        nombreRouter: "Router Principal",
+        nombreRed: "LAN-Oficina",
+        accion: AccionFirewall.DENEGAR,
+        direccion: DireccionTrafico.HACIA,
+        protocolo: TipoProtocolo.SSH,
+      },
     },
   ],
   fases: [

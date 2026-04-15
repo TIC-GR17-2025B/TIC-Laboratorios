@@ -4,6 +4,7 @@ import {
   DispositivoComponent,
   VPNGatewayComponent,
   ClienteVPNComponent,
+  RedComponent,
 } from "../components";
 import { Sistema, type Entidad } from "../core";
 import { TipoProtocolo } from "../../types/TrafficEnums";
@@ -129,6 +130,16 @@ export class SistemaRed extends Sistema {
 
     dispositivo?.redes.push(entidadRed);
 
+    this.ecsManager.registrarAccion(
+      AccionesRealizables.AGREGAR,
+      ObjetosManejables.RED,
+      this.getTiempoSimulacion(),
+      {
+        nombreDispositivo: dispositivo?.nombre,
+        nombreRed: this.ecsManager.getComponentes(entidadRed)?.get(RedComponent)?.nombre
+      }
+    );
+
     this.ecsManager.emit(EventosPublicos.RED_ASIGNADA, {
       entidadDispositivo: entidadDisp,
       entidadRed: entidadRed,
@@ -146,6 +157,16 @@ export class SistemaRed extends Sistema {
     const index = dispositivo.redes.indexOf(entidadRed);
     if (index > -1) {
       dispositivo.redes.splice(index, 1);
+
+      this.ecsManager.registrarAccion(
+        AccionesRealizables.ELIMINAR,
+        ObjetosManejables.RED,
+        this.getTiempoSimulacion(),
+        {
+          nombreDispositivo: dispositivo?.nombre,
+          nombreRed: this.ecsManager.getComponentes(entidadRed)?.get(RedComponent)?.nombre
+        }
+      );
 
       this.ecsManager.emit(EventosPublicos.RED_REMOVIDA, {
         entidadDispositivo: entidadDisp,

@@ -16,5 +16,5 @@ export enum ObjetosManejables {
     PERFIL_CLIENTE_VPN = "perfil de cliente VPN",
     PERFIL_VPN_GATEWAY = "perfil de VPN gateway",
     VEREDICTO_FIRMA_DIGITAL = "veredicto de autenticidad de documento digital con firma y clave pública",
-    OPCION_TOOLBAR = "opción del toolbar de la simulación",
+    RED = "red de computadora",
 }
