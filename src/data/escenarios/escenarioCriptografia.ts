@@ -1,3 +1,4 @@
+import { AccionesRealizables, ObjetosManejables } from "../../types/AccionesEnums";
 import {
   EstadoAtaqueDispositivo,
   Mueble,
@@ -53,8 +54,8 @@ export const escenarioCriptografia: unknown = {
         "El cliente ha enviado un contrato firmado digitalmente al 'PC Abogado'. " +
         "Una FIRMA DIGITAL garantiza la INTEGRIDAD del documento (no fue alterado) y la AUTENTICIDAD del remitente. " +
         "Abre el 'PC Abogado', ve al verificador de firmas y verifica el 'Contrato Comercial' " +
-        "usando la 'Firma Contrato Comercial' y la 'Clave_Publica_Cliente'. " +
-        "Si el hash del documento coincide con el de la firma, el documento es auténtico.",
+        "usando la clave pública del cliente. Debes emitir un veredicto sobre la autenticidad del documento " +
+        "según los hashes resultantes.",
       fase: 1,
       infoAdicional: {
         nombreDocumento: "Contrato Comercial",
@@ -81,8 +82,8 @@ export const escenarioCriptografia: unknown = {
       descripcion:
         "Se recibió una factura supuestamente firmada por un proveedor. Sin embargo, hay sospechas de que " +
         "el documento fue ALTERADO después de ser firmado (ataque a la Integridad). " +
-        "Verifica la 'Factura Proveedor' con la 'Firma Factura Proveedor' y la 'Clave_Publica_Proveedor'. " +
-        "Si los hashes NO coinciden, el documento fue modificado y la verificación debe fallar.",
+        "Verifica la 'Factura Proveedor' con la clave pública del proveedor. " +
+        "De igual forma, emite un veredicto según los los hashes resultantes.",
       fase: 2,
       infoAdicional: {
         nombreDocumento: "Factura Proveedor",
@@ -111,7 +112,8 @@ export const escenarioCriptografia: unknown = {
         "Para proteger las comunicaciones futuras, configura un túnel VPN cifrado entre el bufete y el cliente. " +
         "La VPN utiliza criptografía para crear un canal seguro: la opción 'Encriptar y Autenticar' (EA) " +
         "combina encriptación simétrica (para velocidad) con autenticación asimétrica (para verificar identidad). " +
-        "Configura el 'VPN Gateway Bufete' y el 'PC Cliente' con protección EA.",
+        "Configura el 'VPN Gateway Bufete' y el 'PC Cliente' con protección EA para que el cliente pueda establecer "+
+        "una conexión con la computadora del abogado.",
       fase: 3,
       infoAdicional: {
         gateway: {
@@ -131,12 +133,74 @@ export const escenarioCriptografia: unknown = {
     {
       nombreEvento: "Completación Escenario",
       tipoEvento: TipoEvento.COMPLETACION_ESCENARIO,
-      tiempoNotificacion: 65,
+      tiempoNotificacion: 60,
       descripcion:
-        "¡Felicidades! Has aplicado conceptos de criptografía: verificación de firmas digitales con PKI, " +
+        "¡Felicidades! Has aplicado conceptos de criptografía: verificación de firmas digitales, " +
         "detección de documentos alterados mediante funciones hash, y comunicación cifrada con VPN. " +
         "Estos son los pilares de la seguridad criptográfica moderna.",
       fase: 3,
+    },
+  ],
+  accionesEsperadas: [
+    {
+      accion: AccionesRealizables.AGREGAR,
+      objeto: ObjetosManejables.APLICACION,
+      inicioTiempoEsperado: 5,
+      finTiempoEsperado: 15,
+      val: {
+        nombreDispositivo:"PC Abogado",
+        aplicacionAgregada:"FirmaChecker"
+      }
+    },
+    {
+      accion: AccionesRealizables.AGREGAR,
+      objeto: ObjetosManejables.VEREDICTO_FIRMA_DIGITAL,
+      inicioTiempoEsperado: 5,
+      finTiempoEsperado: 15,
+      val: {
+        nombreDocumento: "Contrato Comercial",
+        nombreFirma: "Firma Contrato Comercial",
+        nombreClave: "Clave_Publica_Cliente",
+        veredicto: true
+      }
+    },
+    {
+      accion: AccionesRealizables.AGREGAR,
+      objeto: ObjetosManejables.VEREDICTO_FIRMA_DIGITAL,
+      inicioTiempoEsperado: 25,
+      finTiempoEsperado: 35,
+      val: {
+        nombreDocumento: "Factura Proveedor",
+        nombreFirma: "Firma Factura Proveedor",
+        nombreClave: "Clave_Publica_Proveedor",
+        veredicto: false
+      }
+    },
+    {
+      accion: AccionesRealizables.AGREGAR,
+      objeto: ObjetosManejables.PERFIL_VPN_GATEWAY,
+      inicioTiempoEsperado: 45,
+      finTiempoEsperado: 55,
+      val: {
+        nombreVPNGateway: "VPN Gateway Bufete",
+        lanLocal: "LAN-Bufete",
+        hostLan: "PC Abogado",
+        proteccion: TipoProteccionVPN.EA,
+        dominioRemoto: "Cliente-Externo",
+        hostRemoto: "PC Cliente"
+      }
+    },
+    {
+      accion: AccionesRealizables.AGREGAR,
+      objeto: ObjetosManejables.PERFIL_CLIENTE_VPN,
+      inicioTiempoEsperado: 45,
+      finTiempoEsperado: 55,
+      val: {
+        nombreCliente: "PC Cliente",
+        proteccion: TipoProteccionVPN.EA,
+        dominioRemoto: "Bufete-Mendoza",
+        hostRemoto: "PC Abogado"
+      }
     },
   ],
   fases: [
@@ -249,7 +313,7 @@ export const escenarioCriptografia: unknown = {
                     },
                     {
                       nombre: "Factura Proveedor",
-                      contenido: "FACTURA #2024-0891\nMonto: $15,000.00\nConcepto: Servicios de asesoría — MODIFICADO POR ATACANTE",
+                      contenido: "FACTURA #2024-0891\nMonto: $15,000.00\nConcepto: Servicios de asesoría ",
                       tipo: TipoActivo.DOCUMENTO,
                       firma: "Firma Factura Proveedor",
                     },

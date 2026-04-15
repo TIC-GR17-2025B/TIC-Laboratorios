@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import ComboBox from "../../../common/components/ComboBox";
 import styles from "../styles/ModalVPN.module.css";
-import { TipoProteccionVPN } from "../../../../types/DeviceEnums";
+import { TipoDispositivo, TipoProteccionVPN } from "../../../../types/DeviceEnums";
 import { useECSSceneContext } from "../../escenarios-simulados/context/ECSSceneContext";
 import { useEscenario } from "../../../common/contexts";
 import type { PerfilVPNGateway } from "../../../../types/EscenarioTypes";
@@ -64,9 +64,12 @@ export default function ModalVPN() {
       const opciones = redesLocalesEntidades
         .map((redEntidad) => {
           const redComponent = redController.ecsManager.getComponentes(redEntidad)?.get(RedComponent);
-          return redComponent
-            ? { label: redComponent.nombre, value: redEntidad.toString() }
-            : null;
+          if (redComponent?.nombre != "Internet") {
+            return redComponent
+              ? { label: redComponent.nombre, value: redEntidad.toString() }
+              : null;
+          }
+          return null;
         })
         .filter((opcion): opcion is OptionItem => opcion !== null);
       setLanLocalOpciones(opciones);
@@ -98,9 +101,12 @@ export default function ModalVPN() {
       const opcionesHosts = hosts
         .map((entidad) => {
           const dispositivoComponent = redController.ecsManager.getComponentes(entidad)?.get(DispositivoComponent);
-          return dispositivoComponent
-            ? { label: dispositivoComponent.nombre, value: entidad.toString() }
-            : null;
+          if (dispositivoComponent?.tipo === TipoDispositivo.WORKSTATION || dispositivoComponent?.tipo === TipoDispositivo.SERVER) {
+            return dispositivoComponent
+              ? { label: dispositivoComponent.nombre, value: entidad.toString() }
+              : null;
+          }
+          return null;
         })
         .filter((opcion): opcion is OptionItem => opcion !== null);
       setHostLanOpciones(opcionesHosts);

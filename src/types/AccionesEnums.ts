@@ -8,12 +8,13 @@ export enum AccionesRealizables {
 }
 
 export enum ObjetosManejables {
-    CONFIG_WORKSTATION = "configuración workstation",
-    CONFIG_FIREWALL = "configuración firewall",
-    APLICACION = "aplicación",
-    CORREO = "correo",
-    COMANDO = "comando",
+    CONFIG_WORKSTATION = "configuración de workstation",
+    CONFIG_FIREWALL = "configuración de firewall",
+    APLICACION = "aplicación/software de computadora",
+    CORREO = "correo electrónico",
+    COMANDO = "comando de terminal/CLI",
     PERFIL_CLIENTE_VPN = "perfil de cliente VPN",
     PERFIL_VPN_GATEWAY = "perfil de VPN gateway",
+    VEREDICTO_FIRMA_DIGITAL = "veredicto de autenticidad de documento digital con firma y clave pública",
     OPCION_TOOLBAR = "opción del toolbar de la simulación",
 }

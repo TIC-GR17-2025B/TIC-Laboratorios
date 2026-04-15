@@ -1,6 +1,8 @@
+import { AccionesRealizables, ObjetosManejables } from "../../types/AccionesEnums";
 import type { Activo, RegistroVeredictoFirma } from "../../types/EscenarioTypes";
 // import { ActivoComponent } from "../components";
 import { Sistema/*, type ClaseComponente*/ } from "../core";
+import { SistemaTiempo } from "./SistemaTiempo";
 
 export class SistemaActivo extends Sistema {
     // public componentesRequeridos: Set<ClaseComponente> = new Set([ActivoComponent]);
@@ -23,6 +25,17 @@ export class SistemaActivo extends Sistema {
 
     public registrarVeredictoFirma(registro: RegistroVeredictoFirma) {
       this.registroVeredictosFirmas.push(registro);
+      this.ecsManager.registrarAccion(
+          AccionesRealizables.AGREGAR,
+          ObjetosManejables.VEREDICTO_FIRMA_DIGITAL,
+          this.getTiempoSimulacion(),
+          {
+            nombreDocumento: registro.nombreDocumento,
+            nombreFirma: registro.nombreFirma,
+            nombreClave: registro.nombreClave,
+            veredicto: registro.veredicto
+          }
+      );
     }
 
     // Calcula el hash con SHA256 de la entrada que se proporcione.
@@ -33,5 +46,9 @@ export class SistemaActivo extends Sistema {
       const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').slice(0,15);
+    }
+
+    private getTiempoSimulacion(): number | undefined {
+      return this.ecsManager.getSistema(SistemaTiempo)?.getTiempoSimulacion();
     }
 }

@@ -83,6 +83,7 @@ function ModalVerificacionFirma() {
     const [documentosDisponibles, setDocumentosDisponibles] = useState<DocumentoDisponible[]>([]);
     const [documentoSeleccionado, setDocumentoSeleccionado] = useState<DocumentoDisponible | null>(null);
     const [hashDocumento, setHashDocumento] = useState<string>("");
+    const [firmasDisponibles, setFirmasDisponibles] = useState<Activo[]>([]);
     const [firmaActivo, setFirmaActivo] = useState<Activo | null>(null);
     const [clavesPublicasDisponibles, setClavesPublicasDisponibles] = useState<ClavePublica[]>([]);
     const [claveSeleccionada, setClaveSeleccionada] = useState<ClavePublica | null>(null);
@@ -103,6 +104,7 @@ function ModalVerificacionFirma() {
         if (!activoComponent?.activos || activoComponent.activos.length === 0) {
             setDocumentosDisponibles([]);
             setClavesPublicasDisponibles([]);
+            setFirmasDisponibles([]);
             setFirmaActivo(null);
             return;
         }
@@ -119,10 +121,12 @@ function ModalVerificacionFirma() {
             }));
         setDocumentosDisponibles(documentos);
 
-        // Buscar la firma cifrada
-        const firma = activos.find(
+        // Buscar todas las firmas digitales
+        const firmas = activos.filter(
             (activo) => activo.tipo === TipoActivo.FIRMA_DIGITAL
         );
+        setFirmasDisponibles(firmas || null);
+        const firma = firmas.find((firma) => firma.tipo === TipoActivo.FIRMA_DIGITAL); // Provisional
         setFirmaActivo(firma || null);
 
         // Obtener todas las claves públicas
@@ -150,7 +154,9 @@ function ModalVerificacionFirma() {
         if (!claveSeleccionada || !firmaActivo) return;
 
         const escenarioController = EscenarioController.getInstance();
-        const hash = await escenarioController.getHashFirma(firmaActivo, claveSeleccionada.activo);
+        const firma = firmasDisponibles.find((firma) => firma.propietario === claveSeleccionada.activo.propietario)!;
+        setFirmaActivo(firma);
+        const hash = await escenarioController.getHashFirma(firma, claveSeleccionada.activo);
         if (hash) {
             setHashFirma(hash);
         }
@@ -576,7 +582,7 @@ function ModalVerificacionFirma() {
                                     )}
                                 </div>
                                 <div className={styles.textoVeredicto}>
-                                    <h3>{veredicto === "valido" ? "Firma Válida" : "Firma Inválida"}</h3>
+                                    <h3>{veredicto === "valido" ? "Veredicto: Firma Válida" : "Veredicto: Firma Inválida"}</h3>
                                     <p>
                                         {veredicto === "valido"
                                             ? "El documento es auténtico y no ha sido modificado."

@@ -234,7 +234,6 @@ export class SistemaEvento extends Sistema {
         const info = evento.infoAdicional as RegistroVeredictoFirma;
 
         const registrosVeredictos = this.ecsManager.getSistema(SistemaActivo)?.registroVeredictosFirmas;
-
         const busquedaVeredicto = registrosVeredictos?.find((registro) => 
           registro.nombreDocumento === info.nombreDocumento &&
           registro.nombreFirma === info.nombreFirma &&
