@@ -47,10 +47,8 @@ export const escenarioAutenticacion: unknown = {
   titulo: "Autenticación y Control de Acceso",
   categoria: "Cap. 3 — Autenticación",
   descripcion:
-    "La empresa DataCorp ha recibido alertas de intentos de acceso no autorizado. " +
-    "Como administrador de seguridad, debes fortalecer la autenticación de los dispositivos, " +
-    "implementar controles de acceso mediante firewall, defender contra un ataque de troyano, " +
-    "y configurar acceso remoto seguro con VPN autenticada.",
+    "DataCorp detecta accesos no autorizados. Fortalece la autenticación, aplica firewall, " +
+    "defiende contra un troyano y habilita VPN autenticada.",
   presupuestoInicial: 2000,
   ataques: [
     {

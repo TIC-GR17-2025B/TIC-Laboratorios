@@ -5,9 +5,7 @@
   border: 1px solid var(--border-primary);
   border-radius: var(--border-radius);
   overflow: hidden;
-  position: sticky;
-  top: 48px;
-  align-self: start;
+  width: 260px;
 }
 
 /* ── Header ── */

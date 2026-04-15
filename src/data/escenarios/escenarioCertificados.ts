@@ -27,9 +27,8 @@ export const escenarioCertificados: unknown = {
   titulo: "Certificados Digitales y PKI",
   categoria: "Cap. 2 — Criptografía",
   descripcion:
-    "La Autoridad Certificadora InternalCA emite certificados digitales para la organización. " +
-    "Verifica documentos firmados, protege el servidor de certificados con firewall, " +
-    "y establece una conexión VPN cifrada para la emisión segura de certificados a la sucursal.",
+    "La CA InternalCA emite certificados digitales. Verifica firmas, protege el servidor CA " +
+    "con firewall y cifra la emisión a la sucursal con VPN.",
   presupuestoInicial: 2000,
   ataques: [],
   eventos: [

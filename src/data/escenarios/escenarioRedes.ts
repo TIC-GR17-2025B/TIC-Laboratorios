@@ -51,9 +51,8 @@ export const escenarioRedes: unknown = {
   titulo: "Seguridad de Redes: Firewall, Segmentación y VPN",
   categoria: "Cap. 4 — Seguridad de Redes",
   descripcion:
-    "La clínica MediSalud necesita segmentar su red para proteger los historiales médicos, " +
-    "configurar firewalls para controlar el tráfico y establecer una VPN segura con su laboratorio externo. " +
-    "Aplicarás soluciones comunes de seguridad de redes: Firewall, segmentación por zonas y VPN.",
+    "La clínica MediSalud debe proteger sus historiales médicos. Aplica segmentación por zonas, " +
+    "firewall y una VPN segura con el laboratorio externo.",
   presupuestoInicial: 2500,
   ataques: [],
   eventos: [

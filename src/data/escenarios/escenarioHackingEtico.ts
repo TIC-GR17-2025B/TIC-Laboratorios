@@ -35,9 +35,8 @@ export const escenarioHackingEtico: unknown = {
   titulo: "Hacking Ético y Análisis de Vulnerabilidades",
   categoria: "Cap. 5 — Administración de Riesgos",
   descripcion:
-    "En este escenario eres Lisa Rodríguez, una aficionada del Hacking Ético que está poniendo en práctica técnicas de ingeniería social "+
-    "para hackear un dipositivo y obtener información de la empresa 'Corporación'. Siguiendo las distintas fases para realizar un proceso "+
-    "de Hacking Ético, intenta conseguir información que pueda comprometer a la empresa.",
+    "Eres Lisa Rodríguez, aficionada al hacking ético. Sigue las fases del proceso " +
+    "aplicando ingeniería social para obtener información de la empresa 'Corporación'.",
   presupuestoInicial: 1000,
   ataques: [],
   eventos: [

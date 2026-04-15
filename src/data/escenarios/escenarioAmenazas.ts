@@ -32,9 +32,8 @@ export const escenarioAmenazas: unknown = {
   titulo: "Amenazas y Ataques Comunes",
   categoria: "Cap. 1 — Introducción",
   descripcion:
-    "Una pequeña consultora ha recibido alertas de seguridad. Como administrador, debes proteger " +
-    "los equipos contra amenazas comunes: bloquear accesos no autorizados con firewall " +
-    "y prevenir un ataque de troyano configurando correctamente los workstations.",
+    "Una consultora está bajo alerta. Bloquea accesos no autorizados con firewall " +
+    "y endurece los workstations para frenar un troyano.",
   presupuestoInicial: 1000,
   ataques: [
     // ── FASE 2: Hardening contra amenaza interna ──

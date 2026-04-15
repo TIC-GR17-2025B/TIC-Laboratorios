@@ -100,7 +100,8 @@ export default function LevelSelectionMenuList() {
     const isCompletado = (slug: string) => progresos.some(p => p.slug_escenario === slug && p.terminado);
     const hasIntentos = (slug: string) => progresos.some(p => p.slug_escenario === slug);
 
-    // Group by categoria, sorted by defined order
+    // Group by categoria, sorted by defined order. Dentro de cada categoría, ordenar por id
+    // para que el orden no dependa del orden alfabético de los exports del namespace.
     const groupMap = new Map<string, EscenarioPreview[]>();
     for (const esc of escenarios) {
         const cat = esc.categoria || 'General';
@@ -113,7 +114,10 @@ export default function LevelSelectionMenuList() {
             const ib = CATEGORY_ORDER.indexOf(b);
             return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
         })
-        .map(([categoria, escenarios]) => ({ categoria, escenarios }));
+        .map(([categoria, escenarios]) => ({
+            categoria,
+            escenarios: [...escenarios].sort((a, b) => a.id - b.id),
+        }));
 
     // Flat ordered list of all scenario slugs to determine unlock state
     const allSlugs = groups.flatMap(g => g.escenarios.map(e => e.slug));
@@ -122,6 +126,12 @@ export default function LevelSelectionMenuList() {
         if (flatIndex === 0) return true;
         return allSlugs.slice(0, flatIndex).every(slug => isCompletado(slug));
     };
+
+    // Nivel sugerido: primer nodo desbloqueado, no completado y sin intentos previos.
+    // Es el candidato natural para "Empezar".
+    const suggestedIdx = allSlugs.findIndex(
+        (slug, i) => isUnlocked(i) && !isCompletado(slug) && !hasIntentos(slug)
+    );
 
     let globalIndex = 0;
 
@@ -152,16 +162,31 @@ export default function LevelSelectionMenuList() {
 
                             const isOpen = openTooltip === esc.id;
                             const dimmed = !(unlocked || attempted || completado);
+                            const isSuggested = idx === suggestedIdx;
 
                             return (
                                 <motion.div
                                     key={esc.id}
                                     className={styles.nodeRow}
-                                    style={{ marginTop: mt, zIndex: isOpen ? 10 : 1 }}
+                                    style={{ marginTop: mt, zIndex: isOpen || isSuggested ? 10 : 1 }}
                                     initial={{ y: 20, x: offset }}
                                     animate={{ y: 0, x: offset }}
                                     transition={{ duration: 0.25, delay: idx * 0.05 }}
                                 >
+                                    {isSuggested && (
+                                        <motion.div
+                                            className={styles.suggestedLabel}
+                                            initial={{ opacity: 0, y: 4 }}
+                                            animate={{ opacity: openTooltip !== null ? 0 : 1, y: 0 }}
+                                            transition={{
+                                                opacity: { duration: 0.2 },
+                                                y: { duration: 0.25, delay: idx * 0.05 + 0.15 },
+                                            }}
+                                        >
+                                            Empezar
+                                            <div className={styles.suggestedArrow} />
+                                        </motion.div>
+                                    )}
                                     <motion.div
                                         data-node
                                         className={`${styles.node} ${styles[nodeState]}`}

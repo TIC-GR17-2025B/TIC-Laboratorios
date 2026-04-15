@@ -38,9 +38,8 @@ export const escenarioCriptografia: unknown = {
   titulo: "Criptografía: Firma Digital y Comunicación Segura",
   categoria: "Cap. 2 — Criptografía",
   descripcion:
-    "El bufete legal Mendoza & Asociados recibe contratos firmados digitalmente por sus clientes. " +
-    "Deberás verificar la autenticidad de documentos mediante firmas digitales y claves públicas (PKI), " +
-    "detectar un documento que ha sido alterado, y establecer un canal cifrado (VPN) para futuras comunicaciones.",
+    "El bufete Mendoza & Asociados recibe contratos firmados digitalmente. " +
+    "Verifica firmas con PKI, detecta alteraciones y establece un canal VPN cifrado.",
   presupuestoInicial: 1500,
   ataques: [],
   eventos: [

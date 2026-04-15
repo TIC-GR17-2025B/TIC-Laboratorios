@@ -20,8 +20,8 @@ export default function AgentMalvadoUI() {
             className={styles.container}
         >
             {!isGenerating && !generatedScenario && !error && (
-                <button onClick={handleGenerate} className={styles.buttonPrimary}>
-                    <Sparkles size={14} /> Generar Nivel IA
+                <button onClick={handleGenerate} className={`${styles.button} botonIa`}>
+                    <Sparkles size={14} /> Generar nivel personalizado con IA
                 </button>
             )}
 

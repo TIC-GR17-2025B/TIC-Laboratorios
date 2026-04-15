@@ -53,9 +53,8 @@ export const escenarioBanco: unknown = {
   titulo: "Banco Nacional: Operación Firewall — Defensa APT",
   categoria: "Cap. 6 — Tendencias Actuales",
   descripcion:
-    "El Banco Nacional ha detectado indicadores de compromiso asociados a un grupo APT. " +
-    "Como analista de ciberseguridad, debes contener la amenaza, investigar el movimiento " +
-    "lateral, y fortalecer la infraestructura antes de que los atacantes exfiltren datos financieros.",
+    "El Banco Nacional detecta actividad de un grupo APT. Contén la amenaza, investiga el " +
+    "movimiento lateral y fortalece la infraestructura antes de la exfiltración.",
   presupuestoInicial: 8000,
   ataques: [],
   eventos: [

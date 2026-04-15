@@ -33,10 +33,8 @@ export const escenarioIoT: unknown = {
   titulo: "Seguridad IoT e Infraestructura Crítica",
   categoria: "Cap. 6 — Tendencias Actuales",
   descripcion:
-    "La planta SmartFactory ha integrado sensores IoT en su red de producción. " +
-    "Un ataque dirigido podría comprometer la infraestructura crítica. " +
-    "Segmenta la red IoT, protege los sistemas SCADA con firewall, " +
-    "defiende contra un ataque de troyano y establece monitoreo remoto seguro.",
+    "SmartFactory integró sensores IoT en producción. Segmenta la red IoT, protege los SCADA " +
+    "con firewall, defiende contra un troyano y habilita monitoreo remoto seguro.",
   presupuestoInicial: 4000,
   ataques: [
     {

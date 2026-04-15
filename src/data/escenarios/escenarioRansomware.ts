@@ -16,9 +16,8 @@ export const escenarioRansomware: unknown = {
   titulo: "Gestión de Riesgos: Respuesta a Incidentes",
   categoria: "Cap. 5 — Administración de Riesgos",
   descripcion:
-    "Un hospital ha detectado actividad de ransomware en su red. Como parte del plan de gestión de riesgos, " +
-    "debes ejecutar el proceso de respuesta a incidentes: contener la amenaza, proteger los activos críticos " +
-    "y establecer una VPN de emergencia para el equipo CSIRT.",
+    "Un hospital detecta ransomware activo. Ejecuta la respuesta a incidentes: contén la amenaza, " +
+    "protege activos críticos y habilita VPN de emergencia para el CSIRT.",
   presupuestoInicial: 3000,
   ataques: [],
   eventos: [

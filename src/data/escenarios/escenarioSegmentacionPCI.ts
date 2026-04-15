@@ -27,9 +27,8 @@ export const escenarioSegmentacionPCI: unknown = {
   titulo: "Segmentación PCI-DSS: Empresa Retail",
   categoria: "Cap. 4 — Seguridad de Redes",
   descripcion:
-    "Una cadena de retail necesita cumplir con la normativa PCI-DSS para proteger datos de pago. " +
-    "Segmenta la red, configura firewalls con múltiples reglas y establece " +
-    "una VPN segura entre la tienda central y la bodega remota.",
+    "Una cadena retail debe cumplir PCI-DSS para proteger datos de pago. Segmenta la red, " +
+    "configura reglas de firewall y establece VPN entre tienda central y bodega remota.",
   presupuestoInicial: 2500,
   ataques: [],
   eventos: [

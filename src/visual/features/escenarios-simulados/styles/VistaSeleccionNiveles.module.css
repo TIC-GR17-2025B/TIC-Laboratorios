@@ -12,7 +12,12 @@
 .sidebar {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
+  position: sticky;
+  top: 48px;
+  align-self: start;
+  max-height: calc(100vh - 64px);
+  overflow-y: auto;
 }
 
 /* ── Path ── */
@@ -135,6 +140,33 @@
 }
 
 
+/* ── Suggested level label (above node, arrow pointing down) ── */
+
+.suggestedLabel {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  transform: translateX(-50%);
+  padding: 6px 12px;
+  background: var(--blue);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 8px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.suggestedArrow {
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 10px;
+  height: 10px;
+  background: var(--blue);
+}
+
 /* ── Tooltip ── */
 
 .tooltip {
@@ -185,8 +217,6 @@
   border-radius: 8px;
   font-size: 13px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
   cursor: pointer;
   transition: filter 0.15s ease;
 }

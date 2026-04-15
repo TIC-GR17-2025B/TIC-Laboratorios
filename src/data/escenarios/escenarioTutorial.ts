@@ -38,10 +38,8 @@ export const escenarioTutorial: unknown = {
   titulo: "Tutorial: Introducción a la Seguridad",
   categoria: "Cap. 1 — Introducción",
   descripcion:
-    "Bienvenido a tu primer día como administrador de seguridad en TechStart. " +
-    "Aprenderás los conceptos fundamentales: Disponibilidad (que los sistemas estén accesibles), " +
-    "Confidencialidad (que solo los autorizados accedan) e Integridad (que la información no sea alterada). " +
-    "Este escenario te guiará paso a paso.",
+    "Tu primer día como administrador en TechStart. Aprende los tres pilares de la seguridad: " +
+    "Confidencialidad, Integridad y Disponibilidad (CIA).",
   presupuestoInicial: 500,
   ataques: [],
   eventos: [

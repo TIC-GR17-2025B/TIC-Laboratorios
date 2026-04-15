@@ -32,9 +32,8 @@ export const escenarioAuditoria: unknown = {
   titulo: "Auditoría de Seguridad Empresarial",
   categoria: "Cap. 5 — Administración de Riesgos",
   descripcion:
-    "Como auditor de seguridad contratado por LogiCorp, debes evaluar la postura de seguridad de la empresa. " +
-    "Escanea la infraestructura, identifica vulnerabilidades humanas, " +
-    "y aplica controles correctivos de red para mejorar la seguridad.",
+    "Auditas a LogiCorp. Escanea la infraestructura, detecta vulnerabilidades humanas " +
+    "y aplica controles correctivos de red.",
   presupuestoInicial: 3000,
   ataques: [],
   eventos: [

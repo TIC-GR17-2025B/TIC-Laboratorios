@@ -34,9 +34,8 @@ export const escenarioControlAcceso: unknown = {
   titulo: "Control de Acceso y Protocolos Seguros",
   categoria: "Cap. 3 — Autenticación",
   descripcion:
-    "La universidad TechU necesita controlar el acceso a sus laboratorios de investigación. " +
-    "Implementa políticas de hardening, segmenta la red para aislar los laboratorios, " +
-    "defiende contra software no autorizado y configura acceso VPN autenticado para investigadores remotos.",
+    "La universidad TechU debe proteger sus laboratorios de investigación. " +
+    "Aplica hardening, segmenta la red y habilita VPN autenticada para investigadores remotos.",
   presupuestoInicial: 2500,
   ataques: [
     {

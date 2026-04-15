@@ -1,14 +1,7 @@
 /* ── Container ── */
 
 .container {
-  background-color: #1e1e1e;
-  color: white;
-  padding: 0.8rem;
-  border-radius: 12px;
   width: 100%;
-  margin-top: 20px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
-  border: 1px solid #333;
   font-size: 0.85rem;
 }
 
@@ -23,7 +16,7 @@
 .button {
   width: 100%;
   padding: 8px;
-  border: none;
+  border: 1px solid var(--border-primary);
   border-radius: 8px;
   font-size: 0.85rem;
   cursor: pointer;
@@ -31,24 +24,16 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  font-weight: 600;
-  transition: background 0.2s;
-}
-
-.buttonPrimary {
-  composes: button;
-  background-color: #ef5350;
-  color: white;
-}
-
-.buttonPrimary:hover {
-  background-color: #f44336;
+  color: var(--text-primary);
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
 }
 
 .buttonSuccess {
   composes: button;
   background-color: #52d356;
   color: #000;
+  border: none;
+  font-weight: 600;
   flex: 1;
 }
 
@@ -60,9 +45,11 @@
   composes: button;
   background: #333;
   color: #ccc;
+  border: none;
   width: auto;
   padding: 8px 12px;
   font-size: 0.8rem;
+  font-weight: 600;
 }
 
 .buttonSecondary:hover {
@@ -73,9 +60,11 @@
   composes: button;
   background: #333;
   color: #fff;
+  border: none;
   padding: 6px 12px;
   border-radius: 6px;
   font-size: 0.8rem;
+  font-weight: 600;
 }
 
 /* ── Loading ── */
@@ -101,7 +90,7 @@
 }
 
 .loadingText {
-  color: #26c6da;
+  color: var(--text-muted);
   font-size: 0.75rem;
   margin: 0;
 }
