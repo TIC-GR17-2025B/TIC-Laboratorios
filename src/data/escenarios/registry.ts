@@ -20,14 +20,14 @@ const escenarioMap = new Map<string, EscenarioMeta>([
       titulo: "Criptografía: Firma Digital y Comunicación Segura",
     },
   ],
-  [
+  /*[
     "certificados",
     { slug: "certificados", titulo: "Certificados Digitales y PKI" },
-  ],
-  [
+  ],*/
+  /*[
     "autenticacion",
     { slug: "autenticacion", titulo: "Autenticación y Control de Acceso" },
-  ],
+  ],*/
   [
     "control-acceso",
     {
@@ -35,20 +35,20 @@ const escenarioMap = new Map<string, EscenarioMeta>([
       titulo: "Control de Acceso y Protocolos Seguros",
     },
   ],
-  [
+  /*[
     "redes",
     {
       slug: "redes",
       titulo: "Seguridad de Redes: Firewall, Segmentación y VPN",
     },
-  ],
-  [
+  ],*/
+  /*[
     "segmentacion-pci",
     {
       slug: "segmentacion-pci",
       titulo: "Segmentación PCI-DSS: Empresa Retail",
     },
-  ],
+  ],*/
   [
     "hacking-etico",
     {
@@ -56,32 +56,32 @@ const escenarioMap = new Map<string, EscenarioMeta>([
       titulo: "Hacking Ético y Análisis de Vulnerabilidades",
     },
   ],
-  [
+  /*[
     "ransomware",
     {
       slug: "ransomware",
       titulo: "Gestión de Riesgos: Respuesta a Incidentes",
     },
-  ],
-  [
+  ],*/
+  /*[
     "auditoria",
     { slug: "auditoria", titulo: "Auditoría de Seguridad Empresarial" },
-  ],
-  [
+  ],*/
+  /*[
     "banco",
     {
       slug: "banco",
       titulo: "Banco Nacional: Operación Firewall — Defensa APT",
     },
-  ],
-  ["iot", { slug: "iot", titulo: "Seguridad IoT e Infraestructura Crítica" }],
-  [
+  ],*/
+  /*["iot", { slug: "iot", titulo: "Seguridad IoT e Infraestructura Crítica" }],*/
+  /*[
     "prueba",
     {
       slug: "Prueba",
       titulo: "Prueba",
     },
-  ],
+  ],*/
 ]);
 
 export function getNombreEscenario(slug: string): string {

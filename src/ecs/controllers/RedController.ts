@@ -502,7 +502,7 @@ export class RedController {
       if (dispActual?.tipo != TipoDispositivo.WORKSTATION) continue;
 
       const infoDispActual: InfoDispositivoEscaneado = {
-        nombre: dispActual!.nombre,
+        nombre: dispActual!.nombre+" | "+dispActual!.nombreEquipo,
         sistOp: dispActual!.sistemaOperativo,
         encargado: dispActual!.personaEncargada!
       };

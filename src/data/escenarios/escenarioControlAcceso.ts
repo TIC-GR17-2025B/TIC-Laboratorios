@@ -14,6 +14,7 @@ import {
   ObjetosManejables,
 } from "../../types/AccionesEnums";
 import { ColoresRed } from "../colores";
+import { AccionFirewall, DireccionTrafico } from "../../types/FirewallTypes";
 
 /**
  * Escenario 10 — Control de Acceso y Protocolos Seguros
@@ -41,17 +42,23 @@ export const escenarioControlAcceso: unknown = {
   ataques: [
     {
       nombreAtaque: "Ejecución de software no autorizado",
-      tiempoNotificacion: 55,
+      tiempoNotificacion: 37,
+      tiempoEnOcurrir: 42,
       tipoAtaque: TipoAtaque.INFECCION_TROYANO,
       dispositivoAAtacar: "PC Estudiante",
       descripcion:
-        "¡ALERTA! Un estudiante descargó software no autorizado que contiene malware. " +
-        "Si 'Sin software externo' está activado en 'PC Estudiante', el ataque será bloqueado.",
+        "¡ALERTA! Un estudiante descargó software no autorizado en 'PC Estudiante' que contiene malware. " +
+        "Si el equipo está configurado correctamente, el ataque será bloqueado.",
       fase: 2,
       condicionMitigacion: {
-        accion: AccionesRealizables.EJECUTAR,
+        accion: AccionesRealizables.CLICK,
         objeto: ObjetosManejables.CONFIG_WORKSTATION,
-        val: { nombreConfig: "Sin software externo", activado: true },
+        val: [
+          {
+            nombreConfig: "Sin software externo",
+            activado: true
+          },
+        ],
       },
     },
   ],
@@ -60,7 +67,8 @@ export const escenarioControlAcceso: unknown = {
     {
       nombreEvento: "Asignar laboratorio a red segura",
       tipoEvento: TipoEvento.TRAFICO_RED,
-      tiempoNotificacion: 10,
+      tiempoNotificacion: 5,
+      tiempoEnOcurrir: 10,
       descripcion:
         "El 'PC Investigador' necesita acceder al 'Servidor de Datos' en la red 'LAN-Lab'. " +
         "Asigna el 'PC Investigador' a 'LAN-Lab' para permitir la comunicación.",
@@ -76,7 +84,8 @@ export const escenarioControlAcceso: unknown = {
     {
       nombreEvento: "Bloquear acceso desde red estudiantil",
       tipoEvento: TipoEvento.TRAFICO_RED,
-      tiempoNotificacion: 25,
+      tiempoNotificacion: 15,
+      tiempoEnOcurrir: 20,
       descripcion:
         "Los estudiantes NO deben poder acceder al laboratorio vía SSH. " +
         "Configura el firewall del 'Router Universidad' para bloquear SSH entrante a 'LAN-Lab'.",
@@ -92,40 +101,44 @@ export const escenarioControlAcceso: unknown = {
     {
       nombreEvento: "Completación Fase 1",
       tipoEvento: TipoEvento.COMPLETACION_FASE,
-      tiempoNotificacion: 40,
-      descripcion: "Red segmentada correctamente. Ahora protege los equipos.",
+      tiempoNotificacion: 25,
+      descripcion: "Red segmentada correctamente. Ahora debes proteger los equipos.",
       fase: 1,
     },
     // ── FASE 2: Hardening + ataque ──
     {
       nombreEvento: "Bloquear software externo en aula",
       tipoEvento: TipoEvento.VERIFICACION_ACCION_JUGADOR,
-      tiempoNotificacion: 45,
+      tiempoNotificacion: 30,
+      tiempoEnOcurrir: 35,
       descripcion:
         "Los equipos del aula son vulnerables a software malicioso descargado por estudiantes. " +
         "Activa 'Sin software externo' en 'PC Estudiante' para prevenir la instalación de programas no autorizados.",
       fase: 2,
       infoAdicional: {
-        accion: AccionesRealizables.EJECUTAR,
+        accion: AccionesRealizables.CLICK,
         objeto: ObjetosManejables.CONFIG_WORKSTATION,
-        tiempo: 0,
-        val: { nombreConfig: "Sin software externo", activado: true },
+        val: { 
+          nombreConfig: "Sin software externo",
+          dispositivoAAtacar: "PC Estudiante",
+          activado: true
+        },
       },
     },
     {
       nombreEvento: "Completación Fase 2",
       tipoEvento: TipoEvento.COMPLETACION_FASE,
-      tiempoNotificacion: 70,
+      tiempoNotificacion: 45,
       descripcion: "Equipos protegidos. Ahora configura acceso remoto para investigadores.",
       fase: 2,
     },
     // ── FASE 3: VPN autenticada ──
     {
-      nombreEvento: "VPN para investigador remoto",
+      nombreEvento: "Configurar VPN para investigador remoto.",
       tipoEvento: TipoEvento.CONEXION_VPN,
-      tiempoNotificacion: 75,
+      tiempoNotificacion: 50,
       descripcion:
-        "Un investigador necesita acceder al laboratorio desde casa. " +
+        "Un investigador necesita acceder al servidor del laboratorio desde casa. " +
         "Configura VPN con modo 'Encriptar y Autenticar' (EA) entre el 'VPN Gateway Universidad' " +
         "y el 'PC Remoto Investigador'.",
       fase: 3,
@@ -147,11 +160,73 @@ export const escenarioControlAcceso: unknown = {
     {
       nombreEvento: "Completación Escenario",
       tipoEvento: TipoEvento.COMPLETACION_ESCENARIO,
-      tiempoNotificacion: 95,
+      tiempoNotificacion: 65,
       descripcion:
         "¡Felicidades! Has implementado control de acceso multicapa: " +
         "segmentación de red, hardening de dispositivos y VPN autenticada.",
       fase: 3,
+    },
+  ],
+  accionesEsperadas: [
+    {
+      accion: AccionesRealizables.AGREGAR,
+      objeto: ObjetosManejables.RED,
+      inicioTiempoEsperado: 5,
+      finTiempoEsperado: 10,
+      val: {
+        nombreDispositivo: "PC Investigador",
+        nombreRed: "LAN-Lab"
+      }
+    },
+    {
+      accion: AccionesRealizables.CLICK,
+      objeto: ObjetosManejables.CONFIG_FIREWALL,
+      inicioTiempoEsperado: 15,
+      finTiempoEsperado: 20,
+      val: {
+        nombreRouter: "Router Universidad",
+        nombreRed: "LAN-Lab",
+        accion: AccionFirewall.DENEGAR,
+        direccion: DireccionTrafico.HACIA,
+        protocolo: TipoProtocolo.SSH,
+      }
+    },
+    {
+      accion: AccionesRealizables.CLICK,
+      objeto: ObjetosManejables.CONFIG_WORKSTATION,
+      inicioTiempoEsperado: 30,
+      finTiempoEsperado: 35,
+      val: {
+        nombreConfig: "Sin software externo",
+        dispositivoAAtacar: "PC Estudiante",
+        activado: true
+      }
+    },
+    {
+      accion: AccionesRealizables.AGREGAR,
+      objeto: ObjetosManejables.PERFIL_VPN_GATEWAY,
+      inicioTiempoEsperado: 50,
+      finTiempoEsperado: 60,
+      val: {
+        nombreVPNGateway: "VPN Gateway Universidad",
+        lanLocal: "LAN-Lab",
+        hostLan: "Servidor de Datos",
+        proteccion: TipoProteccionVPN.EA,
+        dominioRemoto: "Investigador-Remoto",
+        hostRemoto: "PC Remoto Investigador"
+      }
+    },
+    {
+      accion: AccionesRealizables.AGREGAR,
+      objeto: ObjetosManejables.PERFIL_CLIENTE_VPN,
+      inicioTiempoEsperado: 50,
+      finTiempoEsperado: 60,
+      val: {
+        nombreCliente: "PC Remoto Investigador",
+        proteccion: TipoProteccionVPN.EA,
+        dominioRemoto: "TechU",
+        hostRemoto: "Servidor de Datos"
+      }
     },
   ],
   fases: [

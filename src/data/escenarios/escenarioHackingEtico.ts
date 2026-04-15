@@ -3,6 +3,7 @@ import {
   ObjetosManejables,
 } from "../../types/AccionesEnums";
 import {
+    ComandoTerminal,
   EstadoAtaqueDispositivo,
   Mueble,
   NivelConcienciaSeguridad,
@@ -13,6 +14,21 @@ import {
 import { ColoresRed } from "../colores";
 import { PlantillasCorreoPhishing } from "../plantillas/Plantillas";
 
+function generarContrasenia(): string {
+  const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let resultado = '';
+  const longitud = 7;
+
+  for (let i = 0; i < longitud; i++) {
+    const indice = Math.floor(Math.random() * caracteres.length);
+    resultado += caracteres[indice];
+  }
+
+  return resultado;
+}
+
+const contrasenia = generarContrasenia();
+
 export const escenarioHackingEtico: unknown = {
   id: 5,
   slug: "hacking-etico",
@@ -20,7 +36,9 @@ export const escenarioHackingEtico: unknown = {
   categoria: "Cap. 5 — Administración de Riesgos",
   imagenPreview: "/redFirewallVPN.webp",
   descripcion:
-    "Un escenario en el que se aplica técnicas de ingeniería social para hackear un dipositivo y obtener información.",
+    "En este escenario eres Lisa Rodríguez, una aficionada del Hacking Ético que está poniendo en práctica técnicas de ingeniería social "+
+    "para hackear un dipositivo y obtener información de la empresa 'Corporación'. Siguiendo las distintas fases para realizar un proceso "+
+    "de Hacking Ético, intenta conseguir información que pueda comprometer a la empresa.",
   presupuestoInicial: 1000,
   ataques: [],
   eventos: [
@@ -28,13 +46,13 @@ export const escenarioHackingEtico: unknown = {
       nombreEvento: "Escaneo de dispositivos",
       tipoEvento: TipoEvento.VERIFICACION_ACCION_JUGADOR,
       tiempoNotificacion: 5,
+      tiempoEnOcurrir: 10,
       descripcion:
-        "Para empezar con la fase de Reconocimiento y Escaneo, escanea los dispositivos disponibles en el dominio 'Corporación' utilizando Net-Scan Viz",
+        "Para empezar con la fase de Reconocimiento y Escaneo, escanea los dispositivos disponibles en el dominio 'Corporación' utilizando Net-Scan Viz. Pista: guarda la información resultante del escaneo.",
       fase: 1,
       infoAdicional: {
         accion: AccionesRealizables.EJECUTAR,
         objeto: ObjetosManejables.APLICACION,
-        tiempo: 0,
         val: {
           nombreAplicacion: "Net-Scan Viz",
         },
@@ -43,14 +61,14 @@ export const escenarioHackingEtico: unknown = {
     {
       nombreEvento: "Búsqueda de personas",
       tipoEvento: TipoEvento.VERIFICACION_ACCION_JUGADOR,
-      tiempoNotificacion: 20,
+      tiempoNotificacion: 15,
+      tiempoEnOcurrir: 20,
       descripcion:
-        "Ahora se necesita obtener información de los empleados de la empresa. Utiliza Company Social-Searcher para lograrlo.",
+        "Ahora se necesita obtener información de los empleados de la empresa. Utiliza Company Social-Searcher para lograrlo. Pista: observa quién es más propenso a caer en un ataque de ingeniería social.",
       fase: 1,
       infoAdicional: {
         accion: AccionesRealizables.EJECUTAR,
         objeto: ObjetosManejables.APLICACION,
-        tiempo: 0,
         val: {
           nombreAplicacion: "Company Social-Searcher",
         },
@@ -59,7 +77,7 @@ export const escenarioHackingEtico: unknown = {
     {
       nombreEvento: "Completación Fase 1",
       tipoEvento: TipoEvento.COMPLETACION_FASE,
-      tiempoNotificacion: 35, // Este es un caso especial. Aquí se ejecutará directamente en el tiempo de notificación
+      tiempoNotificacion: 25, // Este es un caso especial. Aquí se ejecutará directamente en el tiempo de notificación
       descripcion:
         "¡Has completado la fase de Reconocimiento y Escaneo! Ahora puedes continuar con la fase de Explotación.",
       fase: 1,
@@ -67,7 +85,8 @@ export const escenarioHackingEtico: unknown = {
     {
       nombreEvento: "Creación de correo phishing",
       tipoEvento: TipoEvento.ENVIO_CORREO,
-      tiempoNotificacion: 40,
+      tiempoNotificacion: 30,
+      tiempoEnOcurrir: 35,
       descripcion:
         "Una vez identificados los dispositivos y empleados de la empresa, es posible obtener credenciales de acceso mediante ingeniería social. Utiliza Phish-Matic para crear un correo tipo phishing e intentar obtener credenciales a través de él.",
       fase: 2,
@@ -80,7 +99,8 @@ export const escenarioHackingEtico: unknown = {
     {
       nombreEvento: "Recepción de credenciales",
       tipoEvento: TipoEvento.ENVIO_ACTIVO,
-      tiempoNotificacion: 55,
+      tiempoNotificacion: 40,
+      ejecutarAlInstante: true,
       descripcion:
         "El engaño con el correo fue exitoso. El empleado acaba de enviar sus credenciales, revisa tu explorador de archivos para encontrarlas.",
       fase: 2,
@@ -89,24 +109,23 @@ export const escenarioHackingEtico: unknown = {
         dispositivoEmisor: "Computadora Jacob",
         dispositivoReceptor: "Computadora Lisa",
       },
-      ejecutarAlInstante: true,
     },
     {
       nombreEvento: "Conexión a dispositivo mediante SSH",
       tipoEvento: TipoEvento.VERIFICACION_ACCION_JUGADOR,
-      tiempoNotificacion: 65,
+      tiempoNotificacion: 45,
+      tiempoEnOcurrir: 50,
       descripcion:
-        "Ahora, utilizando las credenciales, abre la consola en 'Computadora Lisa' para acceder al dispositivo del empleado mediante SSH.",
+        "Ahora, utilizando las credenciales, abre la consola en 'Computadora Lisa' para acceder al dispositivo del empleado mediante SSH. Pista: ejecuta el comando de ayuda 'h' de la consola para guiarte.",
       fase: 2,
       infoAdicional: {
         accion: AccionesRealizables.EJECUTAR,
         objeto: ObjetosManejables.COMANDO,
-        tiempo: 0,
         val: {
-          comando: "ssh",
-          nombreEquipo: "PcJacob",
+          comando: ComandoTerminal.SSH,
+          nombreEquipo: "pc-jacob",
           usuario: "jgarcia",
-          contrasenia: "j123",
+          contrasenia: contrasenia,
           conectadoDesde: "Computadora Lisa",
         },
       },
@@ -114,16 +133,16 @@ export const escenarioHackingEtico: unknown = {
     {
       nombreEvento: "Obtención de información confidencial",
       tipoEvento: TipoEvento.VERIFICACION_ACCION_JUGADOR,
-      tiempoNotificacion: 78,
+      tiempoNotificacion: 55,
+      tiempoEnOcurrir: 60,
       descripcion:
-        "Una vez conectado al dispositivo del empleado, obtén información que sea confidencial para la empresa. Pista: ejecuta el comando de ayuda de la consola para guiarte.",
+        "Una vez conectado al dispositivo del empleado, obtén información que sea confidencial para la empresa.",
       fase: 2,
       infoAdicional: {
         accion: AccionesRealizables.EJECUTAR,
         objeto: ObjetosManejables.COMANDO,
-        tiempo: 0,
         val: {
-          comando: "cat",
+          comando: ComandoTerminal.CAT,
           nombreArchivo: "secret_keys",
           nombreDispositivo: "Computadora Jacob",
         },
@@ -132,9 +151,96 @@ export const escenarioHackingEtico: unknown = {
     {
       nombreEvento: "Completación Escenario",
       tipoEvento: TipoEvento.COMPLETACION_ESCENARIO,
-      tiempoNotificacion: 90,
-      descripcion: "¡Felicidades, has completado el escenario de este nivel!",
+      tiempoNotificacion: 65,
+      descripcion:
+        "¡Felicidades, has completado el escenario de este nivel! Ahora ya tienes una mejor idea "+
+        "sobre las fases para realizar un proceso de Hacking Ético.",
       fase: 2,
+    },
+  ],
+  accionesEsperadas: [
+    {
+      accion: AccionesRealizables.AGREGAR,
+      objeto: ObjetosManejables.APLICACION,
+      inicioTiempoEsperado: 5,
+      finTiempoEsperado: 10,
+      val: {
+        nombreDispositivo: "Computadora Lisa",
+        aplicacionAgregada: "Net-Scan Viz"
+      }
+    },
+    {
+      accion: AccionesRealizables.EJECUTAR,
+      objeto: ObjetosManejables.APLICACION,
+      inicioTiempoEsperado: 5,
+      finTiempoEsperado: 10,
+      val: {
+        nombreAplicacion: "Net-Scan Viz"
+      }
+    },
+    {
+      accion: AccionesRealizables.AGREGAR,
+      objeto: ObjetosManejables.APLICACION,
+      inicioTiempoEsperado: 15,
+      finTiempoEsperado: 20,
+      val: {
+        nombreDispositivo: "Computadora Lisa",
+        aplicacionAgregada: "Company Social-Searcher"
+      }
+    },
+    {
+      accion: AccionesRealizables.EJECUTAR,
+      objeto: ObjetosManejables.APLICACION,
+      inicioTiempoEsperado: 15,
+      finTiempoEsperado: 20,
+      val: {
+        nombreAplicacion: "Company Social-Searcher"
+      }
+    },
+    {
+      accion: AccionesRealizables.ENVIO,
+      objeto: ObjetosManejables.CORREO,
+      inicioTiempoEsperado: 30,
+      finTiempoEsperado: 35,
+      val: {
+        dispositivoEmisor: "Computadora Lisa",
+        destinatario: "jacob.garcia@corp.com",
+        asunto: PlantillasCorreoPhishing[0].asunto
+      }
+    },
+    {
+      accion: AccionesRealizables.EJECUTAR,
+      objeto: ObjetosManejables.COMANDO,
+      inicioTiempoEsperado: 45,
+      finTiempoEsperado: 50,
+      val: {
+        comando: ComandoTerminal.SSH,
+        nombreEquipo: "pc-jacob",
+        usuario: "jgarcia",
+        contrasenia: contrasenia,
+        conectadoDesde: "Computadora Lisa"
+      }
+    },
+    {
+      accion: AccionesRealizables.EJECUTAR,
+      objeto: ObjetosManejables.COMANDO,
+      inicioTiempoEsperado: 55,
+      finTiempoEsperado: 60,
+      val: {
+        comando: ComandoTerminal.LS,
+        nombreDispositivo: "Computadora Jacob"
+      }
+    },
+    {
+      accion: AccionesRealizables.EJECUTAR,
+      objeto: ObjetosManejables.COMANDO,
+      inicioTiempoEsperado: 55,
+      finTiempoEsperado: 60,
+      val: {
+        comando: ComandoTerminal.CAT,
+        nombreArchivo: "secret_keys",
+        nombreDispositivo: "Computadora Jacob"
+      }
     },
   ],
   fases: [
@@ -186,7 +292,7 @@ export const escenarioHackingEtico: unknown = {
   zonas: [
     {
       id: 1,
-      nombre: "Edificio Principal - Piso 1",
+      nombre: "Corporación - Edificio Principal",
       dominio: "Corporación",
       esInteractiva: false,
       // Redes disponibles para asignar en esta zona
@@ -298,13 +404,13 @@ export const escenarioHackingEtico: unknown = {
                   posicion: { x: -3, y: 0, z: 0, rotacionY: 180 },
                   estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
                   personaEncargada: "Jacob García",
-                  nombreEquipo: "PcJacob",
+                  nombreEquipo: "pc-jacob",
                   usuario: "jgarcia",
-                  contrasenia: "j123",
+                  contrasenia: contrasenia,
                   activos: [
                     {
                       nombre: "credenciales",
-                      contenido: "usuario: jgarcia\ncontraseña: j123",
+                      contenido: `usuario: jgarcia\ncontraseña: ${contrasenia}`,
                       tipo: TipoActivo.DOCUMENTO,
                     },
                     {
