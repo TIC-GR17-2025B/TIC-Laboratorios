@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { ComponenteContainer } from "../src/ecs/core";
-import { Transform, Velocidad } from "../src/ecs/components";
+import { ComponenteContainer } from "../src/client/ecs/core";
+import { Transform, Velocidad } from "../src/client/ecs/components";
 
 describe("ComponenteContainer", () => {
   let container: ComponenteContainer;

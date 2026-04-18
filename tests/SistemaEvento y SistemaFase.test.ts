@@ -1,19 +1,19 @@
 import { describe, beforeEach, test, expect, it } from "vitest";
-import { ECSManager, Entidad } from "../src/ecs/core";
-import { SistemaActivo, SistemaEvento, SistemaFase, SistemaJerarquiaEscenario, SistemaPresupuesto, SistemaRed, SistemaTiempo } from "../src/ecs/systems";
-import { EstadoAtaqueDispositivo, TipoActivo, TipoAtaque, TipoDispositivo, TipoEvento, TipoProteccionVPN } from "../src/types/DeviceEnums";
-import { AccionesRealizables, ObjetosManejables } from "../src/types/AccionesEnums";
-import { ActivoComponent, AtaqueComponent, ClienteVPNComponent, DispositivoComponent, EscenarioComponent, EventoComponent, FaseComponent, RedComponent, RouterComponent, VPNGatewayComponent, WorkstationComponent, ZonaComponent } from "../src/ecs/components";
-import { PlantillasCorreoPhishing } from "../src/data/plantillas/Plantillas";
-import { FirewallBuilder } from "../src/ecs/utils/FirewallBuilder";
-import { RedController } from "../src/ecs/controllers/RedController";
-import { EscenarioController } from "../src/ecs/controllers/EscenarioController";
-import { TipoProtocolo } from "../src/types/TrafficEnums";
-import { PerfilClienteVPN, PerfilVPNGateway } from "../src/types/EscenarioTypes";
-import { ColoresRed } from "../src/data/colores";
-import { APPS } from "../src/data/apps";
-import { FirewallConfigService } from "../src/ecs/systems/red";
-import { AccionFirewall, DireccionTrafico } from "../src/types/FirewallTypes";
+import { ECSManager, Entidad } from "../src/client/ecs/core";
+import { SistemaActivo, SistemaEvento, SistemaFase, SistemaJerarquiaEscenario, SistemaPresupuesto, SistemaRed, SistemaTiempo } from "../src/client/ecs/systems";
+import { EstadoAtaqueDispositivo, TipoActivo, TipoAtaque, TipoDispositivo, TipoEvento, TipoProteccionVPN } from "../src/client/shared/types/DeviceEnums";
+import { AccionesRealizables, ObjetosManejables } from "../src/client/shared/types/AccionesEnums";
+import { ActivoComponent, AtaqueComponent, ClienteVPNComponent, DispositivoComponent, EscenarioComponent, EventoComponent, FaseComponent, RedComponent, RouterComponent, VPNGatewayComponent, WorkstationComponent, ZonaComponent } from "../src/client/ecs/components";
+import { PlantillasCorreoPhishing } from "../src/client/data/plantillas/Plantillas";
+import { FirewallBuilder } from "../src/client/ecs/utils/FirewallBuilder";
+import { RedController } from "../src/client/ecs/controllers/RedController";
+import { EscenarioController } from "../src/client/ecs/controllers/EscenarioController";
+import { TipoProtocolo } from "../src/client/shared/types/TrafficEnums";
+import { PerfilClienteVPN, PerfilVPNGateway } from "../src/client/shared/types/EscenarioTypes";
+import { ColoresRed } from "../src/client/data/colores";
+import { APPS } from "../src/client/data/apps";
+import { FirewallConfigService } from "../src/client/ecs/systems/red";
+import { AccionFirewall, DireccionTrafico } from "../src/client/shared/types/FirewallTypes";
 
 describe("SistemaEvento y SistemaFase", () => {
 

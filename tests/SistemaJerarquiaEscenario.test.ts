@@ -1,9 +1,9 @@
 import { describe, it, beforeEach, expect } from "vitest";
-import { SistemaJerarquiaEscenario } from "../src/ecs/systems";
-import { ECSManager, Entidad } from "../src/ecs/core";
-import { DispositivoComponent, EscenarioComponent, EspacioComponent, OficinaComponent, PersonaComponent, RedComponent, ZonaComponent } from "../src/ecs/components";
-import { ColoresRed } from "../src/data/colores";
-import { EstadoAtaqueDispositivo, NivelConcienciaSeguridad, TipoDispositivo } from "../src/types/DeviceEnums";
+import { SistemaJerarquiaEscenario } from "../src/client/ecs/systems";
+import { ECSManager, Entidad } from "../src/client/ecs/core";
+import { DispositivoComponent, EscenarioComponent, EspacioComponent, OficinaComponent, PersonaComponent, RedComponent, ZonaComponent } from "../src/client/ecs/components";
+import { ColoresRed } from "../src/client/data/colores";
+import { EstadoAtaqueDispositivo, NivelConcienciaSeguridad, TipoDispositivo } from "../src/client/shared/types/DeviceEnums";
 
 describe("SistemaJerarquiaEscenario", () => {
     

@@ -1,19 +1,19 @@
 import { describe, test, expect } from "vitest";
-import { ECSManager } from "../src/ecs/core";
-import { SistemaRed } from "../src/ecs/systems";
+import { ECSManager } from "../src/client/ecs/core";
+import { SistemaRed } from "../src/client/ecs/systems";
 import {
   EstadoAtaqueDispositivo,
   TipoActivo,
   TipoDispositivo,
-} from "../src/types/DeviceEnums";
+} from "../src/client/shared/types/DeviceEnums";
 import {
   ActivoComponent,
   DispositivoComponent,
   RouterComponent,
   RedComponent,
-} from "../src/ecs/components";
-import { TipoProtocolo } from "../src/types/TrafficEnums";
-import { FirewallBuilder } from "../src/ecs/utils/FirewallBuilder";
+} from "../src/client/ecs/components";
+import { TipoProtocolo } from "../src/client/shared/types/TrafficEnums";
+import { FirewallBuilder } from "../src/client/ecs/utils/FirewallBuilder";
 
 describe("SistemaRed", () => {
   test("se pueden enviar activos entre dispositivos de la misma red", () => {

@@ -1,7 +1,7 @@
 import { describe, it, beforeEach, expect } from "vitest";
-import { ECSManager } from "../src/ecs/core";
-import { Transform, Velocidad } from "../src/ecs/components";
-import { SistemaTiempo } from "../src/ecs/systems";
+import { ECSManager } from "../src/client/ecs/core";
+import { Transform, Velocidad } from "../src/client/ecs/components";
+import { SistemaTiempo } from "../src/client/ecs/systems";
 
 describe("ECSManager", () => {
   let em: ECSManager;

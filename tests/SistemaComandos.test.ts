@@ -1,13 +1,13 @@
-import { ECSManager, Entidad } from "../src/ecs/core";
-import { SistemaComandos, SistemaJerarquiaEscenario } from "../src/ecs/systems";
-import { ActivoComponent, DispositivoComponent, RedComponent, RouterComponent, ZonaComponent } from "../src/ecs/components";
-import { ComandoTerminal, EstadoAtaqueDispositivo, TipoActivo, TipoDispositivo } from "../src/types/DeviceEnums";
+import { ECSManager, Entidad } from "../src/client/ecs/core";
+import { SistemaComandos, SistemaJerarquiaEscenario } from "../src/client/ecs/systems";
+import { ActivoComponent, DispositivoComponent, RedComponent, RouterComponent, ZonaComponent } from "../src/client/ecs/components";
+import { ComandoTerminal, EstadoAtaqueDispositivo, TipoActivo, TipoDispositivo } from "../src/client/shared/types/DeviceEnums";
 import { beforeEach, test, describe, expect, it } from "vitest";
-import { ColoresRed } from "../src/data/colores";
-import { FirewallBuilder } from "../src/ecs/utils/FirewallBuilder";
-import { RedController } from "../src/ecs/controllers/RedController";
-import { AccionFirewall, DireccionTrafico } from "../src/types/FirewallTypes";
-import { TipoProtocolo } from "../src/types/TrafficEnums";
+import { ColoresRed } from "../src/client/data/colores";
+import { FirewallBuilder } from "../src/client/ecs/utils/FirewallBuilder";
+import { RedController } from "../src/client/ecs/controllers/RedController";
+import { AccionFirewall, DireccionTrafico } from "../src/client/shared/types/FirewallTypes";
+import { TipoProtocolo } from "../src/client/shared/types/TrafficEnums";
 
 describe("SistemaComandos", () => {
 

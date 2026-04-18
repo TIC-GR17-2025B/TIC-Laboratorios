@@ -1,10 +1,10 @@
 import { describe, expect, test } from "vitest";
-import { ECSManager } from "../src/ecs/core";
-import { SistemaPresupuesto } from "../src/ecs/systems";
-import { DispositivoComponent, EscenarioComponent, /*PresupuestoComponent,*/ WorkstationComponent } from "../src/ecs/components";
-import { ConfiguracionWorkstation } from "../src/data/configuraciones/configWorkstation";
-import { EstadoAtaqueDispositivo, TipoDispositivo } from "../src/types/DeviceEnums";
-import { APPS } from "../src/data/apps";
+import { ECSManager } from "../src/client/ecs/core";
+import { SistemaPresupuesto } from "../src/client/ecs/systems";
+import { DispositivoComponent, EscenarioComponent, /*PresupuestoComponent,*/ WorkstationComponent } from "../src/client/ecs/components";
+import { ConfiguracionWorkstation } from "../src/client/data/configuraciones/configWorkstation";
+import { EstadoAtaqueDispositivo, TipoDispositivo } from "../src/client/shared/types/DeviceEnums";
+import { APPS } from "../src/client/data/apps";
 
 describe(/*'PresupuestoComponent y */'SistemaPresupuesto', () => {
     test('activación y desactivación de configuraciones'/* con presupuesto suficiente'*/, () => {

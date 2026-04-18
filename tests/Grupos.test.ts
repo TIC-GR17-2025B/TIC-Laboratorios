@@ -1,12 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 
-import { GroupsUseCase } from "../src/groups/application/GroupsUseCase"
-import { JoinGroupsUseCase } from "../src/groups/application/JoinGroupsUseCase"
-import { GenerateGroupCodeUseCase } from "../src/groups/application/GenerateGroupCodeUseCase"
-import { RemoveStudentGroupUseCase } from "../src/groups/application/RemoveStudentGroupUseCase"
-import { LeaveGroupUseCase } from "../src/groups/application/LeaveGroupUseCase"
+import { GroupsUseCase } from "../src/server/groups/application/GroupsUseCase"
+import { JoinGroupsUseCase } from "../src/server/groups/application/JoinGroupsUseCase"
+import { GenerateGroupCodeUseCase } from "../src/server/groups/application/GenerateGroupCodeUseCase"
+import { RemoveStudentGroupUseCase } from "../src/server/groups/application/RemoveStudentGroupUseCase"
+import { LeaveGroupUseCase } from "../src/server/groups/application/LeaveGroupUseCase"
 
-import type { IGroupsRepository } from "../src/groups/domain/repositories/IGroupsRepository"
+import type { IGroupsRepository } from "../src/server/groups/domain/repositories/IGroupsRepository"
 
 // Mock del generador de código
 vi.mock("../src/groups/domain/utils/CodeGenerator.js", () => ({

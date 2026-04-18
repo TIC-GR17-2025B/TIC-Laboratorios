@@ -1,12 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 
-import { GuardarProgresoUseCase } from "../src/auth/application/useCases/GuardarProgresoUseCase"
-import { ObtenerProgresoUseCase } from "../src/auth/application/useCases/ObtenerProgresoUseCase"
-import { ObtenerTodosProgresosUseCase } from "../src/auth/application/useCases/ObtenerTodosProgresosUseCase"
-import { ObtenerEstudianteProfesorUseCase } from "../src/auth/application/useCases/ObtenerEstudianteProfesorUseCase"
+import { GuardarProgresoUseCase } from "../src/server/auth/application/useCases/GuardarProgresoUseCase"
+import { ObtenerProgresoUseCase } from "../src/server/auth/application/useCases/ObtenerProgresoUseCase"
+import { ObtenerTodosProgresosUseCase } from "../src/server/auth/application/useCases/ObtenerTodosProgresosUseCase"
+import { ObtenerEstudianteProfesorUseCase } from "../src/server/auth/application/useCases/ObtenerEstudianteProfesorUseCase"
 
-import type { IProgresoRepository } from "../src/auth/domain/repositories/IProgresoRepository"
-import type { IAuthRepository } from "../src/auth/domain/repositories/IAuthRepository"
+import type { IProgresoRepository } from "../src/server/auth/domain/repositories/IProgresoRepository"
+import type { IAuthRepository } from "../src/server/auth/domain/repositories/IAuthRepository"
 
 describe("Progreso UseCases", () => {
 
