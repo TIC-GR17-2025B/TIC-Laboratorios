@@ -22,16 +22,7 @@
     "types": ["node"]
   },
   "include": [
-    "src/server.ts",
-    "src/auth/**/*",
-    "src/groups/**/*",
-    "src/feedback/**/*",
-    "src/course-analysis/**/*",
-    "src/chat/**/*",
-    "src/data/escenarios/registry.ts",
-    "src/repositories/**/*",
-    "src/application/**/*",
-    "src/domain/**/*"
+    "src/server/**/*"
   ],
   "exclude": [
     "node_modules",
