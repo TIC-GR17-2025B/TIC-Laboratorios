@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { API_BASE_URL } from "../../../common/utils/apiConfig";
+import { useAsyncState } from "../../../common/hooks";
 
 const API_URL = API_BASE_URL;
 
@@ -22,125 +23,87 @@ export interface Estudiante {
 }
 
 export const useGroups = (idProfesor: number | null) => {
+  const { loading, error, runAsync } = useAsyncState();
   const [grupos, setGrupos] = useState<Grupo[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  const fetchGrupos = async () => {
+  const fetchGrupos = useCallback(async () => {
     if (!idProfesor) return;
-
-    setLoading(true);
-    setError(null);
-
-    try {
+    const result = await runAsync(async () => {
       const response = await fetch(`${API_URL}/groups/profesor/${idProfesor}`);
-
-      if (!response.ok) {
-        throw new Error("Error al obtener los grupos");
-      }
-
-      const result = await response.json();
-      setGrupos(result.data || []);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Error desconocido");
-    } finally {
-      setLoading(false);
-    }
-  };
+      if (!response.ok) throw new Error("Error al obtener los grupos");
+      return response.json();
+    });
+    if (result) setGrupos(result.data ?? []);
+  }, [idProfesor, runAsync]);
 
   useEffect(() => {
     fetchGrupos();
-  }, [idProfesor]);
+  }, [fetchGrupos]);
 
   const createGrupo = async (nombre: string): Promise<boolean> => {
     if (!idProfesor) return false;
-
-    try {
+    const ok = await runAsync(async () => {
       const response = await fetch(`${API_URL}/groups`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id_profesor: idProfesor, nombre }),
       });
-
       if (!response.ok) {
         const result = await response.json();
         throw new Error(result.error || "Error al crear el grupo");
       }
-
-      await fetchGrupos();
       return true;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al crear grupo");
-      return false;
-    }
+    });
+    if (ok) await fetchGrupos();
+    return ok === true;
   };
 
-  const updateGrupo = async (
-    idCurso: number,
-    nombre: string
-  ): Promise<boolean> => {
-    try {
+  const updateGrupo = async (idCurso: number, nombre: string): Promise<boolean> => {
+    const ok = await runAsync(async () => {
       const response = await fetch(`${API_URL}/groups/edit/${idCurso}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nombre }),
       });
-
       if (!response.ok) {
         const result = await response.json();
         throw new Error(result.error || "Error al actualizar el grupo");
       }
-
-      await fetchGrupos();
       return true;
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Error al actualizar grupo"
-      );
-      return false;
-    }
+    });
+    if (ok) await fetchGrupos();
+    return ok === true;
   };
 
   const deleteGrupo = async (idCurso: number): Promise<boolean> => {
-    try {
+    const ok = await runAsync(async () => {
       const response = await fetch(`${API_URL}/groups/delete/${idCurso}`, {
         method: "DELETE",
       });
-
       if (!response.ok) {
         const result = await response.json();
         throw new Error(result.error || "Error al eliminar el grupo");
       }
-
-      await fetchGrupos();
       return true;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al eliminar grupo");
-      return false;
-    }
+    });
+    if (ok) await fetchGrupos();
+    return ok === true;
   };
 
   const generateCode = async (idCurso: number): Promise<string | null> => {
-    try {
-      const response = await fetch(
-        `${API_URL}/groups/${idCurso}/generate-code`,
-        {
-          method: "POST",
-        }
-      );
-
+    const codigo = await runAsync(async () => {
+      const response = await fetch(`${API_URL}/groups/${idCurso}/generate-code`, {
+        method: "POST",
+      });
       if (!response.ok) {
         const result = await response.json();
         throw new Error(result.error || "Error al generar código");
       }
-
       const result = await response.json();
-      await fetchGrupos();
-      return result.data.codigo_acceso;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al generar código");
-      return null;
-    }
+      return result.data.codigo_acceso as string;
+    });
+    if (codigo !== null) await fetchGrupos();
+    return codigo;
   };
 
   const removeStudent = async (
@@ -148,8 +111,7 @@ export const useGroups = (idProfesor: number | null) => {
     idEstudiante: number
   ): Promise<boolean> => {
     if (!idProfesor) return false;
-
-    try {
+    const ok = await runAsync(async () => {
       const response = await fetch(
         `${API_URL}/groups/${idCurso}/remove-student/${idEstudiante}`,
         {
@@ -158,39 +120,22 @@ export const useGroups = (idProfesor: number | null) => {
           body: JSON.stringify({ id_profesor: idProfesor }),
         }
       );
-
       if (!response.ok) {
         const result = await response.json();
         throw new Error(result.error || "Error al eliminar estudiante");
       }
-
       return true;
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Error al eliminar estudiante"
-      );
-      return false;
-    }
+    });
+    return ok === true;
   };
 
-  const getEstudiantesByGrupo = async (
-    idCurso: number
-  ): Promise<Estudiante[]> => {
-    try {
+  const getEstudiantesByGrupo = async (idCurso: number): Promise<Estudiante[]> => {
+    const result = await runAsync(async () => {
       const response = await fetch(`${API_URL}/groups/${idCurso}/estudiantes`);
-
-      if (!response.ok) {
-        throw new Error("Error al obtener estudiantes");
-      }
-
-      const result = await response.json();
-      return result.data || [];
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Error al obtener estudiantes"
-      );
-      return [];
-    }
+      if (!response.ok) throw new Error("Error al obtener estudiantes");
+      return response.json();
+    });
+    return result?.data ?? [];
   };
 
   return {

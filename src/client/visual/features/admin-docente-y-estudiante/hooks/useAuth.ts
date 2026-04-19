@@ -1,5 +1,5 @@
-import { useState } from "react";
 import { API_BASE_URL } from "../../../common/utils/apiConfig";
+import { useAsyncState } from "../../../common/hooks";
 
 const API_URL = API_BASE_URL;
 
@@ -70,108 +70,58 @@ export interface UseAuthReturn {
 }
 
 export const useAuth = (): UseAuthReturn => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { loading, error, runAsync } = useAsyncState();
 
-  const registerEstudiante = async (
-    data: RegisterEstudianteData
-  ): Promise<AuthResponse | null> => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch(`${API_URL}/auth/register/estudiante`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+  const registerEstudiante = (data: RegisterEstudianteData) =>
+    runAsync(async () => {
+      let response: Response;
+      try {
+        response = await fetch(`${API_URL}/auth/register/estudiante`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+      } catch (err) {
+        // Error de conexión: se decora con hint de dev para facilitar diagnóstico.
+        const msg = err instanceof Error ? err.message : "Error de conexión";
+        throw new Error(`${msg}. ¿Está el servidor backend corriendo en /auth?`);
+      }
 
       const contentType = response.headers.get("content-type");
       if (!contentType || !contentType.includes("application/json")) {
         await response.text();
-        setError(
-          `Error del servidor: No se recibió una respuesta JSON válida.`
-        );
-        return null;
+        throw new Error("Error del servidor: No se recibió una respuesta JSON válida.");
       }
 
       const result: AuthResponse = await response.json();
-
-      if (!response.ok) {
-        setError(result.error || "Error al registrar estudiante");
-        return null;
-      }
-
+      if (!response.ok) throw new Error(result.error || "Error al registrar estudiante");
       return result;
-    } catch (err) {
-      console.error("Error completo:", err);
-      const errorMessage =
-        err instanceof Error ? err.message : "Error de conexión";
-      setError(
-        `${errorMessage}. ¿Está el servidor backend corriendo en /auth?`
-      );
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  };
+    });
 
-  const registerProfesor = async (
-    data: RegisterProfesorData
-  ): Promise<AuthResponse | null> => {
-    setLoading(true);
-    setError(null);
-
-    try {
+  const registerProfesor = (data: RegisterProfesorData) =>
+    runAsync(async () => {
       const response = await fetch(`${API_URL}/auth/register/profesor`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
 
       const result: AuthResponse = await response.json();
-
-      if (!response.ok) {
-        setError(result.error || "Error al registrar profesor");
-        return null;
-      }
-
+      if (!response.ok) throw new Error(result.error || "Error al registrar profesor");
       return result;
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Error de conexión";
-      setError(errorMessage);
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  };
+    });
 
-  const login = async (data: LoginData): Promise<AuthResponse | null> => {
-    setLoading(true);
-    setError(null);
-
-    try {
+  const login = (data: LoginData) =>
+    runAsync(async () => {
       const response = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
 
       const result: AuthResponse = await response.json();
+      if (!response.ok) throw new Error(result.error || "Error al iniciar sesión");
 
-      if (!response.ok) {
-        setError(result.error || "Error al iniciar sesión");
-        return null;
-      }
-
-      // Guardar token, rol y usuario en localStorage
       if (result.data?.token) {
         localStorage.setItem("authToken", result.data.token);
         localStorage.setItem("userRole", result.data.role);
@@ -182,15 +132,7 @@ export const useAuth = (): UseAuthReturn => {
       }
 
       return result;
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Error de conexión";
-      setError(errorMessage);
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  };
+    });
 
   const logout = () => {
     localStorage.removeItem("authToken");
@@ -198,9 +140,7 @@ export const useAuth = (): UseAuthReturn => {
     localStorage.removeItem("user");
   };
 
-  const isAuthenticated = (): boolean => {
-    return !!localStorage.getItem("authToken");
-  };
+  const isAuthenticated = (): boolean => !!localStorage.getItem("authToken");
 
   const getUser = (): StoredUser | null => {
     const userStr = localStorage.getItem("user");
