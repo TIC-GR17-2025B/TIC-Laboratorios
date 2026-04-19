@@ -37,8 +37,8 @@ router.post('/', async (req: Request , res: Response) => {
 // GET /progreso/estudiante/10/escenario/tutorial - Obtener progreso específico
 router.get('/estudiante/:idEstudiante/escenario/:slugEscenario', async (req: Request , res: Response) => {
   try {
-    const idEstudiante = parseInt(req.params.idEstudiante)
-    const slugEscenario = req.params.slugEscenario
+    const idEstudiante = parseInt(req.params['idEstudiante'] as string)
+    const slugEscenario = req.params['slugEscenario'] as string
 
     if (isNaN(idEstudiante) || !slugEscenario) {
       return res.status(400).json({
@@ -67,7 +67,7 @@ router.get('/estudiante/:idEstudiante/escenario/:slugEscenario', async (req: Req
 // GET /progreso/estudiante/10 - Obtener todos los progresos de un estudiante
 router.get('/estudiante/:idEstudiante', async (req: Request , res: Response) => {
   try {
-    const idEstudiante = parseInt(req.params.idEstudiante)
+    const idEstudiante = parseInt(req.params['idEstudiante'] as string)
 
     if (isNaN(idEstudiante)) {
       return res.status(400).json({

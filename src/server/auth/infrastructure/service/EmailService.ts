@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer'
+import type { TransportOptions } from 'nodemailer'
 
 export interface EmailService {
   sendConfirmationEmail(email: string, token: string, nombre: string): Promise<void>
@@ -10,7 +11,7 @@ export class NodemailerEmailService implements EmailService {
   private fromEmail: string
   private frontendUrl: string
 
-  constructor(smtpConfig: nodemailer.TransportOptions, fromEmail: string, frontendUrl: string) {
+  constructor(smtpConfig: TransportOptions, fromEmail: string, frontendUrl: string) {
     this.transporter = nodemailer.createTransport(smtpConfig)
     this.fromEmail = fromEmail
     this.frontendUrl = frontendUrl

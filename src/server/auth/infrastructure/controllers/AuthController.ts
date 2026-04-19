@@ -1,11 +1,11 @@
 import express from "express"
-import type SMTPTransport from 'nodemailer/lib/smtp-transport'
+import type { TransportOptions } from "nodemailer"
 import type { Request, Response } from "express"
 import { PrismaAuthRepository } from "../repositories/PrismaAuthRepository.js"
 import { RegisterEstudianteUseCase } from "../../application/useCases/RegisterEstudianteUseCase.js"
 import { RegisterProfesorUseCase } from "../../application/useCases/RegisterProfesorUseCase.js"
 import { LoginUseCase } from "../../application/useCases/LoginUseCase.js"
-import { ConfirmarEmailUseCase} from "../../application/useCases/ConfirmarEmailUseCase.js"
+import { ConfirmarEmailUseCase } from "../../application/useCases/ConfirmarEmailUseCase.js"
 import { ReenviarConfirmacionEmailUseCase } from "../../application/useCases/ReenviarConfirmacionEmailUseCase.js"
 import { ObtenerEstudianteProfesorUseCase } from "../../application/useCases/ObtenerEstudianteProfesorUseCase.js"
 import { NodemailerEmailService } from "../../infrastructure/service/EmailService.js"
@@ -45,7 +45,7 @@ if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) {
   throw new Error('Faltan variables de entorno para la configuración de SMTP')
 }
 
-const smtpConfig: SMTPTransport.Options = {
+const smtpConfig = {
   host: SMTP_HOST,
   port: Number(SMTP_PORT ?? 587),
   secure: SMTP_SECURE === 'true',
@@ -53,7 +53,7 @@ const smtpConfig: SMTPTransport.Options = {
     user: SMTP_USER,
     pass: SMTP_PASS,
   },
-}
+} as TransportOptions
 
 // Inicializar el servicio de correo con Nodemailer
 const emailService = new NodemailerEmailService(smtpConfig, fromEmail, frontendUrl)
@@ -72,8 +72,8 @@ const cambiarContraseniaUseCase = new CambiarContraseniaUseCase(repo)
 router.post('/register/estudiante', async (req: Request, res: Response) => {
   try {
     const created = await registerEstudiante.execute(req.body)
-    res.status(201).json({ 
-      success: true, 
+    res.status(201).json({
+      success: true,
       data: created,
       message: 'Estudiante registrado. Por favor, verifica tu correo electrónico.'
     })
@@ -88,8 +88,8 @@ router.post('/register/estudiante', async (req: Request, res: Response) => {
 router.post('/register/profesor', async (req: Request, res: Response) => {
   try {
     const created = await registerProfesor.execute(req.body)
-    res.status(201).json({ 
-      success: true, 
+    res.status(201).json({
+      success: true,
       data: created,
       message: 'Profesor registrado. Por favor, verifica tu correo electrónico.'
     })
@@ -185,7 +185,7 @@ router.post('/resend-confirmation', async (req: Request, res: Response) => {
 // GET /auth/profesor/:id/estudiantes - Requiere autenticación y rol de profesor
 router.get('/profesor/:id/estudiantes', authMiddleware, requireProfesor, async (req: Request, res: Response) => {
   try {
-    const id_profesor = parseInt(req.params.id)
+    const id_profesor = parseInt(req.params['id'] as string)
 
     if (isNaN(id_profesor)) {
       return res.status(400).json({
@@ -203,9 +203,9 @@ router.get('/profesor/:id/estudiantes', authMiddleware, requireProfesor, async (
     }
 
     const estudiantes = await obtenerEstudianteProfesor.execute(id_profesor)
-    
-    res.json({ 
-      success: true, 
+
+    res.json({
+      success: true,
       data: estudiantes,
       total: estudiantes.length
     })
