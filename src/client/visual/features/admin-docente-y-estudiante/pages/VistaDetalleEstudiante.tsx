@@ -5,38 +5,23 @@ import { NivelController } from '../../../../ecs/controllers/NivelController';
 import styles from '../styles/VistaDetalleEstudiante.module.css';
 import Breadcrumb from '../components/Breadcrumb';
 
-// Hook para obtener escenarios
-const useEscenarios = () => {
-    const [escenarios, setEscenarios] = useState<Escenario[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-        const fetchEscenarios = () => {
-            setLoading(true);
-            setError(null);
-            try {
-                const nivelController = new NivelController();
-                const result = nivelController.getEscenarios();
-                setEscenarios(result || []);
-            } catch (err) {
-                setError(err instanceof Error ? err.message : "Error al cargar escenarios");
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchEscenarios();
-    }, []);
-
-    return { escenarios, loading, error };
-};
-
 interface Escenario {
     id: number;
     slug: string;
     titulo: string;
     descripcion: string;
 }
+
+const useEscenarios = () => {
+    const [escenarios, setEscenarios] = useState<Escenario[]>([]);
+
+    useEffect(() => {
+        const nivelController = new NivelController();
+        setEscenarios(nivelController.getEscenarios() || []);
+    }, []);
+
+    return { escenarios };
+};
 
 export default function VistaDetalleEstudiante() {
     const { idEstudiante } = useParams<{ idEstudiante: string }>();
@@ -47,7 +32,7 @@ export default function VistaDetalleEstudiante() {
     const { progresos, loading: loadingProgresos, error: errorProgresos } =
         useProgresoEstudiante(idEstudiante ? parseInt(idEstudiante) : null);
 
-    const { escenarios, loading: loadingEscenarios, error: errorEscenarios } = useEscenarios();
+    const { escenarios } = useEscenarios();
 
     const toggleEscenario = (escenarioId: number) => {
         setExpandedEscenario(expandedEscenario === escenarioId ? null : escenarioId);
@@ -63,8 +48,8 @@ export default function VistaDetalleEstudiante() {
         return `${minutos}m ${segs}s`;
     };
 
-    const loading = loadingProgresos || loadingEscenarios;
-    const error = errorProgresos || errorEscenarios;
+    const loading = loadingProgresos;
+    const error = errorProgresos;
 
     return (
         <>

@@ -62,22 +62,17 @@ export const FasesProvider = ({ children }: FasesProviderProps) => {
     };
 
     const actualizarFases = () => {
-        try {
-            const controller = EscenarioController.getInstance();
-            const fasesECS = controller.getFasesConObjetivos();
+        const controller = EscenarioController.getInstance();
+        const fasesECS = controller.getFasesConObjetivos();
 
-            if (fasesECS && fasesECS.length > 0) {
-                const fasesConvertidas = fasesECS.map(convertirFaseComponentAFase);
-                setFases(fasesConvertidas);
+        if (fasesECS && fasesECS.length > 0) {
+            const fasesConvertidas = fasesECS.map(convertirFaseComponentAFase);
+            setFases(fasesConvertidas);
 
-                // Encontrar el índice de la fase actual
-                const indexActual = fasesConvertidas.findIndex((f) => f.faseActual);
-                if (indexActual !== -1) {
-                    setFaseActualIndex(indexActual);
-                }
+            const indexActual = fasesConvertidas.findIndex((f) => f.faseActual);
+            if (indexActual !== -1) {
+                setFaseActualIndex(indexActual);
             }
-        } catch (error) {
-            console.error('Error al obtener fases del controlador:', error);
         }
     };
 
@@ -88,54 +83,50 @@ export const FasesProvider = ({ children }: FasesProviderProps) => {
 
         actualizarFases();
 
-        try {
-            const controller = EscenarioController.getInstance();
-            
-            const unsubscribeFaseCompletada = controller.on(EventosPublicos.FASE_COMPLETADA, () => {
-                setTimeout(() => actualizarFases(), 100);
-            });
+        const controller = EscenarioController.getInstance();
 
-            const unsubscribeObjetivoCompletado = controller.on('objetivo:completado' as EventosPublicos, () => {
-                setTimeout(() => actualizarFases(), 100);
-            });
+        const unsubscribeFaseCompletada = controller.on(EventosPublicos.FASE_COMPLETADA, () => {
+            setTimeout(() => actualizarFases(), 100);
+        });
 
-            // Cuando una fase no se completa, directamente "pierde"
-            const unsubscribeFaseNoCompletada = controller.on(EventosPublicos.FASE_NO_COMPLETADA, (data: unknown) => {
-                setTimeout(() => {
-                    actualizarFases();
-                    const mensaje = (data as string) || MensajesGenerales.MSJ_FASE_NO_COMPLETADA;
-                    openModal(
-                        <ModalResultadoFase tipo="fallo" mensaje={mensaje} />,
-                        undefined,
-                        false,
-                        false
-                    );
-                }, 100);
-            });
+        const unsubscribeObjetivoCompletado = controller.on('objetivo:completado' as EventosPublicos, () => {
+            setTimeout(() => actualizarFases(), 100);
+        });
 
-            // Cuando "gana"
-            const unsubscribeEscenarioCompletado = controller.on(EventosPublicos.ESCENARIO_COMPLETADO, (data: unknown) => {
-                setTimeout(() => {
-                    actualizarFases();
-                    const mensaje = (data as string) || '¡Has completado exitosamente todos los objetivos del escenario! Excelente trabajo en la configuración y seguridad de la red.';
-                    openModal(
-                        <ModalResultadoFase tipo="exito" mensaje={mensaje} />,
-                        undefined,
-                        false,
-                        false
-                    );
-                }, 100);
-            });
+        // Cuando una fase no se completa, directamente "pierde"
+        const unsubscribeFaseNoCompletada = controller.on(EventosPublicos.FASE_NO_COMPLETADA, (data: unknown) => {
+            setTimeout(() => {
+                actualizarFases();
+                const mensaje = (data as string) || MensajesGenerales.MSJ_FASE_NO_COMPLETADA;
+                openModal(
+                    <ModalResultadoFase tipo="fallo" mensaje={mensaje} />,
+                    undefined,
+                    false,
+                    false
+                );
+            }, 100);
+        });
 
-            return () => {
-                unsubscribeFaseCompletada();
-                unsubscribeObjetivoCompletado();
-                unsubscribeFaseNoCompletada();
-                unsubscribeEscenarioCompletado();
-            };
-        } catch (error) {
-            console.error('Error al suscribirse a eventos del controlador:', error);
-        }
+        // Cuando "gana"
+        const unsubscribeEscenarioCompletado = controller.on(EventosPublicos.ESCENARIO_COMPLETADO, (data: unknown) => {
+            setTimeout(() => {
+                actualizarFases();
+                const mensaje = (data as string) || '¡Has completado exitosamente todos los objetivos del escenario! Excelente trabajo en la configuración y seguridad de la red.';
+                openModal(
+                    <ModalResultadoFase tipo="exito" mensaje={mensaje} />,
+                    undefined,
+                    false,
+                    false
+                );
+            }, 100);
+        });
+
+        return () => {
+            unsubscribeFaseCompletada();
+            unsubscribeObjetivoCompletado();
+            unsubscribeFaseNoCompletada();
+            unsubscribeEscenarioCompletado();
+        };
     }, [openModal, escenario.id]);
 
     return (
