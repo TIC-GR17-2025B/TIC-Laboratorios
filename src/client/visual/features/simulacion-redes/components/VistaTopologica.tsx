@@ -1,19 +1,34 @@
-/*  eslint-disable  @typescript-eslint/no-explicit-any */
-import { useNodesState, useEdgesState, ReactFlow } from "@xyflow/react";
+import { useNodesState, useEdgesState, ReactFlow, Handle, Position } from "@xyflow/react";
+import type { Node, NodeProps } from "@xyflow/react";
 import { TipoDispositivo } from "../../../../shared/types/DeviceEnums";
 import "@xyflow/react/dist/style.css";
-import { Handle, Position } from '@xyflow/react';
 import styles from '../styles/VistaTopologica.module.css';
 import { useTopologiaLayout, useTopologiaData, useDispositivoRedes } from '../hooks';
 import getIconoNodo from "../utils/getIconoNodo";
 import { useState, useEffect } from "react";
 import RedChip from "./RedChip";
 import { RedComponent } from "../../../../ecs/components";
+import type { ECSManager } from "../../../../ecs/core";
 import { useECSSceneContext } from "../../escenarios-simulados/context/ECSSceneContext";
 import { getColoresRed } from "../utils/obtenerConfiguraciones";
 
+interface DeviceNodeData extends Record<string, unknown> {
+    label: string;
+    tipo: TipoDispositivo | "Internet";
+    redes?: { nombre: string; color: string }[];
+    entidadId?: number;
+    conectado?: boolean;
+}
 
-function DeviceNode({ data }: any) {
+interface GroupNodeData extends Record<string, unknown> {
+    label: string;
+}
+
+type DeviceFlowNode = Node<DeviceNodeData, "device">;
+type GroupFlowNode = Node<GroupNodeData, "group">;
+type TopologiaNode = DeviceFlowNode | GroupFlowNode;
+
+function DeviceNode({ data }: NodeProps<DeviceFlowNode>) {
     const coloresRed = getColoresRed();
     const isWorkstation = data.tipo === TipoDispositivo.WORKSTATION;
     const isRouter = data.tipo === TipoDispositivo.ROUTER || data.tipo === TipoDispositivo.VPN;
@@ -75,7 +90,7 @@ function DeviceNode({ data }: any) {
                 {getIconoNodo(data.tipo)}
                 {!isInternet && redes.length > 0 && (
                     <div className={styles.networkBadges}>
-                        {redes.map((red: RedComponent, index: number) => (
+                        {redes.map((red, index) => (
                             <div
                                 key={`badge-${red.nombre}-${index}`}
                                 className={styles.networkBadge}
@@ -103,7 +118,7 @@ function DeviceNode({ data }: any) {
 }
 
 // zonas
-function GroupNode({ data }: { data: { label: string } }) {
+function GroupNode({ data }: NodeProps<GroupFlowNode>) {
     return (
         <div className={styles.groupNode}>
             <div className={styles.groupLabel}>
@@ -132,8 +147,8 @@ export default function VistaTopologicaFlow() {
         setEdges(initialEdges);
     }, [initialNodes, initialEdges, setNodes, setEdges]);
 
-    const handleNodeClick = (_event: React.MouseEvent, node: any) => {
-        if (node.data.entidadId !== undefined) {
+    const handleNodeClick = (_event: React.MouseEvent, node: TopologiaNode) => {
+        if (node.type === "device" && node.data.entidadId !== undefined) {
             setEntidadSeleccionada(node.data.entidadId);
         } else {
             setEntidadSeleccionada(null);
@@ -169,7 +184,7 @@ export default function VistaTopologicaFlow() {
 
 interface PanelLateralTopologiaProps {
     entidadId: number | null;
-    ecsManager: any;
+    ecsManager: ECSManager;
     onCerrar: () => void;
 }
 

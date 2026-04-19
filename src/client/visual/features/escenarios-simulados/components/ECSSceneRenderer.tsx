@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router';
 import Model3D from './Model3D';
 import { getModelo } from '../config/modelConfig';
 import { useEscenario, useModal } from '../../../common/contexts';
+import type { ECSEntityRef } from '../../../common/contexts/EscenarioContext';
 import { useECSSceneContext } from '../context/ECSSceneContext';
 import { useScreenTransition } from '../../../common/contexts/ScreenTransitionContext';
 import ModalFirewall from '../../simulacion-redes/components/ModalFirewall';
@@ -30,16 +31,14 @@ const ECSSceneRenderer: React.FC = () => {
         setDispositivoSeleccionado(null);
     }, []);
 
-    const handleEntityClick = (entity: unknown) => {
-        const e = entity as { objetoConTipo?: { tipo?: string }; entidadId?: number };
-        if (e.objetoConTipo?.tipo === 'espacio') return;
-        setClickedEntityId(e.entidadId ?? null);
+    const handleEntityClick = (entity: ECSEntityRef) => {
+        if (entity.objetoConTipo?.tipo === 'espacio') return;
+        setClickedEntityId(entity.entidadId ?? null);
         setDispositivoSeleccionado(entity);
     };
 
-    const handleEntityHover = (entity: unknown) => {
-        const e = entity as { objetoConTipo?: { tipo?: string } };
-        if (e.objetoConTipo?.tipo === 'espacio') return;
+    const handleEntityHover = (entity: ECSEntityRef) => {
+        if (entity.objetoConTipo?.tipo === 'espacio') return;
         if (clickedEntityId === null) {
             setDispositivoSeleccionado(entity);
         }
@@ -59,12 +58,11 @@ const ECSSceneRenderer: React.FC = () => {
         setMenuOpenForEntity(null);
     };
 
-    const handleContextMenu = (entity: unknown) => {
-        const e = entity as { objetoConTipo?: { tipo?: string }; entidadId?: number };
-        if (e.objetoConTipo?.tipo !== 'espacio') {
-            setClickedEntityId(e.entidadId ?? null);
+    const handleContextMenu = (entity: ECSEntityRef) => {
+        if (entity.objetoConTipo?.tipo !== 'espacio') {
+            setClickedEntityId(entity.entidadId ?? null);
             setDispositivoSeleccionado(entity);
-            setMenuOpenForEntity(e.entidadId ?? null);
+            setMenuOpenForEntity(entity.entidadId ?? null);
         }
     };
 

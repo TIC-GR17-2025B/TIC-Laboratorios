@@ -17,7 +17,7 @@ export default function VistaPerfil() {
     const { getUser, getUserRole } = useAuth();
     const user = getUser();
     const role = getUserRole();
-    const idEstudiante = role === 'estudiante' && user ? (user as { id_estudiante: number }).id_estudiante : null;
+    const idEstudiante = role === 'estudiante' && user?.id_estudiante ? user.id_estudiante : null;
 
     const { progresos, loading } = useProgresoEstudiante(user?.id_estudiante || null);
     const { grupo, loading: grupoLoading, refetch: refetchGrupo } = useEstudianteGrupo();

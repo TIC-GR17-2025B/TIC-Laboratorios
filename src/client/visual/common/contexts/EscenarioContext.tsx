@@ -8,16 +8,68 @@ import {
     WorkstationComponent,
     Transform,
 } from '../../../ecs/components';
+import { ComponenteContainer } from '../../../ecs/core/Componente';
 import { useSelectedLevel } from './SelectedLevelContext';
+
+/**
+ * Shape mínimo de los datos de un dispositivo provenientes del ECS.
+ * Los valores llegan tipados como `unknown` porque se originan en estructuras
+ * dinámicas del builder; se narrow-ean al construir el `Dispositivo`.
+ */
+interface DispositivoRaw {
+    tipo?: unknown;
+    nombre?: unknown;
+    sistemaOperativo?: unknown;
+    hardware?: unknown;
+    software?: unknown;
+    estadoAtaque?: unknown;
+}
+
+/**
+ * Forma de la entidad que emite `ECSSceneRenderer` al seleccionar un objeto 3D.
+ * `entidadCompleta` se tipa como `unknown` porque proviene del builder dinámico y
+ * solo se reconoce con `instanceof ComponenteContainer`.
+ */
+export interface ECSEntityRef {
+    id?: unknown;
+    tipo?: unknown;
+    entidadId?: number;
+    entidadCompleta?: unknown;
+    objetoConTipo?: DispositivoRaw;
+    position?: { x: number; y: number; z: number };
+}
 
 interface EscenarioContextType {
     escenario: Escenario | null;
     setEscenario: (escenario: Escenario) => void;
     dispositivoSeleccionado: Dispositivo | null;
     // Acepta un Dispositivo ya normalizado, null, o una entidad/objeto proveniente del ECS
-    setDispositivoSeleccionado: (dispositivo: Dispositivo | null | unknown) => void;
+    setDispositivoSeleccionado: (dispositivo: Dispositivo | ECSEntityRef | null) => void;
     // ID de la entidad seleccionada (puede ser dispositivo o espacio)
     entidadSeleccionadaId: number | null;
+}
+
+function hasDispositivoShape(raw: ECSEntityRef): raw is ECSEntityRef & { id: number; tipo: TipoDispositivo } {
+    return typeof raw.id !== 'undefined' && typeof raw.tipo !== 'undefined';
+}
+
+function toDispositivoFromRaw(
+    entidadId: number,
+    raw: DispositivoRaw,
+    posicion: Dispositivo['posicion'],
+): Dispositivo {
+    return {
+        id: entidadId,
+        entidadId,
+        tipo: raw.tipo as TipoDispositivo,
+        nombre: raw.nombre as string | undefined,
+        sistemaOperativo: raw.sistemaOperativo as string | undefined,
+        hardware: (raw.hardware as string) ?? "",
+        software: raw.software as string | undefined,
+        posicion,
+        estadoAtaque: raw.estadoAtaque as EstadoAtaqueDispositivo,
+        activos: [],
+    };
 }
 
 /**
@@ -67,125 +119,66 @@ export function EscenarioProvider({ children, initialEscenario }: EscenarioProvi
     }
 
     // Helper: normaliza distintos shapes que pueden venir al seleccionar una entidad 3D
-    const mapEntityToDispositivo = (input: unknown): Dispositivo | null => {
+    const mapEntityToDispositivo = (input: Dispositivo | ECSEntityRef | null): Dispositivo | null => {
         if (!input) return null;
 
-        const raw = input as Record<string, unknown>;
+        const raw = input as ECSEntityRef;
 
-        // Si ya tiene forma de Dispositivo
-        if (typeof raw.id !== 'undefined' && typeof raw.tipo !== 'undefined') {
-            return raw as unknown as Dispositivo;
+        // Caso 1: ya viene con forma de Dispositivo
+        if (hasDispositivoShape(raw)) {
+            return input as Dispositivo;
         }
 
-        // Forma que usa ECSSceneRenderer: { objetoConTipo, entidadId, entidadCompleta, position }
-        if (raw.entidadCompleta) {
-            try {
-                const container = raw.entidadCompleta as unknown;
+        const entidadId = raw.entidadId ?? 0;
 
-                type LocalContainer = { tiene?: (c: unknown) => boolean; get?: (c: unknown) => unknown };
-                const cont = container as LocalContainer;
+        // Caso 2: entidad del ECSSceneRenderer con ComponenteContainer
+        if (raw.entidadCompleta instanceof ComponenteContainer) {
+            const container = raw.entidadCompleta;
+            const dispComp = container.get(DispositivoComponent);
+            const transform = container.get(Transform);
 
-                // Extraer DispositivoComponent si existe
-                let dispComp: unknown = null;
-                if (typeof cont.tiene === 'function' && cont.tiene!(DispositivoComponent)) {
-                    dispComp = cont.get!(DispositivoComponent);
+            // Si no hay DispositivoComponent pero sí objetoConTipo, se usa como fallback
+            if (!dispComp) {
+                if (raw.objetoConTipo) {
+                    return toDispositivoFromRaw(entidadId, raw.objetoConTipo, raw.position);
                 }
-
-                // Extraer Transform para posicion
-                let transform: unknown = null;
-                if (typeof cont.tiene === 'function' && cont.tiene!(Transform)) {
-                    transform = cont.get!(Transform);
-                }
-
-                if (!dispComp) {
-                    // fallback: intentar leer objetoConTipo
-                    if (raw.objetoConTipo) {
-                        const oc = raw.objetoConTipo as Record<string, unknown>;
-                        return {
-                            id: (raw.entidadId as number) ?? 0,
-                            tipo: oc.tipo as unknown as TipoDispositivo,
-                            nombre: oc.nombre as string | undefined,
-                            sistemaOperativo: oc.sistemaOperativo as string | undefined,
-                            hardware: (oc.hardware as string) ?? "",
-                            software: oc.software as string | undefined,
-                            posicion: (raw.position as unknown) as { x: number; y: number; z: number } | undefined,
-                            estadoAtaque: oc.estadoAtaque as unknown as EstadoAtaqueDispositivo,
-                        } as Dispositivo;
-                    }
-                    return null;
-                }
-
-                const t = transform as Record<string, unknown> | undefined;
-                const posicion = t
-                    ? { x: t.x as number, y: t.y as number, z: t.z as number, rotacionY: t.rotacionY as number }
-                    : (raw.position as unknown) as { x: number; y: number; z: number } | undefined;
-
-                const dc = dispComp as Record<string, unknown>;
-                const dispositivo: Dispositivo = {
-                    id: (raw.entidadId as number) ?? 0,
-                    entidadId: (raw.entidadId as number) ?? 0,
-                    tipo: dc.tipo as unknown as TipoDispositivo,
-                    nombre: dc.nombre as string | undefined,
-                    sistemaOperativo: dc.sistemaOperativo as string | undefined,
-                    hardware: (dc.hardware as string) ?? "",
-                    software: dc.software as string | undefined,
-                    posicion,
-                    estadoAtaque: dc.estadoAtaque as unknown as EstadoAtaqueDispositivo,
-                    activos: [],
-                };
-
-                // Añadir configuraciones desde WorkstationComponent si existe
-                if (typeof cont.tiene === 'function' && cont.tiene!(WorkstationComponent)) {
-                    try {
-                        const ws = cont.get!(WorkstationComponent) as unknown;
-                        const wsObj = ws as { configuraciones?: unknown };
-                        if (wsObj && typeof wsObj.configuraciones !== 'undefined') {
-                            dispositivo.configuraciones = wsObj.configuraciones;
-                        }
-                    } catch (e) {
-                        console.warn('No se pudo leer WorkstationComponent:', e);
-                    }
-                }
-
-                return dispositivo;
-            } catch (e) {
-                console.warn('Error mapeando entidad a dispositivo:', e);
                 return null;
             }
+
+            const posicion = transform
+                ? { x: transform.x, y: transform.y, z: transform.z, rotacionY: transform.rotacionY }
+                : raw.position;
+
+            const dispositivo = toDispositivoFromRaw(entidadId, dispComp as DispositivoRaw, posicion);
+
+            const ws = container.get(WorkstationComponent);
+            if (ws && typeof ws.configuraciones !== 'undefined') {
+                dispositivo.configuraciones = ws.configuraciones;
+            }
+
+            return dispositivo;
         }
 
-        // Forma alternativa: objeto con objetoConTipo y position
+        // Caso 3: objeto con objetoConTipo y position (sin container ECS)
         if (raw.objetoConTipo) {
-            const oc = raw.objetoConTipo as Record<string, unknown>;
-            return {
-                id: (raw.entidadId as number) ?? 0,
-                entidadId: (raw.entidadId as number) ?? 0,
-                tipo: oc.tipo as unknown as TipoDispositivo,
-                nombre: oc.nombre as string | undefined,
-                sistemaOperativo: oc.sistemaOperativo as string | undefined,
-                hardware: (oc.hardware as string) ?? "",
-                software: oc.software as string | undefined,
-                posicion: (raw.position as unknown) as { x: number; y: number; z: number } | undefined,
-                estadoAtaque: oc.estadoAtaque as unknown as EstadoAtaqueDispositivo,
-            } as Dispositivo;
+            return toDispositivoFromRaw(entidadId, raw.objetoConTipo, raw.position);
         }
 
         return null;
     };
 
     // Setter expuesto: acepta un Dispositivo o una entidad/objeto y mapea a Dispositivo
-    const setDispositivoSeleccionado = (dispositivo: Dispositivo | null | unknown) => {
+    const setDispositivoSeleccionado = (dispositivo: Dispositivo | ECSEntityRef | null) => {
         const mapped = mapEntityToDispositivo(dispositivo);
         setDispositivoSeleccionadoState(mapped);
 
-        // Actualizar también el ID de la entidad seleccionada
         if (!dispositivo) {
             setEntidadSeleccionadaId(null);
-        } else {
-            const raw = dispositivo as Record<string, unknown>;
-            const id = raw.entidadId as number | undefined;
-            setEntidadSeleccionadaId(id ?? null);
+            return;
         }
+
+        const id = (dispositivo as ECSEntityRef).entidadId;
+        setEntidadSeleccionadaId(typeof id === 'number' ? id : null);
     };
 
     return (

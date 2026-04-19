@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { API_BASE_URL } from "../../../common/utils/apiConfig";
 
-// Usar la configuración centralizada de API
 const API_URL = API_BASE_URL;
 
 interface RegisterEstudianteData {
@@ -42,7 +41,35 @@ interface AuthResponse {
   error?: string;
 }
 
-export const useAuth = () => {
+/**
+ * Usuario persistido en localStorage tras el login.
+ * Combina los campos de `AuthResponse.data.user` con identificadores de rol
+ * (`id_estudiante` o `id_profesor`) que inyecta el backend en el login.
+ */
+export interface StoredUser {
+  id: string;
+  nombre_completo: string;
+  correo_electronico: string;
+  rol: string;
+  id_estudiante?: number;
+  id_profesor?: number;
+}
+
+export type UserRole = "estudiante" | "profesor";
+
+export interface UseAuthReturn {
+  loading: boolean;
+  error: string | null;
+  registerEstudiante: (data: RegisterEstudianteData) => Promise<AuthResponse | null>;
+  registerProfesor: (data: RegisterProfesorData) => Promise<AuthResponse | null>;
+  login: (data: LoginData) => Promise<AuthResponse | null>;
+  logout: () => void;
+  isAuthenticated: () => boolean;
+  getUser: () => StoredUser | null;
+  getUserRole: () => UserRole | null;
+}
+
+export const useAuth = (): UseAuthReturn => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -175,13 +202,13 @@ export const useAuth = () => {
     return !!localStorage.getItem("authToken");
   };
 
-  const getUser = () => {
+  const getUser = (): StoredUser | null => {
     const userStr = localStorage.getItem("user");
-    return userStr ? JSON.parse(userStr) : null;
+    return userStr ? (JSON.parse(userStr) as StoredUser) : null;
   };
 
-  const getUserRole = (): "estudiante" | "profesor" | null => {
-    return localStorage.getItem("userRole") as "estudiante" | "profesor" | null;
+  const getUserRole = (): UserRole | null => {
+    return localStorage.getItem("userRole") as UserRole | null;
   };
 
   return {
