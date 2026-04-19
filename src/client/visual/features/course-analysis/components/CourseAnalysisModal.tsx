@@ -19,7 +19,6 @@ export function CourseAnalysisModal({
 
   const { analisis, resumen, fecha_generacion } = analysis;
 
-  // Formatear fecha
   const fecha = new Date(fecha_generacion).toLocaleDateString('es-ES', {
     year: 'numeric',
     month: 'long',

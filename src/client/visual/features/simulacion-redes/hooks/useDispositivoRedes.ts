@@ -9,13 +9,7 @@ import {
 import { SistemaJerarquiaEscenario } from "../../../../ecs/systems/SistemaJerarquiaEscenario";
 import { RedController } from "../../../../ecs/controllers/RedController";
 import { EventosPublicos } from "../../../../shared/types/EventosEnums";
-
-interface RedInfo {
-  entidadId: Entidad;
-  nombre: string;
-  color: string;
-  estaActiva: boolean;
-}
+import type { RedInfo } from "../types/redTypes";
 
 export function useDispositivoRedes(
   entidadId: Entidad | null,

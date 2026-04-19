@@ -6,17 +6,11 @@ import { useProgresoEstudiante } from '../hooks/useEstudiantes';
 import { useEstudianteGrupo } from '../contexts/EstudianteGrupoContext';
 import { FeedbackButton } from '../../feedback/components/FeedbackButton';
 import { FeedbackModal } from '../../feedback/components/FeedbackModal';
+import type { FeedbackData } from '../../feedback/types/feedback.types';
 import ModalUnirseGrupo from '../components/ModalUnirseGrupo';
 import { NivelController } from '../../../../ecs/controllers/NivelController';
 import { API_BASE_URL } from '../../../common/utils/apiConfig';
 import styles from '../styles/VistaPerfil.module.css';
-
-interface FeedbackData {
-    analisis: string;
-    fortaleza: string;
-    area_mejora: string;
-    consejo: string;
-}
 
 export default function VistaPerfil() {
     const navigate = useNavigate();

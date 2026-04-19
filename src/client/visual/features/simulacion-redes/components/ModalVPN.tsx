@@ -309,7 +309,6 @@ function ConfiguracionVpnGateway({
   const entidadHostLan = parseInt(hostLan);
   const dispositivoLanComponent = redController.ecsManager.getComponentes(entidadHostLan)?.get(DispositivoComponent);
   const nombreHostLan = dispositivoLanComponent?.nombre || hostLan;
-  //const tipoHostLan = dispositivoLanComponent?.tipo as any;
 
   const entidadZonaRemota = parseInt(dominioRemoto);
   const zonaRemotaComponent = redController.ecsManager.getComponentes(entidadZonaRemota)?.get(ZonaComponent);
@@ -318,7 +317,6 @@ function ConfiguracionVpnGateway({
   const entidadHostRemoto = parseInt(hostRemoto);
   const dispositivoRemotoComponent = redController.ecsManager.getComponentes(entidadHostRemoto)?.get(DispositivoComponent);
   const nombreHostRemoto = dispositivoRemotoComponent?.nombre || hostRemoto;
-  //const tipoHostRemoto = dispositivoRemotoComponent?.tipo as any;
 
   return (
     <div className={styles.configuracionItem}>

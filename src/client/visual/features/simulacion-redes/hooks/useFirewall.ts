@@ -9,12 +9,7 @@ import {
 import { RouterComponent, RedComponent } from "../../../../ecs/components";
 import { useECSSceneContext } from "../../escenarios-simulados/context/ECSSceneContext";
 import { useEscenario } from "../../../common/contexts/EscenarioContext";
-
-interface RedInfo {
-  nombre: string;
-  color: string;
-  entidadId: Entidad;
-}
+import type { RedInfo } from "../types/redTypes";
 
 export function useFirewall() {
   const { entidadSeleccionadaId } = useEscenario();

@@ -55,7 +55,6 @@ const AuthPage = () => {
         window.history.replaceState(null, '', newMode === 'login' ? '/login' : '/signup');
     };
 
-    // --- Validation ---
     const validateLogin = (): boolean => {
         const errors: FieldErrors = {};
         if (!loginEmail.trim()) errors.loginEmail = 'Ingresa tu correo electrónico';
@@ -86,7 +85,6 @@ const AuthPage = () => {
         return Object.keys(errors).length === 0;
     };
 
-    // --- Handlers ---
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!validateLogin()) return;

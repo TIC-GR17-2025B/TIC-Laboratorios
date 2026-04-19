@@ -40,7 +40,7 @@ const CameraZoomEffect: React.FC = () => {
     const savedLookAt = useRef(new Vector3());
     const savedAspect = useRef(0);
 
-    // Fix #1: Restore camera and reset state if component unmounts mid-transition
+    // Si el componente se desmonta mid-transición, restaura cámara y resetea estado para evitar que quede "trabada".
     useEffect(() => {
         return () => {
             if (savedAspect.current > 0 && camera instanceof PerspectiveCamera) {
@@ -62,10 +62,10 @@ const CameraZoomEffect: React.FC = () => {
     }, []);
 
     useFrame((_, rawDelta) => {
-        // Fix #4: Clamp delta to prevent instant animation skip on tab return
+        // Clamp del delta: si el usuario vuelve a la pestaña tras mucho tiempo, rawDelta sería enorme y saltaría la animación.
         const delta = Math.min(rawDelta, 0.1);
 
-        // Fix #2: Lock camera aspect during entire transition (zoom + desktopMode)
+        // Aspect bloqueado durante toda la transición (zoom + desktopMode) para que los resize no deformen la vista.
         if ((isZooming || desktopMode) && savedAspect.current > 0 && camera instanceof PerspectiveCamera) {
             if (camera.aspect !== savedAspect.current) {
                 camera.aspect = savedAspect.current;
@@ -98,7 +98,7 @@ const CameraZoomEffect: React.FC = () => {
         // Save initial camera state on first frame of zoom-in
         // Guard: only save if not already saved (prevents stale frames after enterDesktopMode from overwriting)
         if (zoomDirection.current === 'in' && progress.current === 0 && !savedCameraState.current) {
-            // Fix #2: Save aspect at zoom start to lock for entire transition
+            // Guarda el aspect al inicio del zoom para mantenerlo constante durante toda la transición.
             if (camera instanceof PerspectiveCamera) {
                 savedAspect.current = camera.aspect;
             }
@@ -178,7 +178,7 @@ const CameraZoomEffect: React.FC = () => {
                 // Restore camera exactly
                 camera.position.copy(saved.position);
                 camera.quaternion.copy(saved.quaternion);
-                // Fix #5: Reset aspect ratio with NaN/zero guard
+                // Guard contra NaN/cero al recalcular aspect (size puede ser 0 si el canvas no está mounted).
                 if (camera instanceof PerspectiveCamera) {
                     const aspect = size.width / size.height;
                     camera.aspect = (isFinite(aspect) && aspect > 0) ? aspect : 1;
@@ -202,7 +202,7 @@ function projectMonitorToScreen(
     screenCenter: Vector3,
     rotationY: number,
 ) {
-    // Fix #6: Use same -90° offset as camera zoom calculation (was +90° before)
+    // -90° para alinearse con el cálculo del zoom de cámara (el modelo GLTF tiene su eje frontal rotado).
     const adjusted = rotationY - Math.PI / 2;
     const cosR = Math.cos(adjusted);
     const sinR = Math.sin(adjusted);

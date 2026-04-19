@@ -23,7 +23,6 @@ export default function TarjetaLogNuevo() {
         return null;
     }
 
-    // Formatear el tiempo transcurrido
     const formatearTiempo = (segundos: number): string => {
         const minutos = Math.floor(segundos / 60);
         const segs = Math.floor(segundos % 60);

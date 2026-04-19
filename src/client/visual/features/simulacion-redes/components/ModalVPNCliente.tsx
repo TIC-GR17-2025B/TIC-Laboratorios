@@ -231,7 +231,6 @@ function ConfiguracionVpnCliente({ index, proteccion, dominioRemoto, hostRemoto,
     const entidadHost = parseInt(hostRemoto);
     const dispositivoComponent = redController.ecsManager.getComponentes(entidadHost)?.get(DispositivoComponent);
     const nombreHost = dispositivoComponent?.nombre || hostRemoto;
-    // const tipoHost = dispositivoComponent?.tipo as any; // necesito ver bien este tipado luego
 
     return (
         <div className={styles.configuracionItem}>
