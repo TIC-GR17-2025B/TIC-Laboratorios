@@ -1,11 +1,11 @@
 import type { IChatRepository, ChatMessagePayload, ChatResponse } from "../../domain/repositories/IChatRepository.js";
 import type { ILLMService, ITopicAnalyzer, ToolResult } from "../services/GeminiService.js";
 import type { IVectorSearchService } from "../services/QdrantService.js";
-import type { ITTSService } from "../services/GoogleTTSService.js";
+import type { ITTSService } from "../services/PiperTTSService.js";
 import type { IConversationMemory } from "../services/ConversationMemoryManager.js";
 import { GeminiService } from "../services/GeminiService.js";
 import { QdrantService } from "../services/QdrantService.js";
-import { GoogleTTSService } from "../services/GoogleTTSService.js";
+import { PiperTTSService } from "../services/PiperTTSService.js";
 import { getMemoryManager } from "../services/ConversationMemoryManager.js";
 import { CYBERSECURITY_SYSTEM_PROMPT, CONTEXT_EXPLANATION_PREFIX } from "../prompts/systemPrompt.js";
 
@@ -25,7 +25,7 @@ export class NativeChatRepository implements IChatRepository {
   constructor({
     llmService = new GeminiService(), 
     vectorService = new QdrantService(),
-    ttsService = new GoogleTTSService(),
+    ttsService = new PiperTTSService(),
     memoryManager = getMemoryManager()
   }: Partial<ChatDependencies> = {}) { 
     this.llmService = llmService;

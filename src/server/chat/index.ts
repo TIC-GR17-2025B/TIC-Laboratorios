@@ -19,6 +19,6 @@ export { SendMessageUseCase } from "./application/useCases/SendMessageUseCase.js
 export { SendContextUseCase } from "./application/useCases/SendContextUseCase.js";
 export { ToggleContextModeUseCase } from "./application/useCases/ToggleContextModeUseCase.js";
 
-export { HttpChatRepository } from "./infrastructure/repositories/HttpChatRepository";
-export { NativeChatRepository } from "./infrastructure/repositories/NativeChatRepository";
-export { ContextModeManager } from "./infrastructure/context-mode/ContextModeManager";
+export { HttpChatRepository } from "./infrastructure/repositories/HttpChatRepository.js";
+export { NativeChatRepository } from "./infrastructure/repositories/NativeChatRepository.js";
+export { ContextModeManager } from "./infrastructure/context-mode/ContextModeManager.js";

@@ -36,45 +36,32 @@ export function useScenarioBuilder() {
 
         const scenario = scenarioData;
 
-        const rawZonas = findInObj(scenario, 'zonas') ?? [];
-        const rawFases = findInObj(scenario, 'fases') ?? [];
-        const rawEventos = findInObj(scenario, 'eventos') ?? [];
-        const rawAtaques = findInObj(scenario, 'ataques') ?? [];
+        const rawZonas = (findInObj(scenario, 'zonas') ?? []) as RawData[];
+        const rawFases = (findInObj(scenario, 'fases') ?? []) as RawData[];
+        const rawEventos = (findInObj(scenario, 'eventos') ?? []) as RawData[];
+        const rawAtaques = (findInObj(scenario, 'ataques') ?? []) as RawData[];
 
-        const zonasNormalizadas = normalizarZonas(rawZonas);
+        const zonasNormalizadas = normalizarZonas(rawZonas, rawEventos);
         inyectarRouterSiFalta(zonasNormalizadas);
 
         const fasesReconstruidas = reconstruirFasesSiFaltan(rawFases, rawEventos, rawAtaques, scenario);
         const fasesNormalizadas = normalizarFases(fasesReconstruidas);
 
-        const todosLosEventos: RawData[] = [...rawEventos as RawData[]];
+        const todosLosEventos: RawData[] = [];
         let timeCursor = TIEMPO_INICIAL;
 
-        fasesNormalizadas.forEach((fase: RawData) => {
-            const faseId = fase.id;
-            const eventosFase = rawEventos.filter((e: RawData) => Number(e.fase) === faseId);
-            const ataquesFase = rawAtaques.filter((a: RawData) => Number(a.fase) === faseId);
+        fasesNormalizadas.forEach((item: unknown) => {
+            const fase = item as RawData;
+            const faseId = Number(fase.id);
+            const eventosFase = rawEventos.filter((e) => Number(e.fase) === faseId);
+            const ataquesFase = rawAtaques.filter((a) => Number(a.fase) === faseId);
 
             const flujoFase: RawData[] = [];
 
-            ataquesFase.forEach((atk: RawData) => {
-                const nombre = String(atk.nombreAtaque ?? '').toLowerCase();
-                const esPaz = nombre.includes('escaneo') || nombre.includes('búsqueda') || nombre.includes('auditoría');
-
-                if (esPaz) {
-                    flujoFase.push({
-                        nombreEvento: atk.nombreAtaque,
-                        tipoEvento: TipoEvento.VERIFICACION_ACCION_JUGADOR,
-                        descripcion: atk.descripcion ?? `Realiza: ${atk.nombreAtaque}`,
-                        fase: faseId,
-                        infoAdicional: { ...atk.condicionMitigacion, esObjetivo: true },
-                    });
-                } else {
-                    flujoFase.push(atk);
-                }
-            });
-
-            eventosFase.forEach((ev: RawData) => {
+            // EVENTOS PRIMERO (VERIFICACION, TRAFICO_RED, VPN, etc.)
+            // Deben quedar en índice menor que los ataques en la lista ordenada
+            // para que SistemaFase avance correctamente sin bloquearse en el ataque.
+            eventosFase.forEach((ev) => {
                 const tipoValidado = validarTipoEvento(String(ev.tipoEvento ?? ''));
                 if (tipoValidado) ev.tipoEvento = tipoValidado;
 
@@ -85,8 +72,26 @@ export function useScenarioBuilder() {
                 if (!esCierre) flujoFase.push(ev);
             });
 
+            // ATAQUES DESPUÉS — reciben tiempoNotificacion mayor y quedan tras los eventos
+            ataquesFase.forEach((atk) => {
+                const nombre = String(atk.nombreAtaque ?? '').toLowerCase();
+                const esPaz = nombre.includes('escaneo') || nombre.includes('búsqueda') || nombre.includes('auditoría');
+
+                if (esPaz) {
+                    flujoFase.push({
+                        nombreEvento: atk.nombreAtaque,
+                        tipoEvento: TipoEvento.VERIFICACION_ACCION_JUGADOR,
+                        descripcion: atk.descripcion ?? `Realiza: ${atk.nombreAtaque}`,
+                        fase: faseId,
+                        infoAdicional: { ...(atk.condicionMitigacion as Record<string, unknown> || {}), esObjetivo: true },
+                    });
+                } else {
+                    flujoFase.push(atk);
+                }
+            });
+
             const cierreNarrativo = eventosFase.find(
-                (e: RawData) => e.tipoEvento === TipoEvento.COMPLETACION_FASE
+                (e) => e.tipoEvento === TipoEvento.COMPLETACION_FASE
                     || e.tipoEvento === TipoEvento.COMPLETACION_ESCENARIO
             );
 
@@ -105,7 +110,7 @@ export function useScenarioBuilder() {
                 });
             }
 
-            flujoFase.forEach((accion: RawData) => {
+            flujoFase.forEach((accion) => {
                 const esCierre = accion.tipoEvento === TipoEvento.COMPLETACION_FASE
                     || accion.tipoEvento === TipoEvento.COMPLETACION_ESCENARIO;
 
@@ -142,16 +147,7 @@ export function useScenarioBuilder() {
             redes: [],
         } as unknown as Escenario;
 
-        console.group('🚀 ESCENARIO ENSAMBLADO');
-        console.log('Título:', levelToPlay.titulo);
-        console.log('Fases:', levelToPlay.fases.length);
-        console.log('Objetivos por Fase:', levelToPlay.fases.map(f => ({
-            fase: f.id,
-            objetivos: f.objetivos.map((o: { descripcion: string }) => o.descripcion),
-        })));
-        console.log('Ataques:', levelToPlay.ataques.length);
-        console.log('Eventos:', levelToPlay.eventos.length);
-        console.groupEnd();
+
 
         localStorage.setItem('slug_escenario_actual', 'ai-generated-scenario');
         setSelectedEscenario(levelToPlay);

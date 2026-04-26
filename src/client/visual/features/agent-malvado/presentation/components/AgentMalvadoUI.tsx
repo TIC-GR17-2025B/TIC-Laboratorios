@@ -53,14 +53,12 @@ export default function AgentMalvadoUI() {
             {scenario && !isGenerating && (
                 <div id="gen-success" className={styles.successContainer}>
                     <div className={styles.scenarioCard}>
-                        <h3 className={styles.scenarioTitle}>¡Nivel Listo!</h3>
+                        <h3 className={styles.scenarioTitle}>¡Nivel de práctica listo!</h3>
                         <div className={styles.scenarioName}>
                             {scenario.titulo ?? 'Operación Clasificada'}
                         </div>
                         <div className={styles.scenarioMeta}>
                             <span>{scenario.categoria ?? ''}</span>
-                            {' | '}
-                            <span>Dificultad: {scenario.dificultad ?? ''}</span>
                         </div>
                     </div>
 

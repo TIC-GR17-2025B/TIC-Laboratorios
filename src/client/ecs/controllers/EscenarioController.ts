@@ -1,5 +1,5 @@
 import {
-    ActivoComponent,
+  ActivoComponent,
   AtaqueComponent,
   DispositivoComponent,
   EscenarioComponent,
@@ -12,7 +12,7 @@ import {
 } from "../components";
 import { ECSManager, type Entidad } from "../core";
 import {
-    SistemaActivo,
+  SistemaActivo,
   SistemaComandos,
   SistemaEvento,
   SistemaFase,
@@ -176,7 +176,7 @@ export class EscenarioController {
       };
       this.agregarLogGeneralEscenario(log);
       this.ecsManager.emit(EventosPublicos.FASE_NO_COMPLETADA,
-                           MensajesGenerales.MSJ_FASE_NO_COMPLETADA);
+        MensajesGenerales.MSJ_FASE_NO_COMPLETADA);
       this.sistemaTiempo?.destruir();
     });
 
@@ -228,23 +228,23 @@ export class EscenarioController {
 
     // Oyentes para guardar el progreso
     this.ecsManager.on(EventosPublicos.FASE_NO_COMPLETADA, () => {
-        this.progresoController?.guardarProgresoEstudiante(
-            false,
-            this.getTiempoTotalTranscurrido(),
-            this.escenario.accionesEsperadas,
-            this.ecsManager.getAccionesSimulacion()
-        ); 
-        this.sistemaTiempo?.destruir();
+      this.progresoController?.guardarProgresoEstudiante(
+        false,
+        this.getTiempoTotalTranscurrido(),
+        this.escenario.accionesEsperadas,
+        this.ecsManager.getAccionesSimulacion()
+      );
+      this.sistemaTiempo?.destruir();
     });
 
     this.ecsManager.on(EventosPublicos.ESCENARIO_COMPLETADO, () => {
-        this.progresoController?.guardarProgresoEstudiante(
-            true,
-            this.getTiempoTotalTranscurrido(),
-            this.escenario.accionesEsperadas,
-            this.ecsManager.getAccionesSimulacion()
-        ); 
-        this.sistemaTiempo?.destruir();
+      this.progresoController?.guardarProgresoEstudiante(
+        true,
+        this.getTiempoTotalTranscurrido(),
+        this.escenario.accionesEsperadas,
+        this.ecsManager.getAccionesSimulacion()
+      );
+      this.sistemaTiempo?.destruir();
     });
   }
 
@@ -275,7 +275,7 @@ export class EscenarioController {
     }
     const eventos = this.getEventos();
     this.sistemaTiempo.eventosEscenario = eventos;
-    this.sistemaFase.eventosEscenario = eventos.sort((a,b) => a.tiempoNotificacion - b.tiempoNotificacion);
+    this.sistemaFase.eventosEscenario = eventos.sort((a, b) => a.tiempoNotificacion - b.tiempoNotificacion);
   }
 
   public ejecutarTiempo(): void {
@@ -375,8 +375,8 @@ export class EscenarioController {
     //     this.entidadPresupuesto,
     //     new PresupuestoComponent(montoInicial)
     //   );
-      this.sistemaPresupuesto = new SistemaPresupuesto();
-      this.ecsManager.agregarSistema(this.sistemaPresupuesto);
+    this.sistemaPresupuesto = new SistemaPresupuesto();
+    this.ecsManager.agregarSistema(this.sistemaPresupuesto);
     // }
   }
 
@@ -425,15 +425,15 @@ export class EscenarioController {
   }
 
   public getPresupuestoActual(): number {
-  //   if (!this.ecsManager || !this.entidadPresupuesto) {
-  //     return 0;
-  //   }
-  //   const cont = this.ecsManager.getComponentes(this.entidadPresupuesto);
-  //   if (!cont) return 0;
-  //
-  //   const presupuesto = cont.get(PresupuestoComponent);
-  //   return presupuesto?.monto ?? 0;
-      return 0;
+    //   if (!this.ecsManager || !this.entidadPresupuesto) {
+    //     return 0;
+    //   }
+    //   const cont = this.ecsManager.getComponentes(this.entidadPresupuesto);
+    //   if (!cont) return 0;
+    //
+    //   const presupuesto = cont.get(PresupuestoComponent);
+    //   return presupuesto?.monto ?? 0;
+    return 0;
   }
 
   public getEventos(): EventoComponent[] {
@@ -481,8 +481,8 @@ export class EscenarioController {
     return dispositivosTodos;
   }
 
-  public getFasesConObjetivos(): FaseComponent[] | undefined{
-    for (const [,container] of this.ecsManager.getEntidades()) {
+  public getFasesConObjetivos(): FaseComponent[] | undefined {
+    for (const [, container] of this.ecsManager.getEntidades()) {
       if (container.tiene(EscenarioComponent)) {
         return container.get(EscenarioComponent)?.fases;
       }
@@ -507,7 +507,7 @@ export class EscenarioController {
 
   public eliminarActivoDeDispositivo(entidadDispositivo: Entidad, nombreActivo: string) {
     const activosDispActual = this.ecsManager.getComponentes(entidadDispositivo)
-                                       ?.get(ActivoComponent);
+      ?.get(ActivoComponent);
 
     const activos = (activosDispActual?.activos ?? []);
 
@@ -544,7 +544,7 @@ export class EscenarioController {
   }
 
   public getTodasAppsDisponibles(): SoftwareApp[] | undefined {
-    for (const [,c] of this.ecsManager.getEntidades()) {
+    for (const [, c] of this.ecsManager.getEntidades()) {
       if (c.tiene(EscenarioComponent))
         return c.get(EscenarioComponent)?.apps;
     }
@@ -552,17 +552,17 @@ export class EscenarioController {
 
   // Devuelve todas las apps que NO están instaladas (compradas) en el dispositivo actual
   public getAppsDisponiblesPorDispositivo(entidadDispositivo: Entidad)
-  : SoftwareApp[] | undefined {
+    : SoftwareApp[] | undefined {
     const todasAppsDisponibles = this.getTodasAppsDisponibles();
     const appsInstaladasDispositivoActual = this.ecsManager.getComponentes(entidadDispositivo)
-                                                    ?.get(DispositivoComponent)?.apps;
+      ?.get(DispositivoComponent)?.apps;
     const appsDisponiblesParaDispositivoActual = [];
 
     for (const app of todasAppsDisponibles ?? []) {
       if (!appsInstaladasDispositivoActual?.includes(app))
         appsDisponiblesParaDispositivoActual.push(app);
     }
-   
+
     return appsDisponiblesParaDispositivoActual;
   }
 

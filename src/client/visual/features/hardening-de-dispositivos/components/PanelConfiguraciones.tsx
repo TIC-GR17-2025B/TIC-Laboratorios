@@ -200,6 +200,8 @@ export default function PanelConfiguraciones() {
                                     key={idx}
                                     className={styles.configRow}
                                     onClick={() => handleToggle(idx, nombre)}
+                                    data-context={nombre.toLowerCase()}
+                                    data-object-name={`Configuración: ${nombre}`}
                                 >
                                     <span className={styles.configNombre}>{nombre}</span>
                                     <label className={styles.toggle} onClick={(e) => e.stopPropagation()}>

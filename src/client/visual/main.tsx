@@ -44,8 +44,8 @@ window.addEventListener('beforeunload', () => {
 function GameProvidersLayout() {
   return (
     <ProtectedRoute>
-        <EscenarioProvider>
-          <ModalProvider>
+      <EscenarioProvider>
+        <ModalProvider>
           <ChatProvider>
             <FasesProvider>
               <ECSSceneProvider>
@@ -75,41 +75,41 @@ function AnimatedRoutes() {
       <AnimatePresence mode="wait">
         <Routes location={location}>
           <Route path='/login' element={<AuthPage />} />
-        <Route path='/signup' element={<AuthPage />} />
+          <Route path='/signup' element={<AuthPage />} />
 
-        <Route path='/docente' element={
-          <ProtectedRouteByRole requiredRole="profesor">
-            <DocenteLayout />
-          </ProtectedRouteByRole>
-        }>
-          <Route index element={<VistaDocente />} />
-          <Route path='grupo/:id' element={<DetalleGrupo />} />
-          <Route path='estudiante/:idEstudiante' element={<VistaDetalleEstudiante />} />
-        </Route>
+          <Route path='/docente' element={
+            <ProtectedRouteByRole requiredRole="profesor">
+              <DocenteLayout />
+            </ProtectedRouteByRole>
+          }>
+            <Route index element={<VistaDocente />} />
+            <Route path='grupo/:id' element={<DetalleGrupo />} />
+            <Route path='estudiante/:idEstudiante' element={<VistaDetalleEstudiante />} />
+          </Route>
 
-        <Route element={
-          <ProtectedRouteByRole requiredRole="estudiante">
-            <EstudianteLayout />
-          </ProtectedRouteByRole>
-        }>
-          <Route path='/seleccion-niveles' element={<VistaSeleccionNiveles />} />
-          <Route path='/perfil' element={<VistaPerfil />} />
-        </Route>
+          <Route element={
+            <ProtectedRouteByRole requiredRole="estudiante">
+              <EstudianteLayout />
+            </ProtectedRouteByRole>
+          }>
+            <Route path='/seleccion-niveles' element={<VistaSeleccionNiveles />} />
+            <Route path='/perfil' element={<VistaPerfil />} />
+          </Route>
 
-        {/* 
+          {/* 
           Las rutas del juego comparten los mismos providers con Outlet
           También les paso el Header, Modal y TarjetaLogNuevo 
         */}
-        <Route element={<GameProvidersLayout />}>
-          <Route path='/' element={<VistaOficina />} />
-          <Route path='/dispositivos' element={<Dispositivos />} />
-          <Route path='/redes' element={<Redes />} />
-          <Route path='/fases-partida' element={<VistaFasesPartida />} />
-        </Route>
+          <Route element={<GameProvidersLayout />}>
+            <Route path='/' element={<VistaOficina />} />
+            <Route path='/dispositivos' element={<Dispositivos />} />
+            <Route path='/redes' element={<Redes />} />
+            <Route path='/fases-partida' element={<VistaFasesPartida />} />
+          </Route>
 
-        <Route path='*' element={<NotFound />} />
-      </Routes>
-    </AnimatePresence>
+          <Route path='*' element={<NotFound />} />
+        </Routes>
+      </AnimatePresence>
     </>
   );
 }

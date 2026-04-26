@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI, type Content, type Part } from "@google/generative-ai";
+import { CONTEXT_EXPLANATION_PREFIX } from "../prompts/systemPrompt.js";
 
 export interface ChatMessage {
   role: "user" | "model";
@@ -31,7 +32,13 @@ export class GeminiService implements ILLMService, ITopicAnalyzer {
     "filtrado de paquetes", "stateful", "proxy", "next-generation",
     "reglas de firewall", "dmz", "zona desmilitarizada",
     "vpn", "vpns", "ipsec", "ssl", "tls", "openvpn", "wireguard", "l2tp", "pptp",
-    "túnel", "tunneling", "split tunneling", "encriptación vpn"
+    "túnel", "tunneling", "split tunneling", "encriptación vpn",
+    "firma", "firmas", "certificado", "certificados", "hash", "hashes",
+    "clave publica", "clave privada", "rsa", "sha", "cifrado", "desencriptar",
+    "osint", "phishing", "correo falso", "spam", "ingenieria social", "credenciales",
+    "filtracion", "social-searcher", "phish-matic",
+    "nmap", "escaner", "escaneo", "puertos", "puerto abierto", "net-scan",
+    "vulnerabilidad", "exploit", "cve"
   ];
 
   constructor(apiKey: string = "") {
@@ -73,6 +80,10 @@ export class GeminiService implements ILLMService, ITopicAnalyzer {
   }
 
   analyzeTopicForTool(message: string): "InformationSecurity" | "Contexto" {
+    if (message.startsWith(CONTEXT_EXPLANATION_PREFIX)) {
+      return "Contexto";
+    }
+
     const lowerMessage = message.toLowerCase();
     const matchesInfoSecurity = GeminiService.INFO_SECURITY_KEYWORDS
       .some(keyword => lowerMessage.includes(keyword));
