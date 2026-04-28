@@ -8,6 +8,21 @@
 
 /* ── Profile ── */
 
+.profileHeader {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.profileAvatar {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  border: 1px solid var(--border-primary);
+  flex-shrink: 0;
+}
+
 .pageTitle {
   font-size: 28px;
   font-weight: 600;
@@ -15,8 +30,15 @@
   color: var(--text-primary);
 }
 
+.profileMetaRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+
 .meta {
-  margin: 2px 0 0 0;
+  margin: 0;
   font-size: 13px;
   color: var(--text-muted);
 }
@@ -31,7 +53,7 @@
   font-size: 16px;
   font-weight: 600;
   color: var(--text-primary);
-  margin: 0 0 32px 0;
+  margin: 0 0 16px 0;
 }
 
 .historialList {
@@ -107,8 +129,23 @@
 .escenarioActions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   flex-shrink: 0;
+}
+
+.chevronWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid var(--border-primary);
+  transition: background 0.15s ease;
+}
+
+.chevronWrap:hover {
+  background: var(--surface-secondary);
 }
 
 .chevron {
@@ -226,8 +263,9 @@
 
 .linkButton {
   padding: 0;
-  background: none;
+  background: none !important;
   border: none;
+  border-radius: 0 !important;
   color: var(--text-muted);
   text-decoration: underline;
   cursor: pointer;
@@ -237,6 +275,7 @@
 
 .linkButton:hover {
   color: var(--text-primary);
+  background: none !important;
 }
 
 /* ── Empty / loading ── */

@@ -4,6 +4,7 @@ import { API_BASE_URL } from "../../../common/utils/apiConfig";
 export interface LeaderboardEntry {
     idEstudiante: number;
     nombre: string;
+    correo: string;
     puntaje: number;
     rank: number;
 }
@@ -18,6 +19,7 @@ interface EstudianteAPI {
     id_estudiante: number;
     primernombre: string;
     primer_apellido: string;
+    correo_electronico?: string;
 }
 
 interface ProgresoAPI {
@@ -94,6 +96,7 @@ export function useLeaderboard(idCurso: number | null): UseLeaderboardResult {
                     return {
                         idEstudiante: estudiante.id_estudiante,
                         nombre: `${estudiante.primernombre} ${estudiante.primer_apellido}`,
+                        correo: estudiante.correo_electronico || '',
                         puntaje,
                         rank: 0,
                     };

@@ -9,7 +9,7 @@
   min-height: 34px;
   padding: 0;
   background: transparent;
-  border-radius: 50%;
+  border-radius: 6px;
   cursor: pointer;
   overflow: hidden;
 }
@@ -17,16 +17,9 @@
 .avatar {
   width: 34px;
   height: 34px;
-  border-radius: 50%;
-  background: var(--surface-secondary);
+  border-radius: 6px;
+  overflow: hidden;
   border: 1px solid var(--border-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  font-size: 13px;
-  color: var(--text-primary);
-  box-sizing: initial;
 }
 
 /* ── Dropdown ── */

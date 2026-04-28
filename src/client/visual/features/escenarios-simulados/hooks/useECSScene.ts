@@ -53,6 +53,9 @@ export function useECSScene() {
   >([]);
   const [showZoneToast, setShowZoneToast] = useState(false);
   const [zoneToastName, setZoneToastName] = useState("");
+  const [zoomCommand, setZoomCommand] = useState<"in" | "out" | null>(null);
+  const [dispositivoIndex, setDispositivoIndex] = useState(0);
+  const [focusTarget, setFocusTarget] = useState<[number, number, number] | null>(null);
 
   // useRef para evitar múltiples inicializaciones
   const inicializado = useRef(false);
@@ -352,7 +355,8 @@ export function useECSScene() {
   const cambiarZona = useCallback(
     (nuevaZonaId: number) => {
       setZonaActual(nuevaZonaId);
-      // Mostrar toast con el nombre de la zona
+      setDispositivoIndex(0);
+      setFocusTarget(null);
       const zona = zonasDisponibles.find((z) => z.id === nuevaZonaId);
       if (zona) {
         setZoneToastName(zona.nombre);
@@ -387,6 +391,32 @@ export function useECSScene() {
     setShowZoneToast(false);
   }, []);
 
+  const zoomIn = useCallback(() => setZoomCommand("in"), []);
+  const zoomOut = useCallback(() => setZoomCommand("out"), []);
+  const clearZoomCommand = useCallback(() => setZoomCommand(null), []);
+
+  const getWorkstations = useCallback((): ECSSceneEntity[] => {
+    return processEntities().filter((e) => e.objetoConTipo.tipo === "workstation");
+  }, [entities, zonaActual]);
+
+  const siguienteDispositivo = useCallback(() => {
+    const workstations = getWorkstations();
+    if (workstations.length === 0) return;
+    const nextIndex = (dispositivoIndex + 1) % workstations.length;
+    setDispositivoIndex(nextIndex);
+    setFocusTarget(workstations[nextIndex].position);
+  }, [dispositivoIndex, getWorkstations]);
+
+  const anteriorDispositivo = useCallback(() => {
+    const workstations = getWorkstations();
+    if (workstations.length === 0) return;
+    const prevIndex = (dispositivoIndex - 1 + workstations.length) % workstations.length;
+    setDispositivoIndex(prevIndex);
+    setFocusTarget(workstations[prevIndex].position);
+  }, [dispositivoIndex, getWorkstations]);
+
+  const clearFocusTarget = useCallback(() => setFocusTarget(null), []);
+
   return {
     entities,
     mostrarNuevoLog,
@@ -419,5 +449,15 @@ export function useECSScene() {
     showZoneToast,
     zoneToastName,
     hideZoneToast,
+    zoomIn,
+    zoomOut,
+    zoomCommand,
+    clearZoomCommand,
+    siguienteDispositivo,
+    anteriorDispositivo,
+    dispositivoIndex,
+    focusTarget,
+    clearFocusTarget,
+    getWorkstations,
   };
 }

@@ -16,6 +16,7 @@
     font-size: 12px;
     white-space: nowrap;
     pointer-events: none;
+    user-select: none;
     opacity: 0;
     transition: opacity 0.15s ease;
     z-index: 10;
@@ -60,6 +61,59 @@
     transform: translateX(-50%) translateY(1px);
     border-top-color: transparent;
     border-bottom-color: var(--surface-secondary);
+}
+
+.right {
+    bottom: auto;
+    top: 50%;
+    left: calc(100% + 8px);
+    transform: translateY(-50%);
+}
+
+.right::after {
+    top: 50%;
+    left: auto;
+    right: 100%;
+    bottom: auto;
+    transform: translateY(-50%);
+    border-top-color: transparent;
+    border-right-color: var(--border-primary);
+}
+
+.right::before {
+    top: 50%;
+    left: auto;
+    right: 100%;
+    bottom: auto;
+    transform: translateY(-50%) translateX(1px);
+    border-top-color: transparent;
+    border-right-color: var(--surface-secondary);
+}
+
+.left {
+    bottom: auto;
+    top: 50%;
+    left: auto;
+    right: calc(100% + 8px);
+    transform: translateY(-50%);
+}
+
+.left::after {
+    top: 50%;
+    left: 100%;
+    bottom: auto;
+    transform: translateY(-50%);
+    border-top-color: transparent;
+    border-left-color: var(--border-primary);
+}
+
+.left::before {
+    top: 50%;
+    left: 100%;
+    bottom: auto;
+    transform: translateY(-50%) translateX(-1px);
+    border-top-color: transparent;
+    border-left-color: var(--surface-secondary);
 }
 
 .wrapper:hover .tooltip {

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import styles from '../styles/Sidebar.module.css';
 import NavigationLink from './Navigation';
+import Tooltip from './Tooltip';
 import DevicesIcon from '../icons/DevicesIcon';
 import OfficeIcon from '../icons/OfficeIcon';
 import RedesIcon from '../icons/RedesIcon';
@@ -97,24 +98,26 @@ const Sidebar: React.FC = () => {
                 <nav className={styles.dock} data-tour="dock">
                     <div className={styles.navSection}>
                         {desktopMode && !isZooming ? (
-                            <button
-                                className={styles.dockItem}
-                                onClick={exitDesktopMode}
-                            >
-                                <OfficeIcon size={20} />
-                                <span className={styles.tooltip}>Oficina</span>
-                            </button>
+                            <Tooltip text="Oficina">
+                                <button
+                                    className={styles.dockItem}
+                                    onClick={exitDesktopMode}
+                                >
+                                    <OfficeIcon size={20} />
+                                </button>
+                            </Tooltip>
                         ) : (
                             <NavigationLink icon={<OfficeIcon size={20} />} label="Oficina" to="/" forceInactive={desktopMode || isZooming} data-tour="dock-oficina" />
                         )}
-                        <button
-                            className={`${styles.dockItem} ${desktopMode || isZooming ? styles.active : ''}`}
-                            onClick={handleDispositivosClick}
-                            data-tour="dock-dispositivos"
-                        >
-                            <DevicesIcon size={20} />
-                            <span className={styles.tooltip}>Dispositivos</span>
-                        </button>
+                        <Tooltip text="Dispositivos">
+                            <button
+                                className={`${styles.dockItem} ${desktopMode || isZooming ? styles.active : ''}`}
+                                onClick={handleDispositivosClick}
+                                data-tour="dock-dispositivos"
+                            >
+                                <DevicesIcon size={20} />
+                            </button>
+                        </Tooltip>
                         <NavigationLink icon={<RedesIcon size={20} />} label="Redes" to="/redes" data-tour="dock-redes" />
                         <NavigationLink icon={<EstrellaPartidaIcon size={20} />} label="Partida" to="/fases-partida" data-tour="dock-partida" />
                     </div>
@@ -126,48 +129,51 @@ const Sidebar: React.FC = () => {
                             {formatearTiempo(tiempoTranscurrido)}
                         </div>
 
-                        <button
-                            className={styles.controlBtn}
-                            onClick={() => { if (isPaused) resume(); else pause(); }}
-                            data-tour="dock-pausa"
-                            aria-label={isPaused ? 'Reanudar animacion' : 'Pausar animacion'}
-                        >
-                            {isPaused ? (
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
-                                    <path fill="currentColor" d="M8 17.175V6.825q0-.425.3-.713t.7-.287q.125 0 .263.037t.262.113l8.15 5.175q.225.15.338.375t.112.475t-.112.475t-.338.375l-8.15 5.175q-.125.075-.262.113T9 18.175q-.4 0-.7-.288t-.3-.712" />
-                                </svg>
-                            ) : (
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
-                                    <path fill="currentColor" d="M16 19q-.825 0-1.412-.587T14 17V7q0-.825.588-1.412T16 5t1.413.588T18 7v10q0 .825-.587 1.413T16 19m-8 0q-.825 0-1.412-.587T6 17V7q0-.825.588-1.412T8 5t1.413.588T10 7v10q0 .825-.587 1.413T8 19" />
-                                </svg>
-                            )}
-                            <span className={styles.tooltip}>{isPaused ? 'Reanudar' : 'Pausar'}</span>
-                        </button>
+                        <Tooltip text={isPaused ? 'Reanudar' : 'Pausar'}>
+                            <button
+                                className={styles.controlBtn}
+                                onClick={() => { if (isPaused) resume(); else pause(); }}
+                                data-tour="dock-pausa"
+                                aria-label={isPaused ? 'Reanudar animacion' : 'Pausar animacion'}
+                            >
+                                {isPaused ? (
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+                                        <path fill="currentColor" d="M8 17.175V6.825q0-.425.3-.713t.7-.287q.125 0 .263.037t.262.113l8.15 5.175q.225.15.338.375t.112.475t-.112.475t-.338.375l-8.15 5.175q-.125.075-.262.113T9 18.175q-.4 0-.7-.288t-.3-.712" />
+                                    </svg>
+                                ) : (
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+                                        <path fill="currentColor" d="M16 19q-.825 0-1.412-.587T14 17V7q0-.825.588-1.412T16 5t1.413.588T18 7v10q0 .825-.587 1.413T16 19m-8 0q-.825 0-1.412-.587T6 17V7q0-.825.588-1.412T8 5t1.413.588T10 7v10q0 .825-.587 1.413T8 19" />
+                                    </svg>
+                                )}
+                            </button>
+                        </Tooltip>
 
                         <div className={styles.chatWrapper}>
-                            <button
-                                className={`${styles.chatBtn} ${isChatOpen ? styles.chatActive : ''}`}
-                                onClick={() => toggleChat()}
-                                aria-label={isChatOpen ? 'Cerrar chat' : 'Abrir chat'}
-                                data-chat-toggle="true"
-                            >
-                                <EstrellasIcon size={20} />
-                                <span className={styles.tooltip}>Chatbot</span>
-                            </button>
+                            <Tooltip text="Chatbot">
+                                <button
+                                    className={`${styles.chatBtn} ${isChatOpen ? styles.chatActive : ''}`}
+                                    onClick={() => toggleChat()}
+                                    aria-label={isChatOpen ? 'Cerrar chat' : 'Abrir chat'}
+                                    data-chat-toggle="true"
+                                >
+                                    <EstrellasIcon size={20} />
+                                </button>
+                            </Tooltip>
                             <ChatContainer
                                 isOpen={isChatOpen}
                             />
                         </div>
                     </div>
                 </nav>
-                <button className={styles.exitBtn} onClick={handleExitClick}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        <polyline points="16 17 21 12 16 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        <line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                    <span className={styles.tooltip}>Salir</span>
-                </button>
+                <Tooltip text="Salir">
+                    <button className={styles.exitBtn} onClick={handleExitClick}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            <polyline points="16 17 21 12 16 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            <line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                    </button>
+                </Tooltip>
             </div>
         </>
     );

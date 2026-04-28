@@ -1,4 +1,5 @@
 import type { LeaderboardEntry } from "../hooks/useLeaderboard";
+import Identicon from "../../../common/components/Identicon";
 import styles from "../styles/Leaderboard.module.css";
 
 interface LeaderboardProps {
@@ -78,6 +79,9 @@ export default function Leaderboard({
                                 <span className={`${styles.rank} ${rankClass(entry.rank)}`}>
                                     {entry.rank}
                                 </span>
+                                <div className={styles.avatar}>
+                                    <Identicon seed={entry.correo} />
+                                </div>
                                 <span className={styles.name}>{entry.nombre}</span>
                                 <span className={styles.score}>
                                     {entry.puntaje.toLocaleString()} pts

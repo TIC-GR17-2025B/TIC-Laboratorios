@@ -2,7 +2,7 @@
 
 .main {
   display: grid;
-  grid-template-columns: 1fr 260px;
+  grid-template-columns: 1fr 300px;
   gap: 40px;
   padding: 0;
 }
@@ -92,7 +92,6 @@
   position: relative;
 }
 
-
 /* ── Node circle ── */
 
 .node {
@@ -138,7 +137,6 @@
   border-color: var(--text-secondary);
   color: var(--text-primary);
 }
-
 
 /* ── Suggested level label (above node, arrow pointing down) ── */
 

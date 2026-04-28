@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, type ReactNode } from 'react';
 import { LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { useAuth } from '../hooks/useAuth';
+import Identicon from '../../../common/components/Identicon';
 import styles from '../styles/UserMenu.module.css';
 
 export interface UserMenuItem {
@@ -23,7 +24,7 @@ export default function UserMenu({ items = [] }: UserMenuProps) {
     const user = getUser();
     const userName = user?.primernombre || user?.nombre_completo || 'Usuario';
     const userEmail = user?.correo_electronico || user?.email || '';
-    const userInitial = userName.charAt(0).toUpperCase();
+    const identiconSeed = userEmail || user?.id || userName;
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -49,7 +50,7 @@ export default function UserMenu({ items = [] }: UserMenuProps) {
                 aria-label="Menú de usuario"
             >
                 <div className={styles.avatar}>
-                    {userInitial}
+                    <Identicon seed={identiconSeed} />
                 </div>
             </button>
 

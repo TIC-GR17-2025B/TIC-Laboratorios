@@ -12,6 +12,7 @@ import { useGenerateCourseAnalysis } from '../../course-analysis/hooks/useGenera
 import type { CourseAnalysisResponse } from '../../course-analysis/types/courseAnalysis.types';
 import styles from '../styles/DetalleGrupo.module.css';
 import Breadcrumb from '../components/Breadcrumb';
+import Identicon from '../../../common/components/Identicon';
 
 type Tab = 'students' | 'analysis' | 'settings';
 
@@ -222,7 +223,7 @@ export default function DetalleGrupo() {
                         aria-label={`Ver progreso de ${est.primernombre} ${est.primer_apellido}`}
                       >
                         <div className={styles.avatar}>
-                          {est.primernombre[0]}{est.primer_apellido[0]}
+                          <Identicon seed={est.correo_electronico} />
                         </div>
                         <div className={styles.studentInfo}>
                           <span className={styles.studentName}>

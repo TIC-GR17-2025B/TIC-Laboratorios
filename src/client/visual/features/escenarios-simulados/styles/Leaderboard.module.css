@@ -5,7 +5,7 @@
   border: 1px solid var(--border-primary);
   border-radius: var(--border-radius);
   overflow: hidden;
-  width: 260px;
+  width: 300px;
 }
 
 /* ── Header ── */
@@ -39,7 +39,7 @@
 
 .row {
   display: grid;
-  grid-template-columns: 24px 1fr auto;
+  grid-template-columns: 24px 22px 1fr auto;
   align-items: center;
   gap: 6px;
   padding: 8px 16px;
@@ -78,9 +78,17 @@
 
 /* ── Name ── */
 
+.avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
 .name {
   color: var(--text-primary);
-  font-weight: 500;
+  font-weight: 400;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -125,8 +133,13 @@
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.8; }
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.8;
+  }
 }
 
 /* ── Responsive ── */

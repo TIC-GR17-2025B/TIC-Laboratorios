@@ -85,27 +85,6 @@
   color: var(--blue);
 }
 
-/* Tooltip - now appears above the dock */
-.tooltip {
-  position: absolute;
-  bottom: calc(100% + 10px);
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--surface-secondary);
-  border: 1px solid var(--border-primary);
-  color: var(--text-primary);
-  padding: 6px 10px;
-  border-radius: 8px;
-  font-size: 12px;
-  white-space: nowrap;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.15s ease;
-}
-
-.dockItem:hover .tooltip {
-  opacity: 1;
-}
 
 /* Time display in dock */
 .tiempoDisplay {
@@ -142,9 +121,6 @@
   color: var(--text-primary);
 }
 
-.controlBtn:hover .tooltip {
-  opacity: 1;
-}
 
 /* Chat button special styling */
 .chatBtn {
@@ -192,9 +168,6 @@
   color: #ef4444;
 }
 
-.exitBtn:hover .tooltip {
-  opacity: 1;
-}
 
 /* Exit confirmation dialog */
 .exitOverlay {

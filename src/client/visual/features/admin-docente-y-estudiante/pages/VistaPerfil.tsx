@@ -9,6 +9,7 @@ import type { FeedbackData } from '../../feedback/types/feedback.types';
 import ModalUnirseGrupo from '../components/ModalUnirseGrupo';
 import { NivelController } from '../../../../ecs/controllers/NivelController';
 import { API_BASE_URL } from '../../../common/utils/apiConfig';
+import Identicon from '../../../common/components/Identicon';
 import styles from '../styles/VistaPerfil.module.css';
 
 export default function VistaPerfil() {
@@ -96,17 +97,32 @@ export default function VistaPerfil() {
     return (
         <div className={styles.main}>
             {/* ── Profile ── */}
-            <div>
-                <h1 className={styles.pageTitle}>
-                    {user?.primernombre} {user?.primer_apellido}
-                </h1>
-                <p className={styles.meta}>{user?.correo_electronico}</p>
-                {grupo && <p className={styles.meta}>{grupo.nombre}</p>}
-                {!grupo && !grupoLoading && (
-                    <button className={styles.linkButton} onClick={() => setIsModalOpen(true)}>
-                        Unirse a un grupo
-                    </button>
-                )}
+            <div className={styles.profileHeader}>
+                <div className={styles.profileAvatar}>
+                    <Identicon seed={user?.correo_electronico || user?.id || 'user'} />
+                </div>
+                <div>
+                    <h1 className={styles.pageTitle}>
+                        {user?.primernombre} {user?.primer_apellido}
+                    </h1>
+                    <div className={styles.profileMetaRow}>
+                        <p className={styles.meta}>{user?.correo_electronico}</p>
+                        {grupo && (
+                            <>
+                                <span className={styles.metaDot}>·</span>
+                                <p className={styles.meta}>{grupo.nombre}</p>
+                            </>
+                        )}
+                        {!grupo && !grupoLoading && (
+                            <>
+                                <span className={styles.metaDot}>·</span>
+                                <button className={styles.linkButton} onClick={() => setIsModalOpen(true)}>
+                                    Unirse a un grupo
+                                </button>
+                            </>
+                        )}
+                    </div>
+                </div>
             </div>
 
             {/* ── Historial de evaluaciones ── */}
@@ -171,13 +187,15 @@ export default function VistaPerfil() {
                                                     }}
                                                 />
                                             )}
-                                            <svg
-                                                className={`${styles.chevron} ${open ? styles.chevronOpen : ''}`}
-                                                width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
-                                                aria-hidden="true"
-                                            >
-                                                <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z" />
-                                            </svg>
+                                            <div className={styles.chevronWrap}>
+                                                <svg
+                                                    className={`${styles.chevron} ${open ? styles.chevronOpen : ''}`}
+                                                    width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+                                                    aria-hidden="true"
+                                                >
+                                                    <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z" />
+                                                </svg>
+                                            </div>
                                         </div>
                                     </div>
 
