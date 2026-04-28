@@ -9,9 +9,6 @@ import { useScreenTransition } from '../../../common/contexts/ScreenTransitionCo
 import ModalFirewall from '../../simulacion-redes/components/ModalFirewall';
 import ModalVPN from '../../simulacion-redes/components/ModalVPN';
 
-/**
- * Componente que renderiza todas las entidades del ECS como modelos 3D
- */
 const ECSSceneRenderer: React.FC = () => {
     const { setDispositivoSeleccionado, entidadSeleccionadaId } = useEscenario();
     const { processEntities } = useECSSceneContext();
@@ -21,7 +18,6 @@ const ECSSceneRenderer: React.FC = () => {
     const [clickedEntityId, setClickedEntityId] = useState<number | null>(null);
     const navigate = useNavigate();
 
-    // Handle zoom-to-screen transition for workstations
     const handleZoomToDevice = useCallback((position: [number, number, number], rotationY: number) => {
         if (isZooming || desktopMode) return;
         startZoom(position, rotationY);
@@ -126,9 +122,10 @@ const ECSSceneRenderer: React.FC = () => {
                 <meshBasicMaterial visible={false} />
             </mesh>
 
-            {processedEntities.map(({ objetoConTipo, position, rotacionY, entidadId, entidadCompleta }) => {
+            {processedEntities.map(({ objetoConTipo, position, rotacionY, entidadId, entidadCompleta, esInteractiva }) => {
                 const modelPath = getModelo(objetoConTipo);
                 const isEspacio = objetoConTipo?.tipo === 'espacio';
+                const isInteractive = !isEspacio && esInteractiva;
 
                 if (modelPath === "") return null;
                 return (
@@ -138,11 +135,11 @@ const ECSSceneRenderer: React.FC = () => {
                         position={position}
                         rotation={[0, rotacionY, 0]}
                         scale={1}
-                        onClick={isEspacio ? undefined : () => handleContextMenu({ objetoConTipo, entidadId, entidadCompleta })}
-                        onHover={isEspacio ? undefined : () => handleEntityHover({ objetoConTipo, entidadId, entidadCompleta })}
-                        onHoverEnd={isEspacio ? undefined : handleEntityHoverEnd}
-                        isSelected={!isEspacio && entidadSeleccionadaId === entidadId}
-                        enableHover={!isEspacio && !desktopMode}
+                        onClick={isInteractive ? () => handleContextMenu({ objetoConTipo, entidadId, entidadCompleta }) : undefined}
+                        onHover={isInteractive ? () => handleEntityHover({ objetoConTipo, entidadId, entidadCompleta }) : undefined}
+                        onHoverEnd={isInteractive ? handleEntityHoverEnd : undefined}
+                        isSelected={isInteractive && entidadSeleccionadaId === entidadId}
+                        enableHover={isInteractive && !desktopMode}
                         showMenu={menuOpenForEntity === entidadId}
                         menuOptions={getMenuOptions(rotacionY, position)}
                         onMenuClose={() => setMenuOpenForEntity(null)}

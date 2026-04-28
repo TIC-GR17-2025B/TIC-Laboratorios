@@ -102,6 +102,12 @@
   background-color: var(--surface-secondary);
 }
 
+.redChipWrapper.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .panelLateral {
   position: absolute;
   top: 0;

@@ -45,19 +45,25 @@ export function useDispositivoRedes(
     return container?.get(DispositivoComponent);
   }, [entidadId, ecsManager, refreshKey]);
 
-  /* Cálculo de las redes disponibles en la zona del dispositivo */
-  const redesDisponibles = useMemo((): RedInfo[] => {
-    if (!entidadId || !dispositivo) return [];
+  /* Resolución de la zona del dispositivo */
+  const zonaComponent = useMemo(() => {
+    if (!entidadId) return null;
 
     const sistemaJerarquia = ecsManager.getSistema(SistemaJerarquiaEscenario);
-    if (!sistemaJerarquia) return [];
+    if (!sistemaJerarquia) return null;
 
     const zonaEntidadId = sistemaJerarquia.obtenerZonaDeDispositivo(entidadId);
-    if (!zonaEntidadId) return [];
+    if (!zonaEntidadId) return null;
 
     const zonaContainer = ecsManager.getComponentes(zonaEntidadId);
-    const zonaComponent = zonaContainer?.get(ZonaComponent);
-    if (!zonaComponent) return [];
+    return zonaContainer?.get(ZonaComponent) ?? null;
+  }, [entidadId, ecsManager, refreshKey]);
+
+  const esZonaInteractiva = zonaComponent?.esInteractiva ?? true;
+
+  /* Cálculo de las redes disponibles en la zona del dispositivo */
+  const redesDisponibles = useMemo((): RedInfo[] => {
+    if (!entidadId || !dispositivo || !zonaComponent) return [];
 
     const redesActivasSet = new Set(dispositivo.redes);
 
@@ -75,7 +81,7 @@ export function useDispositivoRedes(
         };
       })
       .filter((red): red is RedInfo => red !== null);
-  }, [entidadId, dispositivo, ecsManager, refreshKey]);
+  }, [entidadId, dispositivo, zonaComponent, ecsManager, refreshKey]);
 
   /* Función para hacer toggle de una red a un dispositivo, solo llamo al RedController*/
   const toggleRed = useCallback(
@@ -97,6 +103,7 @@ export function useDispositivoRedes(
   return {
     dispositivo,
     redesDisponibles,
+    esZonaInteractiva,
     toggleRed,
   };
 }

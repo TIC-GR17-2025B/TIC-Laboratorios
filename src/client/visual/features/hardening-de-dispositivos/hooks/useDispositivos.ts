@@ -5,7 +5,9 @@ import {
   WorkstationComponent,
   Transform,
   RedComponent,
+  ZonaComponent,
 } from "../../../../ecs/components";
+import { SistemaJerarquiaEscenario } from "../../../../ecs/systems/SistemaJerarquiaEscenario";
 import type { Dispositivo } from "../../../../shared/types/EscenarioTypes";
 import {
   EstadoAtaqueDispositivo,
@@ -43,7 +45,17 @@ export function useDispositivos() {
     const controller = EscenarioController.getInstance();
     const entidades = controller.getWorkstationsYServers();
 
-    return entidades.map((entidad): Dispositivo => {
+    const sistemaJerarquia = controller.ecsManager.getSistema(SistemaJerarquiaEscenario);
+    const entidadesInteractivas = entidades.filter((entidad) => {
+      if (!sistemaJerarquia) return true;
+      const zonaEntidadId = sistemaJerarquia.obtenerZonaDeDispositivo(entidad);
+      if (!zonaEntidadId) return true;
+      const zonaContainer = controller.ecsManager.getComponentes(zonaEntidadId);
+      const zona = zonaContainer?.get(ZonaComponent);
+      return zona?.esInteractiva ?? true;
+    });
+
+    return entidadesInteractivas.map((entidad): Dispositivo => {
       const container = controller.ecsManager.getComponentes(entidad);
       if (!container) {
         return {

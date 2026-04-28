@@ -189,7 +189,7 @@ interface PanelLateralTopologiaProps {
 }
 
 function PanelLateralTopologia({ entidadId, ecsManager, onCerrar }: PanelLateralTopologiaProps) {
-    const { dispositivo, toggleRed } = useDispositivoRedes(entidadId, ecsManager);
+    const { dispositivo, toggleRed, esZonaInteractiva } = useDispositivoRedes(entidadId, ecsManager);
     const { redController } = useECSSceneContext();
     const [isOpen, setIsOpen] = useState(false);
     const [lastDispositivo, setLastDispositivo] = useState(dispositivo);
@@ -241,13 +241,13 @@ function PanelLateralTopologia({ entidadId, ecsManager, onCerrar }: PanelLateral
                         <h3>{displayDispositivo.nombre}</h3>
                     </div>
                     <p className={styles.tipoDispo}>{displayDispositivo.tipo}</p>
-                    <p>Conectar redes</p>
+                    <p>{esZonaInteractiva ? 'Conectar redes' : 'Redes (solo lectura)'}</p>
                     <div className={styles.redChipContainer}>
                         {displayRedes.map((red) => (
                             <div
                                 key={red.nombre}
-                                className={`${styles.redChipWrapper} ${red.estaActiva ? styles.selected : ''}`}
-                                onClick={() => isOpen && toggleRed(red.entidadId)}
+                                className={`${styles.redChipWrapper} ${red.estaActiva ? styles.selected : ''} ${!esZonaInteractiva ? styles.disabled : ''}`}
+                                onClick={() => isOpen && esZonaInteractiva && toggleRed(red.entidadId)}
                             >
                                 <RedChip nombre={red.nombre} color={red.color} activado={red.estaActiva} />
                             </div>

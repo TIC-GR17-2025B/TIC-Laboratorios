@@ -16,6 +16,7 @@ export interface ECSSceneEntity {
   position: [number, number, number];
   rotacionY: number;
   entidadCompleta: unknown;
+  esInteractiva: boolean;
 }
 
 interface Transform {
@@ -49,7 +50,7 @@ export function useECSScene() {
   const [hasNewLog, setHasNewLog] = useState(false);
   const [zonaActual, setZonaActual] = useState<number | null>(null);
   const [zonasDisponibles, setZonasDisponibles] = useState<
-    Array<{ id: number; nombre: string; dominio: string }>
+    Array<{ id: number; nombre: string; dominio: string; esInteractiva: boolean }>
   >([]);
   const [showZoneToast, setShowZoneToast] = useState(false);
   const [zoneToastName, setZoneToastName] = useState("");
@@ -317,6 +318,7 @@ export function useECSScene() {
           position,
           rotacionY,
           entidadCompleta: entidadObjeto,
+          esInteractiva: esZonaInteractiva,
         };
       }
     );
@@ -386,6 +388,12 @@ export function useECSScene() {
 
     cambiarZona(anteriorZonaId);
   }, [zonasDisponibles, zonaActual, cambiarZona]);
+
+  const esZonaInteractiva = useMemo(() => {
+    if (zonaActual === null) return true;
+    const zona = zonasDisponibles.find((z) => z.id === zonaActual);
+    return zona?.esInteractiva ?? true;
+  }, [zonaActual, zonasDisponibles]);
 
   const hideZoneToast = useCallback(() => {
     setShowZoneToast(false);

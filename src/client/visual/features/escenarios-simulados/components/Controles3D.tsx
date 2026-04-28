@@ -16,7 +16,7 @@ export default function Controles3D() {
     } = useECSSceneContext();
 
     const workstations = getWorkstations();
-    const hasWorkstations = workstations.length > 1;
+    const hasWorkstations = workstations.length > 1 && (workstations[0]?.esInteractiva ?? true);
 
     return (
         <aside className={styles.controles3D} aria-label="Controles de vista 3D">
