@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import styles from '../styles/EventLogsPanel.module.css';
 import { obtenerColorCategoria, obtenerIconoCategoria } from '../utils/getCategoryDetails';
 import { useECSSceneContext } from '../context/ECSSceneContext';
@@ -16,25 +16,17 @@ const LogItem = (log: { time: string; content: string; category: string }) => (
 
 const EventLogsPanel: React.FC = () => {
     const { logs, hasNewLog, logsPanelOpen, toggleLogsPanel } = useECSSceneContext();
-    const [isOpen, setIsOpen] = useState(logsPanelOpen);
-
-    // Sincronizar el estado local con el contexto
-    useEffect(() => {
-        setIsOpen(logsPanelOpen);
-    }, [logsPanelOpen]);
 
     const handleToggle = () => {
-        const newState = !isOpen;
-        setIsOpen(newState);
-        toggleLogsPanel(newState);
+        toggleLogsPanel(!logsPanelOpen);
     };
 
     return (
         <>
             <aside
-                className={`${styles.logsPanel} ${!isOpen ? styles.hidden : ''}`}
+                className={`${styles.logsPanel} ${!logsPanelOpen ? styles.hidden : ''}`}
                 aria-label="Panel de registros de eventos"
-                aria-hidden={!isOpen}
+                aria-hidden={!logsPanelOpen}
                 data-tour="logs-panel"
             >
                 <header className={styles.logsHeader}>
@@ -65,7 +57,7 @@ const EventLogsPanel: React.FC = () => {
                 </section>
             </aside>
 
-            {!isOpen && (
+            {!logsPanelOpen && (
                 <button
                     className={styles.toggleButtonCollapsed}
                     onClick={handleToggle}

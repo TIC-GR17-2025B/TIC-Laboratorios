@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import type { ReactNode } from 'react';
 
 interface ModalContextType {
@@ -27,27 +27,30 @@ export function ModalProvider({ children }: ModalProviderProps) {
     const [dismissible, setDismissible] = useState(true);
     const [showHeader, setShowHeader] = useState(true);
 
-    const openModal = (content: ReactNode, title?: string, dismissible: boolean = true, showHeader: boolean = true) => {
+    const openModal = useCallback((content: ReactNode, title?: string, isDismissible: boolean = true, hasHeader: boolean = true) => {
         setModalContent(content);
         setModalTitle(title || null);
-        setDismissible(dismissible);
-        setShowHeader(showHeader);
+        setDismissible(isDismissible);
+        setShowHeader(hasHeader);
         setIsOpen(true);
-    };
+    }, []);
 
-    const closeModal = () => {
+    const closeModal = useCallback(() => {
         setIsOpen(false);
-        // Pequeño delay antes de limpiar el contenido para permitir animaciones
         setTimeout(() => {
             setModalContent(null);
             setModalTitle(null);
             setDismissible(true);
             setShowHeader(true);
         }, 300);
-    };
+    }, []);
+
+    const contextValue = useMemo(() => ({
+        isOpen, modalContent, modalTitle, dismissible, showHeader, openModal, closeModal,
+    }), [isOpen, modalContent, modalTitle, dismissible, showHeader, openModal, closeModal]);
 
     return (
-        <ModalContext.Provider value={{ isOpen, modalContent, modalTitle, dismissible, showHeader, openModal, closeModal }}>
+        <ModalContext.Provider value={contextValue}>
             {children}
         </ModalContext.Provider>
     );

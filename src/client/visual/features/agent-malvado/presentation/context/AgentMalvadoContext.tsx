@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, type ReactNode } from 'react';
+import { useAsyncState } from '../../../../common/hooks/useAsyncState';
 import { GenerateScenarioUseCase } from '../../application/useCases/GenerateScenarioUseCase';
 import { ScenarioBuilderApiService } from '../../infrastructure/services/ScenarioBuilderApiService';
 
@@ -13,29 +14,24 @@ interface AgentMalvadoContextProps {
 const AgentMalvadoContext = createContext<AgentMalvadoContextProps | undefined>(undefined);
 
 export const AgentMalvadoProvider = ({ children }: { children: ReactNode }) => {
-  const [isGenerating, setIsGenerating] = useState(false);
+  const { loading: isGenerating, error, runAsync, setError } = useAsyncState();
   const [generatedScenario, setGeneratedScenario] = useState<Record<string, unknown> | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
   const generateDynamicLevel = async (customPrompt?: string) => {
-    setIsGenerating(true);
-    setError(null);
     setGeneratedScenario(null);
 
-    try {
+    const result = await runAsync(async () => {
       const apiService = new ScenarioBuilderApiService();
       const useCase = new GenerateScenarioUseCase(apiService);
-      const result = await useCase.execute({ prompt: customPrompt });
+      return useCase.execute({ prompt: customPrompt });
+    });
 
+    if (result) {
       if (result.success && result.data) {
-        setGeneratedScenario(result.data[0] || result.data); // Assuming array format for ECS
+        setGeneratedScenario(result.data[0] || result.data);
       } else {
         setError(result.error || 'Fallo desconocido de la IA malvada');
       }
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Error de conexión con el servidor ECS');
-    } finally {
-      setIsGenerating(false);
     }
   };
 

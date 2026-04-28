@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useAsyncState } from '../../../common/hooks/useAsyncState';
 import type { CourseAnalysisResponse } from '../types/courseAnalysis.types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -11,62 +11,44 @@ interface UseGenerateCourseAnalysisResult {
 }
 
 export function useGenerateCourseAnalysis(): UseGenerateCourseAnalysisResult {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { loading, error, runAsync } = useAsyncState();
 
   const generateAnalysis = async (idCurso: number, idProfesor: number) => {
-    setLoading(true);
-    setError(null);
-
-    try {
+    const result = await runAsync(async () => {
       const response = await fetch(`${API_BASE_URL}/course-analysis/generate`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id_curso: idCurso, id_profesor: idProfesor }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        const errorMessage = data.error || 'Error al generar el análisis';
-        setError(errorMessage);
-        return { success: false, error: errorMessage };
+        return { success: false as const, error: data.error || 'Error al generar el análisis' };
       }
 
       if (data.success && data.data) {
-        return { success: true, analysis: data.data };
-      } else {
-        setError('Respuesta inválida del servidor');
-        return { success: false, error: 'Respuesta inválida del servidor' };
+        return { success: true as const, analysis: data.data as CourseAnalysisResponse };
       }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Error de conexión con el servidor';
-      setError(errorMessage);
-      console.error('Error al generar análisis de curso:', err);
-      return { success: false, error: errorMessage };
-    } finally {
-      setLoading(false);
-    }
+
+      return { success: false as const, error: 'Respuesta inválida del servidor' };
+    });
+
+    return result ?? { success: false as const, error: 'Error de conexión con el servidor' };
   };
 
   const checkLatestAnalysis = async (idCurso: number) => {
-    setLoading(true);
-    setError(null);
-    try {
+    const result = await runAsync(async () => {
       const response = await fetch(`${API_BASE_URL}/course-analysis/latest/${idCurso}`);
       const data = await response.json();
-      
+
       if (response.ok && data.success && data.data) {
-        return { success: true, analysis: data.data };
+        return { success: true as const, analysis: data.data as CourseAnalysisResponse };
       }
-      return { success: false };
-    } catch {
-      return { success: false };
-    } finally {
-      setLoading(false);
-    }
+      return { success: false as const };
+    });
+
+    return result ?? { success: false as const };
   };
 
   return { generateAnalysis, checkLatestAnalysis, loading, error };

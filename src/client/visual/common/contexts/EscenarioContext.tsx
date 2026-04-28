@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import type { ReactNode } from 'react';
 import type { Dispositivo, Escenario } from '../../../shared/types/EscenarioTypes';
@@ -72,6 +72,50 @@ function toDispositivoFromRaw(
     };
 }
 
+function mapEntityToDispositivo(input: Dispositivo | ECSEntityRef | null): Dispositivo | null {
+    if (!input) return null;
+
+    const raw = input as ECSEntityRef;
+
+    if (hasDispositivoShape(raw)) {
+        return input as Dispositivo;
+    }
+
+    const entidadId = raw.entidadId ?? 0;
+
+    if (raw.entidadCompleta instanceof ComponenteContainer) {
+        const container = raw.entidadCompleta;
+        const dispComp = container.get(DispositivoComponent);
+        const transform = container.get(Transform);
+
+        if (!dispComp) {
+            if (raw.objetoConTipo) {
+                return toDispositivoFromRaw(entidadId, raw.objetoConTipo, raw.position);
+            }
+            return null;
+        }
+
+        const posicion = transform
+            ? { x: transform.x, y: transform.y, z: transform.z, rotacionY: transform.rotacionY }
+            : raw.position;
+
+        const dispositivo = toDispositivoFromRaw(entidadId, dispComp as DispositivoRaw, posicion);
+
+        const ws = container.get(WorkstationComponent);
+        if (ws && typeof ws.configuraciones !== 'undefined') {
+            dispositivo.configuraciones = ws.configuraciones;
+        }
+
+        return dispositivo;
+    }
+
+    if (raw.objetoConTipo) {
+        return toDispositivoFromRaw(entidadId, raw.objetoConTipo, raw.position);
+    }
+
+    return null;
+}
+
 /**
  * Context para gestionar globalmente al escenario actual en toda la aplicación
 */
@@ -110,65 +154,11 @@ export function EscenarioProvider({ children, initialEscenario }: EscenarioProvi
         }
     }, [escenario, navigate]);
 
-    const setEscenario = (nuevoEscenario: Escenario) => {
+    const setEscenario = useCallback((nuevoEscenario: Escenario) => {
         setEscenarioState(nuevoEscenario);
-    };
+    }, []);
 
-    if (!escenario) {
-        return null;
-    }
-
-    // Helper: normaliza distintos shapes que pueden venir al seleccionar una entidad 3D
-    const mapEntityToDispositivo = (input: Dispositivo | ECSEntityRef | null): Dispositivo | null => {
-        if (!input) return null;
-
-        const raw = input as ECSEntityRef;
-
-        // Caso 1: ya viene con forma de Dispositivo
-        if (hasDispositivoShape(raw)) {
-            return input as Dispositivo;
-        }
-
-        const entidadId = raw.entidadId ?? 0;
-
-        // Caso 2: entidad del ECSSceneRenderer con ComponenteContainer
-        if (raw.entidadCompleta instanceof ComponenteContainer) {
-            const container = raw.entidadCompleta;
-            const dispComp = container.get(DispositivoComponent);
-            const transform = container.get(Transform);
-
-            // Si no hay DispositivoComponent pero sí objetoConTipo, se usa como fallback
-            if (!dispComp) {
-                if (raw.objetoConTipo) {
-                    return toDispositivoFromRaw(entidadId, raw.objetoConTipo, raw.position);
-                }
-                return null;
-            }
-
-            const posicion = transform
-                ? { x: transform.x, y: transform.y, z: transform.z, rotacionY: transform.rotacionY }
-                : raw.position;
-
-            const dispositivo = toDispositivoFromRaw(entidadId, dispComp as DispositivoRaw, posicion);
-
-            const ws = container.get(WorkstationComponent);
-            if (ws && typeof ws.configuraciones !== 'undefined') {
-                dispositivo.configuraciones = ws.configuraciones;
-            }
-
-            return dispositivo;
-        }
-
-        // Caso 3: objeto con objetoConTipo y position (sin container ECS)
-        if (raw.objetoConTipo) {
-            return toDispositivoFromRaw(entidadId, raw.objetoConTipo, raw.position);
-        }
-
-        return null;
-    };
-
-    // Setter expuesto: acepta un Dispositivo o una entidad/objeto y mapea a Dispositivo
-    const setDispositivoSeleccionado = (dispositivo: Dispositivo | ECSEntityRef | null) => {
+    const setDispositivoSeleccionado = useCallback((dispositivo: Dispositivo | ECSEntityRef | null) => {
         const mapped = mapEntityToDispositivo(dispositivo);
         setDispositivoSeleccionadoState(mapped);
 
@@ -179,10 +169,22 @@ export function EscenarioProvider({ children, initialEscenario }: EscenarioProvi
 
         const id = (dispositivo as ECSEntityRef).entidadId;
         setEntidadSeleccionadaId(typeof id === 'number' ? id : null);
-    };
+    }, []);
+
+    const contextValue = useMemo(() => ({
+        escenario,
+        setEscenario,
+        dispositivoSeleccionado,
+        setDispositivoSeleccionado,
+        entidadSeleccionadaId,
+    }), [escenario, setEscenario, dispositivoSeleccionado, setDispositivoSeleccionado, entidadSeleccionadaId]);
+
+    if (!escenario) {
+        return null;
+    }
 
     return (
-        <EscenarioContext.Provider value={{ escenario, setEscenario, dispositivoSeleccionado, setDispositivoSeleccionado, entidadSeleccionadaId }}>
+        <EscenarioContext.Provider value={contextValue}>
             {children}
         </EscenarioContext.Provider>
     );
