@@ -755,6 +755,11 @@
   min-width: 0;
 }
 
+.fpFooterInput:focus-visible {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 2px rgba(65, 125, 255, 0.15);
+}
+
 .fpFooterInput::placeholder {
   color: var(--text-secondary);
 }

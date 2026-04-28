@@ -193,10 +193,15 @@ export default function LevelSelectionMenuList() {
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: (dimmed && !isOpen) ? 0.4 : 1 }}
                                         transition={{ duration: 0.25, delay: idx * 0.05 }}
+                                        role="button"
+                                        tabIndex={0}
+                                        aria-label={`${esc.titulo} — ${completado ? 'Completado' : attempted ? 'En progreso' : 'Disponible'}`}
+                                        aria-expanded={isOpen}
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             setOpenTooltip(isOpen ? null : esc.id);
                                         }}
+                                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpenTooltip(isOpen ? null : esc.id); } }}
                                     >
                                         {completado ? (
                                             <Check size={24} strokeWidth={3} />

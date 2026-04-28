@@ -11,6 +11,7 @@ export interface IAuthRepository {
   findUsuarioAuthByRecoveryToken(token: string): Promise<UsuarioAuth | null>
   confirmUsuarioAuth(id_usuario_auth: number): Promise<void>
   updateTokenRecuperacion(id_usuario_auth: number, token: string, expira: string): Promise<void>
+  updateTokenConfirmacion(id_usuario_auth: number, token: string, expira: string): Promise<void>
   updatePassword(id_usuario_auth: number, nuevaContrasenia: string): Promise<void>
 
   createEstudiante(data: EstudianteInput & { id_usuario_auth: number }): Promise<Estudiante>

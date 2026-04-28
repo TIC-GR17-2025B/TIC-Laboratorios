@@ -29,7 +29,7 @@ const ZoneToast: React.FC<ZoneToastProps> = ({ zoneName, show, onHide }) => {
     if (!show && !isVisible) return null;
 
     return (
-        <div className={`${styles.toast} ${isVisible ? styles.show : styles.hide}`}>
+        <div className={`${styles.toast} ${isVisible ? styles.show : styles.hide}`} role="status" aria-live="polite">
             {zoneName}
         </div>
     );

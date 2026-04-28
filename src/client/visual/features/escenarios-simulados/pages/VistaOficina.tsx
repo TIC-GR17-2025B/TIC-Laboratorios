@@ -5,7 +5,6 @@ import { useEscenario } from "../../../common/contexts";
 import { useScreenTransition } from "../../../common/contexts/ScreenTransitionContext";
 import MonitorDesktopOverlay from "../../../common/components/MonitorDesktopOverlay";
 import EventLogsPanel from "../components/EventLogsPanel";
-import TutorialTour from "../components/TutorialTour";
 import { useEffect } from "react";
 function VistaOficina() {
   const { dispositivoSeleccionado, setDispositivoSeleccionado } = useEscenario();
@@ -28,7 +27,6 @@ function VistaOficina() {
       <Escena3D />
       {!desktopMode && <TarjetaEntidadSeleccionada visible={!!dispositivoSeleccionado} />}
       <EventLogsPanel />
-      <TutorialTour />
       <MonitorDesktopOverlay />
     </div>
   )

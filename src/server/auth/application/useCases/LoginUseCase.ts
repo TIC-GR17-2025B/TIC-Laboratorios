@@ -8,6 +8,7 @@ export interface LoginResult {
   role: 'estudiante' | 'profesor'
   user: EstudiantePublic | ProfesorPublic
   token: string
+  confirmado: boolean
 }
 
 export class LoginUseCase {
@@ -31,12 +32,7 @@ export class LoginUseCase {
       return null
     }
 
-    // 3. Verificar si la cuenta está confirmada (skip en desarrollo)
-    if (!usuarioAuth.confirmado && process.env.NODE_ENV === 'production') {
-      throw new Error('Cuenta no confirmada. Por favor, verifica tu correo electrónico.')
-    }
-
-    // 4. Buscar si es profesor
+    // 3. Buscar si es profesor
     const profesor = await this.repo.findProfesorByUsuarioAuth(usuarioAuth.id_usuario_auth)
     
     if (profesor) {
@@ -53,7 +49,8 @@ export class LoginUseCase {
       return {
         role: "profesor",
         user: profesor,
-        token
+        token,
+        confirmado: usuarioAuth.confirmado
       }
     }
 
@@ -74,7 +71,8 @@ export class LoginUseCase {
       return {
         role: "estudiante",
         user: estudiante,
-        token
+        token,
+        confirmado: usuarioAuth.confirmado
       }
     }
 

@@ -61,12 +61,14 @@ const RadialMenu: React.FC<RadialMenuProps> = ({ onClose, options, onNavigate })
 
     return (
         <>
-            <div className="radial-menu-overlay" onClick={onClose} />
+            <div className="radial-menu-overlay" onClick={onClose} aria-hidden="true" />
             <div
                 ref={menuRef}
                 className="radial-menu-container"
+                role="menu"
+                aria-label="Menú de acciones"
             >
-                <div className="radial-menu-center-dot" />
+                <div className="radial-menu-center-dot" aria-hidden="true" />
                 {options.map((option, index) => {
                     const angle = arcStart + (angleStep * index);
                     const translateX = Math.sin(angle) * 120;
@@ -76,6 +78,8 @@ const RadialMenu: React.FC<RadialMenuProps> = ({ onClose, options, onNavigate })
                         <div
                             key={index}
                             className="radial-menu-button"
+                            role="menuitem"
+                            tabIndex={0}
                             style={{
                                 transform: `translate(-50%, -50%) translate(${translateX}px, ${translateY}px)`,
                                 animationDelay: `${index * 0.05}s`
@@ -84,17 +88,26 @@ const RadialMenu: React.FC<RadialMenuProps> = ({ onClose, options, onNavigate })
                                 e.stopPropagation();
                                 e.preventDefault();
 
-                                // Si tiene ruta 'to', navegar a esa ruta
                                 if (option.to && onNavigate) {
                                     onNavigate(option.to);
                                 } else {
-                                    // Si no tiene 'to', ejecutar la función onClick
                                     option.onClick();
                                 }
                                 onClose();
                             }}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                    e.preventDefault();
+                                    if (option.to && onNavigate) {
+                                        onNavigate(option.to);
+                                    } else {
+                                        option.onClick();
+                                    }
+                                    onClose();
+                                }
+                            }}
                         >
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                                 <path d="M10.6667 5.60016L4.73337 11.5335C4.61114 11.6557 4.45559 11.7168 4.2667 11.7168C4.07781 11.7168 3.92225 11.6557 3.80003 11.5335C3.67781 11.4113 3.6167 11.2557 3.6167 11.0668C3.6167 10.8779 3.67781 10.7224 3.80003 10.6002L9.73337 4.66683H4.6667C4.47781 4.66683 4.31959 4.60283 4.19203 4.47483C4.06448 4.34683 4.00048 4.18861 4.00003 4.00016C3.99959 3.81172 4.06359 3.6535 4.19203 3.5255C4.32048 3.3975 4.4787 3.3335 4.6667 3.3335H11.3334C11.5223 3.3335 11.6807 3.3975 11.8087 3.5255C11.9367 3.6535 12.0005 3.81172 12 4.00016V10.6668C12 10.8557 11.936 11.0142 11.808 11.1422C11.68 11.2702 11.5218 11.3339 11.3334 11.3335C11.1449 11.3331 10.9867 11.2691 10.8587 11.1415C10.7307 11.0139 10.6667 10.8557 10.6667 10.6668V5.60016Z" fill="white" />
                             </svg>
                             <span>{option.label}</span>

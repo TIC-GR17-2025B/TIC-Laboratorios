@@ -7,16 +7,19 @@ interface ProtectedRouteByRoleProps {
 }
 
 const ProtectedRouteByRole = ({ children, requiredRole }: ProtectedRouteByRoleProps) => {
-    const { isAuthenticated, getUserRole } = useAuth();
+    const { isAuthenticated, isEmailConfirmed, getUserRole } = useAuth();
 
     if (!isAuthenticated()) {
         return <Navigate to="/login" replace />;
     }
 
+    if (!isEmailConfirmed()) {
+        return <Navigate to="/verificar-email" replace />;
+    }
+
     const userRole = getUserRole();
-    
+
     if (userRole !== requiredRole) {
-        // Si el usuario no tiene el rol requerido, redirigir a su vista correspondiente
         const redirectTo = userRole === 'profesor' ? '/docente' : '/seleccion-niveles';
         return <Navigate to={redirectTo} replace />;
     }

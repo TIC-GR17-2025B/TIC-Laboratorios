@@ -216,6 +216,10 @@ export default function DetalleGrupo() {
                       <div
                         className={styles.studentClickable}
                         onClick={() => handleEstudianteClick(est.id_estudiante)}
+                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleEstudianteClick(est.id_estudiante); } }}
+                        role="button"
+                        tabIndex={0}
+                        aria-label={`Ver progreso de ${est.primernombre} ${est.primer_apellido}`}
                       >
                         <div className={styles.avatar}>
                           {est.primernombre[0]}{est.primer_apellido[0]}
@@ -234,6 +238,7 @@ export default function DetalleGrupo() {
                         onClick={() => handleRemoveStudent(est.id_estudiante)}
                         className={styles.removeButton}
                         title="Eliminar estudiante"
+                        aria-label={`Eliminar a ${est.primernombre} ${est.primer_apellido} del grupo`}
                       >
                         <Trash2 size={14} />
                       </button>

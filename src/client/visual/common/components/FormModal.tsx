@@ -42,10 +42,10 @@ export default function FormModal({
   };
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+    <div className={styles.overlay} onClick={onClose} aria-hidden="true">
+      <div className={styles.modal} role="dialog" aria-modal="true" aria-labelledby="form-modal-title" onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
-          <h2>{title}</h2>
+          <h2 id="form-modal-title">{title}</h2>
           <button
             type="button"
             className={styles.closeButton}
@@ -59,7 +59,7 @@ export default function FormModal({
         <form className={styles.form} onSubmit={handleSubmit}>
           {children}
 
-          {error && <p className={styles.error}>{error}</p>}
+          {error && <p className={styles.error} role="alert" aria-live="assertive">{error}</p>}
 
           <div className={styles.actions}>
             <button

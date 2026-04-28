@@ -17,6 +17,7 @@ export default function SearchBar({ value, onChange, placeholder = 'Buscar' }: S
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className={styles.input}
+        aria-label={placeholder}
       />
     </div>
   );

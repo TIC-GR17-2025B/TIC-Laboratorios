@@ -78,6 +78,10 @@ export default function VistaDocente() {
                                     key={grupo.id_curso}
                                     className={styles.grupoCard}
                                     onClick={() => handleGrupoClick(grupo.id_curso)}
+                                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleGrupoClick(grupo.id_curso); } }}
+                                    role="button"
+                                    tabIndex={0}
+                                    aria-label={`Abrir curso ${grupo.nombre}`}
                                 >
                                     <div
                                         className={styles.cardPreview}

@@ -48,6 +48,7 @@ const Mensaje: React.FC<MessageBubbleProps> = ({ message }) => {
               className={`${styles.audioButton} ${isThisPlaying ? styles.audioPlaying : ''}`}
               onClick={handlePlayAudio}
               title={isThisPlaying ? "Pausar audio" : "Reproducir audio"}
+              aria-label={isThisPlaying ? "Pausar audio" : "Reproducir audio"}
             >
               {isThisPlaying ? (
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">

@@ -6,10 +6,14 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, isEmailConfirmed } = useAuth();
 
     if (!isAuthenticated()) {
         return <Navigate to="/login" replace />;
+    }
+
+    if (!isEmailConfirmed()) {
+        return <Navigate to="/verificar-email" replace />;
     }
 
     return <>{children}</>;

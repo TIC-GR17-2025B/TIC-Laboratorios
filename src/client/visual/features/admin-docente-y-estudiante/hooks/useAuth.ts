@@ -31,6 +31,7 @@ interface AuthResponse {
   data?: {
     token: string;
     role: "estudiante" | "profesor";
+    confirmado: boolean;
     user: {
       id: string;
       nombre_completo: string;
@@ -65,8 +66,10 @@ export interface UseAuthReturn {
   login: (data: LoginData) => Promise<AuthResponse | null>;
   logout: () => void;
   isAuthenticated: () => boolean;
+  isEmailConfirmed: () => boolean;
   getUser: () => StoredUser | null;
   getUserRole: () => UserRole | null;
+  resendConfirmation: (correo_electronico: string) => Promise<{ success: boolean } | null>;
 }
 
 export const useAuth = (): UseAuthReturn => {
@@ -125,6 +128,7 @@ export const useAuth = (): UseAuthReturn => {
       if (result.data?.token) {
         localStorage.setItem("authToken", result.data.token);
         localStorage.setItem("userRole", result.data.role);
+        localStorage.setItem("emailConfirmado", String(result.data.confirmado));
         localStorage.setItem("user", JSON.stringify({
           ...result.data.user,
           correo_electronico: data.correo_electronico,
@@ -137,10 +141,26 @@ export const useAuth = (): UseAuthReturn => {
   const logout = () => {
     localStorage.removeItem("authToken");
     localStorage.removeItem("userRole");
+    localStorage.removeItem("emailConfirmado");
     localStorage.removeItem("user");
   };
 
   const isAuthenticated = (): boolean => !!localStorage.getItem("authToken");
+
+  const isEmailConfirmed = (): boolean => localStorage.getItem("emailConfirmado") === "true";
+
+  const resendConfirmation = (correo_electronico: string) =>
+    runAsync(async () => {
+      const response = await fetch(`${API_URL}/auth/resend-confirmation`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ correo_electronico }),
+      });
+
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Error al reenviar correo de confirmación");
+      return result;
+    });
 
   const getUser = (): StoredUser | null => {
     const userStr = localStorage.getItem("user");
@@ -159,7 +179,9 @@ export const useAuth = (): UseAuthReturn => {
     login,
     logout,
     isAuthenticated,
+    isEmailConfirmed,
     getUser,
     getUserRole,
+    resendConfirmation,
   };
 };

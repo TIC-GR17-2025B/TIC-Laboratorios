@@ -143,10 +143,11 @@ const Signup = () => {
                                 className={styles.stepContent}
                             >
                                 <div className={styles.fieldSection}>
-                                    <span className={styles.fieldLabel}>Nombre</span>
+                                    <label className={styles.fieldLabel} htmlFor="primerNombre">Nombre</label>
                                     <div className={styles.fieldRow}>
                                         <input
                                             type="text"
+                                            id="primerNombre"
                                             name="primerNombre"
                                             value={formData.primerNombre}
                                             onChange={handleChange}
@@ -161,15 +162,17 @@ const Signup = () => {
                                             onChange={handleChange}
                                             className={styles.input}
                                             placeholder="Segundo (opcional)"
+                                            aria-label="Segundo nombre"
                                         />
                                     </div>
                                 </div>
 
                                 <div className={styles.fieldSection}>
-                                    <span className={styles.fieldLabel}>Apellido</span>
+                                    <label className={styles.fieldLabel} htmlFor="primerApellido">Apellido</label>
                                     <div className={styles.fieldRow}>
                                         <input
                                             type="text"
+                                            id="primerApellido"
                                             name="primerApellido"
                                             value={formData.primerApellido}
                                             onChange={handleChange}
@@ -185,14 +188,16 @@ const Signup = () => {
                                             className={styles.input}
                                             placeholder="Segundo"
                                             required
+                                            aria-label="Segundo apellido"
                                         />
                                     </div>
                                 </div>
 
                                 <div className={styles.fieldSection}>
-                                    <span className={styles.fieldLabel}>Codigo unico</span>
+                                    <label className={styles.fieldLabel} htmlFor="codigoUnico">Codigo unico</label>
                                     <input
                                         type="number"
+                                        id="codigoUnico"
                                         name="codigoUnico"
                                         value={formData.codigoUnico}
                                         onChange={handleChange}
@@ -216,9 +221,10 @@ const Signup = () => {
                                 className={styles.stepContent}
                             >
                                 <div className={styles.fieldSection}>
-                                    <span className={styles.fieldLabel}>Correo electronico</span>
+                                    <label className={styles.fieldLabel} htmlFor="email">Correo electronico</label>
                                     <input
                                         type="email"
+                                        id="email"
                                         name="email"
                                         value={formData.email}
                                         onChange={handleChange}
@@ -229,9 +235,10 @@ const Signup = () => {
                                 </div>
 
                                 <div className={styles.fieldSection}>
-                                    <span className={styles.fieldLabel}>Contrasena</span>
+                                    <label className={styles.fieldLabel} htmlFor="password">Contrasena</label>
                                     <input
                                         type="password"
+                                        id="password"
                                         name="password"
                                         value={formData.password}
                                         onChange={handleChange}
@@ -242,9 +249,10 @@ const Signup = () => {
                                 </div>
 
                                 <div className={styles.fieldSection}>
-                                    <span className={styles.fieldLabel}>Confirmar contrasena</span>
+                                    <label className={styles.fieldLabel} htmlFor="confirmPassword">Confirmar contrasena</label>
                                     <input
                                         type="password"
+                                        id="confirmPassword"
                                         name="confirmPassword"
                                         value={formData.confirmPassword}
                                         onChange={handleChange}
@@ -257,7 +265,7 @@ const Signup = () => {
                         )}
                     </AnimatePresence>
 
-                    {(localError || error) && <div className={styles.error}>{localError || error}</div>}
+                    {(localError || error) && <div className={styles.error} role="alert" aria-live="assertive">{localError || error}</div>}
 
                     <div className={styles.stepActions}>
                         <AnimatePresence initial={false}>

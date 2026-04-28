@@ -320,8 +320,6 @@
 }
 
 .link:hover,
-.link:focus,
-.link:focus-visible,
 .link:active {
   all: unset;
   color: #e0e0e0 !important;
@@ -336,6 +334,26 @@
   margin: 0 !important;
   outline: none !important;
   box-shadow: none !important;
+}
+
+.link:focus-visible {
+  color: #e0e0e0 !important;
+  text-decoration: underline !important;
+  outline: 2px solid var(--blue) !important;
+  outline-offset: 2px !important;
+  border-radius: 2px !important;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* ── Legacy classes (kept for Signup compatibility) ── */

@@ -95,6 +95,16 @@ export class PrismaAuthRepository implements IAuthRepository {
     })
   }
 
+  async updateTokenConfirmacion(id_usuario_auth: number, token: string, expira: string): Promise<void> {
+    await prisma.usuario_auth.update({
+      where: { id_usuario_auth },
+      data: {
+        token_confirmacion: token,
+        token_expira: new Date(expira)
+      }
+    })
+  }
+
   async updatePassword(id_usuario_auth: number, nuevaContrasenia: string): Promise<void> {
     await prisma.usuario_auth.update({
       where: { id_usuario_auth },

@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../hooks/useAuth';
 import { useProgresoEstudiante } from '../hooks/useEstudiantes';
 import { useEstudianteGrupo } from '../contexts/EstudianteGrupoContext';
@@ -69,7 +68,7 @@ export default function VistaPerfil() {
         return acc;
     }, {} as Record<string, { nombre: string; slug_escenario: string; intentos: typeof progresos; completado: boolean }>);
 
-    const escenarios = Object.values(progresosPorEscenario);
+    const escenarios = Object.values(progresosPorEscenario).filter(e => e.slug_escenario !== 'ai-generated-scenario');
 
     const formatTiempo = (t: number | null) => {
         if (t === null) return '--:--';
@@ -140,12 +139,27 @@ export default function VistaPerfil() {
                                             open ? next.delete(esc.slug_escenario) : next.add(esc.slug_escenario);
                                             return next;
                                         })}
+                                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpandedEscenarios(prev => { const next = new Set(prev); open ? next.delete(esc.slug_escenario) : next.add(esc.slug_escenario); return next; }); } }}
+                                        role="button"
+                                        tabIndex={0}
+                                        aria-expanded={open}
                                     >
                                         <div>
                                             <h3 className={styles.escenarioTitle}>{esc.nombre}</h3>
-                                            <p className={styles.escenarioMeta}>
-                                                {esc.intentos.length} intento{esc.intentos.length !== 1 ? 's' : ''}
-                                            </p>
+                                            <div className={styles.escenarioMetaRow}>
+                                                <p className={styles.escenarioMeta}>
+                                                    {esc.intentos.length} intento{esc.intentos.length !== 1 ? 's' : ''}
+                                                </p>
+                                                <span className={styles.metaDot}>·</span>
+                                                <div className={styles.intentoBars}>
+                                                    {esc.intentos.slice(-5).map((p) => (
+                                                        <span
+                                                            key={p.id_progreso}
+                                                            className={p.terminado ? styles.barOk : styles.barFail}
+                                                        />
+                                                    ))}
+                                                </div>
+                                            </div>
                                         </div>
                                         <div className={styles.escenarioActions}>
                                             {user?.id_estudiante && esc.slug_escenario && (
@@ -160,40 +174,30 @@ export default function VistaPerfil() {
                                             <svg
                                                 className={`${styles.chevron} ${open ? styles.chevronOpen : ''}`}
                                                 width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+                                                aria-hidden="true"
                                             >
                                                 <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z" />
                                             </svg>
                                         </div>
                                     </div>
 
-                                    <AnimatePresence initial={false}>
-                                        {open && esc.intentos.length > 0 && (
-                                            <motion.div
-                                                className={styles.intentosList}
-                                                initial={{ height: 0, opacity: 0 }}
-                                                animate={{ height: 'auto', opacity: 1 }}
-                                                exit={{ height: 0, opacity: 0 }}
-                                                transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }}
-                                            >
-                                                {[...esc.intentos].reverse().map((intento, i) => (
-                                                    <motion.div
-                                                        key={intento.id_progreso}
-                                                        className={styles.intentoRow}
-                                                        initial={{ opacity: 0, x: -6 }}
-                                                        animate={{ opacity: 1, x: 0 }}
-                                                        transition={{ duration: 0.12, delay: i * 0.025 }}
-                                                    >
-                                                        <span className={`${styles.intentoDot} ${intento.terminado ? styles.dotOk : styles.dotFail}`} />
-                                                        <span className={styles.intentoNum}>{formatFecha(intento.fecha_creacion) || `Intento ${esc.intentos.length - i}`}</span>
-                                                        <span className={styles.intentoTiempo}>{formatTiempo(intento.tiempo)}</span>
-                                                        <span className={intento.terminado ? styles.intentoStatusOk : styles.intentoStatusFail}>
-                                                            {intento.terminado ? 'Completado' : 'Fallido'}
-                                                        </span>
-                                                    </motion.div>
-                                                ))}
-                                            </motion.div>
-                                        )}
-                                    </AnimatePresence>
+                                    {open && esc.intentos.length > 0 && (
+                                        <div className={styles.intentosList}>
+                                            {[...esc.intentos].reverse().map((intento, i) => (
+                                                <div
+                                                    key={intento.id_progreso}
+                                                    className={styles.intentoRow}
+                                                >
+                                                    <span className={`${styles.intentoDot} ${intento.terminado ? styles.dotOk : styles.dotFail}`} />
+                                                    <span className={styles.intentoNum}>{formatFecha(intento.fecha_creacion) || `Intento ${esc.intentos.length - i}`}</span>
+                                                    <span className={styles.intentoTiempo}>{formatTiempo(intento.tiempo)}</span>
+                                                    <span className={intento.terminado ? styles.intentoStatusOk : styles.intentoStatusFail}>
+                                                        {intento.terminado ? 'Completado' : 'Fallido'}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
                             );
                         })}

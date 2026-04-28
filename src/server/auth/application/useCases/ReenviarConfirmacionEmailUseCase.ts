@@ -26,7 +26,7 @@ export class ReenviarConfirmacionEmailUseCase {
     const token_expira = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
 
     // 4. Actualizar token en la base de datos
-    await this.repo.updateTokenRecuperacion(
+    await this.repo.updateTokenConfirmacion(
       usuarioAuth.id_usuario_auth,
       token_confirmacion,
       token_expira

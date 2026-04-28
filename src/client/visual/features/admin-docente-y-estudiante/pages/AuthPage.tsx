@@ -94,7 +94,9 @@ const AuthPage = () => {
         });
         if (result?.success && result.data) {
             setIsExiting(true);
-            const destination = result.data.role === 'profesor' ? '/docente' : '/seleccion-niveles';
+            const destination = result.data.confirmado
+                ? (result.data.role === 'profesor' ? '/docente' : '/seleccion-niveles')
+                : '/verificar-email';
             setTimeout(() => navigate(destination), 400);
         }
     };
@@ -132,8 +134,12 @@ const AuthPage = () => {
             contrasenia: formData.password,
         });
         if (result?.success) {
+            await login({
+                correo_electronico: formData.email,
+                contrasenia: formData.password,
+            });
             setIsExiting(true);
-            setTimeout(() => navigate('/seleccion-niveles'), 400);
+            setTimeout(() => navigate('/verificar-email'), 400);
         }
     };
 
@@ -256,6 +262,15 @@ const AuthPage = () => {
                                                 type: 'password',
                                                 placeholder: '••••••••',
                                             })}
+                                            <div style={{ fontSize: 12, textAlign: 'right' }}>
+                                                <button
+                                                    type="button"
+                                                    className={styles.link}
+                                                    onClick={() => navigate('/recuperar-contrasenia')}
+                                                >
+                                                    ¿Olvidaste tu contraseña?
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 )}

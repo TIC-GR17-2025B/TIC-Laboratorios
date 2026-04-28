@@ -26,6 +26,11 @@ import { AnimatePresence } from 'framer-motion'
 import VistaFasesPartida from './features/escenarios-simulados/pages/VistaFasesPartida.tsx'
 import { FasesProvider } from './features/escenarios-simulados/contexts/FasesContext.tsx'
 import VistaSeleccionNiveles from './features/escenarios-simulados/pages/VistaSeleccionNiveles.tsx'
+import TutorialTour from './features/escenarios-simulados/components/TutorialTour.tsx'
+import VerificarEmail from './features/admin-docente-y-estudiante/pages/VerificarEmail.tsx'
+import ConfirmarEmail from './features/admin-docente-y-estudiante/pages/ConfirmarEmail.tsx'
+import RecuperarContrasenia from './features/admin-docente-y-estudiante/pages/RecuperarContrasenia.tsx'
+import RestablecerContrasenia from './features/admin-docente-y-estudiante/pages/RestablecerContrasenia.tsx'
 
 const shouldRedirect = sessionStorage.getItem('redirect-on-reload');
 if (shouldRedirect === 'true') {
@@ -53,6 +58,7 @@ function GameProvidersLayout() {
                   <ModelPreloader />
                   <Modal />
                   <Sidebar />
+                  <TutorialTour />
                   <div className="content">
                     <Outlet />
                     <TarjetaLogNuevo />
@@ -76,6 +82,10 @@ function AnimatedRoutes() {
         <Routes location={location}>
           <Route path='/login' element={<AuthPage />} />
           <Route path='/signup' element={<AuthPage />} />
+          <Route path='/verificar-email' element={<VerificarEmail />} />
+          <Route path='/auth/confirm' element={<ConfirmarEmail />} />
+          <Route path='/recuperar-contrasenia' element={<RecuperarContrasenia />} />
+          <Route path='/auth/reset-password' element={<RestablecerContrasenia />} />
 
           <Route path='/docente' element={
             <ProtectedRouteByRole requiredRole="profesor">

@@ -22,10 +22,10 @@ const Login = () => {
 
         if (result?.success && result.data) {
             setIsExiting(true);
-            const destination = result.data.role === 'profesor' 
-                ? '/docente' 
-                : '/seleccion-niveles';
-            
+            const destination = result.data.confirmado
+                ? (result.data.role === 'profesor' ? '/docente' : '/seleccion-niveles')
+                : '/verificar-email';
+
             setTimeout(() => {
                 navigate(destination);
             }, 400);
@@ -60,6 +60,7 @@ const Login = () => {
 
                 <form onSubmit={handleSubmit} className={styles.form}>
                     <div className={styles.inputGroup}>
+                        <label htmlFor="email" className={styles.srOnly}>Correo electrónico</label>
                         <input
                             type="text"
                             id="email"
@@ -72,6 +73,7 @@ const Login = () => {
                     </div>
 
                     <div className={styles.inputGroup}>
+                        <label htmlFor="password" className={styles.srOnly}>Contraseña</label>
                         <input
                             type="password"
                             id="password"
@@ -83,7 +85,7 @@ const Login = () => {
                         />
                     </div>
 
-                    {error && <div className={styles.error}>{error}</div>}
+                    {error && <div className={styles.error} role="alert" aria-live="assertive">{error}</div>}
 
                     <button
                         type="submit"

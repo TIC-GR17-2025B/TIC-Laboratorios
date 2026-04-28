@@ -80,6 +80,10 @@ export default function VistaDetalleEstudiante() {
                                         <div
                                             className={styles.escenarioHeader}
                                             onClick={() => intentos > 0 && toggleEscenario(escenario.id)}
+                                            onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && intentos > 0) { e.preventDefault(); toggleEscenario(escenario.id); } }}
+                                            role={intentos > 0 ? 'button' : undefined}
+                                            tabIndex={intentos > 0 ? 0 : undefined}
+                                            aria-expanded={intentos > 0 ? isExpanded : undefined}
                                             style={{ cursor: intentos > 0 ? 'pointer' : 'default' }}
                                         >
                                             <div className={styles.escenarioInfo}>
@@ -103,12 +107,23 @@ export default function VistaDetalleEstudiante() {
                                                     </span>
                                                 )}
                                                 {intentos > 0 && (
+                                                    <div className={styles.intentoBars}>
+                                                        {progresosEscenario.map((p) => (
+                                                            <span
+                                                                key={p.id_progreso}
+                                                                className={p.terminado ? styles.barExito : styles.barFallo}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                )}
+                                                {intentos > 0 && (
                                                     <svg
                                                         className={`${styles.expandIcon} ${isExpanded ? styles.expanded : ''}`}
                                                         width="24"
                                                         height="24"
                                                         viewBox="0 0 24 24"
                                                         fill="currentColor"
+                                                        aria-hidden="true"
                                                     >
                                                         <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z" />
                                                     </svg>
