@@ -14,7 +14,7 @@ import { useChatContext } from '../../features/chat/context/ChatContext';
 import ChatContainer from '../../features/chat/components/ChatContainer';
 import { useScreenTransition } from '../contexts/ScreenTransitionContext';
 import { useEscenario } from '../contexts';
-import { EscenarioController } from '../../../../ecs/controllers/EscenarioController';
+import { EscenarioController } from '../../../ecs/controllers/EscenarioController';
 import Button from './Button';
 
 const Sidebar: React.FC = () => {
