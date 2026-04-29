@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router';
 import type { ReactNode } from 'react';
 import type { Dispositivo, Escenario } from '../../../shared/types/EscenarioTypes';
 import { EstadoAtaqueDispositivo, TipoDispositivo } from '../../../shared/types/DeviceEnums';
+import { EscenarioController } from '../../../ecs/controllers/EscenarioController';
 import {
     DispositivoComponent,
     WorkstationComponent,
@@ -150,6 +151,7 @@ export function EscenarioProvider({ children, initialEscenario }: EscenarioProvi
     // Redirigir a selección de niveles si no hay escenario
     useEffect(() => {
         if (!escenario) {
+            EscenarioController.reset();
             navigate('/seleccion-niveles');
         }
     }, [escenario, navigate]);
