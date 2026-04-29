@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import FormModal from '../../../common/components/FormModal';
+import InvitationCode from '../../../common/components/InvitationCode';
 import styles from '../styles/ModalUnirseGrupo.module.css';
 
 interface ModalUnirseGrupoProps {
@@ -50,20 +51,13 @@ export default function ModalUnirseGrupo({ isOpen, onClose, onJoin }: ModalUnirs
       loading={loading}
       error={error}
     >
-      <div className={styles.formGroup}>
-        <label htmlFor="codigo">Código de Invitación</label>
-        <input
-          id="codigo"
-          type="text"
-          value={codigo}
-          onChange={(e) => setCodigo(e.target.value.toUpperCase())}
-          placeholder="Ej: ABC123XYZ"
-          disabled={loading}
-          autoFocus
-          maxLength={20}
-        />
-        <p className={styles.hint}>Ingresa el código que te proporcionó tu docente</p>
-      </div>
+      <InvitationCode
+        mode="input"
+        label="Ingrese el código de invitación"
+        onSubmit={(code) => setCodigo(code)}
+        onChange={() => setError(null)}
+        loading={loading}
+      />
     </FormModal>
   );
 }

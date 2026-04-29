@@ -40,8 +40,6 @@ export function CourseAnalysisView({
 
   return (
     <div className={styles.viewWrapper}>
-      <p className={styles.fecha}>{fecha}</p>
-
       <div className={styles.statsRow}>
         <div className={styles.stat}>
           <span className={styles.statValue}>{resumen.total_estudiantes}</span>
@@ -84,10 +82,10 @@ export function CourseAnalysisView({
       </div>
 
       <div className={styles.footer}>
-        <span className={styles.footerHint}>Nuevos datos disponibles?</span>
         <CourseAnalysisButton
           idCurso={idCurso}
           idProfesor={idProfesor}
+          hasExisting
           onAnalysisGenerated={onAnalysisGenerated}
         />
       </div>

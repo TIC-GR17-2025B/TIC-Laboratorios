@@ -1,103 +1,109 @@
-/* ── Main ── */
+/* ── Layout ── */
 
 .main {
-  width: 100%;
-  max-width: var(--content-width);
-  margin: 0 auto;
-  padding: 48px 0;
-  user-select: none;
-}
-
-.sectionTitle {
-  font-size: 28px;
-  font-weight: 600;
-  margin: 0 0 1rem 0;
-}
-
-.loadingText,
-.errorText {
-  color: var(--text-muted);
-  font-size: 0.875rem;
-  text-align: center;
-  padding: 2rem;
-}
-
-.errorText {
-  color: #ff6b6b;
-}
-
-/* ── Escenarios ── */
-
-.escenariosList {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 32px;
+  padding: 32px 0;
 }
 
-.escenarioCard {
-  border: 1px solid var(--border-primary);
+/* ── Profile ── */
+
+.profileHeader {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.profileAvatar {
+  width: 64px;
+  height: 64px;
   border-radius: var(--border-radius);
   overflow: hidden;
-  background: var(--surface-primary);
+  border: 1px solid var(--border-primary);
+  flex-shrink: 0;
+}
+
+.pageTitle {
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.profileMetaRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.meta {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* ── Historial de evaluaciones ── */
+
+.historialSection {
+  padding-top: 8px;
+}
+
+.historialTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 16px 0;
+}
+
+.historialList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── Escenario block ── */
+
+.escenarioBlock {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border-primary);
+  border-radius: var(--border-radius);
+  padding: 16px;
 }
 
 .escenarioHeader {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 1rem;
-  transition: background 0.1s;
+  justify-content: space-between;
+  cursor: pointer;
+  padding: 4px 0;
 }
 
-.escenarioHeader:hover {
-  background: var(--surface-secondary);
-}
-
-.escenarioInfo {
-  flex: 1;
-  min-width: 0;
-}
-
-.escenarioInfo h3 {
-  margin: 0 0 0.75rem 0;
+.escenarioTitle {
+  font-size: 18px;
+  font-weight: 600;
   color: var(--text-primary);
-  font-weight: 500;
-}
-
-.escenarioDescripcion {
   margin: 0;
-  color: var(--text-muted);
-  line-height: 1.4;
 }
 
-.escenarioStatus {
+.escenarioMetaRow {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  flex-shrink: 0;
+  gap: 8px;
+  margin-top: 2px;
 }
 
-.badgeCompletado,
-.badgeIntentado,
-.badgeNoIntentado {
-  padding: 0.5rem 1rem;
-  border-radius: 12px;
+.escenarioMeta {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0;
 }
 
-.badgeCompletado {
-  background: rgba(76, 175, 80, 0.2);
-  color: #4caf50;
-}
-
-.badgeIntentado {
-  background: rgba(255, 193, 7, 0.2);
-  color: #ffc107;
-}
-
-.badgeNoIntentado {
-  background: var(--surface-secondary);
+.metaDot {
+  font-size: 11px;
   color: var(--text-secondary);
-  border: 1px solid var(--border-primary);
 }
 
 .intentoBars {
@@ -106,102 +112,193 @@
   gap: 3px;
 }
 
-.barExito,
-.barFallo {
+.barOk,
+.barFail {
   display: inline-block;
-  width: 6px;
-  height: 20px;
-  border-radius: 2px;
+  width: 4px;
+  height: 14px;
 }
 
-.barExito {
-  background: #4caf50;
+.barOk {
+  background: #22c55e;
 }
 
-.barFallo {
-  background: #ff6b6b;
+.barFail {
+  background: #ef4444;
 }
 
-.expandIcon {
-  color: var(--text-secondary);
-  transition: transform 0.2s ease;
+.chevronWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid var(--border-primary);
+  transition: background 0.15s ease;
+  flex-shrink: 0;
 }
 
-.expandIcon.expanded {
+.chevronWrap:hover {
+  background: var(--surface-secondary);
+}
+
+.chevron {
+  color: var(--text-muted);
+  transition: transform 0.15s ease;
+  flex-shrink: 0;
+}
+
+.chevronOpen {
   transform: rotate(180deg);
 }
 
-.escenarioDetails {
-  padding: 1rem;
-  border-top: 1px solid var(--border-primary);
-  user-select: none;
-}
+/* ── Intento rows (timeline) ── */
 
 .intentosList {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  user-select: none;
+  position: relative;
+  margin-left: 3px;
+  padding-top: 12px;
+  overflow: hidden;
 }
 
-.intentoItem {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem;
-  background: var(--surface-primary);
-  border-radius: var(--border-radius);
-  border: 1px solid var(--border-primary);
-  user-select: none;
-}
-
-.intentoNumero {
-  width: 75px !important;
-}
-
-.intentoInfo {
+.intentoRow {
   display: flex;
-  gap: 0.75rem;
   align-items: center;
+  gap: 16px;
+  padding: 14px 0 14px 24px;
+  position: relative;
+  user-select: none;
+}
+
+.intentoRow::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--border-primary);
+}
+
+.intentoRow:first-child::before {
+  top: 50%;
+}
+
+.intentoRow:last-child::before {
+  bottom: 50%;
+}
+
+.intentoRow:only-child::before {
+  display: none;
+}
+
+.intentoDot {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.dotOk {
+  background: #22c55e;
+}
+
+.dotFail {
+  background: #ef4444;
+}
+
+.intentoNum {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  min-width: 28px;
+  flex: 1;
 }
 
 .intentoTiempo {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
+  font-size: 13px;
   color: var(--text-muted);
+  font-family: "SF Mono", "Fira Code", monospace;
+  letter-spacing: 0.04em;
+  min-width: 48px;
+  text-align: right;
 }
 
-.intentoExito {
-  color: #4caf50;
-  font-size: 0.75rem;
+.intentoStatusOk {
+  font-size: 13px;
+  color: #22c55e;
+  min-width: 90px;
+  text-align: right;
 }
 
-.intentoFallo {
-  color: #ff6b6b;
-  font-size: 0.75rem;
+.intentoStatusFail {
+  font-size: 13px;
+  color: #ef4444;
+  min-width: 90px;
+  text-align: right;
 }
 
-.intentoFecha {
-  color: var(--text-secondary);
-  font-size: 0.75rem;
+/* ── Empty / loading ── */
+
+.empty {
+  padding: 48px 24px;
+  text-align: center;
 }
 
-@media (max-width: 768px) {
-  .intentoItem {
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
+.muted {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.errorText {
+  color: var(--error);
+  font-size: 14px;
+  text-align: center;
+  padding: 2rem;
+}
+
+/* ── Skeleton ── */
+
+.skeletonItem {
+  height: 86.72px;
+  border: 1px solid var(--border-primary);
+  border-radius: var(--border-radius);
+  background: var(--surface-secondary);
+  animation: skeletonPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes skeletonPulse {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 640px) {
+  .intentoRow {
+    gap: 8px;
   }
 
-  .escenarioHeader {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
+  .intentoTiempo {
+    min-width: unset;
   }
 
-  .escenarioStatus {
-    width: 100%;
-    justify-content: space-between;
+  .intentoStatusOk,
+  .intentoStatusFail {
+    min-width: unset;
+    font-size: 12px;
   }
 }

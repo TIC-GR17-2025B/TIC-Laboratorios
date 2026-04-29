@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
-import { Trash2, Users, BarChart3, Settings, PenSquareIcon } from 'lucide-react';
+import { Trash2, Users, BarChart3, Settings, PenSquareIcon, ArrowRight } from 'lucide-react';
+import Leaderboard from '../../escenarios-simulados/components/Leaderboard';
 import { motion } from 'framer-motion';
 import { useAuth } from '../hooks/useAuth';
 import { useGroups, type Estudiante, type Grupo } from '../hooks/useGroups';
 import InvitationCode from '../../../common/components/InvitationCode';
 import SearchBar from '../../../common/components/SearchBar';
 import TextInput from '../../../common/components/TextInput';
+import Button from '../../../common/components/Button';
+import ConfirmDialog from '../../../common/components/ConfirmDialog';
 import { CourseAnalysisButton } from '../../course-analysis/components/CourseAnalysisButton';
 import { CourseAnalysisView } from '../../course-analysis/components/CourseAnalysisView';
 import { useGenerateCourseAnalysis } from '../../course-analysis/hooks/useGenerateCourseAnalysis';
@@ -38,6 +41,8 @@ export default function DetalleGrupo() {
   const [renameSaving, setRenameSaving] = useState(false);
   const [isCheckingAnalysis, setIsCheckingAnalysis] = useState(false);
   const [analysis, setAnalysis] = useState<CourseAnalysisResponse | null>(null);
+  const [confirmRemoveId, setConfirmRemoveId] = useState<number | null>(null);
+  const [confirmDeleteGrupo, setConfirmDeleteGrupo] = useState(false);
   const { checkLatestAnalysis } = useGenerateCourseAnalysis();
   const insights = useGroupInsights(grupo?.id_curso ?? null);
 
@@ -72,18 +77,23 @@ export default function DetalleGrupo() {
   };
 
   const handleRemoveStudent = async (idEstudiante: number) => {
-    if (!grupo || !window.confirm('¿Estás seguro de que deseas eliminar a este estudiante del grupo?')) {
-      return;
-    }
+    if (!grupo) return;
     const success = await removeStudent(grupo.id_curso, idEstudiante);
     if (success) {
       setEstudiantes(estudiantes.filter((e) => e.id_estudiante !== idEstudiante));
     }
+    setConfirmRemoveId(null);
   };
 
-  const handleEstudianteClick = (idEstudiante: number) => {
-    navigate(`/docente/estudiante/${idEstudiante}`, {
-      state: { fromGrupo: { id: grupo!.id_curso, nombre: grupo!.nombre } },
+  const handleEstudianteClick = (est: Estudiante) => {
+    navigate(`/docente/estudiante/${est.id_estudiante}`, {
+      state: {
+        fromGrupo: { id: grupo!.id_curso, nombre: grupo!.nombre },
+        estudiante: {
+          nombre: `${est.primernombre} ${est.primer_apellido}`,
+          correo: est.correo_electronico,
+        },
+      },
     });
   };
 
@@ -98,13 +108,12 @@ export default function DetalleGrupo() {
   };
 
   const handleDeleteGrupo = async () => {
-    if (!grupo || !window.confirm('¿Estás seguro de que deseas eliminar este grupo? Esta acción no se puede deshacer.')) {
-      return;
-    }
+    if (!grupo) return;
     const success = await deleteGrupo(grupo.id_curso);
     if (success) {
       navigate('/docente');
     }
+    setConfirmDeleteGrupo(false);
   };
 
   const handleExportCSV = () => {
@@ -125,15 +134,7 @@ export default function DetalleGrupo() {
     URL.revokeObjectURL(url);
   };
 
-  if (loading) {
-    return (
-      <div>
-        <p className={styles.loadingText}>Cargando...</p>
-      </div>
-    );
-  }
-
-  if (!grupo) {
+  if (!loading && !grupo) {
     return (
       <div>
         <p className={styles.errorText}>Grupo no encontrado</p>
@@ -160,7 +161,7 @@ export default function DetalleGrupo() {
         <main className={styles.main}>
           <Breadcrumb items={[
             { label: 'Mis Cursos', to: '/docente' },
-            { label: grupo.nombre },
+            { label: grupo?.nombre || '...' },
           ]} />
 
           <nav className={styles.tabBar}>
@@ -213,7 +214,19 @@ export default function DetalleGrupo() {
                 <SearchBar value={searchQuery} onChange={setSearchQuery} />
               </div>
 
-              {estudiantes.length === 0 ? (
+              {loading ? (
+                <div className={styles.studentList}>
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <div key={i} className={styles.skeletonRow} aria-hidden="true">
+                      <div className={styles.skeletonAvatar} />
+                      <div className={styles.skeletonLines}>
+                        <div className={styles.skeletonName} />
+                        <div className={styles.skeletonMeta} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : estudiantes.length === 0 ? (
                 <p className={styles.emptyText}>
                   Los estudiantes aparecerán aquí cuando se unan con el código de invitación.
                 </p>
@@ -227,8 +240,8 @@ export default function DetalleGrupo() {
                     <div key={est.id_estudiante} className={styles.studentRow}>
                       <div
                         className={styles.studentClickable}
-                        onClick={() => handleEstudianteClick(est.id_estudiante)}
-                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleEstudianteClick(est.id_estudiante); } }}
+                        onClick={() => handleEstudianteClick(est)}
+                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleEstudianteClick(est); } }}
                         role="button"
                         tabIndex={0}
                         aria-label={`Ver progreso de ${est.primernombre} ${est.primer_apellido}`}
@@ -246,14 +259,22 @@ export default function DetalleGrupo() {
                           </span>
                         </div>
                       </div>
-                      <button
-                        onClick={() => handleRemoveStudent(est.id_estudiante)}
-                        className={styles.removeButton}
-                        title="Eliminar estudiante"
-                        aria-label={`Eliminar a ${est.primernombre} ${est.primer_apellido} del grupo`}
-                      >
-                        <Trash2 size={14} />
-                      </button>
+                      <div className={styles.rowActions}>
+                        <Button
+                          variant="danger"
+                          square
+                          icon={<Trash2 size={14} />}
+                          onClick={() => setConfirmRemoveId(est.id_estudiante)}
+                          aria-label={`Eliminar a ${est.primernombre} ${est.primer_apellido} del grupo`}
+                        />
+                        <Button
+                          variant="primary"
+                          square
+                          icon={<ArrowRight size={14} />}
+                          onClick={() => handleEstudianteClick(est)}
+                          aria-label={`Ver detalles de ${est.primernombre} ${est.primer_apellido}`}
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -262,49 +283,70 @@ export default function DetalleGrupo() {
           )}
 
           {/* ── Analysis tab ── */}
-          {activeTab === 'analysis' && (
+          {activeTab === 'analysis' && grupo && (
             <>
               <div className={styles.panelHeader}>
                 <h2 className={styles.panelTitle}>Análisis del curso</h2>
               </div>
 
-              <GroupInsights data={insights} groupName={grupo.nombre} />
+              <GroupInsights data={insights} />
 
-              {!analysis ? (
-                isCheckingAnalysis ? (
-                  <div className={styles.analysisPanel} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1rem', padding: '3rem' }}>
-                    <p style={{ color: 'var(--text-2)' }}>Buscando informe de análisis previo...</p>
+              <div className={styles.analysisRow}>
+                <div className={styles.analysisCol}>
+                  <div className={styles.analysisTitleRow}>
+                    <h3 className={styles.analysisSectionTitle}>Análisis de curso con IA</h3>
+                    {analysis && (
+                      <span className={styles.analysisFecha}>
+                        {new Date(analysis.fecha_generacion).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    )}
                   </div>
-                ) : (
-                  <div className={styles.analysisPanel}>
-                    <p className={styles.analysisDesc}>
-                      Genera un análisis con IA sobre el rendimiento y participación de los estudiantes en este grupo.
-                    </p>
-                    <CourseAnalysisButton
+                  {!analysis ? (
+                    isCheckingAnalysis ? (
+                      <div className={styles.analysisPanel} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1rem', padding: '3rem' }}>
+                        <p style={{ color: 'var(--text-muted)' }}>Buscando informe de análisis previo...</p>
+                      </div>
+                    ) : (
+                      <div className={styles.analysisPanel}>
+                        <p className={styles.analysisDesc}>
+                          Genera un análisis con IA sobre el rendimiento y participación de los estudiantes en este grupo.
+                        </p>
+                        <CourseAnalysisButton
+                          idCurso={grupo.id_curso}
+                          idProfesor={idProfesor || 0}
+                          onAnalysisGenerated={(newAnalysis) => {
+                            setAnalysis(newAnalysis);
+                          }}
+                        />
+                      </div>
+                    )
+                  ) : (
+                    <CourseAnalysisView
+                      analysis={analysis}
+                      cursoNombre={grupo.nombre}
                       idCurso={grupo.id_curso}
                       idProfesor={idProfesor || 0}
                       onAnalysisGenerated={(newAnalysis) => {
-                        setAnalysis(newAnalysis);
+                         setAnalysis(newAnalysis);
                       }}
                     />
-                  </div>
-                )
-              ) : (
-                <CourseAnalysisView
-                  analysis={analysis}
-                  cursoNombre={grupo.nombre}
-                  idCurso={grupo.id_curso}
-                  idProfesor={idProfesor || 0}
-                  onAnalysisGenerated={(newAnalysis) => {
-                     setAnalysis(newAnalysis);
-                  }}
-                />
-              )}
+                  )}
+                </div>
+                <div className={styles.leaderboardSidebar}>
+                  <Leaderboard
+                    entries={insights.leaderboard}
+                    groupName={grupo.nombre}
+                    loading={insights.loading}
+                    error={null}
+                    currentStudentId={null}
+                  />
+                </div>
+              </div>
             </>
           )}
 
           {/* ── Settings tab ── */}
-          {activeTab === 'settings' && (
+          {activeTab === 'settings' && grupo && (
             <>
               <div className={styles.panelHeader}>
                 <h2 className={styles.panelTitle}>Configuración</h2>
@@ -318,14 +360,14 @@ export default function DetalleGrupo() {
                     onChange={setEditName}
                     placeholder="Nombre del grupo"
                   />
-                  <button
-                    className={styles.renameButton}
+                  <Button
+                    variant="secondary"
+                    icon={<PenSquareIcon strokeWidth={1} size={14} />}
                     onClick={handleRenameGrupo}
                     disabled={renameSaving || !editName.trim() || editName.trim() === grupo.nombre}
                   >
                     Renombrar
-                    <PenSquareIcon strokeWidth={1} size={14} />
-                  </button>
+                  </Button>
                 </div>
               </div>
 
@@ -351,10 +393,9 @@ export default function DetalleGrupo() {
                     <span>Eliminar grupo</span>
                     <span className={styles.dangerHint}>Se eliminará el grupo y se desmatricularán todos los estudiantes.</span>
                   </div>
-                  <button className={styles.dangerButton} onClick={handleDeleteGrupo}>
-                    <Trash2 size={14} />
+                  <Button variant="danger" icon={<Trash2 size={14} />} onClick={() => setConfirmDeleteGrupo(true)}>
                     Eliminar
-                  </button>
+                  </Button>
                 </div>
               </div>
             </>
@@ -362,6 +403,21 @@ export default function DetalleGrupo() {
         </main>
       </div>
 
+      <ConfirmDialog
+        open={confirmRemoveId !== null}
+        title="Eliminar estudiante"
+        message="¿Estás seguro de que deseas eliminar a este estudiante del grupo?"
+        onConfirm={() => confirmRemoveId && handleRemoveStudent(confirmRemoveId)}
+        onCancel={() => setConfirmRemoveId(null)}
+      />
+
+      <ConfirmDialog
+        open={confirmDeleteGrupo}
+        title="Eliminar grupo"
+        message="Se eliminará el grupo y se desmatricularán todos los estudiantes. Esta acción no se puede deshacer."
+        onConfirm={handleDeleteGrupo}
+        onCancel={() => setConfirmDeleteGrupo(false)}
+      />
     </>
   );
 }

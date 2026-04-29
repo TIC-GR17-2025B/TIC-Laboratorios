@@ -1,9 +1,11 @@
 import { useState, useRef, useCallback } from 'react';
 import { Copy, Check, RefreshCw } from 'lucide-react';
 import Tooltip from './Tooltip';
+import Button from './Button';
 import styles from '../styles/InvitationCode.module.css';
 
 const CODE_LENGTH = 8;
+const PLACEHOLDER = 'ABCD1234';
 
 interface InvitationCodeDisplayProps {
   mode: 'display';
@@ -16,6 +18,7 @@ interface InvitationCodeDisplayProps {
 interface InvitationCodeInputProps {
   mode: 'input';
   onSubmit: (code: string) => void;
+  onChange?: () => void;
   label?: string;
   error?: string;
   loading?: boolean;
@@ -58,19 +61,17 @@ function DisplayMode({ code, onCopy, onRegenerate, label }: Omit<InvitationCodeD
         {code && (
           <div className={styles.actions}>
             <Tooltip text={copied ? 'Copiado' : 'Copiar'}>
-              <button className={styles.actionBtn} onClick={handleCopy}>
-                {copied ? <Check size={16} /> : <Copy size={16} />}
-              </button>
+              <Button variant="icon" square icon={copied ? <Check size={14} /> : <Copy size={14} />} onClick={handleCopy} />
             </Tooltip>
             {onRegenerate && (
               <Tooltip text="Regenerar">
-                <button
-                  className={styles.actionBtn}
+                <Button
+                  variant="icon"
+                  square
+                  icon={<RefreshCw size={14} className={regenerating ? styles.spinning : ''} />}
                   onClick={handleRegenerate}
                   disabled={regenerating}
-                >
-                  <RefreshCw size={16} className={regenerating ? styles.spinning : ''} />
-                </button>
+                />
               </Tooltip>
             )}
           </div>
@@ -80,7 +81,7 @@ function DisplayMode({ code, onCopy, onRegenerate, label }: Omit<InvitationCodeD
   );
 }
 
-function InputMode({ onSubmit, label, error, loading }: Omit<InvitationCodeInputProps, 'mode'>) {
+function InputMode({ onSubmit, onChange, label, error, loading }: Omit<InvitationCodeInputProps, 'mode'>) {
   const [values, setValues] = useState<string[]>(Array(CODE_LENGTH).fill(''));
   const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -95,6 +96,7 @@ function InputMode({ onSubmit, label, error, loading }: Omit<InvitationCodeInput
     const next = [...values];
     next[index] = char;
     setValues(next);
+    onChange?.();
 
     if (char && index < CODE_LENGTH - 1) {
       focusInput(index + 1);
@@ -142,6 +144,7 @@ function InputMode({ onSubmit, label, error, loading }: Omit<InvitationCodeInput
             type="text"
             inputMode="text"
             maxLength={1}
+            placeholder={values.every(v => !v) ? PLACEHOLDER[i] : undefined}
             value={values[i]}
             onChange={e => handleChange(i, e.target.value)}
             onKeyDown={e => handleKeyDown(i, e)}

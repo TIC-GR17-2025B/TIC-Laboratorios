@@ -1,172 +1,180 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useParams, useLocation } from 'react-router';
 import { useProgresoEstudiante } from '../hooks/useEstudiantes';
-import { NivelController } from '../../../../ecs/controllers/NivelController';
-import styles from '../styles/VistaDetalleEstudiante.module.css';
 import Breadcrumb from '../components/Breadcrumb';
-
-interface Escenario {
-    id: number;
-    slug: string;
-    titulo: string;
-    descripcion: string;
-}
-
-const useEscenarios = () => {
-    const [escenarios, setEscenarios] = useState<Escenario[]>([]);
-
-    useEffect(() => {
-        const nivelController = new NivelController();
-        setEscenarios(nivelController.getEscenarios() || []);
-    }, []);
-
-    return { escenarios };
-};
+import Identicon from '../../../common/components/Identicon';
+import styles from '../styles/VistaDetalleEstudiante.module.css';
 
 export default function VistaDetalleEstudiante() {
     const { idEstudiante } = useParams<{ idEstudiante: string }>();
     const location = useLocation();
-    const fromGrupo = (location.state as { fromGrupo?: { id: number; nombre: string } })?.fromGrupo;
-    const [expandedEscenario, setExpandedEscenario] = useState<number | null>(null);
+    const state = location.state as {
+        fromGrupo?: { id: number; nombre: string };
+        estudiante?: { nombre: string; correo: string };
+    } | null;
+    const fromGrupo = state?.fromGrupo;
+    const estudiante = state?.estudiante;
 
-    const { progresos, loading: loadingProgresos, error: errorProgresos } =
+    const [expandedEscenarios, setExpandedEscenarios] = useState<Set<string>>(new Set());
+
+    const { progresos, loading, error } =
         useProgresoEstudiante(idEstudiante ? parseInt(idEstudiante) : null);
 
-    const { escenarios } = useEscenarios();
+    const progresosPorEscenario = progresos.reduce((acc, p) => {
+        const slug = p.slug_escenario;
+        if (!slug) return acc;
+        if (!acc[slug]) acc[slug] = { nombre: p.nombre_escenario, slug_escenario: slug, intentos: [], completado: false };
+        acc[slug].intentos.push(p);
+        if (p.terminado) acc[slug].completado = true;
+        return acc;
+    }, {} as Record<string, { nombre: string; slug_escenario: string; intentos: typeof progresos; completado: boolean }>);
 
-    const toggleEscenario = (escenarioId: number) => {
-        setExpandedEscenario(expandedEscenario === escenarioId ? null : escenarioId);
+    const escenarios = Object.values(progresosPorEscenario).filter(e => e.slug_escenario !== 'ai-generated-scenario');
+
+    const formatTiempo = (t: number | null) => {
+        if (t === null) return '--:--';
+        const mins = Math.floor(t / 60).toString().padStart(2, '0');
+        const secs = Math.floor(t % 60).toString().padStart(2, '0');
+        return `${mins}:${secs}`;
     };
 
-    const getProgresosPorEscenario = (slug: string) => {
-        return progresos.filter(p => p.slug_escenario === slug);
-    };
+    const formatFecha = (fecha?: string) => {
+        if (!fecha) return '';
+        const date = new Date(fecha);
+        const now = new Date();
+        const isToday = date.toDateString() === now.toDateString();
+        const yesterday = new Date(now);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const isYesterday = date.toDateString() === yesterday.toDateString();
 
-    const formatearTiempo = (segundos: number) => {
-        const minutos = Math.floor(segundos / 60);
-        const segs = segundos % 60;
-        return `${minutos}m ${segs}s`;
-    };
+        const time = date.toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit', hour12: true }).toUpperCase();
 
-    const loading = loadingProgresos;
-    const error = errorProgresos;
+        if (isToday) return `Hoy, ${time}`;
+        if (isYesterday) return `Ayer, ${time}`;
+        return date.toLocaleDateString('es', { day: 'numeric', month: 'short' }) + `, ${time}`;
+    };
 
     return (
-        <>
-            <main className={styles.main}>
-                <Breadcrumb items={[
-                    { label: 'Mis Cursos', to: '/docente' },
-                    ...(fromGrupo
-                      ? [{ label: fromGrupo.nombre, to: `/docente/grupo/${fromGrupo.id}` }]
-                      : []),
-                    { label: 'Progreso del Estudiante' },
-                ]} />
+        <div className={styles.main}>
+            <Breadcrumb items={[
+                { label: 'Mis Cursos', to: '/docente' },
+                ...(fromGrupo
+                    ? [{ label: fromGrupo.nombre, to: `/docente/grupo/${fromGrupo.id}` }]
+                    : []),
+                { label: estudiante?.nombre || 'Estudiante' },
+            ]} />
 
-                {loading && <p className={styles.loadingText}>Cargando información...</p>}
-                {error && <p className={styles.errorText}>{error}</p>}
+            {estudiante && (
+                <div className={styles.profileHeader}>
+                    <div className={styles.profileAvatar}>
+                        <Identicon seed={estudiante.correo || 'user'} />
+                    </div>
+                    <div>
+                        <h1 className={styles.pageTitle}>{estudiante.nombre}</h1>
+                        <div className={styles.profileMetaRow}>
+                            <p className={styles.meta}>{estudiante.correo}</p>
+                            {fromGrupo && (
+                                <>
+                                    <span className={styles.metaDot}>·</span>
+                                    <p className={styles.meta}>{fromGrupo.nombre}</p>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
 
-                {!loading && !error && (
-                    <>
-                        <h2 className={styles.sectionTitle}>Escenarios</h2>
-                        <div className={styles.escenariosList}>
-                            {escenarios.map((escenario: Escenario) => {
-                                const progresosEscenario = getProgresosPorEscenario(escenario.slug);
-                                const completado = progresosEscenario.some(p => p.terminado);
-                                const intentos = progresosEscenario.length;
-                                const isExpanded = expandedEscenario === escenario.id;
+            {loading && (
+                <section className={styles.historialSection}>
+                    <h2 className={styles.historialTitle}>Historial de evaluaciones</h2>
+                    <div className={styles.historialList}>
+                        {Array.from({ length: 4 }).map((_, i) => (
+                            <div key={i} className={styles.skeletonItem} aria-hidden="true" />
+                        ))}
+                    </div>
+                </section>
+            )}
 
+            {error && <p className={styles.errorText}>{error}</p>}
+
+            {!loading && !error && (
+                <section className={styles.historialSection}>
+                    <h2 className={styles.historialTitle}>Historial de evaluaciones</h2>
+
+                    {escenarios.length === 0 ? (
+                        <div className={styles.empty}>
+                            <p className={styles.muted}>Este estudiante aún no ha jugado ningún escenario</p>
+                        </div>
+                    ) : (
+                        <div className={styles.historialList}>
+                            {escenarios.map((esc) => {
+                                const open = expandedEscenarios.has(esc.slug_escenario);
                                 return (
-                                    <div key={escenario.id} className={styles.escenarioCard}>
+                                    <div key={esc.slug_escenario} className={styles.escenarioBlock}>
                                         <div
                                             className={styles.escenarioHeader}
-                                            onClick={() => intentos > 0 && toggleEscenario(escenario.id)}
-                                            onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && intentos > 0) { e.preventDefault(); toggleEscenario(escenario.id); } }}
-                                            role={intentos > 0 ? 'button' : undefined}
-                                            tabIndex={intentos > 0 ? 0 : undefined}
-                                            aria-expanded={intentos > 0 ? isExpanded : undefined}
-                                            style={{ cursor: intentos > 0 ? 'pointer' : 'default' }}
+                                            onClick={() => setExpandedEscenarios(prev => {
+                                                const next = new Set(prev);
+                                                open ? next.delete(esc.slug_escenario) : next.add(esc.slug_escenario);
+                                                return next;
+                                            })}
+                                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpandedEscenarios(prev => { const next = new Set(prev); open ? next.delete(esc.slug_escenario) : next.add(esc.slug_escenario); return next; }); } }}
+                                            role="button"
+                                            tabIndex={0}
+                                            aria-expanded={open}
                                         >
-                                            <div className={styles.escenarioInfo}>
-                                                <h3>{escenario.titulo}</h3>
-                                                <p className={styles.escenarioDescripcion}>
-                                                    {escenario.descripcion}
-                                                </p>
-                                            </div>
-                                            <div className={styles.escenarioStatus}>
-                                                {completado ? (
-                                                    <span className={styles.badgeCompletado}>
-                                                        Completado
-                                                    </span>
-                                                ) : intentos > 0 ? (
-                                                    <span className={styles.badgeIntentado}>
-                                                        {intentos} intento{intentos > 1 ? 's' : ''}
-                                                    </span>
-                                                ) : (
-                                                    <span className={styles.badgeNoIntentado}>
-                                                        No intentado
-                                                    </span>
-                                                )}
-                                                {intentos > 0 && (
+                                            <div>
+                                                <h3 className={styles.escenarioTitle}>{esc.nombre}</h3>
+                                                <div className={styles.escenarioMetaRow}>
+                                                    <p className={styles.escenarioMeta}>
+                                                        {esc.intentos.length} intento{esc.intentos.length !== 1 ? 's' : ''}
+                                                    </p>
+                                                    <span className={styles.metaDot}>·</span>
                                                     <div className={styles.intentoBars}>
-                                                        {progresosEscenario.map((p) => (
+                                                        {esc.intentos.slice(-5).map((p) => (
                                                             <span
                                                                 key={p.id_progreso}
-                                                                className={p.terminado ? styles.barExito : styles.barFallo}
+                                                                className={p.terminado ? styles.barOk : styles.barFail}
                                                             />
                                                         ))}
                                                     </div>
-                                                )}
-                                                {intentos > 0 && (
-                                                    <svg
-                                                        className={`${styles.expandIcon} ${isExpanded ? styles.expanded : ''}`}
-                                                        width="24"
-                                                        height="24"
-                                                        viewBox="0 0 24 24"
-                                                        fill="currentColor"
-                                                        aria-hidden="true"
-                                                    >
-                                                        <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z" />
-                                                    </svg>
-                                                )}
+                                                </div>
+                                            </div>
+                                            <div className={styles.chevronWrap}>
+                                                <svg
+                                                    className={`${styles.chevron} ${open ? styles.chevronOpen : ''}`}
+                                                    width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+                                                    aria-hidden="true"
+                                                >
+                                                    <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z" />
+                                                </svg>
                                             </div>
                                         </div>
 
-                                        {isExpanded && progresosEscenario.length > 0 && (
-                                            <div className={styles.escenarioDetails}>
-                                                <div className={styles.intentosList}>
-                                                    {progresosEscenario.map((progreso, index) => (
-                                                        <div key={progreso.id_progreso} className={styles.intentoItem}>
-                                                            <div className={styles.intentoNumero}>
-                                                                Intento {index + 1}
-                                                            </div>
-                                                            <div className={styles.intentoInfo}>
-                                                                <div className={styles.intentoTiempo}>
-                                                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                                                        width="16"
-                                                                        height="16"
-                                                                        viewBox="0 0 24 24"><path fill="currentColor"
-                                                                            d="M12 21a8 8 0 1 1 8-8a8.01 8.01 0 0 1-8 8Zm0-14a6 6 0 1 0 6 6a6.007 6.007 0 0 0-6-6Zm1 7h-2V9h2v5Zm6.293-6.293l-2-2l1.414-1.414l2 2l-1.413 1.413l-.001.001ZM15 4H9V2h6v2Z" /></svg>
-                                                                    <span>{progreso.tiempo !== null ? formatearTiempo(progreso.tiempo) : 'N/A'}</span>
-                                                                </div>
-
-                                                            </div>
-                                                            <div className={styles.intentoFecha}>
-                                                                <span className={progreso.terminado ? styles.intentoExito : styles.intentoFallo}>
-                                                                    {progreso.terminado ? 'Completado' : 'No completado'}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
+                                        {open && esc.intentos.length > 0 && (
+                                            <div className={styles.intentosList}>
+                                                {[...esc.intentos].reverse().map((intento, i) => (
+                                                    <div
+                                                        key={intento.id_progreso}
+                                                        className={styles.intentoRow}
+                                                    >
+                                                        <span className={`${styles.intentoDot} ${intento.terminado ? styles.dotOk : styles.dotFail}`} />
+                                                        <span className={styles.intentoNum}>{formatFecha(intento.fecha_creacion) || `Intento ${esc.intentos.length - i}`}</span>
+                                                        <span className={styles.intentoTiempo}>{formatTiempo(intento.tiempo)}</span>
+                                                        <span className={intento.terminado ? styles.intentoStatusOk : styles.intentoStatusFail}>
+                                                            {intento.terminado ? 'Completado' : 'Fallido'}
+                                                        </span>
+                                                    </div>
+                                                ))}
                                             </div>
                                         )}
                                     </div>
                                 );
                             })}
                         </div>
-                    </>
-                )}
-            </main>
-        </>
+                    )}
+                </section>
+            )}
+        </div>
     );
 }

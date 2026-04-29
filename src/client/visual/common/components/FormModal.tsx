@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Button from "./Button";
 import styles from "../styles/FormModal.module.css";
 
 interface FormModalProps {
@@ -62,21 +63,21 @@ export default function FormModal({
           {error && <p className={styles.error} role="alert" aria-live="assertive">{error}</p>}
 
           <div className={styles.actions}>
-            <button
+            <Button
               type="button"
-              className={styles.cancelButton}
+              variant="secondary"
               onClick={onClose}
               disabled={loading}
             >
               {cancelLabel}
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
-              className={styles.saveButton}
+              variant="accent"
               disabled={loading}
             >
               {loading ? submittingLabel : submitLabel}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

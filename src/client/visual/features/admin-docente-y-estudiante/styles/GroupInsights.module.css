@@ -2,37 +2,27 @@
 
 .grid {
   display: grid;
-  grid-template-columns: 1fr 300px;
-  gap: 16px;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
   margin-bottom: 24px;
 }
 
-.chartsColumn {
+/* ── Section (flat, no card) ── */
+
+.section {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-}
-
-/* ── Card ── */
-
-.card {
   background: var(--surface-secondary);
   border: 1px solid var(--border-primary);
   border-radius: var(--border-radius);
   padding: 16px;
 }
 
-.cardTitle {
-  margin: 0 0 14px;
-  font-size: 14px;
-  font-weight: 600;
+.sectionTitle {
+  margin: 0 0 20px;
+  font-size: 18px;
+  font-weight: 500;
   color: var(--text-primary);
-}
-
-/* ── Leaderboard wrapper ── */
-
-.leaderboardWrapper > div {
-  width: 100%;
 }
 
 /* ── Bar chart (completion) ── */
@@ -83,48 +73,147 @@
   transition: width 0.3s ease;
 }
 
-/* ── Distribution ── */
+/* ── Donut chart ── */
 
-.distList {
+.donutRow {
+  display: flex;
+  align-items: center;
+  gap: 48px;
+  flex: 1;
+}
+
+.donut {
+  flex-shrink: 0;
+  width: 40%;
+  max-width: 160px;
+  aspect-ratio: 1;
+}
+
+.donutSummary {
+  margin: 16px 0 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.donutSummaryPct {
+  color: var(--text-primary);
+}
+
+/* ── Legend ── */
+
+.legend {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  flex: 1;
 }
 
-.distItem {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.distLabel {
+.legendItem {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-size: 13px;
   color: var(--text-primary);
 }
 
-.distDot {
+.legendDot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
   flex-shrink: 0;
 }
 
-.distValue {
+.legendLabel {
+  white-space: nowrap;
+}
+
+.legendValue {
   margin-left: auto;
   color: var(--text-muted);
   font-size: 12px;
+  white-space: nowrap;
 }
 
-/* ── Loading ── */
+/* ── Skeleton ── */
 
-.loading {
-  padding: 2rem;
-  text-align: center;
-  color: var(--text-muted);
-  font-size: 14px;
+.skeletonBone {
+  background: var(--surface-tertiary);
+  border-radius: 4px;
+  animation: skeletonPulse 1.5s ease-in-out infinite;
+}
+
+.skeletonTitle {
+  composes: skeletonBone;
+  width: 45%;
+  height: 18px;
+  margin-bottom: 20px;
+}
+
+.skeletonBars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.skeletonBarItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.skeletonLabel {
+  composes: skeletonBone;
+  height: 13px;
+}
+
+.skeletonTrack {
+  composes: skeletonBone;
+  height: 8px;
+  width: 100%;
+}
+
+.skeletonDonutRow {
+  display: flex;
+  align-items: center;
+  gap: 48px;
+  flex: 1;
+}
+
+.skeletonDonut {
+  composes: skeletonBone;
+  width: 40%;
+  max-width: 160px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.skeletonLegend {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.skeletonLegendItem {
+  composes: skeletonBone;
+  height: 13px;
+}
+
+.skeletonSummary {
+  composes: skeletonBone;
+  width: 70%;
+  height: 13px;
+  margin-top: 16px;
+}
+
+@keyframes skeletonPulse {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 /* ── Responsive ── */
@@ -132,5 +221,10 @@
 @media (max-width: 768px) {
   .grid {
     grid-template-columns: 1fr;
+  }
+
+  .donutRow {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }

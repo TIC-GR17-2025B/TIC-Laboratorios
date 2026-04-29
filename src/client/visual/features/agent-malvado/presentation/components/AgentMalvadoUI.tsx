@@ -2,6 +2,7 @@ import { useAgentMalvado } from '../context/AgentMalvadoContext';
 import { Bot, Sparkles, Play, AlertTriangle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useScenarioBuilder } from '../hooks/useScenarioBuilder';
+import Button from '../../../../common/components/Button';
 import styles from './AgentMalvadoUI.module.css';
 
 export default function AgentMalvadoUI() {
@@ -19,23 +20,16 @@ export default function AgentMalvadoUI() {
             animate={{ opacity: 1, y: 0 }}
             className={styles.container}
         >
-            {!isGenerating && !generatedScenario && !error && (
-                <button onClick={handleGenerate} className={`${styles.button} botonIa`}>
-                    <Sparkles size={14} /> Generar nivel personalizado con IA
-                </button>
-            )}
-
-            {isGenerating && (
-                <div id="gen-loading" className={styles.loadingContainer}>
-                    <motion.div
-                        animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }}
-                        transition={{ repeat: Infinity, duration: 1.5 }}
-                        className={styles.loadingIcon}
-                    >
-                        <Bot size={28} className={styles.botIcon} />
-                    </motion.div>
-                    <p className={styles.loadingText}>Creando nivel...</p>
-                </div>
+            {!generatedScenario && !error && (
+                <Button
+                    variant="ai"
+                    onClick={handleGenerate}
+                    disabled={isGenerating}
+                    icon={isGenerating ? <Bot size={14} /> : <Sparkles size={14} />}
+                    style={{ width: '100%' }}
+                >
+                    {isGenerating ? 'Creando nivel...' : 'Generar nivel personalizado con IA'}
+                </Button>
             )}
 
             {error && (

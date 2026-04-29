@@ -1,10 +1,12 @@
+import { Bot, Sparkles } from 'lucide-react';
 import { useGenerateCourseAnalysis } from '../hooks/useGenerateCourseAnalysis';
 import type { CourseAnalysisResponse } from '../types/courseAnalysis.types';
-import styles from '../styles/CourseAnalysisButton.module.css';
+import Button from '../../../common/components/Button';
 
 interface CourseAnalysisButtonProps {
   idCurso: number;
   idProfesor: number;
+  hasExisting?: boolean;
   onAnalysisGenerated?: (analysis: CourseAnalysisResponse) => void;
   onError?: (error: string) => void;
   className?: string;
@@ -13,6 +15,7 @@ interface CourseAnalysisButtonProps {
 export function CourseAnalysisButton({
   idCurso,
   idProfesor,
+  hasExisting,
   onAnalysisGenerated,
   onError,
   className
@@ -32,20 +35,14 @@ export function CourseAnalysisButton({
   };
 
   return (
-    <button
-      className={`${styles.analysisButton} ${className || ''}`}
+    <Button
+      variant="ai"
+      className={className}
       onClick={handleClick}
       disabled={loading}
-      title={loading ? 'Generando análisis...' : 'Generar análisis del curso con IA'}
+      icon={loading ? <Bot size={14} /> : <Sparkles size={14} />}
     >
-      {loading ? (
-        <>
-          <span className={styles.spinner} />
-          <span>Generando...</span>
-        </>
-      ) : (
-        <span className={styles.label}>Analizar Curso</span>
-      )}
-    </button>
+      {loading ? 'Generando...' : hasExisting ? 'Generar nuevo análisis' : 'Analizar Curso'}
+    </Button>
   );
 }

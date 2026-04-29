@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import type { FeedbackData } from '../types/feedback.types';
+import Button from '../../../common/components/Button';
 import styles from './FeedbackModal.module.css';
 
 interface FeedbackModalProps {
@@ -77,9 +78,9 @@ export function FeedbackModal({ isOpen, onClose, feedback, escenarioNombre }: Fe
                 </div>
 
                 <div className={styles.footer}>
-                    <button className={styles.primaryButton} onClick={onClose}>
+                    <Button variant="primary" onClick={onClose}>
                         Entendido
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>

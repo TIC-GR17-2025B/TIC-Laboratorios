@@ -17,7 +17,7 @@
 }
 
 .cells {
-  display: flex;
+  display: inline-flex;
   border-radius: 6px;
   overflow: hidden;
   border: 1.5px solid var(--border-primary);
@@ -55,12 +55,17 @@
   padding: 0;
 }
 
+.cellInput::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.4;
+}
+
 .cellInput:focus {
-  border-color: var(--text-secondary);
+  border-color: inherit;
 }
 
 .cellFilled {
-  border-color: var(--text-secondary);
+  border-color: inherit;
 }
 
 .cellInput:disabled {

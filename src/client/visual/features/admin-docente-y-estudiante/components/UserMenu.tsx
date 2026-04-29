@@ -18,6 +18,8 @@ interface UserMenuProps {
 export default function UserMenu({ items = [] }: UserMenuProps) {
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
+    const triggerRef = useRef<HTMLButtonElement>(null);
+    const [dropdownPos, setDropdownPos] = useState({ top: 0, right: 0 });
     const navigate = useNavigate();
     const { logout, getUser } = useAuth();
 
@@ -45,8 +47,18 @@ export default function UserMenu({ items = [] }: UserMenuProps) {
     return (
         <div className={styles.container} ref={menuRef}>
             <button
+                ref={triggerRef}
                 className={styles.trigger}
-                onClick={() => setIsOpen(!isOpen)}
+                onClick={() => {
+                    if (!isOpen && triggerRef.current) {
+                        const rect = triggerRef.current.getBoundingClientRect();
+                        setDropdownPos({
+                            top: rect.bottom + 4,
+                            right: window.innerWidth - rect.right,
+                        });
+                    }
+                    setIsOpen(!isOpen);
+                }}
                 aria-label="Menú de usuario"
             >
                 <div className={styles.avatar}>
@@ -55,7 +67,7 @@ export default function UserMenu({ items = [] }: UserMenuProps) {
             </button>
 
             {isOpen && (
-                <div className={styles.dropdown}>
+                <div className={styles.dropdown} style={{ top: dropdownPos.top, right: dropdownPos.right }}>
                     {userEmail && (
                         <>
                             <span className={styles.email}>{userEmail}</span>

@@ -27,8 +27,8 @@
   border-radius: var(--border-radius);
   transform: translate(-50%, -50%);
   z-index: 9999;
-  width: 90%;
-  max-width: 500px;
+  width: fit-content;
+  max-width: 90%;
   overflow: hidden;
   animation: modalSlideIn 0.3s ease-out;
   display: flex;
@@ -50,10 +50,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 24px;
-  border-bottom: 1px solid var(--border-primary);
+  padding: 20px 24px 16px;
   gap: 16px;
-  min-height: 56px;
 }
 
 .header h2 {
@@ -65,31 +63,29 @@
 
 .closeButton {
   flex-shrink: 0;
-  width: 40px;
-  height: 40px;
-  border: 1px solid var(--border-primary);
-  border-radius: var(--border-radius);
-  color: var(--text-primary);
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 0;
+  color: var(--text-secondary);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
-  background: var(--surface-secondary);
+  transition: color 0.15s ease;
+  background: transparent;
   padding: 0;
+  margin-right: -6px;
   font-size: 1.5rem;
 }
 
 .closeButton:hover {
-  background: var(--surface-tertiary);
-}
-
-.closeButton:active {
-  transform: scale(0.95);
+  color: var(--text-primary);
+  background: transparent !important;
 }
 
 .form {
-  padding: 24px;
+  padding: 20px 24px;
   overflow-y: auto;
 }
 
@@ -97,51 +93,12 @@
   color: #ff6b6b;
   font-size: 0.875rem;
   margin: 0.5rem 0;
-  padding: 0.5rem;
-  background-color: rgba(255, 107, 107, 0.1);
-  border: 1px solid rgba(255, 107, 107, 0.3);
-  border-radius: var(--border-radius);
 }
 
 .actions {
   display: flex;
   gap: 0.75rem;
   justify-content: flex-end;
-  padding-top: 1.5rem;
+  padding-top: 20px;
 }
 
-.cancelButton,
-.saveButton {
-  padding: 0.625rem 1.25rem;
-  border-radius: var(--border-radius);
-  font-weight: 500;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  border: 1px solid var(--border-primary);
-}
-
-.cancelButton {
-  background-color: var(--surface-primary);
-  color: var(--text-primary);
-}
-
-.cancelButton:hover:not(:disabled) {
-  background: var(--surface-tertiary);
-}
-
-.saveButton {
-  background-color: var(--blue);
-  color: var(--text-primary);
-  border-color: var(--blue);
-}
-
-.saveButton:hover:not(:disabled) {
-  background-color: var(--blue-lighter);
-}
-
-.cancelButton:disabled,
-.saveButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}

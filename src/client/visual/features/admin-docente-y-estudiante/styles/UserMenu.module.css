@@ -25,9 +25,7 @@
 /* ── Dropdown ── */
 
 .dropdown {
-  position: absolute;
-  top: calc(100% + 4px);
-  right: 0;
+  position: fixed;
   min-width: 220px;
   padding: 4px;
   background: var(--surface-secondary);

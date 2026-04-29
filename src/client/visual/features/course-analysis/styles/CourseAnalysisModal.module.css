@@ -33,10 +33,13 @@
 
 .viewWrapper .content {
   padding: 20px 0 24px;
+  margin: 0 -16px;
+  padding-left: 16px;
+  padding-right: 16px;
 }
 
 .viewWrapper .footer {
-  padding: 16px 0;
+  padding: 16px 0 0;
 }
 
 /* ── Header ── */
