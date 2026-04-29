@@ -10,7 +10,11 @@ interface HistorialEntry {
     salida: string;
 }
 
-export default function ModalConsola() {
+interface ModalConsolaProps {
+    os?: "windows" | "linux" | "other";
+}
+
+export default function ModalConsola({ os = "windows" }: ModalConsolaProps) {
     const { entidadSeleccionadaId } = useEscenario();
     const { escenarioController } = useECSSceneContext();
 
@@ -29,18 +33,21 @@ export default function ModalConsola() {
     const indicHistorial = useRef(-1);
     const entidadActualRef = useRef<number | null>(null);
 
-    // Obtener el prompt a partir de una entidad
+    const isWindows = os === "windows";
+
     const obtenerPrompt = useCallback((entidad: number) => {
         const comp = escenarioController.ecsManager.getComponentes(entidad)?.get(DispositivoComponent);
         if (comp) {
             const usuario = comp.usuario || "user";
             const equipo = (comp.nombreEquipo || comp.nombre || "pc").replace(/\s+/g, "-");
+            if (isWindows) {
+                return `PS C:\\Users\\${equipo}> `;
+            }
             return `${usuario}@${equipo}:~$ `;
         }
-        return "user@pc:~$ ";
-    }, [escenarioController]);
+        return isWindows ? "PS C:\\Users\\pc> " : "user@pc:~$ ";
+    }, [escenarioController, isWindows]);
 
-    // Inicializar el sistema de comandos al montar o cuando cambia el dispositivo
     useEffect(() => {
         if (entidadSeleccionadaId !== null) {
             escenarioController.iniciarSistemaComandos(entidadSeleccionadaId);
@@ -56,21 +63,25 @@ export default function ModalConsola() {
             historialComandos.current = [];
             indicHistorial.current = -1;
 
-            const nombrePC = (comp?.nombreEquipo || comp?.nombre || "pc").replace(/\s+/g, "-");
-            setBannerTexto(
-                `${nombrePC} [Version 1.0.0]\n(c) Seguridad Corporativa. Todos los derechos reservados.\n`
-            );
+            if (isWindows) {
+                setBannerTexto(
+                    `Windows PowerShell\nCopyright (C) Microsoft Corporation. Todos los derechos reservados.\n`
+                );
+            } else {
+                const nombrePC = (comp?.nombreEquipo || comp?.nombre || "pc").replace(/\s+/g, "-");
+                setBannerTexto(
+                    `${nombrePC} [Version 1.0.0]\n(c) Seguridad Corporativa. Todos los derechos reservados.\n`
+                );
+            }
         }
-    }, [entidadSeleccionadaId, escenarioController, obtenerPrompt]);
+    }, [entidadSeleccionadaId, escenarioController, obtenerPrompt, isWindows]);
 
-    // Auto-scroll al final
     useEffect(() => {
         if (terminalRef.current) {
             terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
         }
     }, [historial, esperandoPassword]);
 
-    // Focus en el input correspondiente
     useEffect(() => {
         if (esperandoPassword) {
             passwordRef.current?.focus();
@@ -92,7 +103,6 @@ export default function ModalConsola() {
             }
         ]);
 
-        // Actualizar prompt y entidad actual si cambió (por SSH)
         entidadActualRef.current = respuesta.entidadActual;
         const nuevoPrompt = obtenerPrompt(respuesta.entidadActual);
         setPromptActual(nuevoPrompt);
@@ -105,13 +115,11 @@ export default function ModalConsola() {
     }, [escenarioController]);
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        // Tab autocomplete
         if (e.key === "Tab") {
             e.preventDefault();
             const spaceIdx = inputValue.indexOf(' ');
 
             if (spaceIdx === -1) {
-                // Autocompletar nombre de comando
                 const comandos = ["cat", "cls", "clear", "h", "ls", "ssh"];
                 const coincidencias = comandos.filter(c => c.startsWith(inputValue.toLowerCase()));
                 if (coincidencias.length === 1) {
@@ -121,7 +129,6 @@ export default function ModalConsola() {
                 const cmd = inputValue.substring(0, spaceIdx).trim().toLowerCase();
                 const argPrefix = inputValue.substring(spaceIdx + 1);
                 if (cmd === "cat" && argPrefix) {
-                    // Autocompletar nombre de archivo (soporta nombres con espacios)
                     const archivos = obtenerNombresArchivos();
                     const coincidencias = archivos.filter(a => a.toLowerCase().startsWith(argPrefix.toLowerCase()));
                     if (coincidencias.length === 1) {
@@ -132,7 +139,6 @@ export default function ModalConsola() {
             return;
         }
 
-        // Navegación en historial con flechas
         if (e.key === "ArrowUp") {
             e.preventDefault();
             if (historialComandos.current.length === 0) return;
@@ -161,18 +167,15 @@ export default function ModalConsola() {
         const comando = inputValue.trim();
         if (!comando) return;
 
-        // Guardar en historial de comandos
         historialComandos.current.push(comando);
         indicHistorial.current = -1;
 
-        // Comando cls - limpiar pantalla
         if (comando.toLowerCase() === "cls" || comando.toLowerCase() === "clear") {
             setHistorial([]);
             setInputValue("");
             return;
         }
 
-        // Detectar si es comando SSH
         if (comando.toLowerCase().startsWith("ssh ")) {
             setHistorial(prev => [
                 ...prev,
@@ -226,8 +229,10 @@ export default function ModalConsola() {
         }
     };
 
+    const themeClass = isWindows ? styles.windows : styles.linux;
+
     return (
-        <div className={styles.container} onClick={handleContainerClick}>
+        <div className={`${styles.container} ${themeClass}`} onClick={handleContainerClick}>
             <div className={styles.terminal} ref={terminalRef}>
                 {bannerTexto && (
                     <div className={styles.banner}>{bannerTexto}</div>

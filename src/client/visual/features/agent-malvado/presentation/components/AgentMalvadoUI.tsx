@@ -51,18 +51,15 @@ export default function AgentMalvadoUI() {
                         <div className={styles.scenarioName}>
                             {scenario.titulo ?? 'Operación Clasificada'}
                         </div>
-                        <div className={styles.scenarioMeta}>
-                            <span>{scenario.categoria ?? ''}</span>
-                        </div>
                     </div>
 
                     <div className={styles.actionsRow}>
-                        <button onClick={handlePlay} className={styles.buttonSuccess}>
-                            <Play size={14} className={styles.playIcon} /> Jugar
-                        </button>
-                        <button onClick={clearScenario} className={styles.buttonSecondary}>
+                        <Button variant="success" onClick={handlePlay} icon={<Play size={14} />}>
+                            Jugar
+                        </Button>
+                        <Button variant="secondary" onClick={clearScenario}>
                             Descartar
-                        </button>
+                        </Button>
                     </div>
                 </div>
             )}

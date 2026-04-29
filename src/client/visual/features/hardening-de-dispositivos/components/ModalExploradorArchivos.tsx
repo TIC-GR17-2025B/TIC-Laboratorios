@@ -1,17 +1,10 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import styles from "../styles/ModalExploradorArchivos.module.css";
 import { useEscenario } from "../../../common/contexts";
 import { useECSSceneContext } from "../../escenarios-simulados/context/ECSSceneContext";
 import type { Activo } from "../../../../shared/types/EscenarioTypes";
 import { TipoActivo } from "../../../../shared/types/DeviceEnums";
-import TrashIcon from "../../../common/icons/TrashIcon";
-
-interface MenuContextual {
-    visible: boolean;
-    x: number;
-    y: number;
-    archivo: string | null;
-}
+import { ArrowLeft, ArrowUp, ArrowRight, RotateCw, ChevronRight } from "lucide-react";
 
 const extensiones: Record<string, string> = {
     [TipoActivo.DOCUMENTO]: ".doc",
@@ -20,13 +13,39 @@ const extensiones: Record<string, string> = {
     [TipoActivo.GENERICO]: ".txt",
 };
 
+const tipoLabels: Record<string, string> = {
+    [TipoActivo.DOCUMENTO]: "Documento",
+    [TipoActivo.FIRMA_DIGITAL]: "Firma digital",
+    [TipoActivo.CLAVE_PUBLICA]: "Clave pública",
+    [TipoActivo.GENERICO]: "Archivo",
+};
+
 function getExtension(tipo: TipoActivo): string {
     return extensiones[tipo] ?? ".txt";
 }
 
+function tieneExtension(nombre: string): boolean {
+    return /\.\w{2,5}$/.test(nombre);
+}
+
+function getTipoLabel(tipo: TipoActivo): string {
+    return tipoLabels[tipo] ?? "Archivo";
+}
+
+const pesoBasePorTipo: Record<string, number> = {
+    [TipoActivo.DOCUMENTO]: 4096,
+    [TipoActivo.FIRMA_DIGITAL]: 2048,
+    [TipoActivo.CLAVE_PUBLICA]: 1024,
+    [TipoActivo.GENERICO]: 512,
+};
+
 function calcularTamanio(activo: Activo): string {
-    const bytes = (activo.contenido?.length ?? 0) * 2 + (activo.nombre.length * 2) + 128;
-    if (bytes < 1024) return `${bytes} B`;
+    const tipo = activo.tipo ?? TipoActivo.GENERICO;
+    const base = pesoBasePorTipo[tipo] ?? 512;
+    const contenido = (activo.contenido?.length ?? 0) * 2;
+    const nombre = activo.nombre.length * 2;
+    const bytes = base + contenido + nombre;
+    if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
     return `${(bytes / 1024).toFixed(1)} KB`;
 }
 
@@ -34,7 +53,7 @@ function FileIcon({ tipo }: { tipo: TipoActivo }) {
     switch (tipo) {
         case TipoActivo.DOCUMENTO:
             return (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4cc2ff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                     <polyline points="14 2 14 8 20 8" />
                     <line x1="8" y1="13" x2="16" y2="13" />
@@ -57,7 +76,7 @@ function FileIcon({ tipo }: { tipo: TipoActivo }) {
             );
         default:
             return (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9e9e9e" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                     <polyline points="14 2 14 8 20 8" />
                 </svg>
@@ -96,15 +115,8 @@ const SIDEBAR_FOLDERS = [
 export default function ModalExploradorArchivos() {
     const [activos, setActivos] = useState<Activo[]>([]);
     const [activoSeleccionado, setActivoSeleccionado] = useState<Activo | null>(null);
-    const [menuContextual, setMenuContextual] = useState<MenuContextual>({
-        visible: false,
-        x: 0,
-        y: 0,
-        archivo: null
-    });
     const { entidadSeleccionadaId } = useEscenario();
     const { escenarioController } = useECSSceneContext();
-    const menuRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (entidadSeleccionadaId !== null) {
@@ -118,67 +130,21 @@ export default function ModalExploradorArchivos() {
         }
     }, [entidadSeleccionadaId, escenarioController]);
 
-    useEffect(() => {
-        const handleClickOutside = (e: MouseEvent) => {
-            if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-                setMenuContextual({ visible: false, x: 0, y: 0, archivo: null });
-            }
-        };
-
-        if (menuContextual.visible) {
-            document.addEventListener('mousedown', handleClickOutside);
-        }
-
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [menuContextual.visible]);
-
-    const handleContextMenu = (e: React.MouseEvent, activo: Activo) => {
-        e.preventDefault();
-        setMenuContextual({
-            visible: true,
-            x: e.clientX,
-            y: e.clientY,
-            archivo: activo.nombre
-        });
-    };
-
-    const handleEliminarActivo = () => {
-        if (entidadSeleccionadaId !== null && menuContextual.archivo) {
-            escenarioController.eliminarActivoDeDispositivo(entidadSeleccionadaId, menuContextual.archivo);
-
-            const activosActualizados = activos.filter(a => a.nombre !== menuContextual.archivo);
-            setActivos(activosActualizados);
-
-            if (activoSeleccionado?.nombre === menuContextual.archivo) {
-                setActivoSeleccionado(activosActualizados.length > 0 ? activosActualizados[0] : null);
-            }
-
-            setMenuContextual({ visible: false, x: 0, y: 0, archivo: null });
-        }
-    };
-
-    const handleClickArchivo = (activo: Activo) => {
-        setActivoSeleccionado(activo);
-        setMenuContextual({ visible: false, x: 0, y: 0, archivo: null });
-    };
-
     return (
         <div className={styles.contenedor}>
             {/* Address bar */}
             <div className={styles.addressBar}>
                 <div className={styles.navButtons}>
-                    <span className={styles.navBtn}>←</span>
-                    <span className={styles.navBtn}>→</span>
-                    <span className={styles.navBtn}>↑</span>
+                    <span className={styles.navBtn}><ArrowLeft size={16} /></span>
+                    <span className={styles.navBtn}><ArrowRight size={16} /></span>
+                    <span className={styles.navBtn}><ArrowUp size={16} /></span>
+                    <span className={styles.navBtn}><RotateCw size={14} /></span>
                 </div>
                 <div className={styles.addressPath}>
                     <ComputerSmallIcon />
-                    <span className={styles.addressSep}>›</span>
-                    <span>Este PC</span>
-                    <span className={styles.addressSep}>›</span>
+                    <ChevronRight size={14} className={styles.addressSep} />
                     <span>Documentos</span>
+                    <ChevronRight size={14} className={styles.addressSep} />
                 </div>
             </div>
 
@@ -209,31 +175,40 @@ export default function ModalExploradorArchivos() {
                 <div className={styles.filePanel}>
                     {activos.length === 0 ? (
                         <div className={styles.sinArchivos}>
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="var(--text-secondary)" opacity="0.25">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="#9e9e9e" opacity="0.25">
                                 <path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
                             </svg>
                             <p>Carpeta vacía</p>
                         </div>
                     ) : (
-                        <div className={styles.listaArchivos}>
-                            {activos.map((activo) => {
-                                const tipo = activo.tipo ?? TipoActivo.GENERICO;
-                                return (
-                                    <div
-                                        key={activo.nombre}
-                                        className={`${styles.itemArchivo} ${activoSeleccionado?.nombre === activo.nombre ? styles.seleccionado : ""}`}
-                                        onClick={() => handleClickArchivo(activo)}
-                                        onContextMenu={(e) => handleContextMenu(e, activo)}
-                                    >
-                                        <FileIcon tipo={tipo} />
-                                        <span className={styles.nombreArchivo}>
-                                            {activo.nombre}<span className={styles.extension}>{getExtension(tipo)}</span>
-                                        </span>
-                                        <span className={styles.fileSize}>{calcularTamanio(activo)}</span>
-                                    </div>
-                                );
-                            })}
-                        </div>
+                        <>
+                            <div className={styles.columnHeaders}>
+                                <span className={styles.colNombre}>Nombre</span>
+                                <span className={styles.colTipo}>Tipo</span>
+                                <span className={styles.colTamanio}>Tamaño</span>
+                            </div>
+                            <div className={styles.listaArchivos}>
+                                {activos.map((activo) => {
+                                    const tipo = activo.tipo ?? TipoActivo.GENERICO;
+                                    return (
+                                        <div
+                                            key={activo.nombre}
+                                            className={`${styles.itemArchivo} ${activoSeleccionado?.nombre === activo.nombre ? styles.seleccionado : ""}`}
+                                            onClick={() => setActivoSeleccionado(activo)}
+                                        >
+                                            <span className={styles.colNombre}>
+                                                <FileIcon tipo={tipo} />
+                                                <span className={styles.nombreArchivo}>
+                                                    {activo.nombre}{!tieneExtension(activo.nombre) && <span className={styles.extension}>{getExtension(tipo)}</span>}
+                                                </span>
+                                            </span>
+                                            <span className={styles.colTipo}>{getTipoLabel(tipo)}</span>
+                                            <span className={styles.colTamanio}>{calcularTamanio(activo)}</span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </>
                     )}
                 </div>
 
@@ -247,7 +222,7 @@ export default function ModalExploradorArchivos() {
                         </div>
                     ) : (
                         <div className={styles.sinSeleccion}>
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="var(--text-secondary)" opacity="0.2">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="#9e9e9e" opacity="0.2">
                                 <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13z" />
                             </svg>
                             <p>Selecciona un archivo</p>
@@ -262,24 +237,10 @@ export default function ModalExploradorArchivos() {
                 {activoSeleccionado && (
                     <>
                         <span className={styles.statusSep} />
-                        <span>{activoSeleccionado.nombre}{getExtension(activoSeleccionado.tipo ?? TipoActivo.GENERICO)}</span>
+                        <span>{activoSeleccionado.nombre}{!tieneExtension(activoSeleccionado.nombre) && getExtension(activoSeleccionado.tipo ?? TipoActivo.GENERICO)}</span>
                     </>
                 )}
             </div>
-
-            {/* Context menu */}
-            {menuContextual.visible && (
-                <div
-                    ref={menuRef}
-                    className={styles.menuContextual}
-                    style={{ top: menuContextual.y, left: menuContextual.x }}
-                >
-                    <div className={styles.menuItemDanger} onClick={handleEliminarActivo}>
-                        <TrashIcon size={15} />
-                        <span>Eliminar</span>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }

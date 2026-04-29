@@ -27,6 +27,7 @@ export function useECSLogs(escenarioController: EscenarioController) {
   const [hasNewLog, setHasNewLog] = useState(false);
 
   const lastSeenCountRef = useRef(0);
+  const closeDevicePanelRef = useRef<(() => void) | null>(null);
 
   const agregarLog = useCallback(
     (content: string, category: string) => {
@@ -50,6 +51,7 @@ export function useECSLogs(escenarioController: EscenarioController) {
       if (isOpen) {
         setHasNewLog(false);
         lastSeenCountRef.current = logs.length;
+        closeDevicePanelRef.current?.();
       }
     },
     [logs.length]
@@ -76,5 +78,6 @@ export function useECSLogs(escenarioController: EscenarioController) {
     agregarLog,
     toggleLogsPanel,
     resetLogs,
+    closeDevicePanelRef,
   };
 }

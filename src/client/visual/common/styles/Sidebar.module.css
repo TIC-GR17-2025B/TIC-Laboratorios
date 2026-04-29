@@ -1,57 +1,58 @@
 .dockWrapper {
   position: fixed;
-  bottom: 12px;
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: 24px;
+  left: 24px;
   z-index: 99900;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .dock {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  padding: 6px 8px;
+  padding: 4px;
   gap: 4px;
   background: var(--surface-secondary);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border-primary);
-  border-radius: 16px;
+  border-radius: 8px;
   user-select: none;
   transition: opacity 0.3s ease;
 }
 
 
 /* Override global button styles inside dock */
-.dock button {
+.dockWrapper button {
   background: transparent;
   padding: 0;
 }
 
-.dock button:hover:not(:disabled):not(.dockItem):not(.controlBtn):not(.chatBtn) {
+.dockWrapper button:hover:not(:disabled):not(.dockItem):not(.controlBtn):not(.chatBtn):not(.exitBtn) {
   background-color: transparent;
 }
 
 /* Navigation section */
 .navSection {
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 4px;
 }
 
-/* Vertical divider between nav and controls */
+/* Horizontal divider between nav and controls */
 .spacer {
-  width: 1px;
+  height: 1px;
   align-self: stretch;
+  margin: 0 -4px;
   background: var(--border-primary);
-  margin: -6px 6px;
 }
 
 /* Controls section (timer, pause, chat) */
 .controlsSection {
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 4px;
 }
@@ -64,7 +65,7 @@
   justify-content: center;
   width: 36px;
   height: 36px;
-  border-radius: 10px;
+  border-radius: 4px;
   background: transparent;
   border: none;
   padding: 0;
@@ -91,10 +92,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 36px;
   height: 36px;
-  padding: 0 10px;
-  border-radius: 10px;
-  font-size: 13px;
+  font-size: 11px;
   font-variant-numeric: tabular-nums;
   color: var(--text-muted);
   white-space: nowrap;
@@ -108,7 +108,7 @@
   justify-content: center;
   width: 36px;
   height: 36px;
-  border-radius: 10px;
+  border-radius: 4px;
   background: transparent;
   border: none;
   padding: 0;
@@ -141,22 +141,33 @@
 }
 .chatWrapper > div:last-child {
   position: fixed;
-  bottom: 68px;
-  left: auto;
+  bottom: 24px;
+  left: 80px;
+  right: auto;
   top: auto;
+  width: 380px;
 }
 
-/* Exit button — round floating button to the left of the dock */
-.exitBtn {
-  position: relative;
+/* Exit wrapper — pill container matching dock style */
+.exitWrapper {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
+  padding: 4px;
   background: var(--surface-secondary);
   border: 1px solid var(--border-primary);
+  border-radius: 99999px;
+}
+
+.exitBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 99999px;
+  background: transparent;
+  border: none;
   padding: 0;
   cursor: pointer;
   color: var(--text-muted);
@@ -180,17 +191,16 @@
 
 .exitDialog {
   position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  inset: 0;
+  margin: auto;
   z-index: 100000;
   background: var(--surface-primary);
   border: 1px solid var(--border-primary);
   border-radius: 12px;
   padding: 24px;
   width: 340px;
+  height: fit-content;
   max-width: 90vw;
-  animation: modalSlideIn 0.2s ease-out;
 }
 
 .exitDialogText {
@@ -206,32 +216,3 @@
   justify-content: flex-end;
 }
 
-.exitDialogCancel,
-.exitDialogConfirm {
-  padding: 8px 16px;
-  border-radius: 8px;
-  border: none;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-
-.exitDialogCancel {
-  background: var(--surface-secondary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-primary);
-}
-
-.exitDialogCancel:hover {
-  background: var(--surface-tertiary);
-}
-
-.exitDialogConfirm {
-  background: var(--error);
-  color: #ffffff;
-}
-
-.exitDialogConfirm:hover {
-  background: #b91c1c;
-}

@@ -4,19 +4,12 @@ import { useECSSceneContext } from "../context/ECSSceneContext";
 import Tooltip from "../../../common/components/Tooltip";
 import SiguienteZonaIcon from "../../../common/icons/SiguienteZonaIcon";
 import AnteriorZonaIcon from "../../../common/icons/AnteriorZonaIcon";
-import AnteriorDispositivoIcon from "../../../common/icons/AnteriorDispositivoIcon";
-import SiguienteDispositivoIcon from "../../../common/icons/SiguienteDispositivoIcon";
 
 export default function Controles3D() {
     const {
         siguienteZona, anteriorZona,
         zoomIn, zoomOut,
-        siguienteDispositivo, anteriorDispositivo,
-        getWorkstations,
     } = useECSSceneContext();
-
-    const workstations = getWorkstations();
-    const hasWorkstations = workstations.length > 1 && (workstations[0]?.esInteractiva ?? true);
 
     return (
         <aside className={styles.controles3D} aria-label="Controles de vista 3D">
@@ -47,22 +40,6 @@ export default function Controles3D() {
                     </button>
                 </Tooltip>
             </div>
-
-            {hasWorkstations && (
-                <div className={styles.group}>
-                    <Tooltip text="Dispositivo anterior" position="right">
-                        <button type="button" onClick={anteriorDispositivo} aria-label="Dispositivo anterior">
-                            <AnteriorDispositivoIcon size={18} />
-                        </button>
-                    </Tooltip>
-                    <div className={styles.divider} />
-                    <Tooltip text="Siguiente dispositivo" position="right">
-                        <button type="button" onClick={siguienteDispositivo} aria-label="Siguiente dispositivo">
-                            <SiguienteDispositivoIcon size={18} />
-                        </button>
-                    </Tooltip>
-                </div>
-            )}
         </aside>
     );
 }

@@ -141,14 +141,21 @@ export default function VistaTopologicaFlow() {
     const [edges, setEdges] = useEdgesState(initialEdges);
 
     const [entidadSeleccionada, setEntidadSeleccionada] = useState<number | null>(null);
+    const { toggleLogsPanel, closeDevicePanelRef } = useECSSceneContext();
 
     useEffect(() => {
         setNodes(initialNodes);
         setEdges(initialEdges);
     }, [initialNodes, initialEdges, setNodes, setEdges]);
 
+    useEffect(() => {
+        closeDevicePanelRef.current = () => setEntidadSeleccionada(null);
+        return () => { closeDevicePanelRef.current = null; };
+    }, [closeDevicePanelRef]);
+
     const handleNodeClick = (_event: React.MouseEvent, node: TopologiaNode) => {
         if (node.type === "device" && node.data.entidadId !== undefined) {
+            toggleLogsPanel(false);
             setEntidadSeleccionada(node.data.entidadId);
         } else {
             setEntidadSeleccionada(null);

@@ -91,7 +91,7 @@ function Dispositivos({ embedded = false }: { embedded?: boolean }) {
         { id: "netScanViz", titulo: "Net-Scan Viz", icono: <NetScanVizIcon size={14} />, contenido: <ModalNetScanViz />, posicionInicial: { x: 60, y: 60 } },
         { id: "socialSearcher", titulo: "Social-Searcher", icono: <ConexionIcon size={14} />, contenido: <ModalSocialSearcher />, posicionInicial: { x: 90, y: 40 } },
         { id: "phishMatic", titulo: "Phish-Matic", icono: <RedesIcon size={14} />, contenido: <ModalPhishMatic />, posicionInicial: { x: 120, y: 55 } },
-        { id: "consola", titulo: "Consola", icono: <ConsolaIcon size={14} />, contenido: <ModalConsola />, posicionInicial: { x: 150, y: 35 } },
+        { id: "consola", titulo: "Consola", icono: <ConsolaIcon size={14} />, contenido: <ModalConsola os={getOSCategory(dispositivoSeleccionado?.sistemaOperativo)} />, posicionInicial: { x: 150, y: 35 } },
     ];
 
     const enfocarVentana = (id: VentanaId) => {
@@ -299,6 +299,7 @@ function Dispositivos({ embedded = false }: { embedded?: boolean }) {
                                 onFocus={() => enfocarVentana(id)}
                                 onSnapZoneChange={setSnapPreviewZone}
                                 initialPosition={config.posicionInicial}
+                                initialMaximized
                                 zIndex={10 + ordenZ.indexOf(id)}
                                 hidden={minimizada}
                             >
@@ -316,6 +317,16 @@ function Dispositivos({ embedded = false }: { embedded?: boolean }) {
                     )}
                 </div>
                 <div className={`${styles.barraTareas} ${getTaskbarThemeClass(getOSCategory(dispositivoSeleccionado?.sistemaOperativo))}`}>
+                    {getOSCategory(dispositivoSeleccionado?.sistemaOperativo) === "windows" && (
+                        <button className={styles.botonInicio} title="Inicio">
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor">
+                                <rect x="1" y="1" width="7.5" height="7.5" rx="1" />
+                                <rect x="9.5" y="1" width="7.5" height="7.5" rx="1" />
+                                <rect x="1" y="9.5" width="7.5" height="7.5" rx="1" />
+                                <rect x="9.5" y="9.5" width="7.5" height="7.5" rx="1" />
+                            </svg>
+                        </button>
+                    )}
                     <div className={styles.appsTareas}>
                         {ventanasAbiertas.map(id => {
                             const config = ventanasConfig.find(v => v.id === id);
@@ -328,15 +339,15 @@ function Dispositivos({ embedded = false }: { embedded?: boolean }) {
                                     title={config.titulo}
                                 >
                                     {config.icono}
-                                    <span className={styles.appTareaNombre}>{config.titulo}</span>
                                 </button>
                             );
                         })}
                     </div>
                     <div className={styles.bandejaSistema}>
-                        <span className={styles.reloj}>
-                            {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
+                        <div className={styles.reloj}>
+                            <span>{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                            <span>{new Date().toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
+                        </div>
                     </div>
                 </div>
             </div>

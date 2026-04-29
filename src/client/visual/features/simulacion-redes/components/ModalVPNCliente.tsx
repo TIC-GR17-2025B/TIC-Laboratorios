@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import ComboBox from "../../../common/components/ComboBox";
+import { useEffect, useState, useRef } from "react";
 import styles from "../styles/ModalVPN.module.css";
 import { TipoProteccionVPN } from "../../../../shared/types/DeviceEnums";
 import { useECSSceneContext } from "../../escenarios-simulados/context/ECSSceneContext";
@@ -12,13 +11,63 @@ import ComputadoraIcon from "../../../common/icons/ComputadoraIcon";
 
 type OptionItem = { label: string; value: string };
 
-// No cambiar estos valores, deben coincidir con 
-// el enum TipoProteccionVPN
-const OPCIONES_PROTECCION = [
-    { label: "EA", value: TipoProteccionVPN.EA },
-    { label: "A", value: TipoProteccionVPN.A },
-    { label: "N", value: TipoProteccionVPN.N },
-    { label: "B", value: TipoProteccionVPN.B },
+function ChevronDown() {
+    return (
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+    );
+}
+
+function WinCombo({ items, value, onChange, placeholder = "Seleccionar" }: {
+    items: OptionItem[];
+    value: OptionItem | null;
+    onChange: (item: OptionItem) => void;
+    placeholder?: string;
+}) {
+    const [open, setOpen] = useState(false);
+    const ref = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handler = (e: MouseEvent) => {
+            if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+        };
+        document.addEventListener("mousedown", handler);
+        return () => document.removeEventListener("mousedown", handler);
+    }, []);
+
+    return (
+        <div className={styles.comboBox} ref={ref}>
+            <button className={styles.comboTrigger} onClick={() => setOpen(!open)}>
+                <span className={value ? styles.comboValue : styles.comboPlaceholder}>
+                    {value ? value.label : placeholder}
+                </span>
+                <span className={styles.comboChevron}><ChevronDown /></span>
+            </button>
+            {open && (
+                <div className={styles.comboMenu}>
+                    {items.length === 0 ? (
+                        <div className={styles.comboEmpty}>Sin opciones</div>
+                    ) : items.map((item) => (
+                        <button
+                            key={item.value}
+                            className={`${styles.comboOption} ${value?.value === item.value ? styles.comboOptionSelected : ''}`}
+                            onClick={() => { onChange(item); setOpen(false); }}
+                        >
+                            {item.label}
+                        </button>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}
+
+const OPCIONES_PROTECCION: OptionItem[] = [
+    { label: "Encriptar y Autenticar", value: TipoProteccionVPN.EA },
+    { label: "Solo Autenticar", value: TipoProteccionVPN.A },
+    { label: "Ninguna", value: TipoProteccionVPN.N },
+    { label: "Bloquear", value: TipoProteccionVPN.B },
 ];
 
 export default function ModalVPNCliente() {
@@ -38,13 +87,11 @@ export default function ModalVPNCliente() {
 
     function eliminarPerfilClienteVPN(indiceEnTabla: number) {
         redController.removerPerfilClienteVPN(entidadSeleccionadaId!, indiceEnTabla);
-
         const perfilesActualizados = redController.getPerfilesClienteVPN(entidadSeleccionadaId!);
         if (perfilesActualizados) {
             setConfiguraciones([...perfilesActualizados]);
         }
     }
-
 
     useEffect(() => {
         const perfiles = redController.getPerfilesClienteVPN(entidadSeleccionadaId!);
@@ -64,8 +111,6 @@ export default function ModalVPNCliente() {
                 .filter((opcion): opcion is OptionItem => opcion !== null);
             setDominioRemotoOpciones(opciones);
         }
-
-
     }, []);
 
     useEffect(() => {
@@ -133,84 +178,74 @@ export default function ModalVPNCliente() {
 
     return (
         <div className={styles.modalVPNContainer}>
+            <div className={styles.formSection}>
+                <h3 className={styles.sectionTitle}>Nuevo Perfil</h3>
+
+                <div className={styles.formHorizontal}>
+                    <div className={styles.inputGroup}>
+                        <label className={styles.label}>Protección</label>
+                        <WinCombo
+                            items={OPCIONES_PROTECCION}
+                            placeholder="Seleccionar"
+                            value={proteccion}
+                            onChange={setProteccion}
+                        />
+                    </div>
+                    <div className={styles.inputGroup}>
+                        <label className={styles.label}>Dominio remoto</label>
+                        <WinCombo
+                            items={dominioRemotoOpciones}
+                            placeholder="Seleccionar"
+                            value={dominioRemoto}
+                            onChange={setDominioRemoto}
+                        />
+                    </div>
+                    <div className={styles.inputGroup}>
+                        <label className={styles.label}>Host remoto</label>
+                        <WinCombo
+                            items={hostRemotoOpciones}
+                            placeholder="Seleccionar"
+                            value={hostRemoto}
+                            onChange={setHostRemoto}
+                        />
+                    </div>
+                    <button
+                        className={styles.addButton}
+                        onClick={agregarConfiguracion}
+                        disabled={!isFormularioCompleto}
+                    >
+                        Añadir
+                    </button>
+                </div>
+                {errorMessage && (
+                    <div className={styles.errorMessage}>{errorMessage}</div>
+                )}
+            </div>
             <p className={styles.nota}>
                 Como cliente VPN, este dispositivo se conectará a un dominio remoto específico.
                 Define el nivel de protección y los destinos de conexión.
             </p>
-
-            <div className={styles.modalBody}>
-                <div className={styles.formSection}>
-                    <h3 className={styles.sectionTitle}>Nuevo Perfil</h3>
-                    <div className={styles.formHorizontal}>
-                        <div className={styles.inputGroup}>
-                            <label className={styles.label}>Protección</label>
-                            <ComboBox
-                                items={OPCIONES_PROTECCION}
-                                placeholder="Seleccionar"
-                                value={proteccion}
-                                onChange={setProteccion}
-                                getKey={(item) => item.value}
-                                getLabel={(item) => item.label}
-                            />
-                        </div>
-                        <div className={styles.inputGroup}>
-                            <label className={styles.label}>Dominio remoto</label>
-                            <ComboBox
-                                items={dominioRemotoOpciones}
-                                placeholder="Seleccionar"
-                                value={dominioRemoto}
-                                onChange={setDominioRemoto}
-                                getKey={(item) => item.value}
-                                getLabel={(item) => item.label}
-                            />
-                        </div>
-                        <div className={styles.inputGroup}>
-                            <label className={styles.label}>Host remoto</label>
-                            <ComboBox
-                                items={hostRemotoOpciones}
-                                placeholder="Seleccionar"
-                                value={hostRemoto}
-                                onChange={setHostRemoto}
-                                getKey={(item) => item.value}
-                                getLabel={(item) => item.label}
-                            />
-                        </div>
-                        <button
-                            className={styles.addButton}
-                            onClick={agregarConfiguracion}
-                            disabled={!isFormularioCompleto}
-                            title="Agregar configuración"
-                        >
-                            +
-                        </button>
+            <div>
+                <h3 className={styles.sectionTitle}>Perfiles Activos</h3>
+                {configuraciones.length === 0 ? (
+                    <div className={styles.emptyState}>
+                        <p>No hay configuraciones agregadas</p>
                     </div>
-                    {errorMessage && (
-                        <div className={styles.errorMessage}>{errorMessage}</div>
-                    )}
-                </div>
-
-                <div>
-                    <h3 className={styles.sectionTitle} style={{ margin: "1rem 0" }}>Perfiles Activos</h3>
-                    {configuraciones.length === 0 ? (
-                        <div className={styles.emptyState}>
-                            <p>No hay configuraciones agregadas</p>
-                        </div>
-                    ) : (
-                        <div className={styles.listaConfiguraciones}>
-                            {configuraciones.map((config, index) => (
-                                <ConfiguracionVpnCliente
-                                    key={index}
-                                    index={index}
-                                    proteccion={config.proteccion}
-                                    dominioRemoto={config.dominioRemoto}
-                                    hostRemoto={config.hostRemoto}
-                                    redController={redController}
-                                    onEliminar={eliminarPerfilClienteVPN}
-                                />
-                            ))}
-                        </div>
-                    )}
-                </div>
+                ) : (
+                    <div className={styles.listaConfiguraciones}>
+                        {configuraciones.map((config, index) => (
+                            <ConfiguracionVpnCliente
+                                key={index}
+                                index={index}
+                                proteccion={config.proteccion}
+                                dominioRemoto={config.dominioRemoto}
+                                hostRemoto={config.hostRemoto}
+                                redController={redController}
+                                onEliminar={eliminarPerfilClienteVPN}
+                            />
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );
@@ -223,7 +258,6 @@ interface ConfiguracionVpnClienteProps extends PerfilClienteVPN {
 }
 
 function ConfiguracionVpnCliente({ index, proteccion, dominioRemoto, hostRemoto, redController, onEliminar }: ConfiguracionVpnClienteProps) {
-
     const entidadZona = parseInt(dominioRemoto);
     const zonaComponent = redController.ecsManager.getComponentes(entidadZona)?.get(ZonaComponent);
     const nombreDominio = zonaComponent?.dominio || dominioRemoto;

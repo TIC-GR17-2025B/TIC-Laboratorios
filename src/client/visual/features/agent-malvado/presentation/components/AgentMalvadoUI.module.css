@@ -132,20 +132,14 @@
 
 .scenarioTitle {
   margin: 0 0 6px 0;
-  color: #52d356;
+  color: #4ade80;
   font-size: 0.9rem;
+  font-weight: 400;
 }
 
 .scenarioName {
   font-size: 0.9rem;
-  font-weight: 600;
-  margin-bottom: 3px;
-}
-
-.scenarioMeta {
-  color: #888;
-  font-size: 0.75rem;
-  margin-bottom: 6px;
+  font-weight: 400;
 }
 
 .scenarioDescription {

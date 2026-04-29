@@ -4,15 +4,25 @@ import TarjetaEntidadSeleccionada from "../components/TarjetaEntidadSeleccionada
 import { useEscenario } from "../../../common/contexts";
 import { useScreenTransition } from "../../../common/contexts/ScreenTransitionContext";
 import MonitorDesktopOverlay from "../../../common/components/MonitorDesktopOverlay";
-import EventLogsPanel from "../components/EventLogsPanel";
-import { useEffect } from "react";
+import { useECSSceneContext } from "../context/ECSSceneContext";
+
+import { useEffect, useRef } from "react";
 function VistaOficina() {
   const { dispositivoSeleccionado, setDispositivoSeleccionado } = useEscenario();
-  const { desktopMode, pendingZoom, consumePendingZoom, startZoom } = useScreenTransition();
+  const { desktopMode, pendingZoom, consumePendingZoom, startZoom, exitDesktopMode } = useScreenTransition();
+  const { zonaActual } = useECSSceneContext();
+  const zonaAnteriorRef = useRef(zonaActual);
 
   useEffect(() => {
     setDispositivoSeleccionado(null);
   }, []);
+
+  useEffect(() => {
+    if (zonaAnteriorRef.current !== zonaActual && desktopMode) {
+      exitDesktopMode();
+    }
+    zonaAnteriorRef.current = zonaActual;
+  }, [zonaActual, desktopMode, exitDesktopMode]);
 
   // Handle pending zoom from Sidebar navigation
   useEffect(() => {
@@ -26,7 +36,6 @@ function VistaOficina() {
     <div className={styles.contenedor}>
       <Escena3D />
       {!desktopMode && <TarjetaEntidadSeleccionada visible={!!dispositivoSeleccionado} />}
-      <EventLogsPanel />
       <MonitorDesktopOverlay />
     </div>
   )

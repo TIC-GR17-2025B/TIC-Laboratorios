@@ -8,11 +8,9 @@ import SistemaOpIcon from '../../../common/icons/SistemaOpIcon';
 import KeyIcon from '../../../common/icons/KeyIcon';
 import ComputadoraIcon from '../../../common/icons/ComputadoraIcon';
 
-/* ── Iconos inline ── */
-
 function StorageIcon({ size = 16 }: { size?: number }) {
     return (
-        <svg width={size} height={size} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width={size} height={size} viewBox="0 0 16 16" fill="none">
             <rect x="2" y="2" width="12" height="4" rx="1" stroke="currentColor" strokeWidth="1.5" />
             <rect x="2" y="10" width="12" height="4" rx="1" stroke="currentColor" strokeWidth="1.5" />
             <circle cx="11" cy="4" r="0.75" fill="currentColor" />
@@ -23,7 +21,7 @@ function StorageIcon({ size = 16 }: { size?: number }) {
 
 function PolicyIcon({ size = 16 }: { size?: number }) {
     return (
-        <svg width={size} height={size} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width={size} height={size} viewBox="0 0 16 16" fill="none">
             <path d="M4 2.5H12C12.5523 2.5 13 2.94772 13 3.5V12.5C13 13.0523 12.5523 13.5 12 13.5H4C3.44772 13.5 3 13.0523 3 12.5V3.5C3 2.94772 3.44772 2.5 4 2.5Z"
                 stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             <path d="M5.5 5.5H10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -35,17 +33,24 @@ function PolicyIcon({ size = 16 }: { size?: number }) {
 
 function SearchIcon({ size = 16 }: { size?: number }) {
     return (
-        <svg width={size} height={size} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width={size} height={size} viewBox="0 0 16 16" fill="none">
             <circle cx="7" cy="7" r="4.5" stroke="currentColor" strokeWidth="1.5" />
             <path d="M10.5 10.5L14 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
     );
 }
 
-/* ── Definición de categorías ── */
+function ChevronRight() {
+    return (
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M4.5 2.5L8 6L4.5 9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+    );
+}
 
 interface Categoria {
     titulo: string;
+    descripcion: string;
     icono: ReactNode;
     configs: string[];
 }
@@ -53,7 +58,8 @@ interface Categoria {
 const CATEGORIAS: Categoria[] = [
     {
         titulo: 'Antivirus',
-        icono: <ShieldCheckIcon size={15} />,
+        descripcion: 'Actualizaciones automáticas, gestión de antivirus',
+        icono: <ShieldCheckIcon size={20} />,
         configs: [
             'Actualizaciones automáticas de antivirus',
             'Antivirus gestionado',
@@ -61,7 +67,8 @@ const CATEGORIAS: Categoria[] = [
     },
     {
         titulo: 'Parches y actualizaciones',
-        icono: <SistemaOpIcon size={15} />,
+        descripcion: 'Aplicación de parches, actualizaciones automáticas',
+        icono: <SistemaOpIcon size={20} />,
         configs: [
             'Usuario aplica parches',
             'Actualización automática de parches',
@@ -71,7 +78,8 @@ const CATEGORIAS: Categoria[] = [
     },
     {
         titulo: 'Contraseñas y autenticación',
-        icono: <KeyIcon size={15} />,
+        descripcion: 'Políticas de contraseñas, contraseña única',
+        icono: <KeyIcon size={20} />,
         configs: [
             'Aplicar política de contraseñas',
             'Usar contraseña única',
@@ -79,7 +87,8 @@ const CATEGORIAS: Categoria[] = [
     },
     {
         titulo: 'Seguridad de sesión',
-        icono: <ComputadoraIcon size={15} />,
+        descripcion: 'Bloqueo por inactividad, cierre de sesión',
+        icono: <ComputadoraIcon size={20} />,
         configs: [
             'Bloqueo automático por inactividad',
             'Bloquear o cerrar sesión por inactividad',
@@ -87,7 +96,8 @@ const CATEGORIAS: Categoria[] = [
     },
     {
         titulo: 'Almacenamiento y medios',
-        icono: <StorageIcon size={15} />,
+        descripcion: 'Medios extraíbles, almacenamiento local',
+        icono: <StorageIcon size={20} />,
         configs: [
             'Bloquear medios extraíbles',
             'Bloquear almacenamiento local',
@@ -95,7 +105,8 @@ const CATEGORIAS: Categoria[] = [
     },
     {
         titulo: 'Políticas adicionales',
-        icono: <PolicyIcon size={15} />,
+        descripcion: 'Adjuntos de email, software externo',
+        icono: <PolicyIcon size={20} />,
         configs: [
             'Cuidado con adjuntos de email',
             'Sin software externo',
@@ -103,19 +114,17 @@ const CATEGORIAS: Categoria[] = [
     },
 ];
 
-/* ── Componente principal ── */
-
 export default function PanelConfiguraciones() {
     const baseConfiguraciones = useMemo(() => obtenerConfiguraciones(), []);
     const [checkedItems, setCheckedItems] = useState<boolean[]>(
         new Array(baseConfiguraciones.length).fill(false)
     );
     const [searchQuery, setSearchQuery] = useState('');
+    const [categoriaActiva, setCategoriaActiva] = useState<string | null>(null);
 
     const { toggleConfigWorkstation } = useECSSceneContext();
     const { dispositivoSeleccionado } = useEscenario();
 
-    // Sync checks cuando cambia el dispositivo seleccionado
     useEffect(() => {
         if (!dispositivoSeleccionado || !dispositivoSeleccionado.configuraciones) {
             setCheckedItems(new Array(baseConfiguraciones.length).fill(false));
@@ -134,10 +143,7 @@ export default function PanelConfiguraciones() {
 
     const handleToggle = (index: number, configuracion: string) => {
         const entidadId = (dispositivoSeleccionado as unknown as { entidadId?: number })?.entidadId;
-        if (typeof entidadId !== 'number') {
-            console.warn('No hay entidad seleccionada para aplicar la configuración:', configuracion);
-            return;
-        }
+        if (typeof entidadId !== 'number') return;
 
         toggleConfigWorkstation(entidadId, configuracion);
         const newCheckedItems = [...checkedItems];
@@ -145,31 +151,75 @@ export default function PanelConfiguraciones() {
         setCheckedItems(newCheckedItems);
     };
 
-    // Índice rápido: nombre → posición en baseConfiguraciones
     const configIndex = useMemo(() => {
         const map = new Map<string, number>();
         baseConfiguraciones.forEach((cfg, i) => map.set(cfg.configuracion, i));
         return map;
     }, [baseConfiguraciones]);
 
-    // Filtrar categorías por búsqueda
-    const query = searchQuery.toLowerCase();
-    const categoriasVisibles = CATEGORIAS.map((cat) => {
-        const items = cat.configs
+    const catActiva = CATEGORIAS.find(c => c.titulo === categoriaActiva);
+
+    // Detail view
+    if (catActiva) {
+        const items = catActiva.configs
             .map((nombre) => {
                 const idx = configIndex.get(nombre);
                 if (idx === undefined) return null;
                 return { nombre, idx };
             })
-            .filter((item): item is NonNullable<typeof item> =>
-                item !== null && (!query || item.nombre.toLowerCase().includes(query))
-            );
-        return { ...cat, items };
-    }).filter((cat) => cat.items.length > 0);
+            .filter((item): item is NonNullable<typeof item> => item !== null);
+
+        return (
+            <div className={styles.contenedor}>
+                <div className={styles.breadcrumb}>
+                    <button className={styles.breadcrumbLink} onClick={() => setCategoriaActiva(null)}>
+                        Configuración
+                    </button>
+                    <span className={styles.breadcrumbSep}>{'›'}</span>
+                    <span className={styles.breadcrumbActual}>{catActiva.titulo}</span>
+                </div>
+
+                <div className={styles.detalleCard}>
+                    {items.map(({ nombre, idx }) => (
+                        <div
+                            key={idx}
+                            className={styles.configRow}
+                            onClick={() => handleToggle(idx, nombre)}
+                            data-context={nombre.toLowerCase()}
+                            data-object-name={`Configuración: ${nombre}`}
+                        >
+                            <div className={styles.configInfo}>
+                                <span className={styles.configNombre}>{nombre}</span>
+                                <span className={styles.configEstado}>
+                                    {checkedItems[idx] ? 'Activado' : 'Desactivado'}
+                                </span>
+                            </div>
+                            <label className={styles.toggle} onClick={(e) => e.stopPropagation()}>
+                                <input
+                                    type="checkbox"
+                                    className={styles.toggleInput}
+                                    checked={checkedItems[idx]}
+                                    onChange={() => handleToggle(idx, nombre)}
+                                />
+                                <span className={styles.toggleTrack} />
+                            </label>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
+    // Category list view
+    const query = searchQuery.toLowerCase();
+    const categoriasVisibles = CATEGORIAS.filter(cat =>
+        !query || cat.titulo.toLowerCase().includes(query) ||
+        cat.descripcion.toLowerCase().includes(query) ||
+        cat.configs.some(c => c.toLowerCase().includes(query))
+    );
 
     return (
         <div className={styles.contenedor}>
-            {/* Search bar */}
             <div className={styles.searchBar}>
                 <span className={styles.searchIcon}>
                     <SearchIcon size={14} />
@@ -177,7 +227,7 @@ export default function PanelConfiguraciones() {
                 <input
                     type="text"
                     className={styles.searchInput}
-                    placeholder="Buscar configuración..."
+                    placeholder="Buscar configuración"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -188,36 +238,22 @@ export default function PanelConfiguraciones() {
                     No se encontraron configuraciones
                 </div>
             ) : (
-                categoriasVisibles.map((cat) => (
-                    <div key={cat.titulo} className={styles.seccion}>
-                        <div className={styles.seccionHeader}>
-                            <span className={styles.seccionIcono}>{cat.icono}</span>
-                            <h3 className={styles.seccionTitulo}>{cat.titulo}</h3>
-                        </div>
-                        <div className={styles.seccionCard}>
-                            {cat.items.map(({ nombre, idx }) => (
-                                <div
-                                    key={idx}
-                                    className={styles.configRow}
-                                    onClick={() => handleToggle(idx, nombre)}
-                                    data-context={nombre.toLowerCase()}
-                                    data-object-name={`Configuración: ${nombre}`}
-                                >
-                                    <span className={styles.configNombre}>{nombre}</span>
-                                    <label className={styles.toggle} onClick={(e) => e.stopPropagation()}>
-                                        <input
-                                            type="checkbox"
-                                            className={styles.toggleInput}
-                                            checked={checkedItems[idx]}
-                                            onChange={() => handleToggle(idx, nombre)}
-                                        />
-                                        <span className={styles.toggleTrack} />
-                                    </label>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                ))
+                <div className={styles.listaCards}>
+                    {categoriasVisibles.map((cat) => (
+                        <button
+                            key={cat.titulo}
+                            className={styles.catCard}
+                            onClick={() => { setCategoriaActiva(cat.titulo); setSearchQuery(''); }}
+                        >
+                            <span className={styles.catIcono}>{cat.icono}</span>
+                            <div className={styles.catTexto}>
+                                <span className={styles.catTitulo}>{cat.titulo}</span>
+                                <span className={styles.catDesc}>{cat.descripcion}</span>
+                            </div>
+                            <span className={styles.catChevron}><ChevronRight /></span>
+                        </button>
+                    ))}
+                </div>
             )}
         </div>
     );

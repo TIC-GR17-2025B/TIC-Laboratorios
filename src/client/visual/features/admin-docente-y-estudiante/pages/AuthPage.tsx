@@ -39,7 +39,7 @@ const AuthPage = () => {
 
     const [localError, setLocalError] = useState('');
     const navigate = useNavigate();
-    const { login, registerEstudiante, loading, error } = useAuth();
+    const { login, registerEstudiante, loading, error, clearError } = useAuth();
 
     const clearFieldError = (field: string) => {
         if (fieldErrors[field]) {
@@ -49,6 +49,7 @@ const AuthPage = () => {
 
     const switchMode = (newMode: AuthMode) => {
         setLocalError('');
+        clearError();
         setFieldErrors({});
         setStep(0);
         setMode(newMode);
@@ -104,6 +105,7 @@ const AuthPage = () => {
     const handleChange = (name: string, value: string) => {
         setFormData(prev => ({ ...prev, [name]: value }));
         clearFieldError(name);
+        clearError();
     };
 
     const goNext = () => {
@@ -251,14 +253,14 @@ const AuthPage = () => {
                                     <div className={styles.stepContent}>
                                         <div className={styles.fieldSection}>
                                             <span className={styles.fieldLabel}>Correo electrónico</span>
-                                            {renderInput('loginEmail', loginEmail, (val) => { setLoginEmail(val); clearFieldError('loginEmail'); }, {
+                                            {renderInput('loginEmail', loginEmail, (val) => { setLoginEmail(val); clearFieldError('loginEmail'); clearError(); }, {
                                                 type: 'text',
                                                 placeholder: 'usuario@epn.edu.ec',
                                             })}
                                         </div>
                                         <div className={styles.fieldSection}>
                                             <span className={styles.fieldLabel}>Contraseña</span>
-                                            {renderInput('loginPassword', loginPassword, (val) => { setLoginPassword(val); clearFieldError('loginPassword'); }, {
+                                            {renderInput('loginPassword', loginPassword, (val) => { setLoginPassword(val); clearFieldError('loginPassword'); clearError(); }, {
                                                 type: 'password',
                                                 placeholder: '••••••••',
                                             })}

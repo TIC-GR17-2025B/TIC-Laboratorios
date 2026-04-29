@@ -10,10 +10,10 @@ import ShieldCheckIcon from "../../../common/icons/ShieldCheckIcon";
 type Tab = 'repositorio' | 'instaladas';
 
 const APP_ICONS: Record<string, ReactNode> = {
-    "Net-Scan Viz": <NetScanVizIcon size={44} />,
-    "Company Social-Searcher": <span style={{ color: '#42A5F5' }}><ConexionIcon size={44} /></span>,
-    "Phish-Matic": <span style={{ color: '#EF5350' }}><RedesIcon size={44} /></span>,
-    "FirmaChecker": <span style={{ color: '#4DB6AC' }}><ShieldCheckIcon size={44} /></span>,
+    "Net-Scan Viz": <NetScanVizIcon size={32} />,
+    "Company Social-Searcher": <span style={{ color: '#42A5F5' }}><ConexionIcon size={32} /></span>,
+    "Phish-Matic": <span style={{ color: '#EF5350' }}><RedesIcon size={32} /></span>,
+    "FirmaChecker": <span style={{ color: '#4DB6AC' }}><ShieldCheckIcon size={32} /></span>,
 };
 
 export default function ModalApps() {
@@ -46,7 +46,6 @@ export default function ModalApps() {
         }, 800);
     }, [desinstalarApp]);
 
-    // Filtrar apps por búsqueda
     const filteredApps = useMemo(() => {
         const query = searchQuery.toLowerCase();
         const apps = activeTab === 'repositorio' ? appsDisponibles : appsInstaladas;
@@ -65,10 +64,16 @@ export default function ModalApps() {
     return (
         <div className={styles.container}>
             <div className={styles.searchBar}>
+                <span className={styles.searchIcon}>
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                        <circle cx="7" cy="7" r="4.5" stroke="currentColor" strokeWidth="1.5" />
+                        <path d="M10.5 10.5L14 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                    </svg>
+                </span>
                 <input
                     type="text"
                     className={styles.searchInput}
-                    placeholder="Buscar aplicaciones..."
+                    placeholder="Buscar aplicaciones"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -104,33 +109,31 @@ export default function ModalApps() {
                 ) : (
                     <div className={styles.appList}>
                         {filteredApps.map((app) => (
-                            <div key={app.nombre} className={styles.appCard}>
+                            <div key={app.nombre} className={styles.appRow}>
                                 <div className={styles.appIcon}>
                                     {getAppIcon(app.nombre)}
                                 </div>
                                 <div className={styles.appInfo}>
-                                    <div className={styles.appName}>{app.nombre}</div>
-                                    <div className={styles.appDesc}>{app.descripcion}</div>
+                                    <span className={styles.appName}>{app.nombre}</span>
+                                    <span className={styles.appDesc}>{app.descripcion}</span>
                                 </div>
-                                <div className={styles.appAction}>
-                                    {activeTab === 'repositorio' ? (
-                                        <button
-                                            className={`${styles.btn} ${loadingApp === app.nombre ? styles.btnLoading : styles.btnInstall}`}
-                                            onClick={() => handleInstall(app.nombre)}
-                                            disabled={loadingApp !== null}
-                                        >
-                                            {loadingApp === app.nombre ? <><span className={styles.spinner} />Instalando</> : "Obtener"}
-                                        </button>
-                                    ) : (
-                                        <button
-                                            className={`${styles.btn} ${loadingApp === app.nombre ? styles.btnLoading : styles.btnRemove}`}
-                                            onClick={() => handleUninstall(app.nombre)}
-                                            disabled={loadingApp !== null}
-                                        >
-                                            {loadingApp === app.nombre ? <><span className={styles.spinner} />Desinstalando</> : "Desinstalar"}
-                                        </button>
-                                    )}
-                                </div>
+                                {activeTab === 'repositorio' ? (
+                                    <button
+                                        className={`${styles.btn} ${styles.btnInstall}`}
+                                        onClick={() => handleInstall(app.nombre)}
+                                        disabled={loadingApp !== null}
+                                    >
+                                        {loadingApp === app.nombre ? <><span className={styles.spinner} />Instalando</> : "Obtener"}
+                                    </button>
+                                ) : (
+                                    <button
+                                        className={`${styles.btn} ${styles.btnRemove}`}
+                                        onClick={() => handleUninstall(app.nombre)}
+                                        disabled={loadingApp !== null}
+                                    >
+                                        {loadingApp === app.nombre ? <><span className={styles.spinner} />Quitando</> : "Desinstalar"}
+                                    </button>
+                                )}
                             </div>
                         ))}
                     </div>

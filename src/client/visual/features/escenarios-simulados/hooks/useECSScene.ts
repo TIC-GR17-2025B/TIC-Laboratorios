@@ -288,22 +288,6 @@ export function useECSScene() {
     return processEntities().filter((e) => e.objetoConTipo.tipo === "workstation");
   }, [entities, zoneState.zonaActual]);
 
-  const siguienteDispositivo = useCallback(() => {
-    const workstations = getWorkstations();
-    if (workstations.length === 0) return;
-    const nextIndex = (navState.dispositivoIndex + 1) % workstations.length;
-    navState.setDispositivoIndex(nextIndex);
-    navState.setFocusTarget(workstations[nextIndex].position);
-  }, [navState.dispositivoIndex, getWorkstations]);
-
-  const anteriorDispositivo = useCallback(() => {
-    const workstations = getWorkstations();
-    if (workstations.length === 0) return;
-    const prevIndex = (navState.dispositivoIndex - 1 + workstations.length) % workstations.length;
-    navState.setDispositivoIndex(prevIndex);
-    navState.setFocusTarget(workstations[prevIndex].position);
-  }, [navState.dispositivoIndex, getWorkstations]);
-
   return {
     entities,
     mostrarNuevoLog: logState.mostrarNuevoLog,
@@ -340,11 +324,10 @@ export function useECSScene() {
     zoomOut: navState.zoomOut,
     zoomCommand: navState.zoomCommand,
     clearZoomCommand: navState.clearZoomCommand,
-    siguienteDispositivo,
-    anteriorDispositivo,
     dispositivoIndex: navState.dispositivoIndex,
     focusTarget: navState.focusTarget,
     clearFocusTarget: navState.clearFocusTarget,
     getWorkstations,
+    closeDevicePanelRef: logState.closeDevicePanelRef,
   };
 }

@@ -157,11 +157,13 @@
 
 .botonPrincipal {
   align-self: center;
-  padding: 14px 28px;
+  padding: 14px 28px !important;
   font-size: 15px;
   font-weight: 500;
-  background: var(--blue);
-  border: 1px solid var(--blue);
+  background: var(--blue) !important;
+  border: 1px solid var(--blue) !important;
+  border-radius: 4px !important;
+  color: #ffffff !important;
   transition: all 0.3s ease;
 }
 
@@ -204,17 +206,18 @@
 
 .botonSiguiente {
   align-self: center;
-  padding: 12px 24px;
+  padding: 12px 24px !important;
   font-size: 14px;
-  background: var(--surface-secondary);
-  border: 1px solid var(--blue);
-  color: var(--blue);
+  background: var(--surface-secondary) !important;
+  border: 1px solid var(--blue) !important;
+  border-radius: 4px !important;
+  color: var(--blue) !important;
   transition: all 0.3s ease;
 }
 
 .botonSiguiente:hover {
-  background: var(--blue);
-  color: #ffffff;
+  background: var(--blue) !important;
+  color: #ffffff !important;
 }
 
 .formulario {
@@ -332,12 +335,13 @@
 }
 
 .botonComparar {
-  padding: 14px 28px;
+  padding: 14px 28px !important;
   font-size: 15px;
   font-weight: 500;
-  background: var(--success);
-  border: 1px solid var(--success);
-  color: #ffffff;
+  background: var(--success) !important;
+  border: 1px solid var(--success) !important;
+  border-radius: 4px !important;
+  color: #ffffff !important;
   transition: all 0.3s ease;
 }
 
@@ -346,8 +350,8 @@
 }
 
 .botonInvalido {
-  background: var(--error);
-  border: 1px solid var(--error);
+  background: var(--error) !important;
+  border: 1px solid var(--error) !important;
 }
 
 .botonInvalido:hover {
@@ -430,15 +434,16 @@
 }
 
 .botonReiniciar {
-  padding: 10px 20px;
-  background: var(--surface-secondary);
-  border: 1px solid var(--border-primary);
+  padding: 10px 20px !important;
+  background: var(--surface-secondary) !important;
+  border: 1px solid var(--border-primary) !important;
+  border-radius: 4px !important;
   font-size: 14px;
 }
 
 .botonReiniciar:hover {
-  border-color: var(--blue);
-  color: var(--blue);
+  border-color: var(--blue) !important;
+  color: var(--blue) !important;
 }
 
 /* ═══════════════════════════════════════════════════════ */
@@ -479,11 +484,11 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 24px;
-  background: var(--blue);
-  color: #ffffff;
-  border: none;
-  border-radius: 8px;
+  padding: 10px 24px !important;
+  background: var(--blue) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 4px !important;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -492,7 +497,7 @@
 }
 
 .paso1Btn:hover {
-  background: var(--blue-lighter);
+  background: var(--blue-lighter) !important;
 }
 
 /* ═══════════════════════════════════════════════════════ */
@@ -529,9 +534,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 4px;
+  width: 26px !important;
+  height: 26px !important;
+  padding: 0 !important;
+  border-radius: 4px !important;
+  background: transparent !important;
   font-size: 14px;
   color: var(--text-muted);
   cursor: default;
@@ -765,11 +772,11 @@
 }
 
 .fpFooterBtn {
-  padding: 5px 20px;
-  background: var(--blue);
-  color: #ffffff;
-  border: none;
-  border-radius: 4px;
+  padding: 5px 20px !important;
+  background: var(--blue) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 4px !important;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -778,7 +785,7 @@
 }
 
 .fpFooterBtn:hover:not(:disabled) {
-  background: var(--blue-lighter);
+  background: var(--blue-lighter) !important;
 }
 
 .fpFooterBtn:disabled {

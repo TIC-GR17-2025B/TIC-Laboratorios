@@ -16,11 +16,13 @@ export function formatearTiempo(totalSeconds: number): string {
   const minutes = Math.floor((absSeconds % 3600) / 60);
   const seconds = absSeconds % 60;
 
-  const parts: string[] = [];
+  const mm = String(minutes).padStart(2, "0");
+  const ss = String(seconds).padStart(2, "0");
 
-  if (hours > 0) parts.push(`${hours}h`);
-  if (minutes > 0 || hours > 0) parts.push(`${minutes}m`);
-  parts.push(`${seconds}s`);
+  if (hours > 0) {
+    const hh = String(hours).padStart(2, "0");
+    return `${sign}${hh}:${mm}:${ss}`;
+  }
 
-  return sign + parts.join(" ");
+  return `${sign}${mm}:${ss}`;
 }

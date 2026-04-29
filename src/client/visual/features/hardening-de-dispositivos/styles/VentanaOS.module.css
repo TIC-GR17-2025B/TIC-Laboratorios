@@ -1,10 +1,15 @@
+/* ═══ Windows 11 Dark — Window Frame ═══ */
+
 .ventana {
     position: absolute;
     display: flex;
     flex-direction: column;
-    background: var(--surface-primary);
-    border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18), 0 0 0 1px var(--border-primary);
+    background: #202020;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.38),
+        0 2px 6px rgba(0, 0, 0, 0.24);
     overflow: hidden;
     transition: border-radius 0.2s ease;
 }
@@ -18,17 +23,19 @@
     width: 100%;
     height: 100%;
     border-radius: 0;
+    border: none;
 }
+
+/* ═══ Title Bar ═══ */
 
 .barraVentana {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 36px;
-    min-height: 36px;
-    padding: 0 12px;
-    background: var(--surface-secondary);
-    border-bottom: 1px solid var(--border-primary);
+    height: 32px;
+    min-height: 32px;
+    padding: 0 0 0 12px;
+    background: transparent;
     cursor: grab;
     user-select: none;
 }
@@ -49,56 +56,89 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-primary);
+    font-size: 12px;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.79);
 }
 
 .iconoVentana {
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 0.8;
+    width: 16px;
+    height: 16px;
 }
 
+.iconoVentana svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* ═══ Window Controls (Win11 exact) ═══ */
+
 .botonesVentana {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    display: flex !important;
+    align-items: stretch !important;
+    height: 100%;
+    gap: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
 }
 
 .botonVentana {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-    background: var(--surface-tertiary);
-    border: none;
-    border-radius: 6px;
-    color: var(--text-muted);
-    cursor: pointer;
-    transition: all 0.15s ease;
-    padding: 0;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 46px !important;
+    height: 100% !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    color: rgba(255, 255, 255, 0.79) !important;
+    cursor: pointer !important;
+    transition: background 0.08s ease !important;
+    padding: 0 !important;
+    gap: 0 !important;
+}
+
+.botonVentana svg {
+    width: 10px;
+    height: 10px;
 }
 
 .botonVentana:hover {
-    background: var(--border-primary);
-    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.07) !important;
+    color: #ffffff !important;
+}
+
+.botonVentana:active {
+    background: rgba(255, 255, 255, 0.04) !important;
+    color: rgba(255, 255, 255, 0.6) !important;
 }
 
 .botonCerrar:hover {
-    background: rgba(255, 80, 80, 0.8);
-    color: white;
+    background: #c42b1c !important;
+    color: #ffffff !important;
 }
+
+.botonCerrar:active {
+    background: #a41f14 !important;
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* ═══ Window Content ═══ */
 
 .contenidoVentana {
     flex: 1 1 auto;
     overflow: auto;
     min-height: 0;
+    background: #202020;
 }
 
-/* Resize handles */
+/* ═══ Resize Handles ═══ */
+
 .resizeHandle {
     position: absolute;
 }
@@ -167,7 +207,8 @@
     cursor: sw-resize;
 }
 
-/* Snap states */
+/* ═══ Snap States ═══ */
+
 .ventanaSnapped {
     border-radius: 0;
 }

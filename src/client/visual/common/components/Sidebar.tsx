@@ -14,6 +14,7 @@ import { useChatContext } from '../../features/chat/context/ChatContext';
 import ChatContainer from '../../features/chat/components/ChatContainer';
 import { useScreenTransition } from '../contexts/ScreenTransitionContext';
 import { useEscenario } from '../contexts';
+import Button from './Button';
 
 const Sidebar: React.FC = () => {
     const { pause, resume, isPaused, tiempoTranscurrido, processEntities } = useECSSceneContext();
@@ -81,15 +82,15 @@ const Sidebar: React.FC = () => {
                     <div className={styles.exitOverlay} onClick={handleCancelExit} />
                     <div className={styles.exitDialog}>
                         <p className={styles.exitDialogText}>
-                            Se perdera el progreso del escenario actual.
+                            ¿Estás seguro de que deseas salir? Todo el progreso del escenario actual se perderá y tendrás que comenzar de nuevo.
                         </p>
                         <div className={styles.exitDialogActions}>
-                            <button className={styles.exitDialogCancel} onClick={handleCancelExit}>
+                            <Button variant="secondary" onClick={handleCancelExit}>
                                 Cancelar
-                            </button>
-                            <button className={styles.exitDialogConfirm} onClick={handleConfirmExit}>
-                                Salir
-                            </button>
+                            </Button>
+                            <Button variant="danger" onClick={handleConfirmExit}>
+                                Salir del escenario
+                            </Button>
                         </div>
                     </div>
                 </>
@@ -98,7 +99,7 @@ const Sidebar: React.FC = () => {
                 <nav className={styles.dock} data-tour="dock">
                     <div className={styles.navSection}>
                         {desktopMode && !isZooming ? (
-                            <Tooltip text="Oficina">
+                            <Tooltip text="Oficina" position="right">
                                 <button
                                     className={styles.dockItem}
                                     onClick={exitDesktopMode}
@@ -107,9 +108,9 @@ const Sidebar: React.FC = () => {
                                 </button>
                             </Tooltip>
                         ) : (
-                            <NavigationLink icon={<OfficeIcon size={20} />} label="Oficina" to="/" forceInactive={desktopMode || isZooming} data-tour="dock-oficina" />
+                            <NavigationLink icon={<OfficeIcon size={20} />} label="Oficina" to="/" forceInactive={desktopMode || isZooming} data-tour="dock-oficina" tooltipPosition="right" />
                         )}
-                        <Tooltip text="Dispositivos">
+                        <Tooltip text="Dispositivos" position="right">
                             <button
                                 className={`${styles.dockItem} ${desktopMode || isZooming ? styles.active : ''}`}
                                 onClick={handleDispositivosClick}
@@ -118,8 +119,8 @@ const Sidebar: React.FC = () => {
                                 <DevicesIcon size={20} />
                             </button>
                         </Tooltip>
-                        <NavigationLink icon={<RedesIcon size={20} />} label="Redes" to="/redes" data-tour="dock-redes" />
-                        <NavigationLink icon={<EstrellaPartidaIcon size={20} />} label="Partida" to="/fases-partida" data-tour="dock-partida" />
+                        <NavigationLink icon={<RedesIcon size={20} />} label="Redes" to="/redes" data-tour="dock-redes" tooltipPosition="right" />
+                        <NavigationLink icon={<EstrellaPartidaIcon size={20} />} label="Partida" to="/fases-partida" data-tour="dock-partida" tooltipPosition="right" />
                     </div>
 
                     <div className={styles.spacer} />
@@ -129,7 +130,7 @@ const Sidebar: React.FC = () => {
                             {formatearTiempo(tiempoTranscurrido)}
                         </div>
 
-                        <Tooltip text={isPaused ? 'Reanudar' : 'Pausar'}>
+                        <Tooltip text={isPaused ? 'Reanudar' : 'Pausar'} position="right">
                             <button
                                 className={styles.controlBtn}
                                 onClick={() => { if (isPaused) resume(); else pause(); }}
@@ -149,7 +150,7 @@ const Sidebar: React.FC = () => {
                         </Tooltip>
 
                         <div className={styles.chatWrapper}>
-                            <Tooltip text="Chatbot">
+                            <Tooltip text="Chatbot" position="right">
                                 <button
                                     className={`${styles.chatBtn} ${isChatOpen ? styles.chatActive : ''}`}
                                     onClick={() => toggleChat()}
@@ -165,15 +166,17 @@ const Sidebar: React.FC = () => {
                         </div>
                     </div>
                 </nav>
-                <Tooltip text="Salir">
-                    <button className={styles.exitBtn} onClick={handleExitClick}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            <polyline points="16 17 21 12 16 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            <line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                    </button>
-                </Tooltip>
+                <div className={styles.exitWrapper}>
+                    <Tooltip text="Salir" position="right">
+                        <button className={styles.exitBtn} onClick={handleExitClick}>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                <polyline points="16 17 21 12 16 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                <line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                        </button>
+                    </Tooltip>
+                </div>
             </div>
         </>
     );

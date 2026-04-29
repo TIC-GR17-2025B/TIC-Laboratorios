@@ -61,6 +61,7 @@ export type UserRole = "estudiante" | "profesor";
 export interface UseAuthReturn {
   loading: boolean;
   error: string | null;
+  clearError: () => void;
   registerEstudiante: (data: RegisterEstudianteData) => Promise<AuthResponse | null>;
   registerProfesor: (data: RegisterProfesorData) => Promise<AuthResponse | null>;
   login: (data: LoginData) => Promise<AuthResponse | null>;
@@ -73,7 +74,9 @@ export interface UseAuthReturn {
 }
 
 export const useAuth = (): UseAuthReturn => {
-  const { loading, error, runAsync } = useAsyncState();
+  const { loading, error, runAsync, setError } = useAsyncState();
+
+  const clearError = () => setError(null);
 
   const registerEstudiante = (data: RegisterEstudianteData) =>
     runAsync(async () => {
@@ -174,6 +177,7 @@ export const useAuth = (): UseAuthReturn => {
   return {
     loading,
     error,
+    clearError,
     registerEstudiante,
     registerProfesor,
     login,

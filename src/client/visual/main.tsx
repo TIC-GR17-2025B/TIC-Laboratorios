@@ -27,6 +27,7 @@ import VistaFasesPartida from './features/escenarios-simulados/pages/VistaFasesP
 import { FasesProvider } from './features/escenarios-simulados/contexts/FasesContext.tsx'
 import VistaSeleccionNiveles from './features/escenarios-simulados/pages/VistaSeleccionNiveles.tsx'
 import TutorialTour from './features/escenarios-simulados/components/TutorialTour.tsx'
+import EventLogsPanel from './features/escenarios-simulados/components/EventLogsPanel.tsx'
 import VerificarEmail from './features/admin-docente-y-estudiante/pages/VerificarEmail.tsx'
 import ConfirmarEmail from './features/admin-docente-y-estudiante/pages/ConfirmarEmail.tsx'
 import RecuperarContrasenia from './features/admin-docente-y-estudiante/pages/RecuperarContrasenia.tsx'
@@ -62,6 +63,7 @@ function GameProvidersLayout() {
                   <div className="content">
                     <Outlet />
                     <TarjetaLogNuevo />
+                    <EventLogsPanel />
                   </div>
                 </ScreenTransitionProvider>
               </ECSSceneProvider>
