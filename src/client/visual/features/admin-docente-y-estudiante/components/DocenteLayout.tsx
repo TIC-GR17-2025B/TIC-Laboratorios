@@ -12,7 +12,9 @@ export default function DocenteLayout() {
       transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
     >
       <DocenteHeader />
-      <Outlet />
+      <div className={styles.content}>
+        <Outlet />
+      </div>
     </motion.div>
   );
 }

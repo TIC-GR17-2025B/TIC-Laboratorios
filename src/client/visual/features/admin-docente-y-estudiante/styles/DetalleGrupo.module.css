@@ -2,6 +2,7 @@
 
 .layout {
   display: flex;
+  flex-direction: column;
   flex: 1;
   min-height: 0;
   max-width: var(--content-width);
@@ -9,46 +10,58 @@
   width: 100%;
 }
 
-.sidebar {
-  width: 200px;
-  flex-shrink: 0;
-  border-right: 1px solid var(--border-primary);
-  padding: 16px 0;
-}
+/* ── Tab bar ── */
 
-.sidebarNav {
-  display: flex;
-  flex-direction: column;
+.tabBar {
+  display: inline-flex;
+  align-items: center;
   gap: 2px;
-  padding: 0 8px;
+  padding: 3px;
+  border-radius: 8px;
+  background: var(--surface-secondary);
+  border: 1px solid var(--border-primary);
+  margin-bottom: 24px;
 }
 
-.navItem {
+.tabIndicator {
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  background: var(--surface-tertiary);
+  pointer-events: none;
+}
+
+.tabLabel {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
+  gap: 6px;
+  position: relative;
+  z-index: 1;
+}
+
+.tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
   border-radius: 6px;
-  color: var(--text-muted);
-  background: transparent;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  background: transparent !important;
   cursor: pointer;
-  transition:
-    color 0.1s,
-    background 0.1s;
-  border-left: 2px solid transparent;
-  border-radius: 0;
-  justify-content: flex-start;
+  transition: color 0.2s ease;
+  white-space: nowrap;
 }
 
-.navItem:hover {
+.tab:hover {
   color: var(--text-primary);
-  background: none !important;
+  background: transparent !important;
 }
 
-.navItemActive {
+.tabActive {
   color: var(--text-primary);
-  border-left-color: var(--blue);
-  background: transparent;
 }
 
 /* ── Main content ── */
@@ -56,7 +69,7 @@
 .main {
   flex: 1;
   min-width: 0;
-  padding: 32px 0px 32px 40px;
+  padding: 32px 0px;
 }
 
 /* ── Panel header ── */
@@ -102,12 +115,15 @@
 .studentList {
   display: flex;
   flex-direction: column;
+  border: 1px solid var(--border-primary);
+  border-radius: 6px;
+  overflow: hidden;
 }
 
 .studentRow {
   display: flex;
   align-items: center;
-  padding: 10px 0;
+  padding: 10px 14px;
   border-bottom: 1px solid var(--border-primary);
   transition: background 0.1s;
 }
@@ -218,6 +234,7 @@
 
 .renameRow > *:first-child {
   flex: 1;
+  max-width: 400px;
 }
 
 .renameButton {
@@ -281,17 +298,18 @@
 }
 
 .dangerButton {
-  background: transparent;
+  background: rgba(255, 107, 107, 0.05);
   border: 1px solid rgba(255, 107, 107, 0.2);
   color: #ff6b6b;
   padding: 6px 14px;
   border-radius: 6px;
   gap: 6px;
   flex-shrink: 0;
+  transition: background 0.15s ease !important;
 }
 
 .dangerButton:hover {
-  background: rgba(255, 107, 107, 0.06);
+  background: rgba(255, 107, 107, 0.1) !important;
 }
 
 /* ── Utility ── */

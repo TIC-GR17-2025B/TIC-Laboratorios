@@ -1,65 +1,32 @@
 .analysisButton {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.625rem 1.25rem;
-  background: linear-gradient(135deg, var(--blue), #667eea);
-  color: var(--text-primary);
-  border: none;
-  border-radius: var(--border-radius);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: 500;
-  font-size: 0.875rem;
-  box-shadow: 0 2px 8px rgba(86, 120, 248, 0.2);
+  font-size: 14px;
+  font-weight: 400;
 }
 
-.analysisButton:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(86, 120, 248, 0.4);
-  background: linear-gradient(135deg, #5678f8, #7b8ff0);
+.label {
+  color: transparent !important;
+  background: linear-gradient(90deg, #9ca3af 25%, #e5e7eb 50%, #9ca3af 75%);
+  background-size: 400px 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: shimmerText 2s linear infinite;
 }
 
-.analysisButton:active:not(:disabled) {
-  transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(86, 120, 248, 0.3);
-}
-
-.analysisButton:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.analysisButton svg {
-  flex-shrink: 0;
+@keyframes shimmerText {
+  0% { background-position: -200px 0; }
+  100% { background-position: 200px 0; }
 }
 
 .spinner {
   width: 16px;
   height: 16px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: white;
+  border: 2px solid var(--text-secondary);
+  border-top-color: var(--text-primary);
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
   flex-shrink: 0;
 }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .analysisButton {
-    padding: 0.5rem 1rem;
-    font-size: 0.813rem;
-  }
-
-  .analysisButton svg {
-    width: 16px;
-    height: 16px;
-  }
+  to { transform: rotate(360deg); }
 }

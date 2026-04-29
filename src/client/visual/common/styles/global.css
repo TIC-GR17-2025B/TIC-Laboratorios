@@ -8,9 +8,9 @@
   --border-primary: #393939;
   --border-radius: 8px;
   --content-width: 1200px;
-  --blue: #417dff;
+  --blue: #5a8fff;
   --blue-lighter: #7694cd;
-  --blue-transparent: #417dff22;
+  --blue-transparent: #5a8fff22;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -168,7 +168,7 @@ body.context-mode-active [data-context]::before {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(65, 125, 255, 0.2),
+    rgba(90, 143, 255, 0.2),
     transparent
   );
   pointer-events: none;
@@ -227,7 +227,7 @@ body.context-mode-active [data-context]:hover::after {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(65, 125, 255, 0.2),
+    rgba(90, 143, 255, 0.2),
     transparent
   );
   pointer-events: none;
@@ -243,7 +243,9 @@ body.context-mode-active [data-context]:hover::after {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
@@ -255,7 +257,7 @@ body.context-mode-active [data-context]:hover::after {
 .IaActivo {
   border-color: var(--blue);
   box-shadow:
-    0 4px 16px rgba(65, 125, 255, 0.3),
+    0 4px 16px rgba(90, 143, 255, 0.3),
     0 2px 8px rgba(0, 0, 0, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }

@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { Trash2, Users, BarChart3, Settings, PenSquareIcon } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useAuth } from '../hooks/useAuth';
 import { useGroups, type Estudiante, type Grupo } from '../hooks/useGroups';
-import CodigoInvitacion from '../components/CodigoInvitacion';
+import InvitationCode from '../../../common/components/InvitationCode';
 import SearchBar from '../../../common/components/SearchBar';
 import TextInput from '../../../common/components/TextInput';
 import { CourseAnalysisButton } from '../../course-analysis/components/CourseAnalysisButton';
@@ -13,6 +14,8 @@ import type { CourseAnalysisResponse } from '../../course-analysis/types/courseA
 import styles from '../styles/DetalleGrupo.module.css';
 import Breadcrumb from '../components/Breadcrumb';
 import Identicon from '../../../common/components/Identicon';
+import GroupInsights from '../components/GroupInsights';
+import { useGroupInsights } from '../hooks/useGroupInsights';
 
 type Tab = 'students' | 'analysis' | 'settings';
 
@@ -36,6 +39,10 @@ export default function DetalleGrupo() {
   const [isCheckingAnalysis, setIsCheckingAnalysis] = useState(false);
   const [analysis, setAnalysis] = useState<CourseAnalysisResponse | null>(null);
   const { checkLatestAnalysis } = useGenerateCourseAnalysis();
+  const insights = useGroupInsights(grupo?.id_curso ?? null);
+
+
+
 
   useEffect(() => {
     const loadGrupo = async () => {
@@ -150,17 +157,24 @@ export default function DetalleGrupo() {
   return (
     <>
       <div className={styles.layout}>
-        <aside className={styles.sidebar}>
-          <nav className={styles.sidebarNav}>
+        <main className={styles.main}>
+          <Breadcrumb items={[
+            { label: 'Mis Cursos', to: '/docente' },
+            { label: grupo.nombre },
+          ]} />
+
+          <nav className={styles.tabBar}>
             <button
-              className={`${styles.navItem} ${activeTab === 'students' ? styles.navItemActive : ''}`}
+              className={`${styles.tab} ${activeTab === 'students' ? styles.tabActive : ''}`}
               onClick={() => setActiveTab('students')}
             >
-              <Users size={18} />
-              Curso
+              {activeTab === 'students' && (
+                <motion.div className={styles.tabIndicator} layoutId="detalle-tab" transition={{ type: 'spring', duration: 0.35, bounce: 0.15 }} />
+              )}
+              <span className={styles.tabLabel}><Users size={16} /> Curso</span>
             </button>
             <button
-              className={`${styles.navItem} ${activeTab === 'analysis' ? styles.navItemActive : ''}`}
+              className={`${styles.tab} ${activeTab === 'analysis' ? styles.tabActive : ''}`}
               onClick={async () => {
                 setActiveTab('analysis');
                 if (grupo && !analysis) {
@@ -173,24 +187,21 @@ export default function DetalleGrupo() {
                 }
               }}
             >
-              <BarChart3 size={18} />
-              Análisis
+              {activeTab === 'analysis' && (
+                <motion.div className={styles.tabIndicator} layoutId="detalle-tab" transition={{ type: 'spring', duration: 0.35, bounce: 0.15 }} />
+              )}
+              <span className={styles.tabLabel}><BarChart3 size={16} /> Análisis</span>
             </button>
             <button
-              className={`${styles.navItem} ${activeTab === 'settings' ? styles.navItemActive : ''}`}
+              className={`${styles.tab} ${activeTab === 'settings' ? styles.tabActive : ''}`}
               onClick={() => setActiveTab('settings')}
             >
-              <Settings size={18} />
-              Configuración
+              {activeTab === 'settings' && (
+                <motion.div className={styles.tabIndicator} layoutId="detalle-tab" transition={{ type: 'spring', duration: 0.35, bounce: 0.15 }} />
+              )}
+              <span className={styles.tabLabel}><Settings size={16} /> Configuración</span>
             </button>
           </nav>
-        </aside>
-
-        <main className={styles.main}>
-          <Breadcrumb items={[
-            { label: 'Mis Cursos', to: '/docente' },
-            { label: grupo.nombre },
-          ]} />
           {/* ── Students tab ── */}
           {activeTab === 'students' && (
             <>
@@ -257,6 +268,8 @@ export default function DetalleGrupo() {
                 <h2 className={styles.panelTitle}>Análisis del curso</h2>
               </div>
 
+              <GroupInsights data={insights} groupName={grupo.nombre} />
+
               {!analysis ? (
                 isCheckingAnalysis ? (
                   <div className={styles.analysisPanel} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1rem', padding: '3rem' }}>
@@ -317,9 +330,11 @@ export default function DetalleGrupo() {
               </div>
 
               <div className={styles.settingsSection}>
-                <CodigoInvitacion
-                  codigo={grupo.codigo_acceso}
-                  onGenerate={handleGenerateCode}
+                <InvitationCode
+                  mode="display"
+                  code={grupo.codigo_acceso}
+                  label="Código de invitación"
+                  onRegenerate={async () => { await handleGenerateCode(); }}
                 />
               </div>
 
