@@ -33,6 +33,7 @@ describe("Auth Extra UseCases", () => {
       confirmUsuarioAuth: vi.fn(),
       findUsuarioAuthByEmail: vi.fn(),
       updateTokenRecuperacion: vi.fn(),
+      updateTokenConfirmacion: vi.fn(),
       findEstudianteByUsuarioAuth: vi.fn(),
       findProfesorByUsuarioAuth: vi.fn()
     }
