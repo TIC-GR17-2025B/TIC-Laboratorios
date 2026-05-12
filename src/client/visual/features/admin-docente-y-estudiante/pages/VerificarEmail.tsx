@@ -53,7 +53,8 @@ const VerificarEmail = () => {
                     <p className={styles.subtitle} style={{ margin: '0 0 8px 0', lineHeight: 1.6 }}>
                         Enviamos un enlace de verificacion a{' '}
                         <span style={{ color: '#e0e0e0' }}>{email}</span>.
-                        Revisa tu bandeja de entrada y haz clic en el enlace para activar tu cuenta.
+                        Revisa tu bandeja de entrada y haz clic en el enlace para activar tu cuenta.<br/>
+                        <span style={{ color: '#F9FF8C' }}>Chequea tu bandeja de spam en caso de no encontrarlo en la principal.</span>
                     </p>
 
                     {sent && (

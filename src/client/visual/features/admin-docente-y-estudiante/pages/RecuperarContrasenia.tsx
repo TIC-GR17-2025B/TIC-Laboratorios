@@ -80,7 +80,7 @@ const RecuperarContrasenia = () => {
                         <p className={styles.subtitle} style={{ margin: '0 0 8px 0', lineHeight: 1.6 }}>
                             Si existe una cuenta con{' '}
                             <span style={{ color: '#e0e0e0' }}>{email}</span>,
-                            recibirás un enlace para restablecer tu contraseña. Revisa tu bandeja de entrada.
+                            recibirás un enlace para restablecer tu contraseña. <span style={{ color: '#F9FF8C' }}>Revisa tu bandeja de entrada o de spam.</span>.
                         </p>
                     </div>
                 )}
