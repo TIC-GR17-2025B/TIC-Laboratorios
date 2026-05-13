@@ -18,6 +18,7 @@ export interface IAuthRepository {
   findEstudianteByUsuarioAuth(id_usuario_auth: number): Promise<Estudiante | null>
   findEstudianteById(id_estudiante: number): Promise<Estudiante | null>
   findEstudiantesByProfesor(id_profesor: number): Promise<EstudiantePublic[]>
+  findEstudianteByCodigoUnico(codigo_unico: number): Promise<Estudiante | null>
   
 
   createProfesor(data: ProfesorInput & { id_usuario_auth: number }): Promise<Profesor>

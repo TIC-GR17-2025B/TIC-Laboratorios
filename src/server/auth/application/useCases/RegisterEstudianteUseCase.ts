@@ -27,6 +27,12 @@ export class RegisterEstudianteUseCase {
       throw new Error('El correo electrónico ya está registrado')
     }
 
+    //verificar si el codigo_unico ya existe
+    const existingCodigo = await this.repo.findEstudianteByCodigoUnico(payload.codigo_unico)
+    if (existingCodigo) {
+      throw new Error('El código único ya está registrado')
+    }
+
     // Hash de la contraseña
     const contrasenia_hash = await bcrypt.hash(payload.contrasenia, 10)
 

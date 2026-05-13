@@ -165,6 +165,13 @@ export class PrismaAuthRepository implements IAuthRepository {
     return estudiantes as EstudiantePublic[]
   }
 
+  async findEstudianteByCodigoUnico(codigo_unico: number): Promise<Estudiante | null> {
+    const found = await prisma.estudiante.findUnique({
+      where: { codigo_unico }
+    })
+    return found as Estudiante | null
+  }
+
   // Profesor
 
   async createProfesor(data: ProfesorInput & { id_usuario_auth: number }): Promise<Profesor> {
