@@ -28,7 +28,8 @@ describe("Register UseCases", () => {
             findUsuarioAuthByEmail: vi.fn(),
             createUsuarioAuth: vi.fn(),
             createEstudiante: vi.fn(),
-            createProfesor: vi.fn()
+            createProfesor: vi.fn(),
+            findEstudianteByCodigoUnico: vi.fn(),
         }
 
         emailService = {

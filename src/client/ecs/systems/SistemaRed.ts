@@ -42,32 +42,6 @@ export class SistemaRed extends Sistema {
     super();
   }
 
-  /*
-  enviarActivo(
-    entidadEmisora: Entidad,
-    entidadReceptora: Entidad,
-    nombreActivo: string
-  ): void {
-    //encontrar el activo en el emisor por su id
-    const activoAEnviar = this.ecsManager
-      .getComponentes(entidadEmisora)
-      ?.get(ActivoComponent)
-      ?.activos.find((a) => a.nombre === nombreActivo);
-
-    // quitar el activo del emisor
-    this.ecsManager
-      .getComponentes(entidadEmisora)
-      ?.get(ActivoComponent)
-      ?.activos.filter((a) => a.nombre !== nombreActivo);
-
-    // agregar el activo al receptor
-    this.ecsManager
-      .getComponentes(entidadReceptora)
-      ?.get(ActivoComponent)
-      ?.activos.push(activoAEnviar!);
-  }
- */
-
   // Inicializa servicios de forma lazy (solo la primera vez que se accede)
   private getEventoService(): EventoRedService {
     if (!this.eventoService) {

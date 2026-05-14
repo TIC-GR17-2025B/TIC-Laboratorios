@@ -26,6 +26,7 @@ export default defineConfig(({ mode }) => {
         exclude: [
           '**/EscenarioController.ts',
           '**/ProgresoController.ts',
+          '**/RedController.ts',
           '**/ScenarioBuilder.ts',
           '**/FirewallBuilder.ts',
           '**/apiConfig.ts',
