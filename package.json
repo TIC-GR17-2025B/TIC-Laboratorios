@@ -11,7 +11,7 @@
     "build:server": "tsc --project tsconfig.server.json",
     "build:all": "npm run build && npm run build:server",
     "postinstall": "prisma generate",
-    "preview": "vite preview",
+    "preview": "vite preview --host",
     "start": "node dist/server/server/server.js",
     "start:all": "concurrently \"npm run preview\" \"npm run start\"",
     "lint": "eslint .",
