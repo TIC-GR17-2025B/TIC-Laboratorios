@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef, type CSSProperties } from "react";
+import { useState, useEffect, useLayoutEffect, useCallback, useRef, type CSSProperties } from "react";
 import { useNavigate, useLocation } from "react-router";
 import { useECSSceneContext } from "../context/ECSSceneContext";
 import { useChatContext } from "../../chat/context/ChatContext";
@@ -15,36 +15,47 @@ interface TourStep {
 }
 
 const GAP = 12;
+// Margen mínimo entre el tooltip y el borde de la ventana
+const VIEWPORT_MARGIN = 12;
+
+const clamp = (value: number, min: number, max: number) =>
+  Math.min(Math.max(value, min), max);
 
 function getTooltipPosition(
   rect: DOMRect | null,
-  placement: TourStep["placement"]
+  placement: TourStep["placement"],
+  size: { width: number; height: number }
 ): CSSProperties {
   if (!rect || placement === "center") return {};
-  const pos: CSSProperties = {};
+
+  let left = 0;
+  let top = 0;
   switch (placement) {
     case "top":
-      pos.left = rect.left + rect.width / 2;
-      pos.bottom = window.innerHeight - rect.top + GAP;
-      pos.transform = "translateX(-50%)";
+      left = rect.left + rect.width / 2 - size.width / 2;
+      top = rect.top - GAP - size.height;
       break;
     case "bottom":
-      pos.left = rect.left + rect.width / 2;
-      pos.top = rect.bottom + GAP;
-      pos.transform = "translateX(-50%)";
+      left = rect.left + rect.width / 2 - size.width / 2;
+      top = rect.bottom + GAP;
       break;
     case "left":
-      pos.right = window.innerWidth - rect.left + GAP;
-      pos.top = rect.top + rect.height / 2;
-      pos.transform = "translateY(-50%)";
+      left = rect.left - GAP - size.width;
+      top = rect.top + rect.height / 2 - size.height / 2;
       break;
     case "right":
-      pos.left = rect.right + GAP;
-      pos.top = rect.top + rect.height / 2;
-      pos.transform = "translateY(-50%)";
+      left = rect.right + GAP;
+      top = rect.top + rect.height / 2 - size.height / 2;
       break;
   }
-  return pos;
+
+  // Acotar al viewport para que el tooltip nunca se salga ni se corte
+  const maxLeft = window.innerWidth - size.width - VIEWPORT_MARGIN;
+  const maxTop = window.innerHeight - size.height - VIEWPORT_MARGIN;
+  return {
+    left: clamp(left, VIEWPORT_MARGIN, Math.max(VIEWPORT_MARGIN, maxLeft)),
+    top: clamp(top, VIEWPORT_MARGIN, Math.max(VIEWPORT_MARGIN, maxTop)),
+  };
 }
 
 export default function TutorialTour() {
@@ -56,6 +67,8 @@ export default function TutorialTour() {
   const [active, setActive] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
+  const [tooltipSize, setTooltipSize] = useState({ width: 0, height: 0 });
+  const tooltipRef = useRef<HTMLDivElement>(null);
   const wasPausedBeforeTour = useRef(false);
   const prevStepRef = useRef(-1);
 
@@ -227,6 +240,19 @@ export default function TutorialTour() {
     };
   }, [active, step.target, location.pathname]);
 
+  // Medir el tooltip para poder acotarlo al viewport (antes del paint, sin parpadeo)
+  useLayoutEffect(() => {
+    if (!active || isCentered) return;
+    const el = tooltipRef.current;
+    if (!el) return;
+    const { offsetWidth, offsetHeight } = el;
+    setTooltipSize((prev) =>
+      prev.width === offsetWidth && prev.height === offsetHeight
+        ? prev
+        : { width: offsetWidth, height: offsetHeight }
+    );
+  }, [active, isCentered, stepIndex, targetRect]);
+
   if (!active) return null;
 
   const tooltipClass = isCentered
@@ -249,7 +275,11 @@ export default function TutorialTour() {
         />
       )}
 
-      <div className={tooltipClass} style={isCentered ? {} : getTooltipPosition(targetRect, step.placement)}>
+      <div
+        ref={tooltipRef}
+        className={tooltipClass}
+        style={isCentered ? {} : getTooltipPosition(targetRect, step.placement, tooltipSize)}
+      >
         <div className={s.header}>
           <h3 className={s.title}>{step.title}</h3>
           <button className={s.closeButton} onClick={close} aria-label="Cerrar tour">

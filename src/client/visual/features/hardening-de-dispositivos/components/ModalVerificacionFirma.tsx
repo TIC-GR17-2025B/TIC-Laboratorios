@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import styles from "../styles/ModalVerificacionFirma.module.css";
 import DocumentIcon from "../../../common/icons/DocumentIcon";
 import KeyIcon from "../../../common/icons/KeyIcon";
@@ -8,8 +8,11 @@ import { EscenarioController } from "../../../../ecs/controllers/EscenarioContro
 import { ActivoComponent } from "../../../../ecs/components";
 import type { Activo } from "../../../../shared/types/EscenarioTypes";
 import { TipoActivo } from "../../../../shared/types/DeviceEnums";
+import { ArrowLeft, ArrowRight, ArrowUp, RotateCw, ChevronRight } from "lucide-react";
 
 type Paso = 1 | 2 | 3 | 4;
+
+/* ── Icons ── */
 
 function FolderSmallIcon() {
     return (
@@ -30,28 +33,83 @@ function ComputerSmallIcon() {
     );
 }
 
-function KeyFileIcon() {
-    return (
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" />
-        </svg>
-    );
+function FileIcon({ tipo }: { tipo: TipoActivo }) {
+    switch (tipo) {
+        case TipoActivo.DOCUMENTO:
+            return (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4cc2ff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                    <line x1="8" y1="13" x2="16" y2="13" />
+                    <line x1="8" y1="17" x2="16" y2="17" />
+                </svg>
+            );
+        case TipoActivo.FIRMA_DIGITAL:
+            return (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                    <path d="M9 15l2 2 4-4" />
+                </svg>
+            );
+        case TipoActivo.CLAVE_PUBLICA:
+            return (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" />
+                </svg>
+            );
+        default:
+            return (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9e9e9e" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                </svg>
+            );
+    }
 }
 
-function DocFileIcon() {
-    return (
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-            <polyline points="14 2 14 8 20 8" />
-            <line x1="8" y1="13" x2="16" y2="13" />
-            <line x1="8" y1="17" x2="16" y2="17" />
-        </svg>
-    );
+/* ── Helpers ── */
+
+const extensiones: Record<string, string> = {
+    [TipoActivo.DOCUMENTO]: ".doc",
+    [TipoActivo.FIRMA_DIGITAL]: ".sig",
+    [TipoActivo.CLAVE_PUBLICA]: ".pub",
+    [TipoActivo.GENERICO]: ".txt",
+};
+
+const tipoLabels: Record<string, string> = {
+    [TipoActivo.DOCUMENTO]: "Documento",
+    [TipoActivo.FIRMA_DIGITAL]: "Firma digital",
+    [TipoActivo.CLAVE_PUBLICA]: "Clave pública",
+    [TipoActivo.GENERICO]: "Archivo",
+};
+
+const pesoBasePorTipo: Record<string, number> = {
+    [TipoActivo.DOCUMENTO]: 4096,
+    [TipoActivo.FIRMA_DIGITAL]: 2048,
+    [TipoActivo.CLAVE_PUBLICA]: 1024,
+    [TipoActivo.GENERICO]: 512,
+};
+
+function getExtension(tipo: TipoActivo): string {
+    return extensiones[tipo] ?? ".txt";
+}
+
+function getTipoLabel(tipo: TipoActivo): string {
+    return tipoLabels[tipo] ?? "Archivo";
+}
+
+function tieneExtension(nombre: string): boolean {
+    return /\.\w{2,5}$/.test(nombre);
 }
 
 function calcularTamanio(activo: Activo): string {
-    const bytes = (activo.contenido?.length ?? 0) * 2 + (activo.nombre.length * 2) + 128;
-    if (bytes < 1024) return `${bytes} B`;
+    const tipo = activo.tipo ?? TipoActivo.GENERICO;
+    const base = pesoBasePorTipo[tipo] ?? 512;
+    const contenido = (activo.contenido?.length ?? 0) * 2;
+    const nombre = activo.nombre.length * 2;
+    const bytes = base + contenido + nombre;
+    if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
     return `${(bytes / 1024).toFixed(1)} KB`;
 }
 
@@ -63,6 +121,177 @@ const FP_SIDEBAR_FOLDERS = [
     { id: "musica", label: "Música" },
     { id: "videos", label: "Videos" },
 ];
+
+/* ── Draggable File Picker ── */
+
+interface FilePickerItem {
+    id: string;
+    nombre: string;
+    activo: Activo;
+}
+
+interface FilePickerProps {
+    items: FilePickerItem[];
+    selectedItem: FilePickerItem | null;
+    onSelect: (item: FilePickerItem) => void;
+    onConfirm: () => void;
+    placeholder: string;
+    emptyMessage: string;
+    confirmDisabled: boolean;
+}
+
+function FilePicker({ items, selectedItem, onSelect, onConfirm, placeholder, emptyMessage, confirmDisabled }: FilePickerProps) {
+    const [pos, setPos] = useState({ x: 0, y: 0 });
+    const dragState = useRef({ startX: 0, startY: 0, startPosX: 0, startPosY: 0 });
+
+    const handleDragStart = (e: React.MouseEvent) => {
+        e.preventDefault();
+        dragState.current = {
+            startX: e.clientX,
+            startY: e.clientY,
+            startPosX: pos.x,
+            startPosY: pos.y,
+        };
+
+        const handleMouseMove = (ev: MouseEvent) => {
+            const { startX, startY, startPosX, startPosY } = dragState.current;
+            setPos({
+                x: startPosX + (ev.clientX - startX),
+                y: startPosY + (ev.clientY - startY),
+            });
+        };
+
+        const handleMouseUp = () => {
+            document.removeEventListener("mousemove", handleMouseMove);
+            document.removeEventListener("mouseup", handleMouseUp);
+        };
+
+        document.addEventListener("mousemove", handleMouseMove);
+        document.addEventListener("mouseup", handleMouseUp);
+    };
+
+    const selectedNombre = selectedItem
+        ? (tieneExtension(selectedItem.nombre) ? selectedItem.nombre : `${selectedItem.nombre}${getExtension(selectedItem.activo.tipo ?? TipoActivo.GENERICO)}`)
+        : "";
+
+    return (
+        <div className={styles.filePicker} style={{ transform: `translate(${pos.x}px, ${pos.y}px)` }}>
+            <div className={styles.fpAddressBar} onMouseDown={handleDragStart}>
+                <div className={styles.fpNavButtons}>
+                    <span className={styles.fpNavBtn}><ArrowLeft size={16} /></span>
+                    <span className={styles.fpNavBtn}><ArrowRight size={16} /></span>
+                    <span className={styles.fpNavBtn}><ArrowUp size={16} /></span>
+                    <span className={styles.fpNavBtn}><RotateCw size={14} /></span>
+                </div>
+                <div className={styles.fpAddressPath}>
+                    <ComputerSmallIcon />
+                    <ChevronRight size={14} className={styles.fpAddressSep} />
+                    <span>Documentos</span>
+                    <ChevronRight size={14} className={styles.fpAddressSep} />
+                </div>
+            </div>
+
+            <div className={styles.fpBody}>
+                <div className={styles.fpSidebar}>
+                    <div className={styles.fpSidebarSection}>
+                        <div className={styles.fpSidebarItem}>
+                            <ComputerSmallIcon />
+                            <span>Este PC</span>
+                        </div>
+                    </div>
+                    <div className={styles.fpSidebarSection}>
+                        {FP_SIDEBAR_FOLDERS.map(folder => (
+                            <div
+                                key={folder.id}
+                                className={`${styles.fpSidebarItem} ${folder.id === "documentos" ? styles.fpSidebarItemActive : ""}`}
+                            >
+                                <FolderSmallIcon />
+                                <span>{folder.label}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <div className={styles.fpFilePanel}>
+                    {items.length === 0 ? (
+                        <div className={styles.fpEmpty}>
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="#9e9e9e" opacity="0.25">
+                                <path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
+                            </svg>
+                            <p>{emptyMessage}</p>
+                        </div>
+                    ) : (
+                        <>
+                            <div className={styles.fpColumnHeaders}>
+                                <span className={styles.fpColNombre}>Nombre</span>
+                                <span className={styles.fpColTipo}>Tipo</span>
+                                <span className={styles.fpColTamanio}>Tamaño</span>
+                            </div>
+                            <div className={styles.fpFileList}>
+                                {items.map((item) => {
+                                    const tipo = item.activo.tipo ?? TipoActivo.GENERICO;
+                                    return (
+                                        <div
+                                            key={item.id}
+                                            className={`${styles.fpFileItem} ${selectedItem?.id === item.id ? styles.fpFileItemSelected : ""}`}
+                                            onClick={() => onSelect(item)}
+                                        >
+                                            <span className={styles.fpColNombre}>
+                                                <FileIcon tipo={tipo} />
+                                                <span className={styles.fpFileName}>
+                                                    {item.nombre}{!tieneExtension(item.nombre) && <span className={styles.fpExtension}>{getExtension(tipo)}</span>}
+                                                </span>
+                                            </span>
+                                            <span className={styles.fpColTipo}>{getTipoLabel(tipo)}</span>
+                                            <span className={styles.fpColTamanio}>{calcularTamanio(item.activo)}</span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </>
+                    )}
+                </div>
+
+                <div className={styles.fpPreview}>
+                    {selectedItem ? (
+                        <div className={styles.fpPreviewContent}>
+                            <div className={styles.fpPreviewCard}>
+                                <pre>{selectedItem.activo.contenido ?? "Sin contenido"}</pre>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className={styles.fpPreviewEmpty}>
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="#9e9e9e" opacity="0.2">
+                                <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13z" />
+                            </svg>
+                            <p>Selecciona un archivo</p>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            <div className={styles.fpFooter}>
+                <span className={styles.fpFooterLabel}>Nombre:</span>
+                <input
+                    className={styles.fpFooterInput}
+                    type="text"
+                    readOnly
+                    value={selectedNombre}
+                    placeholder={placeholder}
+                />
+                <button
+                    className={styles.fpFooterBtn}
+                    onClick={onConfirm}
+                    disabled={confirmDisabled}
+                >
+                    Abrir
+                </button>
+            </div>
+        </div>
+    );
+}
+
+/* ── Interfaces ── */
 
 interface ClavePublica {
     id: string;
@@ -76,8 +305,10 @@ interface DocumentoDisponible {
     activo: Activo;
 }
 
+/* ── Main Component ── */
+
 function ModalVerificacionFirma() {
-    const { dispositivoSeleccionado, entidadSeleccionadaId } = useEscenario();
+    const { entidadSeleccionadaId } = useEscenario();
     const { redController } = useECSSceneContext();
     const [pasoActual, setPasoActual] = useState<Paso>(1);
     const [documentosDisponibles, setDocumentosDisponibles] = useState<DocumentoDisponible[]>([]);
@@ -92,13 +323,11 @@ function ModalVerificacionFirma() {
     const [filePickerAbierto, setFilePickerAbierto] = useState(false);
     const [filePickerClaveAbierto, setFilePickerClaveAbierto] = useState(false);
 
-    // Cargar firma cifrada y claves públicas del dispositivo seleccionado desde el ECS
     useEffect(() => {
         if (!entidadSeleccionadaId || !redController) {
             return;
         }
 
-        // Obtener el ActivoComponent directamente del ECS
         const activoComponent = redController.ecsManager.getComponentes(entidadSeleccionadaId)?.get(ActivoComponent);
 
         if (!activoComponent?.activos || activoComponent.activos.length === 0) {
@@ -111,7 +340,6 @@ function ModalVerificacionFirma() {
 
         const activos = activoComponent.activos;
 
-        // Buscar todos los documentos con firma
         const documentos = activos
             .filter((activo) => activo.tipo === TipoActivo.DOCUMENTO && activo.firma)
             .map((activo, index) => ({
@@ -121,15 +349,13 @@ function ModalVerificacionFirma() {
             }));
         setDocumentosDisponibles(documentos);
 
-        // Buscar todas las firmas digitales
         const firmas = activos.filter(
             (activo) => activo.tipo === TipoActivo.FIRMA_DIGITAL
         );
         setFirmasDisponibles(firmas || null);
-        const firma = firmas.find((firma) => firma.tipo === TipoActivo.FIRMA_DIGITAL); // Provisional
+        const firma = firmas.find((firma) => firma.tipo === TipoActivo.FIRMA_DIGITAL);
         setFirmaActivo(firma || null);
 
-        // Obtener todas las claves públicas
         const claves = activos
             .filter((activo) => activo.tipo === TipoActivo.CLAVE_PUBLICA)
             .map((activo, index) => ({
@@ -165,7 +391,6 @@ function ModalVerificacionFirma() {
     const emitirVeredicto = (esValido: boolean) => {
         setVeredicto(esValido ? "valido" : "invalido");
 
-        // Registrar el veredicto en el sistema
         if (documentoSeleccionado && firmaActivo && claveSeleccionada) {
             const escenarioController = EscenarioController.getInstance();
             escenarioController.registrarVeredictoFirma({
@@ -190,7 +415,6 @@ function ModalVerificacionFirma() {
 
     return (
         <div className={styles.contenedor}>
-            {/* Indicador de pasos */}
             <div className={styles.indicadorPasos}>
                 <div className={`${styles.paso} ${pasoActual >= 1 ? styles.pasoActivo : ""}`}>
                     <div className={styles.numeroPaso}>1</div>
@@ -213,7 +437,6 @@ function ModalVerificacionFirma() {
                 </div>
             </div>
 
-            {/* Contenido de los pasos */}
             <div className={styles.contenidoPaso}>
                 {pasoActual === 1 && (
                     <div className={styles.pasoContenido}>
@@ -228,108 +451,15 @@ function ModalVerificacionFirma() {
                                 <p className={styles.paso1Desc}>Abre el explorador de archivos para elegir el documento cuya firma deseas verificar.</p>
                             </div>
                         ) : (
-                        <div className={styles.filePicker}>
-                            {/* Address bar */}
-                            <div className={styles.fpAddressBar}>
-                                <div className={styles.fpNavButtons}>
-                                    <span className={styles.fpNavBtn}>←</span>
-                                    <span className={styles.fpNavBtn}>→</span>
-                                    <span className={styles.fpNavBtn}>↑</span>
-                                </div>
-                                <div className={styles.fpAddressPath}>
-                                    <ComputerSmallIcon />
-                                    <span className={styles.fpAddressSep}>›</span>
-                                    <span>Este PC</span>
-                                    <span className={styles.fpAddressSep}>›</span>
-                                    <span>Documentos</span>
-                                </div>
-                            </div>
-
-                            {/* Body */}
-                            <div className={styles.fpBody}>
-                                {/* Sidebar */}
-                                <div className={styles.fpSidebar}>
-                                    <div className={styles.fpSidebarSection}>
-                                        <div className={styles.fpSidebarItem}>
-                                            <ComputerSmallIcon />
-                                            <span>Este PC</span>
-                                        </div>
-                                    </div>
-                                    <div className={styles.fpSidebarSection}>
-                                        {FP_SIDEBAR_FOLDERS.map(folder => (
-                                            <div
-                                                key={folder.id}
-                                                className={`${styles.fpSidebarItem} ${folder.id === "documentos" ? styles.fpSidebarItemActive : ""}`}
-                                            >
-                                                <FolderSmallIcon />
-                                                <span>{folder.label}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* File list */}
-                                <div className={styles.fpFilePanel}>
-                                    {documentosDisponibles.length === 0 ? (
-                                        <div className={styles.fpEmpty}>
-                                            <svg width="28" height="28" viewBox="0 0 24 24" fill="var(--text-secondary)" opacity="0.25">
-                                                <path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
-                                            </svg>
-                                            <p>No hay documentos firmados</p>
-                                        </div>
-                                    ) : (
-                                        documentosDisponibles.map((doc) => (
-                                            <div
-                                                key={doc.id}
-                                                className={`${styles.fpFileItem} ${documentoSeleccionado?.id === doc.id ? styles.fpFileItemSelected : ""}`}
-                                                onClick={() => setDocumentoSeleccionado(doc)}
-                                            >
-                                                <DocFileIcon />
-                                                <span className={styles.fpFileName}>
-                                                    {doc.nombre}<span className={styles.fpExtension}>.doc</span>
-                                                </span>
-                                                <span className={styles.fpFileSize}>{calcularTamanio(doc.activo)}</span>
-                                            </div>
-                                        ))
-                                    )}
-                                </div>
-
-                                {/* Preview */}
-                                <div className={styles.fpPreview}>
-                                    {documentoSeleccionado ? (
-                                        <div className={styles.fpPreviewContent}>
-                                            <pre>{documentoSeleccionado.activo.contenido ?? "Sin contenido"}</pre>
-                                        </div>
-                                    ) : (
-                                        <div className={styles.fpPreviewEmpty}>
-                                            <svg width="28" height="28" viewBox="0 0 24 24" fill="var(--text-secondary)" opacity="0.2">
-                                                <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13z" />
-                                            </svg>
-                                            <p>Selecciona un archivo</p>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Footer */}
-                            <div className={styles.fpFooter}>
-                                <span className={styles.fpFooterLabel}>Nombre:</span>
-                                <input
-                                    className={styles.fpFooterInput}
-                                    type="text"
-                                    readOnly
-                                    value={documentoSeleccionado ? `${documentoSeleccionado.nombre}.doc` : ""}
-                                    placeholder="Selecciona un documento"
-                                />
-                                <button
-                                    className={styles.fpFooterBtn}
-                                    onClick={() => setPasoActual(2)}
-                                    disabled={!documentoSeleccionado}
-                                >
-                                    Abrir
-                                </button>
-                            </div>
-                        </div>
+                            <FilePicker
+                                items={documentosDisponibles}
+                                selectedItem={documentoSeleccionado}
+                                onSelect={setDocumentoSeleccionado}
+                                onConfirm={() => setPasoActual(2)}
+                                placeholder="Selecciona un documento"
+                                emptyMessage="No hay documentos firmados"
+                                confirmDisabled={!documentoSeleccionado}
+                            />
                         )}
                     </div>
                 )}
@@ -380,7 +510,7 @@ function ModalVerificacionFirma() {
                         </h2>
                         <div className={styles.visualizacion}>
                             <div className={styles.inputVisual}>
-                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#9e9e9e" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                                 <span>FIRMA<br />CIFRADA</span>
                             </div>
                             <div className={styles.operador}>+</div>
@@ -390,7 +520,7 @@ function ModalVerificacionFirma() {
                             </div>
                             <div className={styles.flecha}>→</div>
                             <div className={styles.outputVisual}>
-                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 9.9-1" /></svg>
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#9e9e9e" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 9.9-1" /></svg>
                                 <span>HASH<br />EXTRAÍDO</span>
                             </div>
                         </div>
@@ -406,105 +536,22 @@ function ModalVerificacionFirma() {
                                 </button>
                             </div>
                         ) : filePickerClaveAbierto && !claveSeleccionada ? (
-                            <div className={styles.filePicker}>
-                                <div className={styles.fpAddressBar}>
-                                    <div className={styles.fpNavButtons}>
-                                        <span className={styles.fpNavBtn}>←</span>
-                                        <span className={styles.fpNavBtn}>→</span>
-                                        <span className={styles.fpNavBtn}>↑</span>
-                                    </div>
-                                    <div className={styles.fpAddressPath}>
-                                        <ComputerSmallIcon />
-                                        <span className={styles.fpAddressSep}>›</span>
-                                        <span>Este PC</span>
-                                        <span className={styles.fpAddressSep}>›</span>
-                                        <span>Documentos</span>
-                                    </div>
-                                </div>
-                                <div className={styles.fpBody}>
-                                    <div className={styles.fpSidebar}>
-                                        <div className={styles.fpSidebarSection}>
-                                            <div className={styles.fpSidebarItem}>
-                                                <ComputerSmallIcon />
-                                                <span>Este PC</span>
-                                            </div>
-                                        </div>
-                                        <div className={styles.fpSidebarSection}>
-                                            {FP_SIDEBAR_FOLDERS.map(folder => (
-                                                <div
-                                                    key={folder.id}
-                                                    className={`${styles.fpSidebarItem} ${folder.id === "documentos" ? styles.fpSidebarItemActive : ""}`}
-                                                >
-                                                    <FolderSmallIcon />
-                                                    <span>{folder.label}</span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                    <div className={styles.fpFilePanel}>
-                                        {clavesPublicasDisponibles.length === 0 ? (
-                                            <div className={styles.fpEmpty}>
-                                                <svg width="28" height="28" viewBox="0 0 24 24" fill="var(--text-secondary)" opacity="0.25">
-                                                    <path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
-                                                </svg>
-                                                <p>No hay claves públicas</p>
-                                            </div>
-                                        ) : (
-                                            clavesPublicasDisponibles.map((clave) => (
-                                                <div
-                                                    key={clave.id}
-                                                    className={`${styles.fpFileItem} ${claveSeleccionada?.id === clave.id ? styles.fpFileItemSelected : ""}`}
-                                                    onClick={() => setClaveSeleccionada(clave)}
-                                                >
-                                                    <KeyFileIcon />
-                                                    <span className={styles.fpFileName}>
-                                                        {clave.nombre}<span className={styles.fpExtension}>.pub</span>
-                                                    </span>
-                                                    <span className={styles.fpFileSize}>{calcularTamanio(clave.activo)}</span>
-                                                </div>
-                                            ))
-                                        )}
-                                    </div>
-                                    <div className={styles.fpPreview}>
-                                        {claveSeleccionada ? (
-                                            <div className={styles.fpPreviewContent}>
-                                                <pre>{claveSeleccionada.activo.contenido ?? "Sin contenido"}</pre>
-                                            </div>
-                                        ) : (
-                                            <div className={styles.fpPreviewEmpty}>
-                                                <svg width="28" height="28" viewBox="0 0 24 24" fill="var(--text-secondary)" opacity="0.2">
-                                                    <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13z" />
-                                                </svg>
-                                                <p>Selecciona un archivo</p>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                                <div className={styles.fpFooter}>
-                                    <span className={styles.fpFooterLabel}>Nombre:</span>
-                                    <input
-                                        className={styles.fpFooterInput}
-                                        type="text"
-                                        readOnly
-                                        value={claveSeleccionada ? `${claveSeleccionada.nombre}.pub` : ""}
-                                        placeholder="Selecciona una clave pública"
-                                    />
-                                    <button
-                                        className={styles.fpFooterBtn}
-                                        onClick={() => setFilePickerClaveAbierto(false)}
-                                        disabled={!claveSeleccionada}
-                                    >
-                                        Abrir
-                                    </button>
-                                </div>
-                            </div>
+                            <FilePicker
+                                items={clavesPublicasDisponibles}
+                                selectedItem={claveSeleccionada}
+                                onSelect={setClaveSeleccionada}
+                                onConfirm={() => setFilePickerClaveAbierto(false)}
+                                placeholder="Selecciona una clave pública"
+                                emptyMessage="No hay claves públicas"
+                                confirmDisabled={!claveSeleccionada}
+                            />
                         ) : (
                             <div className={styles.formulario}>
                                 {!hashFirma ? (
                                     <>
                                         <div className={styles.itemClave} style={{ cursor: 'default' }}>
                                             <KeyIcon size={20} />
-                                            <span>{claveSeleccionada?.nombre}.pub</span>
+                                            <span>{claveSeleccionada?.nombre}{!tieneExtension(claveSeleccionada?.nombre ?? "") && ".pub"}</span>
                                         </div>
                                         <button
                                             className={styles.botonPrincipal}
