@@ -13,6 +13,21 @@ interface RegisterProfesorPayload {
   segundo_apellido: string
 }
 
+const DOMINIOS_PERMITIDOS = ['gmail.com', 'hotmail.com', 'outlook.com', 'epn.edu.ec']
+
+function validarContrasenia(contrasenia: string): void {
+  if (contrasenia.length < 8) {
+    throw new Error('La contraseña debe tener al menos 8 caracteres')
+  }
+}
+
+function validarCorreo(correo: string): void {
+  const dominio = correo.split('@')[1]
+  if (!dominio || !DOMINIOS_PERMITIDOS.includes(dominio)) {
+    throw new Error(`El correo debe pertenecer a uno de los siguientes dominios: ${DOMINIOS_PERMITIDOS.join(', ')}`)
+  }
+}
+
 export class RegisterProfesorUseCase {
   constructor(
     private repo: IAuthRepository,
@@ -20,6 +35,13 @@ export class RegisterProfesorUseCase {
   ) {}
 
   async execute(payload: RegisterProfesorPayload): Promise<ProfesorPublic> {
+    
+    // Validar contraseña
+    validarContrasenia(payload.contrasenia)
+
+    // Validar dominio del correo
+    validarCorreo(payload.correo_electronico)
+    
     // Verificar si el email ya existe
     const existingUser = await this.repo.findUsuarioAuthByEmail(payload.correo_electronico)
     if (existingUser) {
