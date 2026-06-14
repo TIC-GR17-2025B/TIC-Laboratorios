@@ -2,6 +2,7 @@ import React, { useRef, useMemo, useState } from 'react';
 import { useGLTF, Html } from '@react-three/drei';
 import { Group, Mesh, Material, MeshStandardMaterial, Box3, Vector3 } from 'three';
 import RadialMenu from './RadialMenu';
+import { getProceduralScene, isProceduralPath } from './procedural/proceduralModels';
 
 interface Model3DProps {
     modelPath: string;
@@ -27,11 +28,12 @@ interface Model3DProps {
 }
 
 /**
- * Componente reutilizable para cargar y renderizar modelos GLTF
- * Muestra wireframe en hover para debugging
+ * Vista presentacional de un modelo 3D ya resuelto (glTF o procedural).
+ * Recibe la escena (Group) y se encarga del render, hover, anillo de
+ * selección y menú radial. No sabe de dónde vino la escena.
  */
-const Model3D: React.FC<Model3DProps> = React.memo(({
-    modelPath,
+const Model3DView: React.FC<Model3DProps & { scene: Group }> = React.memo(({
+    scene,
     position = [0, 0, 0],
     rotation = [0, 0, 0],
     scale = 1,
@@ -45,10 +47,9 @@ const Model3D: React.FC<Model3DProps> = React.memo(({
     menuOptions = [],
     onMenuClose,
     onNavigate
-}: Model3DProps) => {
+}) => {
     const groupRef = useRef<Group>(null);
     const [hovered, setHovered] = useState(false);
-    const { scene } = useGLTF(modelPath);
 
     const clonedScene = useMemo(() => {
         const cloned = scene.clone(true);
@@ -183,6 +184,34 @@ const Model3D: React.FC<Model3DProps> = React.memo(({
             )}
         </group>
     );
+});
+
+Model3DView.displayName = 'Model3DView';
+
+/**
+ * Carga una escena desde un archivo glTF.
+ */
+const GLTFModel3D: React.FC<Model3DProps> = (props) => {
+    const { scene } = useGLTF(props.modelPath);
+    return <Model3DView {...props} scene={scene} />;
+};
+
+/**
+ * Obtiene una escena construida proceduralmente desde el registro.
+ */
+const ProceduralModel3D: React.FC<Model3DProps> = (props) => {
+    const scene = getProceduralScene(props.modelPath);
+    return <Model3DView {...props} scene={scene} />;
+};
+
+/**
+ * Selecciona el origen del modelo según la ruta: las rutas con prefijo
+ * `procedural:` se construyen por código; el resto se cargan como glTF.
+ */
+const Model3D: React.FC<Model3DProps> = React.memo((props) => {
+    return isProceduralPath(props.modelPath)
+        ? <ProceduralModel3D {...props} />
+        : <GLTFModel3D {...props} />;
 });
 
 Model3D.displayName = 'Model3D';

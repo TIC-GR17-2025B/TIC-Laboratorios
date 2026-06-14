@@ -67,13 +67,6 @@ const escenarioMap = new Map<string, EscenarioMeta>([
     "auditoria",
     { slug: "auditoria", titulo: "Auditoría de Seguridad Empresarial" },
   ],*/
-  /*[
-    "banco",
-    {
-      slug: "banco",
-      titulo: "Banco Nacional: Operación Firewall — Defensa APT",
-    },
-  ],*/
   /*["iot", { slug: "iot", titulo: "Seguridad IoT e Infraestructura Crítica" }],*/
   /*[
     "prueba",

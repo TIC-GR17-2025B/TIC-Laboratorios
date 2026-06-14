@@ -353,7 +353,7 @@ export const escenarioCriptografia: unknown = {
             },
             {
               id: 3,
-              mueble: Mueble.MESA,
+              mueble: Mueble.RACK,
               posicion: { x: 0, y: 0, z: 2.5, rotacionY: 0 },
               dispositivos: [
                 {
@@ -373,7 +373,7 @@ export const escenarioCriptografia: unknown = {
             },
             {
               id: 4,
-              mueble: Mueble.MESA,
+              mueble: Mueble.RACK,
               posicion: { x: -3, y: 0, z: 2.5, rotacionY: 0 },
               dispositivos: [
                 {
@@ -432,7 +432,7 @@ export const escenarioCriptografia: unknown = {
             },
             {
               id: 2,
-              mueble: Mueble.MESA,
+              mueble: Mueble.RACK,
               posicion: { x: 2, y: 0, z: 0, rotacionY: 0 },
               dispositivos: [
                 {

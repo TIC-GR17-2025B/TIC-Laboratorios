@@ -246,6 +246,44 @@
   line-height: normal !important;
 }
 
+/* ── Password field (input + toggle de visibilidad) ── */
+.passwordWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Deja espacio a la derecha para el boton del ojito */
+.passwordWrapper .input {
+  padding-right: 42px;
+}
+
+.passwordToggle {
+  position: absolute;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: none;
+  border: none;
+  color: #555;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.passwordToggle:hover {
+  color: #ccc;
+}
+
+.passwordToggle:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 1px;
+}
+
 /* ── Input error state ── */
 .inputError {
   border-color: #f87171;

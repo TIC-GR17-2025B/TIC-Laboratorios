@@ -297,7 +297,7 @@ export const escenarioControlAcceso: unknown = {
               }],
             },
             {
-              id: 3, mueble: Mueble.MESA, posicion: { x: 0, y: 0, z: 2.5, rotacionY: 0 },
+              id: 3, mueble: Mueble.RACK, posicion: { x: 0, y: 0, z: 2.5, rotacionY: 0 },
               dispositivos: [{
                 id: 10003, tipo: TipoDispositivo.ROUTER, nombre: "Router Universidad",
                 sistemaOperativo: "Cisco IOS", hardware: "Cisco ISR 4331",
@@ -308,7 +308,7 @@ export const escenarioControlAcceso: unknown = {
               }],
             },
             {
-              id: 4, mueble: Mueble.MESA, posicion: { x: -3, y: 0, z: 2.5, rotacionY: 0 },
+              id: 4, mueble: Mueble.RACK, posicion: { x: -3, y: 0, z: 2.5, rotacionY: 0 },
               dispositivos: [{
                 id: 10004, tipo: TipoDispositivo.VPN, nombre: "VPN Gateway Universidad",
                 sistemaOperativo: "FortiOS", hardware: "Fortinet FortiGate 200F", software: "VPN, IDS/IPS",

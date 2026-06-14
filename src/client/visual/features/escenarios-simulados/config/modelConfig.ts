@@ -1,5 +1,7 @@
 import { Mueble, TipoDispositivo } from "../../../../shared/types/DeviceEnums";
 import { preloadModel } from "../components/Model3DUtils";
+import { isProceduralPath } from "../components/procedural/proceduralModels";
+import { RACK_TOPE_Y } from "../components/procedural/rackModel";
 
 /**
  * Configuración centralizada de modelos 3D y sus propiedades
@@ -11,6 +13,7 @@ import { preloadModel } from "../components/Model3DUtils";
  */
 export const MUEBLE_MODELS: Record<string, string> = {
   [Mueble.MESA]: "/assets/models/escritorio.gltf",
+  [Mueble.RACK]: "procedural:rack",
 };
 
 /**
@@ -18,8 +21,9 @@ export const MUEBLE_MODELS: Record<string, string> = {
  */
 export const DISPOSITIVO_MODELS: Record<string, string> = {
   [TipoDispositivo.WORKSTATION]: "/assets/models/computadora.gltf",
-  [TipoDispositivo.ROUTER]: "/assets/models/router.gltf",
-  [TipoDispositivo.VPN]: "/assets/models/vpn.gltf",
+  [TipoDispositivo.ROUTER]: "procedural:router",
+  [TipoDispositivo.SWITCH]: "procedural:switch",
+  [TipoDispositivo.VPN]: "procedural:switch",
 };
 
 /**
@@ -30,28 +34,43 @@ export const preloadAllModels = async () => {
   const allPaths = [
     ...Object.values(MUEBLE_MODELS),
     ...Object.values(DISPOSITIVO_MODELS),
-  ].filter((path) => path); // Filtrar paths vacíos
+  ].filter((path) => path && !isProceduralPath(path)); // Solo glTF (los procedurales no se precargan)
 
   // Precargar todos los modelos en paralelo
   await Promise.all(allPaths.map((path) => preloadModel(path)));
 };
 
 /**
- * Alturas específicas para cada tipo de dispositivo en Three.js (eje Y)
- * Estos valores se aplicarán automáticamente a la coordenada Y de la posición
+ * Ajuste fino (eje Y) por tipo de dispositivo, SOBRE la superficie del mueble
+ * en el que se apoya. Normalmente 0: los modelos tienen su base en y=0 y se
+ * apoyan en la superficie del mueble (ver MUEBLE_SURFACE_HEIGHTS). La altura del
+ * dispositivo la define el mueble, no su tipo, para no acoplar (un router puede
+ * ir en mesa, rack o piso).
  */
 export const DISPOSITIVO_HEIGHTS: Record<string, number> = {
-  [TipoDispositivo.WORKSTATION]: 0.71,
-  [TipoDispositivo.ROUTER]: 0.71,
-  [TipoDispositivo.VPN]: 0.71,
+  [TipoDispositivo.WORKSTATION]: 0,
+  [TipoDispositivo.ROUTER]: 0,
+  [TipoDispositivo.SWITCH]: 0,
+  [TipoDispositivo.VPN]: 0,
 };
 
 /**
- * Alturas específicas para cada tipo de mueble en Three.js (eje Y)
+ * Altura (eje Y) de la base del modelo del mueble (apoya en el piso).
  */
 export const MUEBLE_HEIGHTS: Record<string, number> = {
   [Mueble.MESA]: 0,
   [Mueble.RACK]: 0,
+  [Mueble.LIBRE]: 0,
+};
+
+/**
+ * Altura (eje Y) de la SUPERFICIE de cada mueble: dónde se apoyan los
+ * dispositivos colocados sobre él. La mesa tiene su tablero a ~0.71 y el rack
+ * (gabinete de pie) su tapa a RACK_TOPE_Y; "libre" es el piso.
+ */
+export const MUEBLE_SURFACE_HEIGHTS: Record<string, number> = {
+  [Mueble.MESA]: 0.71,
+  [Mueble.RACK]: RACK_TOPE_Y,
   [Mueble.LIBRE]: 0,
 };
 
@@ -86,6 +105,14 @@ export const getDispositivoModel = (tipo: string): string => {
  */
 export const getDispositivoHeight = (tipo: string): number => {
   return DISPOSITIVO_HEIGHTS[tipo] ?? 0;
+};
+
+/**
+ * Obtiene la altura (Y) de la superficie de un mueble (dónde se apoyan los
+ * dispositivos colocados sobre él).
+ */
+export const getMuebleSurfaceHeight = (tipo: string): number => {
+  return MUEBLE_SURFACE_HEIGHTS[tipo] ?? 0;
 };
 
 /**

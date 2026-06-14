@@ -1,6 +1,10 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import type { Entidad } from "../../../../ecs/core/Componente";
-import { getDispositivoHeight } from "../config/modelConfig";
+import {
+  getDispositivoHeight,
+  getMuebleHeight,
+  getMuebleSurfaceHeight,
+} from "../config/modelConfig";
 import { useEscenarioActual } from "../../../common/contexts/EscenarioContext";
 import { EscenarioController } from "../../../../ecs/controllers/EscenarioController";
 import {
@@ -8,7 +12,7 @@ import {
   TipoLogGeneral,
 } from "../../../../shared/types/EventosEnums";
 import { RedController } from "../../../../ecs/controllers/RedController";
-import { EscenarioComponent } from "../../../../ecs/components";
+import { EscenarioComponent, EspacioComponent } from "../../../../ecs/components";
 import { useECSLogs } from "./useECSLogs";
 import { useECSTime } from "./useECSTime";
 import { useECSZones } from "./useECSZones";
@@ -194,6 +198,32 @@ export function useECSScene() {
         ? escenarioController.builder.obtenerEntidadesDeZona(zoneState.zonaActual)
         : entities;
 
+    const sistemaJerarquia = escenarioController.builder.getSistemaJerarquia();
+
+    // Altura a la que se apoya un dispositivo: la superficie del mueble de su
+    // espacio (mesa/rack/piso) + un ajuste fino opcional por tipo. Así la altura
+    // depende del mueble y no del tipo de dispositivo.
+    const calcularOffsetY = (
+      entidadId: Entidad,
+      objetoConTipo: ObjetoConTipo | undefined
+    ): number => {
+      if (!objetoConTipo) return 0;
+      if (objetoConTipo.tipo === "espacio") {
+        return getMuebleHeight(String(objetoConTipo.mueble ?? ""));
+      }
+      const espacioId = sistemaJerarquia.obtenerEspacioDeDispositivo(entidadId);
+      const muebleTipo =
+        espacioId != null
+          ? escenarioController.ecsManager
+              .getComponentes(espacioId)
+              ?.get(EspacioComponent)?.mueble
+          : undefined;
+      return (
+        getMuebleSurfaceHeight(String(muebleTipo ?? "")) +
+        getDispositivoHeight(objetoConTipo.tipo)
+      );
+    };
+
     return Array.from(entidadesAMostrar.entries()).map(
       ([entidadId, entidadObjeto]): ECSSceneEntity => {
         const componentes = Array.from(
@@ -221,9 +251,7 @@ export function useECSScene() {
             typeof (c as Record<string, unknown>).x === "number"
         );
 
-        const offsetY = objetoConTipo
-          ? getDispositivoHeight(objetoConTipo.tipo)
-          : 0;
+        const offsetY = calcularOffsetY(entidadId, objetoConTipo);
         const position: [number, number, number] = transform
           ? [transform.x, transform.y + offsetY, transform.z]
           : [0, offsetY, 0];
@@ -327,6 +355,9 @@ export function useECSScene() {
     dispositivoIndex: navState.dispositivoIndex,
     focusTarget: navState.focusTarget,
     clearFocusTarget: navState.clearFocusTarget,
+    inspectTarget: navState.inspectTarget,
+    inspectDevice: navState.inspectDevice,
+    clearInspect: navState.clearInspect,
     getWorkstations,
     closeDevicePanelRef: logState.closeDevicePanelRef,
   };

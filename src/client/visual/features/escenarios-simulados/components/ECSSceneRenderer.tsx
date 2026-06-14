@@ -9,9 +9,15 @@ import { useScreenTransition } from '../../../common/contexts/ScreenTransitionCo
 import ModalFirewall from '../../simulacion-redes/components/ModalFirewall';
 import ModalVPN from '../../simulacion-redes/components/ModalVPN';
 
+// Tipos de dispositivo a los que la cámara hace zoom de enfoque al seleccionarlos.
+const TIPOS_CON_ZOOM_ENFOQUE = new Set(['router', 'switch', 'vpn']);
+
+const soportaZoomEnfoque = (tipo: unknown): boolean =>
+    TIPOS_CON_ZOOM_ENFOQUE.has(String(tipo ?? '').toLowerCase());
+
 const ECSSceneRenderer: React.FC = () => {
     const { setDispositivoSeleccionado, entidadSeleccionadaId } = useEscenario();
-    const { processEntities } = useECSSceneContext();
+    const { processEntities, inspectDevice, clearInspect } = useECSSceneContext();
     const { openModal } = useModal();
     const { startZoom, isZooming, desktopMode } = useScreenTransition();
     const [menuOpenForEntity, setMenuOpenForEntity] = useState<number | null>(null);
@@ -52,13 +58,21 @@ const ECSSceneRenderer: React.FC = () => {
         setClickedEntityId(null);
         setDispositivoSeleccionado(null);
         setMenuOpenForEntity(null);
+        clearInspect();
     };
 
-    const handleContextMenu = (entity: ECSEntityRef) => {
+    const handleContextMenu = (entity: ECSEntityRef, position?: [number, number, number]) => {
         if (entity.objetoConTipo?.tipo !== 'espacio') {
             setClickedEntityId(entity.entidadId ?? null);
             setDispositivoSeleccionado(entity);
             setMenuOpenForEntity(entity.entidadId ?? null);
+
+            // Acercar la cámara a los dispositivos que lo soportan (router/switch/vpn).
+            if (position && soportaZoomEnfoque(entity.objetoConTipo?.tipo)) {
+                inspectDevice(position);
+            } else {
+                clearInspect();
+            }
         }
     };
 
@@ -95,6 +109,9 @@ const ECSSceneRenderer: React.FC = () => {
                         setMenuOpenForEntity(null);
                     }
                 }];
+        } else if (deviceType === 'SWITCH') {
+            // El switch solo se selecciona y acerca; sin menú de configuración.
+            return [];
         }
         return [
             {
@@ -135,7 +152,7 @@ const ECSSceneRenderer: React.FC = () => {
                         position={position}
                         rotation={[0, rotacionY, 0]}
                         scale={1}
-                        onClick={isInteractive ? () => handleContextMenu({ objetoConTipo, entidadId, entidadCompleta }) : undefined}
+                        onClick={isInteractive ? () => handleContextMenu({ objetoConTipo, entidadId, entidadCompleta }, position) : undefined}
                         onHover={isInteractive ? () => handleEntityHover({ objetoConTipo, entidadId, entidadCompleta }) : undefined}
                         onHoverEnd={isInteractive ? handleEntityHoverEnd : undefined}
                         isSelected={isInteractive && entidadSeleccionadaId === entidadId}

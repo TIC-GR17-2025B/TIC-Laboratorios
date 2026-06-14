@@ -426,7 +426,7 @@ export const escenarioHackingEtico: unknown = {
             },
             {
               id: 3,
-              mueble: Mueble.MESA,
+              mueble: Mueble.RACK,
               posicion: { x: 0, y: 0, z: 2.5, rotacionY: 0 },
               dispositivos: [
                 {
@@ -447,7 +447,7 @@ export const escenarioHackingEtico: unknown = {
             },
             {
               id: 4,
-              mueble: Mueble.MESA,
+              mueble: Mueble.RACK,
               posicion: { x: -3, y: 0, z: 2.5, rotacionY: 0 },
               dispositivos: [
                 {
@@ -515,7 +515,7 @@ export const escenarioHackingEtico: unknown = {
             },
             {
               id: 2,
-              mueble: Mueble.MESA,
+              mueble: Mueble.RACK,
               posicion: { x: 1, y: 0, z: 2.5, rotacionY: 0 },
               dispositivos: [
                 {

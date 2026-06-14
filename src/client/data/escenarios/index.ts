@@ -9,6 +9,5 @@ export * from './escenarioControlAcceso.js';
 export * from './escenarioHackingEtico.js';
 // export * from './escenarioRansomware.js';
 // export * from './escenarioAuditoria.js';
-// export * from './escenarioBanco.js';
 // export * from './escenarioIoT.js';
 // export * from './escenarioPrueba.js';

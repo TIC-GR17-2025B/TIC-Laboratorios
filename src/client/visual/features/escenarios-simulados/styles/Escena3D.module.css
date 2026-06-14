@@ -38,3 +38,9 @@
   height: 40px;
   width: 40px;
 }
+
+/* Panel de métricas de performance (solo dev), esquina superior izquierda */
+.stats {
+  top: 0 !important;
+  left: 0 !important;
+}

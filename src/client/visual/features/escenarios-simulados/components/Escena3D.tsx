@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Stats } from '@react-three/drei';
 import styles from '../styles/Escena3D.module.css';
 import Scene3DCanvas from './Scene3DCanvas';
 import CameraControls from './CameraControls';
@@ -61,6 +62,9 @@ const Escena3D: React.FC = () => {
                 </>
             )}
             <Scene3DCanvas className={`${styles.canvas} ${isReady ? styles.ready : ''}`}>
+                {/* Métricas de performance (FPS, MS, MB). Temporalmente activo en
+                    cualquier modo para poder medir en build + preview. */}
+                <Stats className={styles.stats} />
                 <ResizeHandler />
                 <Lights
                     ambientIntensity={DEFAULT_LIGHT_CONFIG.ambientIntensity}

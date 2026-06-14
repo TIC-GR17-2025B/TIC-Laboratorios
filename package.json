@@ -7,6 +7,8 @@
     "dev": "vite",
     "dev:server": "nodemon --watch src --exec tsx src/server/server.ts",
     "dev:full": "concurrently \"npm run dev:server\" \"vite\"",
+    "preview:server": "tsx src/server/server.ts",
+    "preview:full": "npm run build && concurrently \"npm run preview:server\" \"vite preview --host\"",
     "build": "vite build",
     "build:server": "tsc --project tsconfig.server.json",
     "build:all": "npm run build && npm run build:server",

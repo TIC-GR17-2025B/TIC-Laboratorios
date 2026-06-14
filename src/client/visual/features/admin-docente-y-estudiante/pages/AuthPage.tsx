@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import styles from '../styles/Auth.module.css';
 import { useAuth } from '../hooks/useAuth';
 
@@ -22,6 +22,7 @@ const AuthPage = () => {
     const [direction, setDirection] = useState(1);
     const [isExiting, setIsExiting] = useState(false);
     const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+    const [visiblePasswords, setVisiblePasswords] = useState<Record<string, boolean>>({});
 
     const [loginEmail, setLoginEmail] = useState('');
     const [loginPassword, setLoginPassword] = useState('');
@@ -190,6 +191,39 @@ const AuthPage = () => {
         </>
     );
 
+    // Helper para campos de contraseña con boton de ojito (mostrar/ocultar)
+    const renderPasswordInput = (
+        name: string,
+        value: string,
+        onChange: (val: string) => void,
+        props: React.InputHTMLAttributes<HTMLInputElement> = {}
+    ) => {
+        const isVisible = !!visiblePasswords[name];
+        return (
+            <>
+                <div className={styles.passwordWrapper}>
+                    <input
+                        {...props}
+                        type={isVisible ? 'text' : 'password'}
+                        value={value}
+                        onChange={(e) => onChange(e.target.value)}
+                        className={`${styles.input} ${fieldErrors[name] ? styles.inputError : ''}`}
+                    />
+                    <button
+                        type="button"
+                        className={styles.passwordToggle}
+                        onClick={() => setVisiblePasswords(prev => ({ ...prev, [name]: !prev[name] }))}
+                        aria-label={isVisible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                        tabIndex={-1}
+                    >
+                        {isVisible ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                </div>
+                {fieldErrors[name] && <span className={styles.fieldError}>{fieldErrors[name]}</span>}
+            </>
+        );
+    };
+
     return (
         <motion.div
             className={styles.authContainer}
@@ -260,8 +294,7 @@ const AuthPage = () => {
                                         </div>
                                         <div className={styles.fieldSection}>
                                             <span className={styles.fieldLabel}>Contraseña</span>
-                                            {renderInput('loginPassword', loginPassword, (val) => { setLoginPassword(val); clearFieldError('loginPassword'); clearError(); }, {
-                                                type: 'password',
+                                            {renderPasswordInput('loginPassword', loginPassword, (val) => { setLoginPassword(val); clearFieldError('loginPassword'); clearError(); }, {
                                                 placeholder: '••••••••',
                                             })}
                                             <div style={{ fontSize: 12, textAlign: 'right' }}>
@@ -337,16 +370,14 @@ const AuthPage = () => {
 
                                         <div className={styles.fieldSection}>
                                             <span className={styles.fieldLabel}>Contraseña</span>
-                                            {renderInput('password', formData.password, (val) => handleChange('password', val), {
-                                                type: 'password',
+                                            {renderPasswordInput('password', formData.password, (val) => handleChange('password', val), {
                                                 placeholder: '••••••••',
                                             })}
                                         </div>
 
                                         <div className={styles.fieldSection}>
                                             <span className={styles.fieldLabel}>Confirmar contraseña</span>
-                                            {renderInput('confirmPassword', formData.confirmPassword, (val) => handleChange('confirmPassword', val), {
-                                                type: 'password',
+                                            {renderPasswordInput('confirmPassword', formData.confirmPassword, (val) => handleChange('confirmPassword', val), {
                                                 placeholder: '••••••••',
                                             })}
                                         </div>

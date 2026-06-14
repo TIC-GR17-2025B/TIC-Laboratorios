@@ -13,7 +13,10 @@ import {
   ObjetosManejables,
 } from "../../shared/types/AccionesEnums";
 import { ColoresRed } from "../colores";
-import { AccionFirewall, DireccionTrafico } from "../../shared/types/FirewallTypes";
+import {
+  AccionFirewall,
+  DireccionTrafico,
+} from "../../shared/types/FirewallTypes";
 
 /**
  * Escenario 8 — Amenazas y Ataques Comunes
@@ -51,7 +54,7 @@ export const escenarioAmenazas: unknown = {
       condicionMitigacion: {
         accion: AccionesRealizables.CLICK,
         objeto: ObjetosManejables.CONFIG_WORKSTATION,
-        val:[
+        val: [
           {
             nombreConfig: "Bloquear medios extraíbles",
             activado: true,
@@ -86,7 +89,7 @@ export const escenarioAmenazas: unknown = {
       descripcion:
         "¡Bien! Has bloqueado la amenaza externa. Ahora protege los equipos contra amenazas internas.",
       fase: 1,
-    }, 
+    },
     {
       nombreEvento: "Completación Escenario",
       tipoEvento: TipoEvento.COMPLETACION_ESCENARIO,
@@ -116,7 +119,7 @@ export const escenarioAmenazas: unknown = {
       objeto: ObjetosManejables.CONFIG_WORKSTATION,
       inicioTiempoEsperado: 25,
       finTiempoEsperado: 30,
-      val:{
+      val: {
         nombreConfig: "Bloquear medios extraíbles",
         dispositivoAAtacar: "PC Secretaría",
         activado: true,
@@ -145,7 +148,10 @@ export const escenarioAmenazas: unknown = {
       faseActual: false,
       completada: false,
       objetivos: [
-        { descripcion: "Bloqueo de Troyano vía USB infectado", completado: false },
+        {
+          descripcion: "Bloqueo de Troyano vía USB infectado",
+          completado: false,
+        },
       ],
     },
   ],
@@ -192,7 +198,11 @@ export const escenarioAmenazas: unknown = {
                   estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
                   personaEncargada: "Ing. Patricia Morales",
                   activos: [
-                    { nombre: "contratos_clientes.pdf", contenido: "Contratos confidenciales", tipo: TipoActivo.DOCUMENTO },
+                    {
+                      nombre: "contratos_clientes.pdf",
+                      contenido: "Contratos confidenciales",
+                      tipo: TipoActivo.DOCUMENTO,
+                    },
                   ],
                   redes: ["LAN-Oficina"],
                 },
@@ -220,7 +230,7 @@ export const escenarioAmenazas: unknown = {
             },
             {
               id: 3,
-              mueble: Mueble.MESA,
+              mueble: Mueble.RACK,
               posicion: { x: 0, y: 0, z: 2.5, rotacionY: 0 },
               dispositivos: [
                 {
@@ -230,7 +240,7 @@ export const escenarioAmenazas: unknown = {
                   sistemaOperativo: "Cisco IOS",
                   hardware: "Cisco ISR 4331",
                   software: "Routing, Firewall",
-                  posicion: { x: 0, y: 0, z: 2.5, rotacionY: 0 },
+                  posicion: { x: 0, y: 0, z: 2.5, rotacionY: -90 },
                   estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
                   activos: [],
                   redes: ["LAN-Oficina", "Internet"],
@@ -257,25 +267,41 @@ export const escenarioAmenazas: unknown = {
           posicion: { x: 10, y: 0, z: 1, rotacionY: 0 },
           espacios: [
             {
-              id: 1, mueble: Mueble.MESA, posicion: { x: 1, y: 0, z: 0, rotacionY: 0 },
+              id: 1,
+              mueble: Mueble.MESA,
+              posicion: { x: 1, y: 0, z: 0, rotacionY: 0 },
               dispositivos: [
                 {
-                  id: 8004, tipo: TipoDispositivo.WORKSTATION, nombre: "Servidor Externo",
-                  sistemaOperativo: "Ubuntu Server 22.04", hardware: "Dell PowerEdge R740",
-                  software: "Apache, DNS", posicion: { x: 1, y: 0, z: 0, rotacionY: 0 },
-                  estadoAtaque: EstadoAtaqueDispositivo.NORMAL, activos: [], redes: ["Red-Externa"],
+                  id: 8004,
+                  tipo: TipoDispositivo.WORKSTATION,
+                  nombre: "Servidor Externo",
+                  sistemaOperativo: "Ubuntu Server 22.04",
+                  hardware: "Dell PowerEdge R740",
+                  software: "Apache, DNS",
+                  posicion: { x: 1, y: 0, z: 0, rotacionY: 0 },
+                  estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
+                  activos: [],
+                  redes: ["Red-Externa"],
                 },
               ],
             },
             {
-              id: 2, mueble: Mueble.MESA, posicion: { x: 1, y: 0, z: 2.5, rotacionY: 0 },
+              id: 2,
+              mueble: Mueble.RACK,
+              posicion: { x: 1, y: 0, z: 2.5, rotacionY: 0 },
               dispositivos: [
                 {
-                  id: 8005, tipo: TipoDispositivo.ROUTER, nombre: "Router Externo",
-                  sistemaOperativo: "Cisco IOS", hardware: "Cisco ASR 1001-X",
-                  software: "Routing, NAT", posicion: { x: 1, y: 0, z: 2.5, rotacionY: 0 },
-                  estadoAtaque: EstadoAtaqueDispositivo.NORMAL, activos: [],
-                  redes: ["Red-Externa", "Internet"], conectadoAInternet: true,
+                  id: 8005,
+                  tipo: TipoDispositivo.ROUTER,
+                  nombre: "Router Externo",
+                  sistemaOperativo: "Cisco IOS",
+                  hardware: "Cisco ASR 1001-X",
+                  software: "Routing, NAT",
+                  posicion: { x: 1, y: 0, z: 2.5, rotacionY: 0 },
+                  estadoAtaque: EstadoAtaqueDispositivo.NORMAL,
+                  activos: [],
+                  redes: ["Red-Externa", "Internet"],
+                  conectadoAInternet: true,
                 },
               ],
             },
