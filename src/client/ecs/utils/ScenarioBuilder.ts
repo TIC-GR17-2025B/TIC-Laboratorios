@@ -375,6 +375,7 @@ export class ScenarioBuilder {
       nombreEquipo?: string;
       usuario?: string;
       contrasenia?: string;
+      decorativo?: boolean;
     };
 
     // Extraer entidades de redes
@@ -399,7 +400,8 @@ export class ScenarioBuilder {
         d.contrasenia ?? "",
         entidadesRedesDispActual,
         d.personaEncargada,
-        d.apps
+        d.apps,
+        d.decorativo ?? false
       )
     );
 

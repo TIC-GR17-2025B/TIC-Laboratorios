@@ -71,7 +71,8 @@ function obtenerNodosDeZona(
   for (const [dispEntidadId, dispContainer] of dispositivosZona) {
     const dispositivoComponent = dispContainer.get(DispositivoComponent);
 
-    if (dispositivoComponent) {
+    // Los dispositivos decorativos se ven en 3D pero no son parte del nivel.
+    if (dispositivoComponent && !dispositivoComponent.decorativo) {
       const nodo = crearNodoDispositivo(
         dispEntidadId,
         dispositivoComponent,

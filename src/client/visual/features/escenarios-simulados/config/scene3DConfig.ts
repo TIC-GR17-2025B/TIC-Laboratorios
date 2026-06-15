@@ -24,7 +24,9 @@ export const ESCRITORIO_CONFIG: ModelConfig = {
 };
 
 export const DEFAULT_LIGHT_CONFIG: LightConfig = {
-  ambientIntensity: 0.6,
+  // Ambiente base bajo: la luz principal (con sombras) y un ambiente extra
+  // tematizado los aporta SceneDressing según el escenario.
+  ambientIntensity: 0.3,
   directionalIntensity: 0.8,
   directionalPosition: [5, 5, 5],
   enableShadows: true,

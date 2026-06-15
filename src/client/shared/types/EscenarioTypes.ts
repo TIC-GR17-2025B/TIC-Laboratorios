@@ -56,6 +56,8 @@ export interface Dispositivo {
   configuraciones?: unknown;
   activos: Activo[];
   redes?: Array<{ nombre: string; color: string; entidadId: number }>;
+  // Decorativo: se muestra en 3D pero se excluye de topología, escaneo e interacción.
+  decorativo?: boolean;
 }
 
 export interface Activo {

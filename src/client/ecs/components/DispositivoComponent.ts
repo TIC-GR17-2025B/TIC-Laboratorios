@@ -14,7 +14,11 @@ export class DispositivoComponent extends Componente {
     public contrasenia: string,
     public redes: Entidad[] = [],
     public personaEncargada?: string,
-    public apps?: SoftwareApp[]
+    public apps?: SoftwareApp[],
+    // Marca un dispositivo como puramente decorativo: se renderiza en 3D pero
+    // NO aparece en la vista de redes/topología ni en el escaneo, y no es
+    // interactivo. Útil para vestir escenas sin contaminar el nivel.
+    public decorativo: boolean = false
   ) {
     super();
   }

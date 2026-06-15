@@ -1,71 +1,62 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import * as THREE from 'three';
 import { Text } from '@react-three/drei';
+import type { RoomInfo } from '../hooks/useBuildingLayout';
+import { getRoomPalette } from '../config/roomThemes';
 
-export const ROOM_PADDING = 1.0;
-const OFFICE_FLOOR_Y = 0.015;
-
-export interface OfficeBounds {
-    oficinaId: number;
-    nombre: string;
-    minX: number;
-    maxX: number;
-    minZ: number;
-    maxZ: number;
-}
-
-const FLOOR_COLORS = ['#ddd8d0', '#d5d9d1', '#d9d3d7', '#d1d9d5'];
+const OFFICE_FLOOR_Y = 0.02;
 
 interface OfficeRoomProps {
-    bounds: OfficeBounds;
-    index: number;
+    room: RoomInfo;
 }
 
 /**
- * Renderiza solo el piso diferenciado y la etiqueta de una oficina.
- * Las paredes son manejadas por OfficeWalls (edificio unificado).
+ * Renderiza el piso diferenciado y la etiqueta de una oficina. Las paredes las
+ * maneja OfficeWalls (edificio unificado). El color del piso y de la etiqueta
+ * sale de la paleta del tema inferido para la sala.
  */
-const OfficeRoom: React.FC<OfficeRoomProps> = React.memo(({ bounds, index }) => {
-    const x1 = bounds.minX - ROOM_PADDING;
-    const x2 = bounds.maxX + ROOM_PADDING;
-    const z1 = bounds.minZ - ROOM_PADDING;
-    const z2 = bounds.maxZ + ROOM_PADDING;
+const OfficeRoom: React.FC<OfficeRoomProps> = React.memo(({ room }) => {
+    const { padded, centerX, centerZ, width, depth, nombre, tipo } = room;
+    const palette = getRoomPalette(tipo);
 
-    const width = x2 - x1;
-    const depth = z2 - z1;
-    const centerX = (x1 + x2) / 2;
-    const centerZ = (z1 + z2) / 2;
-
-    const colorIndex = index % FLOOR_COLORS.length;
     const floorMaterial = useMemo(() => new THREE.MeshStandardMaterial({
-        color: FLOOR_COLORS[colorIndex],
-        roughness: 0.85,
-        metalness: 0.0,
-    }), [colorIndex]);
+        color: palette.floor,
+        roughness: 0.75,
+        metalness: 0.04,
+        // Evita z-fighting con el piso del edificio (coplanares): este dibuja encima.
+        polygonOffset: true,
+        polygonOffsetFactor: -4,
+        polygonOffsetUnits: -4,
+    }), [palette.floor]);
+
+    useEffect(() => () => floorMaterial.dispose(), [floorMaterial]);
+
+    const labelColor = tipo === 'hacker' || tipo === 'datacenter' ? '#aebfd6' : '#5a4e42';
 
     return (
-        <group name={`office-floor-${bounds.oficinaId}`}>
-            {/* Piso de la oficina - ligeramente elevado sobre el piso del edificio */}
+        <group name={`office-floor-${room.oficinaId}`}>
             <mesh
                 position={[centerX, OFFICE_FLOOR_Y, centerZ]}
                 rotation={[-Math.PI / 2, 0, 0]}
                 receiveShadow
                 material={floorMaterial}
             >
-                <planeGeometry args={[width - 0.04, depth - 0.04]} />
+                <planeGeometry args={[width - 0.06, depth - 0.06]} />
             </mesh>
 
             {/* Etiqueta en la pared trasera, mirando hacia el interior */}
             <Text
-                position={[centerX, 1.8, z2 - 0.08]}
+                position={[centerX, 2.1, padded.z2 - 0.1]}
                 rotation={[0, Math.PI, 0]}
-                fontSize={0.2}
-                color="#5a4e42"
+                fontSize={0.22}
+                color={labelColor}
                 anchorX="center"
                 anchorY="middle"
                 maxWidth={width - 0.5}
+                outlineWidth={0.004}
+                outlineColor={tipo === 'hacker' || tipo === 'datacenter' ? '#05070b' : '#ffffff'}
             >
-                {bounds.nombre}
+                {nombre}
             </Text>
         </group>
     );

@@ -29,14 +29,8 @@ const Environment: React.FC<EnvironmentProps> = ({
             {showAxes && (
                 <axesHelper args={[5]} />
             )}
-            <mesh
-                rotation={[-Math.PI / 2, 0, 0]}
-                position={[0, -0.01, 0]}
-                receiveShadow
-            >
-                <planeGeometry args={[100, 100]} />
-                <shadowMaterial opacity={0.3} />
-            </mesh>
+            {/* El suelo que recibe sombras lo aporta SceneDressing (suelo exterior
+                tematizado). Aquí solo quedan los helpers de depuración. */}
         </>
     );
 };

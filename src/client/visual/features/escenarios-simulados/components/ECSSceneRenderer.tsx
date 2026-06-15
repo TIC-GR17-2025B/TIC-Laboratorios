@@ -142,7 +142,8 @@ const ECSSceneRenderer: React.FC = () => {
             {processedEntities.map(({ objetoConTipo, position, rotacionY, entidadId, entidadCompleta, esInteractiva }) => {
                 const modelPath = getModelo(objetoConTipo);
                 const isEspacio = objetoConTipo?.tipo === 'espacio';
-                const isInteractive = !isEspacio && esInteractiva;
+                const isDecorativo = (objetoConTipo as { decorativo?: boolean })?.decorativo === true;
+                const isInteractive = !isEspacio && !isDecorativo && esInteractiva;
 
                 if (modelPath === "") return null;
                 return (

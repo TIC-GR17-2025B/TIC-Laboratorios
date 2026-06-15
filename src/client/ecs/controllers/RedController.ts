@@ -498,8 +498,9 @@ export class RedController {
 
     for (const entidadDispositivo of dispositivosDominio ?? []) {
       const dispActual = this.ecsManager.getComponentes(entidadDispositivo)?.get(DispositivoComponent);
-      
+
       if (dispActual?.tipo != TipoDispositivo.WORKSTATION) continue;
+      if (dispActual?.decorativo) continue; // Los decorativos no se escanean.
 
       const infoDispActual: InfoDispositivoEscaneado = {
         nombre: dispActual!.nombre+" | "+dispActual!.nombreEquipo,

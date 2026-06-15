@@ -12,7 +12,7 @@ import { RACK_TOPE_Y } from "../components/procedural/rackModel";
  * Mapea tipos de muebles a rutas de modelos 3D
  */
 export const MUEBLE_MODELS: Record<string, string> = {
-  [Mueble.MESA]: "/assets/models/escritorio.gltf",
+  [Mueble.MESA]: "procedural:mesa",
   [Mueble.RACK]: "procedural:rack",
 };
 
