@@ -19,6 +19,8 @@
     "lint": "eslint .",
     "test": "vitest",
     "coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "render-build": "npm install --include=dev && npx prisma generate && npx prisma migrate deploy && npm run build:server",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
@@ -68,6 +70,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
+    "@playwright/test": "^1.50.0",
     "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",

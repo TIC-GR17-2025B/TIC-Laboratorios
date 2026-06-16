@@ -1,5 +1,6 @@
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
+import { configDefaults } from "vitest/config";
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
@@ -32,6 +33,8 @@ export default defineConfig(({ mode }) => {
       proxy: apiProxy,
     },
     test: {
+      // Los specs E2E (tests/e2e) los corre Playwright, no Vitest.
+      exclude: [...configDefaults.exclude, "tests/e2e/**"],
       coverage: {
         provider: 'v8',
         exclude: [
