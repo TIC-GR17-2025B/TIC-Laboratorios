@@ -35,18 +35,18 @@ export class RegisterProfesorUseCase {
   ) {}
 
   async execute(payload: RegisterProfesorPayload): Promise<ProfesorPublic> {
+
+    // Verificar si el email ya existe
+    const existingUser = await this.repo.findUsuarioAuthByEmail(payload.correo_electronico)
+    if (existingUser) {
+      throw new Error('El correo electrónico ya está registrado')
+    }
     
     // Validar contraseña
     validarContrasenia(payload.contrasenia)
 
     // Validar dominio del correo
     validarCorreo(payload.correo_electronico)
-    
-    // Verificar si el email ya existe
-    const existingUser = await this.repo.findUsuarioAuthByEmail(payload.correo_electronico)
-    if (existingUser) {
-      throw new Error('El correo electrónico ya está registrado')
-    }
 
     // Hash de la contraseña
     const contrasenia_hash = await bcrypt.hash(payload.contrasenia, 10)

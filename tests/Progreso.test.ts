@@ -40,7 +40,8 @@ describe("Progreso UseCases", () => {
           id_estudiante: 1,
           slug_escenario: "escenario-1",
           terminado: false,
-          tiempo: -10
+          tiempo: -10,
+          acciones: ""
         })
       ).rejects.toThrow("El tiempo no puede ser negativo")
     })
@@ -48,15 +49,16 @@ describe("Progreso UseCases", () => {
     it("debe guardar progreso correctamente", async () => {
       const useCase = new GuardarProgresoUseCase(progresoRepo)
 
-      ;(progresoRepo.guardarProgresoEstudiante as any).mockResolvedValue({
-        id_progreso: 1
-      })
+        ; (progresoRepo.guardarProgresoEstudiante as any).mockResolvedValue({
+          id_progreso: 1
+        })
 
       const result = await useCase.execute({
         id_estudiante: 1,
         slug_escenario: "escenario-1",
         terminado: true,
-        tiempo: 120
+        tiempo: 120,
+        acciones: ""
       })
 
       expect(result.id_progreso).toBe(1)
@@ -72,10 +74,10 @@ describe("Progreso UseCases", () => {
     it("debe retornar el progreso del estudiante", async () => {
       const useCase = new ObtenerProgresoUseCase(progresoRepo)
 
-      ;(progresoRepo.getProgresoEstudiante as any).mockResolvedValue({
-        terminado: true,
-        intentos: 3
-      })
+        ; (progresoRepo.getProgresoEstudiante as any).mockResolvedValue({
+          terminado: true,
+          intentos: 3
+        })
 
       const result = await useCase.execute(1, "escenario-1")
 
@@ -92,10 +94,10 @@ describe("Progreso UseCases", () => {
     it("debe retornar lista de progresos", async () => {
       const useCase = new ObtenerTodosProgresosUseCase(progresoRepo)
 
-      ;(progresoRepo.getTodosProgresosEstudiante as any).mockResolvedValue([
-        { id_progreso: 1 },
-        { id_progreso: 2 }
-      ])
+        ; (progresoRepo.getTodosProgresosEstudiante as any).mockResolvedValue([
+          { id_progreso: 1 },
+          { id_progreso: 2 }
+        ])
 
       const result = await useCase.execute(1)
 
@@ -119,10 +121,10 @@ describe("Progreso UseCases", () => {
     it("debe retornar estudiantes del profesor", async () => {
       const useCase = new ObtenerEstudianteProfesorUseCase(authRepo)
 
-      ;(authRepo.findEstudiantesByProfesor as any).mockResolvedValue([
-        { id_estudiante: 1 },
-        { id_estudiante: 2 }
-      ])
+        ; (authRepo.findEstudiantesByProfesor as any).mockResolvedValue([
+          { id_estudiante: 1 },
+          { id_estudiante: 2 }
+        ])
 
       const result = await useCase.execute(1)
 
