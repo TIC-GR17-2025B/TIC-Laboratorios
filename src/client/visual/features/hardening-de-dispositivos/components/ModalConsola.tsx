@@ -256,6 +256,7 @@ export default function ModalConsola({ os = "windows" }: ModalConsolaProps) {
                         <input
                             ref={passwordRef}
                             type="password"
+                            aria-label="Contraseña"
                             className={styles.passwordInput}
                             value={passwordValue}
                             onChange={(e) => setPasswordValue(e.target.value)}
@@ -271,6 +272,7 @@ export default function ModalConsola({ os = "windows" }: ModalConsolaProps) {
                         <input
                             ref={inputRef}
                             type="text"
+                            aria-label="Línea de comandos"
                             className={styles.input}
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}

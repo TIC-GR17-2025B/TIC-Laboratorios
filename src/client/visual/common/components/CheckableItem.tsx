@@ -41,6 +41,7 @@ function CheckableItem({
             <div className={styles.labelContainer}>
                 <input
                     type="checkbox"
+                    aria-label={label}
                     checked={checked}
                     onChange={handleChange}
                     onClick={handleCheckboxClick}

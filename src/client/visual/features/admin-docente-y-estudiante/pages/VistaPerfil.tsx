@@ -138,7 +138,7 @@ export default function VistaPerfil() {
                 ) : escenarios.length === 0 ? (
                     <div className={styles.empty}>
                         <p className={styles.muted}>Aun no has jugado ningun escenario</p>
-                        <button className={styles.linkButton} onClick={() => navigate('/seleccion-niveles')}>
+                        <button className={styles.emptyButton} onClick={() => navigate('/seleccion-niveles')}>
                             Ir a escenarios
                         </button>
                     </div>

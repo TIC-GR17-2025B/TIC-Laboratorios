@@ -72,6 +72,7 @@ export default function ModalApps() {
                 </span>
                 <input
                     type="text"
+                    aria-label="Buscar aplicaciones"
                     className={styles.searchInput}
                     placeholder="Buscar aplicaciones"
                     value={searchQuery}

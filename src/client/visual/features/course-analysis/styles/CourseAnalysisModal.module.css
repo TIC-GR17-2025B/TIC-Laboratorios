@@ -29,6 +29,13 @@
 
 .viewWrapper .statsRow {
   padding: 12px 0 20px;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.statsGroup {
+  display: flex;
+  gap: 24px;
 }
 
 .viewWrapper .content {

@@ -197,6 +197,7 @@ export default function PanelConfiguraciones() {
                             <label className={styles.toggle} onClick={(e) => e.stopPropagation()}>
                                 <input
                                     type="checkbox"
+                                    aria-label={nombre}
                                     className={styles.toggleInput}
                                     checked={checkedItems[idx]}
                                     onChange={() => handleToggle(idx, nombre)}
@@ -226,6 +227,7 @@ export default function PanelConfiguraciones() {
                 </span>
                 <input
                     type="text"
+                    aria-label="Buscar configuración"
                     className={styles.searchInput}
                     placeholder="Buscar configuración"
                     value={searchQuery}

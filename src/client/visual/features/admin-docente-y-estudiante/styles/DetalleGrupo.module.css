@@ -215,8 +215,10 @@
 
 .analysisTitleRow {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
+  gap: 16px;
+  min-height: 36px;
   margin: 0 0 20px;
 }
 

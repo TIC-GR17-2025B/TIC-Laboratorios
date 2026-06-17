@@ -295,10 +295,15 @@ export default function DetalleGrupo() {
                 <div className={styles.analysisCol}>
                   <div className={styles.analysisTitleRow}>
                     <h3 className={styles.analysisSectionTitle}>Análisis de curso con IA</h3>
-                    {analysis && (
-                      <span className={styles.analysisFecha}>
-                        {new Date(analysis.fecha_generacion).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                      </span>
+                    {!isCheckingAnalysis && (
+                      <CourseAnalysisButton
+                        idCurso={grupo.id_curso}
+                        idProfesor={idProfesor || 0}
+                        hasExisting={!!analysis}
+                        onAnalysisGenerated={(newAnalysis) => {
+                          setAnalysis(newAnalysis);
+                        }}
+                      />
                     )}
                   </div>
                   {!analysis ? (
@@ -311,13 +316,6 @@ export default function DetalleGrupo() {
                         <p className={styles.analysisDesc}>
                           Genera un análisis con IA sobre el rendimiento y participación de los estudiantes en este grupo.
                         </p>
-                        <CourseAnalysisButton
-                          idCurso={grupo.id_curso}
-                          idProfesor={idProfesor || 0}
-                          onAnalysisGenerated={(newAnalysis) => {
-                            setAnalysis(newAnalysis);
-                          }}
-                        />
                       </div>
                     )
                   ) : (

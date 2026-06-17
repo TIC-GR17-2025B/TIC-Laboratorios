@@ -41,7 +41,7 @@ export default function CodigoInvitacion({ codigo, onGenerate }: CodigoInvitacio
               disabled={loading}
               title="Regenerar"
             >
-              <RefreshCw size={16} />
+              <RefreshCw size={16} className={loading ? styles.spinning : ''} />
             </button>
           </div>
         ) : (

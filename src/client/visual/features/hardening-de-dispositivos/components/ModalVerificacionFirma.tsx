@@ -275,6 +275,7 @@ function FilePicker({ items, selectedItem, onSelect, onConfirm, placeholder, emp
                 <input
                     className={styles.fpFooterInput}
                     type="text"
+                    aria-label={placeholder}
                     readOnly
                     value={selectedNombre}
                     placeholder={placeholder}

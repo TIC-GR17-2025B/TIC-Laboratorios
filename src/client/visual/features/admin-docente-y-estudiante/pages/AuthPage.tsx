@@ -182,6 +182,7 @@ const AuthPage = () => {
     ) => (
         <>
             <input
+                aria-label={typeof props.placeholder === 'string' ? props.placeholder : name}
                 {...props}
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
@@ -321,6 +322,7 @@ const AuthPage = () => {
                                                 })}
                                                 <input
                                                     type="text"
+                                                    aria-label="Segundo (opcional)"
                                                     value={formData.segundoNombre}
                                                     onChange={(e) => handleChange('segundoNombre', e.target.value)}
                                                     className={styles.input}

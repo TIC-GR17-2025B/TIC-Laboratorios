@@ -95,8 +95,9 @@ export default function ModalPhishMatic() {
             </div>
 
             <div className={styles.field}>
-                <span className={styles.label}>Correo destinatario</span>
+                <label htmlFor="phishmatic-destinatario" className={styles.label}>Correo destinatario</label>
                 <input
+                    id="phishmatic-destinatario"
                     type="text"
                     className={styles.input}
                     placeholder="ejemplo@correo.com"

@@ -135,11 +135,12 @@ function InputMode({ onSubmit, onChange, label, error, loading }: Omit<Invitatio
   return (
     <div className={styles.container}>
       {label && <span className={styles.label}>{label}</span>}
-      <div className={styles.cells}>
+      <div className={styles.cells} role="group" aria-label="Código de invitación">
         {Array.from({ length: CODE_LENGTH }).map((_, i) => (
           <input
             key={i}
             ref={el => { inputsRef.current[i] = el; }}
+            aria-label={`Dígito ${i + 1} del código`}
             className={`${styles.cell} ${styles.cellInput} ${values[i] ? styles.cellFilled : ''} ${error ? styles.cellError : ''}`}
             type="text"
             inputMode="text"

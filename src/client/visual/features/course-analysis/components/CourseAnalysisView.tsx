@@ -1,5 +1,4 @@
 import type { CourseAnalysisResponse } from '../types/courseAnalysis.types';
-import { CourseAnalysisButton } from './CourseAnalysisButton';
 import styles from '../styles/CourseAnalysisModal.module.css';
 
 interface CourseAnalysisViewProps {
@@ -41,18 +40,21 @@ export function CourseAnalysisView({
   return (
     <div className={styles.viewWrapper}>
       <div className={styles.statsRow}>
-        <div className={styles.stat}>
-          <span className={styles.statValue}>{resumen.total_estudiantes}</span>
-          <span className={styles.statLabel}>Estudiantes</span>
+        <div className={styles.statsGroup}>
+          <div className={styles.stat}>
+            <span className={styles.statValue}>{resumen.total_estudiantes}</span>
+            <span className={styles.statLabel}>Estudiantes</span>
+          </div>
+          <div className={styles.stat}>
+            <span className={styles.statValue}>{resumen.promedio_intentos.toFixed(1)}</span>
+            <span className={styles.statLabel}>Prom. Intentos</span>
+          </div>
+          <div className={styles.stat}>
+            <span className={styles.statValue}>{resumen.estudiantes_necesitan_apoyo}</span>
+            <span className={styles.statLabel}>Necesitan Apoyo</span>
+          </div>
         </div>
-        <div className={styles.stat}>
-          <span className={styles.statValue}>{resumen.promedio_intentos.toFixed(1)}</span>
-          <span className={styles.statLabel}>Prom. Intentos</span>
-        </div>
-        <div className={styles.stat}>
-          <span className={styles.statValue}>{resumen.estudiantes_necesitan_apoyo}</span>
-          <span className={styles.statLabel}>Necesitan Apoyo</span>
-        </div>
+        <span className={styles.fecha}>{fecha}</span>
       </div>
 
       <div className={styles.content}>
@@ -79,15 +81,6 @@ export function CourseAnalysisView({
           <h3 className={styles.sectionTitle}>{analisis.recomendaciones.titulo}</h3>
           <p className={styles.text}>{formatText(analisis.recomendaciones.contenido)}</p>
         </div>
-      </div>
-
-      <div className={styles.footer}>
-        <CourseAnalysisButton
-          idCurso={idCurso}
-          idProfesor={idProfesor}
-          hasExisting
-          onAnalysisGenerated={onAnalysisGenerated}
-        />
       </div>
     </div>
   );

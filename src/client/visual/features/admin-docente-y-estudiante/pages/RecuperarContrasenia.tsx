@@ -54,8 +54,9 @@ const RecuperarContrasenia = () => {
                 {!sent ? (
                     <form onSubmit={handleSubmit} className={styles.form}>
                         <div className={styles.fieldSection}>
-                            <span className={styles.fieldLabel}>Correo electrónico</span>
+                            <label htmlFor="recuperar-email" className={styles.fieldLabel}>Correo electrónico</label>
                             <input
+                                id="recuperar-email"
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
