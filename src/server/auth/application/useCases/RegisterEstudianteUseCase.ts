@@ -36,18 +36,18 @@ export class RegisterEstudianteUseCase {
   ) {}
 
   async execute(payload: RegisterEstudiantePayload): Promise<EstudiantePublic> {
+    // Verificar si el email ya existe
+    const existingUser = await this.repo.findUsuarioAuthByEmail(payload.correo_electronico)
+    if (existingUser) {
+      throw new Error('El correo electrónico ya está registrado')
+    }
+    
     // Validar contraseña
     validarContrasenia(payload.contrasenia)
 
     // Validar dominio del correo
     validarCorreo(payload.correo_electronico)
     
-    // Verificar si el email ya existe
-    const existingUser = await this.repo.findUsuarioAuthByEmail(payload.correo_electronico)
-    if (existingUser) {
-      throw new Error('El correo electrónico ya está registrado')
-    }
-
     //verificar si el codigo_unico ya existe
     const existingCodigo = await this.repo.findEstudianteByCodigoUnico(payload.codigo_unico)
     if (existingCodigo) {
