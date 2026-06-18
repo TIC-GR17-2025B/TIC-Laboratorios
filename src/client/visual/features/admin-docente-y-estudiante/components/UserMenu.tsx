@@ -86,7 +86,7 @@ export default function UserMenu({ items = [] }: UserMenuProps) {
                         </button>
                     ))}
 
-                    <button style={{ color: "#fd525b" }} className={`${styles.item} ${styles.itemDanger}`} onClick={handleLogout}>
+                    <button className={`${styles.item} ${styles.itemDanger}`} onClick={handleLogout}>
                         <LogOut size={16} />
                         Cerrar sesión
                     </button>

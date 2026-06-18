@@ -132,7 +132,7 @@
 
 .scenarioTitle {
   margin: 0 0 6px 0;
-  color: #4ade80;
+  color: var(--success);
   font-size: 0.9rem;
   font-weight: 400;
 }

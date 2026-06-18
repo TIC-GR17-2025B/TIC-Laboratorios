@@ -77,25 +77,25 @@
 /* ── Danger ── */
 
 .danger {
-  background: rgba(255, 107, 107, 0.05) !important;
-  color: #ff6b6b;
-  border: 1px solid rgba(255, 107, 107, 0.2);
+  background: color-mix(in srgb, var(--error) 5%, transparent) !important;
+  color: var(--error);
+  border: 1px solid color-mix(in srgb, var(--error) 20%, transparent);
 }
 
 .danger:hover:not(:disabled) {
-  background: rgba(255, 107, 107, 0.1) !important;
+  background: color-mix(in srgb, var(--error) 10%, transparent) !important;
 }
 
 /* ── Success ── */
 
 .success {
-  background: rgba(74, 222, 128, 0.05) !important;
-  color: #4ade80;
-  border: 1px solid rgba(74, 222, 128, 0.2);
+  background: color-mix(in srgb, var(--success) 5%, transparent) !important;
+  color: var(--success);
+  border: 1px solid color-mix(in srgb, var(--success) 20%, transparent);
 }
 
 .success:hover:not(:disabled) {
-  background: rgba(74, 222, 128, 0.1) !important;
+  background: color-mix(in srgb, var(--success) 10%, transparent) !important;
 }
 
 /* ── Accent ── */

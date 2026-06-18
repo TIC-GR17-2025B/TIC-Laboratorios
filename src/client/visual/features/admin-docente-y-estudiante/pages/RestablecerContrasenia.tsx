@@ -68,7 +68,7 @@ const RestablecerContrasenia = () => {
                     </div>
                     <h1 className={styles.title}>Enlace inválido</h1>
                     <div className={styles.form} style={{ textAlign: 'center' }}>
-                        <p className={styles.subtitle} style={{ margin: '0 0 8px 0', lineHeight: 1.6, color: '#f87171' }}>
+                        <p className={styles.subtitle} style={{ margin: '0 0 8px 0', lineHeight: 1.6, color: 'var(--error)' }}>
                             El enlace de recuperación no es válido o ha expirado.
                         </p>
                         <button className={styles.submitButton} onClick={() => navigate('/recuperar-contrasenia')}>
@@ -162,7 +162,7 @@ const RestablecerContrasenia = () => {
                         <h1 className={styles.title}>Contraseña actualizada</h1>
 
                         <div className={styles.form} style={{ textAlign: 'center' }}>
-                            <p className={styles.subtitle} style={{ margin: '0 0 8px 0', lineHeight: 1.6, color: '#4ade80' }}>
+                            <p className={styles.subtitle} style={{ margin: '0 0 8px 0', lineHeight: 1.6, color: 'var(--success)' }}>
                                 Tu contraseña ha sido restablecida correctamente.
                             </p>
                             <button className={styles.submitButton} onClick={() => navigate('/login')}>

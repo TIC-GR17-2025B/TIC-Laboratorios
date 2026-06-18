@@ -58,7 +58,7 @@ const VerificarEmail = () => {
                     </p>
 
                     {sent && (
-                        <div style={{ color: '#4ade80', fontSize: 12, textAlign: 'center', paddingBottom: 6 }}>
+                        <div style={{ color: 'var(--success)', fontSize: 12, textAlign: 'center', paddingBottom: 6 }}>
                             Correo reenviado correctamente.
                         </div>
                     )}

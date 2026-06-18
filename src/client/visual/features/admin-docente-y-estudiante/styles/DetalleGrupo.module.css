@@ -396,5 +396,5 @@
 .errorText {
   text-align: center;
   padding: 3rem;
-  color: #ff6b6b;
+  color: var(--error);
 }

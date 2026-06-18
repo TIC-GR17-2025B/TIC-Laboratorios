@@ -295,7 +295,7 @@
   padding: 10px 28px !important;
   font-size: 14px;
   font-weight: 400;
-  background: #059669 !important;
+  background: var(--success-solid) !important;
   border: none !important;
   border-radius: 4px !important;
   color: #ffffff !important;
@@ -308,7 +308,7 @@
 }
 
 .botonInvalido {
-  background: #dc2626 !important;
+  background: var(--error-solid) !important;
 }
 
 /* ── Verdict ── */
@@ -330,12 +330,12 @@
 
 .veredictoValido {
   background: #2b2b2b;
-  border: 2px solid #059669;
+  border: 2px solid var(--success-solid);
 }
 
 .veredictoInvalido {
   background: #2b2b2b;
-  border: 2px solid #dc2626;
+  border: 2px solid var(--error-solid);
 }
 
 .iconoVeredicto {
@@ -348,12 +348,12 @@
 }
 
 .veredictoValido .iconoVeredicto {
-  background: #059669;
+  background: var(--success-solid);
   color: #ffffff;
 }
 
 .veredictoInvalido .iconoVeredicto {
-  background: #dc2626;
+  background: var(--error-solid);
   color: #ffffff;
 }
 
@@ -367,11 +367,11 @@
 }
 
 .veredictoValido .textoVeredicto h3 {
-  color: #059669;
+  color: var(--success-solid);
 }
 
 .veredictoInvalido .textoVeredicto h3 {
-  color: #dc2626;
+  color: var(--error-solid);
 }
 
 .textoVeredicto p {

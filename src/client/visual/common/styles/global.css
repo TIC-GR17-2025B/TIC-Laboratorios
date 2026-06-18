@@ -11,6 +11,21 @@
   --blue: #5a8fff;
   --blue-lighter: #7694cd;
   --blue-transparent: #5a8fff22;
+
+  /* ── Semantic status colors ──
+     base  → text & borders on dark surfaces
+     solid → solid fills with white text on top
+     bg    → subtle tinted background */
+  --error: #f87171;
+  --error-solid: #dc2626;
+  --error-bg: rgba(248, 113, 113, 0.12);
+  --success: #4ade80;
+  --success-solid: #059669;
+  --success-bg: rgba(74, 222, 128, 0.12);
+  --warning: #fbbf24;
+  --warning-solid: #d97706;
+  --warning-bg: rgba(251, 191, 36, 0.12);
+
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;

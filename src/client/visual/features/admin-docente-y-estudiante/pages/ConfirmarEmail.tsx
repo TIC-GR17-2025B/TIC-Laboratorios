@@ -63,7 +63,7 @@ const ConfirmarEmail = () => {
                 </h1>
 
                 <div className={styles.form} style={{ textAlign: 'center' }}>
-                    <p className={styles.subtitle} style={{ margin: '0 0 8px 0', lineHeight: 1.6, color: status === 'success' ? '#4ade80' : status === 'error' ? '#f87171' : '#555' }}>
+                    <p className={styles.subtitle} style={{ margin: '0 0 8px 0', lineHeight: 1.6, color: status === 'success' ? 'var(--success)' : status === 'error' ? 'var(--error)' : '#555' }}>
                         {message}
                     </p>
 

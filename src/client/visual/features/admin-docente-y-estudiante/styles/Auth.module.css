@@ -286,22 +286,22 @@
 
 /* ── Input error state ── */
 .inputError {
-  border-color: #f87171;
+  border-color: var(--error);
 }
 
 .inputError:focus {
-  border-color: #f87171;
+  border-color: var(--error);
 }
 
 .fieldError {
   font-size: 11px;
-  color: #f87171;
+  color: var(--error);
   margin-top: 4px;
 }
 
 /* ── General error ── */
 .error {
-  color: #f87171;
+  color: var(--error);
   font-size: 12px;
   text-align: center;
 }

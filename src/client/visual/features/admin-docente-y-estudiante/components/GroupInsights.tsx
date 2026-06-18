@@ -6,15 +6,15 @@ interface Props {
 }
 
 function completionColor(pct: number): string {
-  if (pct >= 70) return "#34d399";
-  if (pct >= 40) return "#fbbf24";
-  return "#f87171";
+  if (pct >= 70) return "var(--success)";
+  if (pct >= 40) return "var(--warning)";
+  return "var(--error)";
 }
 
 const DIST_ITEMS = [
-  { key: "primerIntento" as const, label: "Primer intento", color: "#34d399" },
-  { key: "dosATres" as const, label: "2-3 intentos", color: "#fbbf24" },
-  { key: "cuatroOMas" as const, label: "4+ intentos", color: "#f87171" },
+  { key: "primerIntento" as const, label: "Primer intento", color: "var(--success)" },
+  { key: "dosATres" as const, label: "2-3 intentos", color: "var(--warning)" },
+  { key: "cuatroOMas" as const, label: "4+ intentos", color: "var(--error)" },
   { key: "sinCompletar" as const, label: "Sin completar", color: "#6b7280" },
 ];
 

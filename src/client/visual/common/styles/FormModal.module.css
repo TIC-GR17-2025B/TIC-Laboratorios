@@ -90,7 +90,7 @@
 }
 
 .error {
-  color: #ff6b6b;
+  color: var(--error);
   font-size: 0.875rem;
   margin: 0.5rem 0;
 }
