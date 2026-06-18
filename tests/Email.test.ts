@@ -26,6 +26,9 @@ describe("Auth Extra UseCases", () => {
   const mockedHash = bcrypt.hash as unknown as ReturnType<typeof vi.fn>
 
   beforeEach(() => {
+
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    
     repo = {
       findUsuarioAuthByRecoveryToken: vi.fn(),
       updatePassword: vi.fn(),

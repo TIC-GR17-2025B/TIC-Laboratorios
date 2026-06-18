@@ -24,6 +24,9 @@ describe("Register UseCases", () => {
     const mockedHash = bcrypt.hash as unknown as ReturnType<typeof vi.fn>
 
     beforeEach(() => {
+
+        vi.spyOn(console, 'error').mockImplementation(() => {})
+        
         repo = {
             findUsuarioAuthByEmail: vi.fn(),
             createUsuarioAuth: vi.fn(),
