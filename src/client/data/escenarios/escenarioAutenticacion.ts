@@ -14,6 +14,7 @@ import {
   ObjetosManejables,
 } from "../../shared/types/AccionesEnums";
 import { ColoresRed } from "../colores";
+import type { DefinicionEscenario } from "../../shared/types/EscenarioTypes";
 
 /**
  * Escenario 3 — Autenticación y Control de Acceso
@@ -41,7 +42,7 @@ import { ColoresRed } from "../colores";
  * ║  └────────────────────────┘  ║
  * ╚══════════════════════════════╝
  */
-export const escenarioAutenticacion: unknown = {
+export const escenarioAutenticacion: DefinicionEscenario = {
   id: 3,
   slug: "autenticacion",
   titulo: "Autenticación y Control de Acceso",
@@ -64,10 +65,12 @@ export const escenarioAutenticacion: unknown = {
       condicionMitigacion: {
         accion: AccionesRealizables.EJECUTAR,
         objeto: ObjetosManejables.CONFIG_WORKSTATION,
-        val: {
-          nombreConfig: "Cuidado con adjuntos de email",
-          activado: true,
-        },
+        val: [
+          {
+            nombreConfig: "Cuidado con adjuntos de email",
+            activado: true,
+          },
+        ],
       },
     },
   ],

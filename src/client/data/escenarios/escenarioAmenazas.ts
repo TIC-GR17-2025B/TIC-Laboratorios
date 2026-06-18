@@ -17,6 +17,7 @@ import {
   AccionFirewall,
   DireccionTrafico,
 } from "../../shared/types/FirewallTypes";
+import type { DefinicionEscenario } from "../../shared/types/EscenarioTypes";
 
 /**
  * Escenario 8 — Amenazas y Ataques Comunes
@@ -29,7 +30,7 @@ import {
  *
  * Dificultad: ★★☆☆☆ (Fácil-Medio)
  */
-export const escenarioAmenazas: unknown = {
+export const escenarioAmenazas: DefinicionEscenario = {
   id: 8,
   slug: "amenazas",
   titulo: "Amenazas y Ataques Comunes",

@@ -7,6 +7,7 @@ import {
   TipoEvento,
   TipoProteccionVPN,
 } from "../../shared/types/DeviceEnums";
+import type { DefinicionEscenario } from "../../shared/types/EscenarioTypes";
 import { TipoProtocolo } from "../../shared/types/TrafficEnums";
 import { ColoresRed } from "../colores";
 
@@ -21,7 +22,7 @@ import { ColoresRed } from "../colores";
  *
  * Dificultad: ★★★★☆ (Medio-Alto)
  */
-export const escenarioSegmentacionPCI: unknown = {
+export const escenarioSegmentacionPCI: DefinicionEscenario = {
   id: 11,
   slug: "segmentacion-pci",
   titulo: "Segmentación PCI-DSS: Empresa Retail",

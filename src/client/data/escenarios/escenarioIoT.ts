@@ -14,6 +14,7 @@ import {
   ObjetosManejables,
 } from "../../shared/types/AccionesEnums";
 import { ColoresRed } from "../colores";
+import type { DefinicionEscenario } from "../../shared/types/EscenarioTypes";
 
 /**
  * Escenario 13 — Seguridad IoT e Infraestructura Crítica
@@ -27,7 +28,7 @@ import { ColoresRed } from "../colores";
  *
  * Dificultad: ★★★★★ (Alto)
  */
-export const escenarioIoT: unknown = {
+export const escenarioIoT: DefinicionEscenario = {
   id: 13,
   slug: "iot",
   titulo: "Seguridad IoT e Infraestructura Crítica",
@@ -49,7 +50,12 @@ export const escenarioIoT: unknown = {
       condicionMitigacion: {
         accion: AccionesRealizables.EJECUTAR,
         objeto: ObjetosManejables.CONFIG_WORKSTATION,
-        val: { nombreConfig: "Actualizaciones automáticas de antivirus", activado: true },
+        val: [
+          {
+            nombreConfig: "Actualizaciones automáticas de antivirus",
+            activado: true
+          },
+        ],
       },
     },
   ],

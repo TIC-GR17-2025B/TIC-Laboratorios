@@ -15,6 +15,7 @@ import {
 } from "../../shared/types/AccionesEnums";
 import { ColoresRed } from "../colores";
 import { AccionFirewall, DireccionTrafico } from "../../shared/types/FirewallTypes";
+import type { DefinicionEscenario } from "../../shared/types/EscenarioTypes";
 
 /**
  * Escenario 10 — Control de Acceso y Protocolos Seguros
@@ -28,7 +29,7 @@ import { AccionFirewall, DireccionTrafico } from "../../shared/types/FirewallTyp
  *
  * Dificultad: ★★★☆☆ (Medio)
  */
-export const escenarioControlAcceso: unknown = {
+export const escenarioControlAcceso: DefinicionEscenario = {
   id: 10,
   slug: "control-acceso",
   titulo: "Control de Acceso y Protocolos Seguros",

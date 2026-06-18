@@ -7,6 +7,7 @@ import {
   TipoEvento,
   TipoProteccionVPN,
 } from "../../shared/types/DeviceEnums";
+import type { DefinicionEscenario } from "../../shared/types/EscenarioTypes";
 import { TipoProtocolo } from "../../shared/types/TrafficEnums";
 import { ColoresRed } from "../colores";
 
@@ -45,7 +46,7 @@ import { ColoresRed } from "../colores";
  * ║ └──────────────────┘  ║   ║ └──────────────────┘  ║
  * ╚══════════════════════╝   ╚══════════════════════╝
  */
-export const escenarioRedes: unknown = {
+export const escenarioRedes: DefinicionEscenario = {
   id: 4,
   slug: "redes",
   titulo: "Seguridad de Redes: Firewall, Segmentación y VPN",

@@ -11,6 +11,7 @@ import {
   TipoEvento,
   TipoProteccionVPN,
 } from "../../shared/types/DeviceEnums";
+import type { DefinicionEscenario } from "../../shared/types/EscenarioTypes";
 import { TipoProtocolo } from "../../shared/types/TrafficEnums";
 import { ColoresRed } from "../colores";
 
@@ -25,7 +26,7 @@ import { ColoresRed } from "../colores";
  *
  * Dificultad: ★★★★☆ (Medio-Alto)
  */
-export const escenarioAuditoria: unknown = {
+export const escenarioAuditoria: DefinicionEscenario = {
   id: 12,
   slug: "auditoria",
   titulo: "Auditoría de Seguridad Empresarial",

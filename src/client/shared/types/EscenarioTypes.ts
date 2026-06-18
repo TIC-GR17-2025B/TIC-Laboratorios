@@ -2,8 +2,8 @@ import type {
   AtaqueComponent,
   EventoComponent,
   FaseComponent,
-} from "../../client/ecs/components";
-import type { Entidad } from "../../client/ecs/core";
+} from "../../ecs/components";
+import type { Entidad } from "../../ecs/core";
 import type { ColoresRed } from "../../data/colores";
 import type { AccionesRealizables, ObjetosManejables } from "./AccionesEnums";
 import {
@@ -11,10 +11,14 @@ import {
   Mueble,
   NivelConcienciaSeguridad,
   TipoActivo,
+  TipoAtaque,
   TipoDispositivo,
+  TipoEvento,
   TipoProteccionVPN,
 } from "./DeviceEnums";
 import type { TipoLogGeneral } from "./EventosEnums";
+import type { AccionFirewall, DireccionTrafico } from "./FirewallTypes";
+import type { TipoProtocolo } from "./TrafficEnums";
 
 export interface Escenario {
   id: number;
@@ -148,10 +152,72 @@ export interface DefinicionEscenario {
   id: number;
   slug: string;
   titulo: string;
+  categoria: string;
   descripcion: string;
-  presupuestoInicial: number;
-  ataques: AtaqueComponent[];
-  eventos: EventoComponent[];
+  presupuestoInicial?: number;
+  ataques: {
+    nombreAtaque: string;
+    tiempoNotificacion: number;
+    tiempoEnOcurrir?: number;
+    tipoAtaque: TipoAtaque;
+    dispositivoAAtacar: string;
+    descripcion: string;
+    fase: number;
+    condicionMitigacion: {
+      accion: AccionesRealizables;
+      objeto: ObjetosManejables;
+      tiempo?: number;
+      val: // El val (info adicional) dependerá del objeto de ObjetosManejables. Se maneja en SistemaEvento
+      { // Para CONFIG_WORKSTATION
+        nombreConfig: string;
+        activado: boolean;
+      }[] |
+      { // Para CONFIG_FIREWALL
+        nombreRed: string;
+        accion: AccionFirewall;
+        direccion: DireccionTrafico;
+        protocolo: TipoProtocolo;
+      }[];
+    };
+  }[];
+  eventos: {
+    nombreEvento: string;
+    tipoEvento: TipoEvento;
+    tiempoNotificacion: number;
+    tiempoEnOcurrir?: number;
+    descripcion: string;
+    fase: number;
+    infoAdicional?: // Lo mismo que el val de ataques pero aquí dependerá de TipoEvento
+    { // Para ENVIO_ACTIVO
+      nombreActivo: string;
+      dispositivoEmisor: string;
+      dispositivoReceptor: string;
+    } |
+    { // Para TRAFICO_RED
+      dispositivoOrigen: string;
+      dispositivoDestino: string;
+      protocolo: unknown;
+      esObjetivo: boolean;
+      debeSerBloqueado: boolean;
+    } |
+    { // Para CONEXION_VPN
+      gateway: PerfilVPNGateway;
+      cliente: PerfilClienteVPN;
+    } | // Para VERIFICACION_FIRMA
+    RegistroVeredictoFirma |
+    { // Para VERIFICACION_ACCION_JUGADOR
+      accion: AccionesRealizables;
+      objeto: ObjetosManejables;
+      tiempo?: number;
+      val?: unknown;
+    } |
+    { // Para ENVIO_CORREO
+      dispositivoEmisor: string;
+      destinatario: string;
+      asunto: string;
+    };
+    ejecutarAlInstante?: boolean;
+  }[];
   accionesEsperadas: {
     accion: AccionesRealizables;
     objeto: ObjetosManejables;
@@ -159,17 +225,21 @@ export interface DefinicionEscenario {
     finTiempoEsperado: number;
     val?: unknown;
   }[];
-  fases: FaseComponent[];
+  fases: {
+    id: number;
+    nombre: string;
+    descripcion: string;
+    faseActual: boolean;
+    completada: boolean;
+    objetivos: ObjetivoFase[];
+  }[];
   zonas: {
     id: number;
     nombre: string;
     dominio: string;
-    esInteractiva?: boolean;
-    redes: {
-      nombre: string;
-      color: ColoresRed;
-    }[];
-    personas: {
+    esInteractiva?: boolean; // Útil para cuando se quiere que el jugador no pueda examinar dispositivos de otras zonas 
+    redes: { nombre: string; color: ColoresRed; }[];
+    personas?: {
       nombre: string;
       correo: string;
       nivelConcienciaSeguridad: NivelConcienciaSeguridad;
@@ -191,10 +261,17 @@ export interface DefinicionEscenario {
           software: string;
           posicion: { x: number; y: number; z: number; rotacionY: number; };
           estadoAtaque: EstadoAtaqueDispositivo;
-          personaEncargada: string;
+          personaEncargada?: string; // Sólo para workstations o servers
+          /* 'nombreEquipo' es el nombre interno del dispositivo, mostrado en la consola/terminal de los dispositivos,
+             y 'nombre' es el convencional, el nombre común con el que el jugador puede identificarlo en la escena. */
+          nombreEquipo?: string; // --|- Normalmente, estos 3 se definirán sólo cuando
+          usuario?: string;      //   |  se utilice la consola/terminal de los dispositivos.
+          contrasenia?: string;  // --|  Principalmente usados para realizar actividades de SSH.
           activos: Activo[];
           redes: string[];
           conectadoAInternet?: boolean;
+          // Se muestra en 3D pero no es utilizable. Útil para vestir escenas sin contaminar el nivel
+          decorativo?: boolean;
         }[];
       }[];
     }[]; 

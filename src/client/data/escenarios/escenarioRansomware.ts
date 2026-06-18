@@ -7,10 +7,11 @@ import {
   TipoEvento,
   TipoProteccionVPN,
 } from "../../shared/types/DeviceEnums";
+import type { DefinicionEscenario } from "../../shared/types/EscenarioTypes";
 import { TipoProtocolo } from "../../shared/types/TrafficEnums";
 import { ColoresRed } from "../colores";
 
-export const escenarioRansomware: unknown = {
+export const escenarioRansomware: DefinicionEscenario = {
   id: 6,
   slug: "ransomware",
   titulo: "Gestión de Riesgos: Respuesta a Incidentes",

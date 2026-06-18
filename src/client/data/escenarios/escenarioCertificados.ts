@@ -7,6 +7,7 @@ import {
   TipoEvento,
   TipoProteccionVPN,
 } from "../../shared/types/DeviceEnums";
+import type { DefinicionEscenario } from "../../shared/types/EscenarioTypes";
 import { TipoProtocolo } from "../../shared/types/TrafficEnums";
 import { ColoresRed } from "../colores";
 
@@ -21,7 +22,7 @@ import { ColoresRed } from "../colores";
  *
  * Dificultad: ★★★☆☆ (Medio)
  */
-export const escenarioCertificados: unknown = {
+export const escenarioCertificados: DefinicionEscenario = {
   id: 9,
   slug: "certificados",
   titulo: "Certificados Digitales y PKI",

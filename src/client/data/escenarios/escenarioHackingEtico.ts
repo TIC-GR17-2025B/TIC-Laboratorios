@@ -11,6 +11,7 @@ import {
   TipoDispositivo,
   TipoEvento,
 } from "../../shared/types/DeviceEnums";
+import type { DefinicionEscenario } from "../../shared/types/EscenarioTypes";
 import { ColoresRed } from "../colores";
 import { PlantillasCorreoPhishing } from "../plantillas/Plantillas";
 
@@ -29,7 +30,7 @@ function generarContrasenia(): string {
 
 const contrasenia = generarContrasenia();
 
-export const escenarioHackingEtico: unknown = {
+export const escenarioHackingEtico: DefinicionEscenario = {
   id: 5,
   slug: "hacking-etico",
   titulo: "Hacking Ético y Análisis de Vulnerabilidades",
@@ -380,6 +381,7 @@ export const escenarioHackingEtico: unknown = {
                     {
                       nombre: "Activo2",
                       contenido: "Bienvenido",
+                      tipo: TipoActivo.GENERICO,
                     },
                   ],
                   // --- ESTADO INICIAL: ninguna ---

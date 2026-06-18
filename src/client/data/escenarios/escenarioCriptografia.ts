@@ -8,6 +8,7 @@ import {
   TipoEvento,
   TipoProteccionVPN,
 } from "../../shared/types/DeviceEnums";
+import type { DefinicionEscenario } from "../../shared/types/EscenarioTypes";
 import { ColoresRed } from "../colores";
 
 /**
@@ -32,7 +33,7 @@ import { ColoresRed } from "../colores";
  * ║  └────────────────────────┘  ║
  * ╚══════════════════════════════╝
  */
-export const escenarioCriptografia: unknown = {
+export const escenarioCriptografia: DefinicionEscenario = {
   id: 2,
   slug: "criptografia",
   titulo: "Criptografía: Firma Digital y Comunicación Segura",
