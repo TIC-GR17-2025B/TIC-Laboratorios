@@ -4,6 +4,8 @@ import type {
   FaseComponent,
 } from "../../client/ecs/components";
 import type { Entidad } from "../../client/ecs/core";
+import type { ColoresRed } from "../../data/colores";
+import type { AccionesRealizables, ObjetosManejables } from "./AccionesEnums";
 import {
   EstadoAtaqueDispositivo,
   Mueble,
@@ -140,4 +142,61 @@ export interface PlantillaCorreoPhishing {
 export interface RespuestaComando {
   texto: string;
   entidadActual: Entidad;
+}
+
+export interface DefinicionEscenario {
+  id: number;
+  slug: string;
+  titulo: string;
+  descripcion: string;
+  presupuestoInicial: number;
+  ataques: AtaqueComponent[];
+  eventos: EventoComponent[];
+  accionesEsperadas: {
+    accion: AccionesRealizables;
+    objeto: ObjetosManejables;
+    inicioTiempoEsperado: number;
+    finTiempoEsperado: number;
+    val?: unknown;
+  }[];
+  fases: FaseComponent[];
+  zonas: {
+    id: number;
+    nombre: string;
+    dominio: string;
+    esInteractiva?: boolean;
+    redes: {
+      nombre: string;
+      color: ColoresRed;
+    }[];
+    personas: {
+      nombre: string;
+      correo: string;
+      nivelConcienciaSeguridad: NivelConcienciaSeguridad;
+    }[];
+    oficinas: {
+      id: number;
+      nombre: string;
+      posicion: { x: number;  y: number; z: number; rotacionY: number; };
+      espacios: {
+        id: number;
+        mueble: Mueble;
+        posicion: { x: number; y: number; z: number; rotacionY: number; };
+        dispositivos: {
+          id: number;
+          tipo: TipoDispositivo;
+          nombre: string;
+          sistemaOperativo: string;
+          hardware: string;
+          software: string;
+          posicion: { x: number; y: number; z: number; rotacionY: number; };
+          estadoAtaque: EstadoAtaqueDispositivo;
+          personaEncargada: string;
+          activos: Activo[];
+          redes: string[];
+          conectadoAInternet?: boolean;
+        }[];
+      }[];
+    }[]; 
+  }[];
 }

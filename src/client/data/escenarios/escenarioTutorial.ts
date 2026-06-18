@@ -7,6 +7,7 @@ import {
   TipoDispositivo,
   TipoEvento,
 } from "../../shared/types/DeviceEnums";
+import type { DefinicionEscenario } from "../../shared/types/EscenarioTypes";
 import { AccionFirewall, DireccionTrafico } from "../../shared/types/FirewallTypes";
 import { TipoProtocolo } from "../../shared/types/TrafficEnums";
 import { ColoresRed } from "../colores";
@@ -32,7 +33,7 @@ import { ColoresRed } from "../colores";
  * ║  └─────────────────────┘  ║   ╚═══════════════════════╝
  * ╚═══════════════════════════╝
  */
-export const escenarioTutorial: unknown = {
+export const escenarioTutorial: DefinicionEscenario = {
   id: 1,
   slug: "tutorial",
   titulo: "Tutorial: Introducción a la Seguridad",
