@@ -135,7 +135,7 @@ export const escenarioHackingEtico: DefinicionEscenario = {
       tiempoNotificacion: 55,
       tiempoEnOcurrir: 60,
       descripcion:
-        "Ya dentro del equipo, busca y extrae algún archivo confidencial de la empresa.",
+        "Ya dentro del equipo, busca y obtén información confidencial de la empresa.",
       fase: 2,
       infoAdicional: {
         accion: AccionesRealizables.EJECUTAR,

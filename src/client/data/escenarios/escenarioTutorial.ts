@@ -91,7 +91,7 @@ export const escenarioTutorial: DefinicionEscenario = {
       tipoEvento: TipoEvento.COMPLETACION_ESCENARIO,
       tiempoNotificacion: 30,
       descripcion:
-        "¡Tutorial completado! Dominas disponibilidad y confidencialidad. Lo que sigue: integridad y criptografía.",
+        "¡Tutorial completado! Dominas disponibilidad y confidencialidad.",
       fase: 2,
     },
   ],

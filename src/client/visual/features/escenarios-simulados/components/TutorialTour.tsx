@@ -88,9 +88,9 @@ export default function TutorialTour() {
       target: "body",
       placement: "center",
       route: "/",
-      title: "Bienvenido al simulador",
+      title: "Bienvenido a CyberSim",
       content:
-        "Este es un simulador para aprender seguridad informática practicando. " +
+        "CyberSim es un simulador para aprender seguridad informática practicando. " +
         "Cada escenario te pone en una situación distinta: a veces proteges los sistemas " +
         "de una empresa, a veces eres tú quien ataca. Te mostramos rápido las herramientas que tienes.",
     },

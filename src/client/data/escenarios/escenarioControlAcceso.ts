@@ -133,7 +133,7 @@ export const escenarioControlAcceso: DefinicionEscenario = {
       tipoEvento: TipoEvento.CONEXION_VPN,
       tiempoNotificacion: 50,
       descripcion:
-        "Un investigador accede al laboratorio desde casa. Configura VPN modo 'Encriptar y Autenticar' (EA) entre el gateway y su PC remoto.",
+        "Un investigador necesita acceder al server del laboratorio desde casa. Configura VPN modo 'Encriptar y Autenticar' (EA) entre el gateway y su PC remoto.",
       fase: 3,
       infoAdicional: {
         gateway: {
