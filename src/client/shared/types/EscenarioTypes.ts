@@ -196,7 +196,7 @@ export interface DefinicionEscenario {
     { // Para TRAFICO_RED
       dispositivoOrigen: string;
       dispositivoDestino: string;
-      protocolo: unknown;
+      protocolo: TipoProtocolo;
       esObjetivo: boolean;
       debeSerBloqueado: boolean;
     } |
@@ -209,7 +209,8 @@ export interface DefinicionEscenario {
       accion: AccionesRealizables;
       objeto: ObjetosManejables;
       tiempo?: number;
-      val?: unknown;
+      val?: unknown; // Dependerá de las acciones que se quieran verificar, para su correcto uso se recomienda revisar ejemplos 
+                     // en escenarios que utilicen este evento o los ejemplos definidos en 'SistemaEvento y SistemaFase.test.ts'.
     } |
     { // Para ENVIO_CORREO
       dispositivoEmisor: string;
@@ -218,12 +219,16 @@ export interface DefinicionEscenario {
     };
     ejecutarAlInstante?: boolean;
   }[];
-  accionesEsperadas: {
+  accionesEsperadas: { // Son las acciones que se espera que el jugador realice durante la simulación,
+                       // estas se guardan para el análisis de la partida, para comparlas con el registro 
+                       // de acciones realizadas (las acciones que sí se realizaron en la simulación, obtenidas 
+                       // de la estructura de accionesSimulacion del ECSManager).
     accion: AccionesRealizables;
     objeto: ObjetosManejables;
     inicioTiempoEsperado: number;
     finTiempoEsperado: number;
-    val?: unknown;
+    val?: unknown; // Dependerá de las acciones que se esperen. Para una mejor comprensión y uso se recomienda revisar los 
+                   // ejemplos en los escenarios que definan este atributo
   }[];
   fases: {
     id: number;

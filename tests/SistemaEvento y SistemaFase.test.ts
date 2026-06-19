@@ -1143,7 +1143,7 @@ describe("SistemaEvento y SistemaFase", () => {
                     // al formato de un registro del registro de acciones del ECSManager; es decir: accion,
                     // objeto, tiempo y val. El tiempo es opcional al igual que val, pero en val se pueden definir 
                     // más parámetros según la acción y/u objeto que se quiera evaluar. Por ejemplo, en este caso se 
-                    // quiere verificar que el jugador a ejecutado una aplicación en la simulación, y en val se le pasa
+                    // quiere verificar que el jugador ha ejecutado una aplicación en la simulación, y en val se le pasa
                     // el nombre de la aplicación. Por lo cual, en val se definirá según sea el caso, dando más flexibilidad
                     // para el uso de este evento. De igual forma, dependiendo de la acción y/u objeto a verificar, puede ser
                     // necesario colocar un endpoint específico en el frontend para registrar la acción. 
