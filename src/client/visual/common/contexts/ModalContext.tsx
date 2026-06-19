@@ -1,5 +1,6 @@
-import { createContext, useContext, useState, useCallback, useMemo } from 'react';
+import { createContext, useContext, useState, useCallback, useMemo, useEffect } from 'react';
 import type { ReactNode } from 'react';
+import { useLocation } from 'react-router';
 
 interface ModalContextType {
     isOpen: boolean;
@@ -26,6 +27,7 @@ export function ModalProvider({ children }: ModalProviderProps) {
     const [modalTitle, setModalTitle] = useState<string | null>(null);
     const [dismissible, setDismissible] = useState(true);
     const [showHeader, setShowHeader] = useState(true);
+    const { pathname } = useLocation();
 
     const openModal = useCallback((content: ReactNode, title?: string, isDismissible: boolean = true, hasHeader: boolean = true) => {
         setModalContent(content);
@@ -44,6 +46,15 @@ export function ModalProvider({ children }: ModalProviderProps) {
             setShowHeader(true);
         }, 300);
     }, []);
+
+    // Cerrar el modal al navegar entre páginas (ej. de oficina a redes/partida)
+    useEffect(() => {
+        setIsOpen(false);
+        setModalContent(null);
+        setModalTitle(null);
+        setDismissible(true);
+        setShowHeader(true);
+    }, [pathname]);
 
     const contextValue = useMemo(() => ({
         isOpen, modalContent, modalTitle, dismissible, showHeader, openModal, closeModal,

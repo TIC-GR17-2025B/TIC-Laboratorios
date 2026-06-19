@@ -71,3 +71,26 @@
 .radial-menu-button:active {
     scale: 0.95;
 }
+
+.radial-menu-blocked {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    padding: 16px 20px;
+    border-radius: var(--border-radius);
+    background: var(--surface-primary);
+    border: 1px solid var(--border-primary);
+    color: var(--text-primary);
+    font-size: 13px;
+    text-align: center;
+    white-space: nowrap;
+    pointer-events: none;
+    transform-origin: center;
+    scale: 0;
+    animation: radial-menu-button-appear 0.3s ease forwards;
+}

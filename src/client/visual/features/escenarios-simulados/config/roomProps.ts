@@ -9,8 +9,8 @@ import { rngInt, rngRange } from '../utils/seededRandom';
  *
  * - Salas sintéticas: se amueblan según su tema (oficina → escritorios, datacenter
  *   → racks, casa → escritorio aislado…), replicando la jerarquía espacio→equipo.
- * - Salas reales: ya traen sus muebles del ECS; solo reciben equipo de red de
- *   ambiente cuando su tema lo pide (datacenter/hacker).
+ * - Salas reales: NO reciben props decorativos; se quedan con sus dispositivos del
+ *   ECS para no mezclar equipo decorativo con los interactuables (confunde).
  *
  * La colocación la fija un PRNG sembrado por el id de la oficina, así que es
  * estable entre renders.
@@ -122,15 +122,4 @@ export function placeBackRow(room: RoomInfo, rng: () => number, spec: RowSpec): 
   }
 
   return props;
-}
-
-/**
- * Equipo de red de ambiente para salas reales: solo las técnicas reciben racks,
- * para no recargar las oficinas (que ya traen sus muebles del ECS).
- */
-export function ambientProps(room: RoomInfo, rng: () => number): PlacedProp[] {
-  if (room.tipo === 'datacenter' || room.tipo === 'hacker') {
-    return placeBackRow(room, rng, { base: 'rack', count: { min: 1, max: 3 }, pitch: 0.8, topper: 'gear', gearChance: 0.85 });
-  }
-  return [];
 }

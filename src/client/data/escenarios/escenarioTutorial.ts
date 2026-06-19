@@ -51,9 +51,7 @@ export const escenarioTutorial: DefinicionEscenario = {
       tiempoNotificacion: 5,
       tiempoEnOcurrir: 10,
       descripcion:
-        "¡Bienvenido! Tu primera tarea como administrador de seguridad es garantizar la DISPONIBILIDAD de los sistemas. " +
-        "El 'PC Empleado' no puede comunicarse con el 'Servidor Interno' porque no está conectado a ninguna red. " +
-        "Dirígete a la vista de Redes y asígnalo a la red 'LAN-Oficina'.",
+        "El PC Empleado no llega al servidor interno: no tiene red. Conéctalo a la LAN de la oficina.",
       fase: 1,
       infoAdicional: {
         dispositivoOrigen: "PC Empleado",
@@ -68,8 +66,7 @@ export const escenarioTutorial: DefinicionEscenario = {
       tipoEvento: TipoEvento.COMPLETACION_FASE,
       tiempoNotificacion: 15,
       descripcion:
-        "¡Excelente! Has restaurado la disponibilidad del sistema. " +
-        "Ahora pasemos a proteger la CONFIDENCIALIDAD de los datos.",
+        "¡Excelente! Restauraste la disponibilidad del sistema. Ahora protege la confidencialidad de los datos.",
       fase: 1,
     },
     // ── FASE 2: Confidencialidad ──
@@ -79,10 +76,7 @@ export const escenarioTutorial: DefinicionEscenario = {
       tiempoNotificacion: 20,
       tiempoEnOcurrir: 25,
       descripcion:
-        "Se ha detectado un intento de conexión SSH desde Internet hacia tu red interna. " +
-        "Esto es una AMENAZA a la CONFIDENCIALIDAD: un atacante externo intenta acceder a tus sistemas. " +
-        "Para proteger la red, configura el firewall del 'Router Principal': " +
-        "bloquea todo el tráfico SSH entrante hacia la red 'LAN-Oficina'.",
+        "Alguien intenta entrar por SSH desde Internet a tu red interna. Usa el firewall del router para frenarlo.",
       fase: 2,
       infoAdicional: {
         dispositivoOrigen: "Servidor Externo",
@@ -97,9 +91,7 @@ export const escenarioTutorial: DefinicionEscenario = {
       tipoEvento: TipoEvento.COMPLETACION_ESCENARIO,
       tiempoNotificacion: 30,
       descripcion:
-        "¡Felicidades! Has completado el tutorial. Aprendiste sobre Disponibilidad (conectar sistemas) " +
-        "y Confidencialidad (bloquear accesos no autorizados). " +
-        "En los siguientes escenarios explorarás la Integridad, la criptografía, la autenticación y más.",
+        "¡Tutorial completado! Dominas disponibilidad y confidencialidad. Lo que sigue: integridad y criptografía.",
       fase: 2,
     },
   ],
@@ -133,7 +125,7 @@ export const escenarioTutorial: DefinicionEscenario = {
       id: 1,
       nombre: "Fase 1: Disponibilidad — Conectar sistemas",
       descripcion:
-        "La DISPONIBILIDAD es uno de los tres pilares de la seguridad (CIA). Significa que los sistemas y datos " +
+        "La disponibilidad es uno de los tres pilares de la seguridad (CIA). Significa que los sistemas y datos " +
         "deben estar accesibles cuando se necesiten. Asigna la red correcta al PC del empleado.",
       faseActual: true,
       completada: false,
@@ -148,7 +140,7 @@ export const escenarioTutorial: DefinicionEscenario = {
       id: 2,
       nombre: "Fase 2: Confidencialidad — Bloquear intrusos",
       descripcion:
-        "La CONFIDENCIALIDAD protege la información contra accesos no autorizados. " +
+        "La confidencialidad protege la información contra accesos no autorizados. " +
         "Configura el firewall para bloquear conexiones SSH desde Internet.",
       faseActual: false,
       completada: false,

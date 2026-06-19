@@ -7,7 +7,9 @@
       "Bash(git merge:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "PowerShell(npm run *)",
+      "Bash(git *)"
     ]
   }
 }

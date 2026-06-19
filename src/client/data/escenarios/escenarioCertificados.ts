@@ -38,9 +38,7 @@ export const escenarioCertificados: DefinicionEscenario = {
       tipoEvento: TipoEvento.VERIFICACION_FIRMA,
       tiempoNotificacion: 5,
       descripcion:
-        "En una PKI (Public Key Infrastructure), cada entidad tiene un certificado digital " +
-        "firmado por una Autoridad Certificadora (CA). Verifica que el 'Certificado Servidor Web' " +
-        "sea auténtico usando la firma y la clave pública de la CA.",
+        "Llegó el 'Certificado Servidor Web', supuestamente emitido por la CA. Verifícalo y decide si es auténtico.",
       fase: 1,
       infoAdicional: {
         nombreDocumento: "Certificado Servidor Web",
@@ -54,9 +52,7 @@ export const escenarioCertificados: DefinicionEscenario = {
       tipoEvento: TipoEvento.VERIFICACION_FIRMA,
       tiempoNotificacion: 20,
       descripcion:
-        "Se recibió un certificado supuestamente emitido por la CA, pero podría ser FALSIFICADO. " +
-        "En PKI, un certificado inválido indica un ataque man-in-the-middle o suplantación. " +
-        "Verifica el 'Certificado Sospechoso' — si los hashes no coinciden, es falso.",
+        "Llegó el 'Certificado Sospechoso' que dice venir de la CA, pero podría ser falso. Verifícalo y emite tu veredicto.",
       fase: 1,
       infoAdicional: {
         nombreDocumento: "Certificado Sospechoso",
@@ -69,7 +65,7 @@ export const escenarioCertificados: DefinicionEscenario = {
       nombreEvento: "Completación Fase 1",
       tipoEvento: TipoEvento.COMPLETACION_FASE,
       tiempoNotificacion: 35,
-      descripcion: "¡Excelente! Has verificado la cadena de confianza PKI. Ahora protege la infraestructura.",
+      descripcion: "¡Bien! Confiar solo en lo que la firma de la CA respalda. Ahora protege la infraestructura.",
       fase: 1,
     },
     {
@@ -77,8 +73,7 @@ export const escenarioCertificados: DefinicionEscenario = {
       tipoEvento: TipoEvento.TRAFICO_RED,
       tiempoNotificacion: 40,
       descripcion:
-        "El servidor de la Autoridad Certificadora es CRÍTICO. Si un atacante lo compromete, " +
-        "podría emitir certificados falsos. Bloquea todo tráfico SSH externo hacia 'LAN-CA'.",
+        "El servidor de la CA es crítico: si lo comprometen, emitirían certificados falsos. Ciérrale el acceso externo.",
       fase: 2,
       infoAdicional: {
         dispositivoOrigen: "PC Sucursal",
@@ -100,9 +95,7 @@ export const escenarioCertificados: DefinicionEscenario = {
       tipoEvento: TipoEvento.CONEXION_VPN,
       tiempoNotificacion: 60,
       descripcion:
-        "La sucursal necesita recibir certificados de forma segura. " +
-        "Configura la VPN con modo 'Encriptar y Autenticar' (EA) para garantizar " +
-        "que los certificados no sean interceptados ni alterados en tránsito.",
+        "La sucursal debe recibir los certificados sin que nadie los intercepte. Configura la VPN con modo EA.",
       fase: 3,
       infoAdicional: {
         gateway: {
@@ -124,9 +117,7 @@ export const escenarioCertificados: DefinicionEscenario = {
       tipoEvento: TipoEvento.COMPLETACION_ESCENARIO,
       tiempoNotificacion: 80,
       descripcion:
-        "¡Felicidades! Has gestionado una infraestructura PKI completa: " +
-        "verificación de certificados, detección de falsificaciones, " +
-        "protección del servidor CA y distribución segura de certificados vía VPN.",
+        "¡PKI bajo control! Verificar firmas, blindar la CA y cifrar la emisión sostienen la confianza.",
       fase: 3,
     },
   ],
@@ -153,7 +144,7 @@ export const escenarioCertificados: DefinicionEscenario = {
       descripcion: "Establece una VPN cifrada para distribuir certificados de forma segura a la sucursal.",
       faseActual: false, completada: false,
       objetivos: [
-        { descripcion: "Establecer VPN cifrada para emisión de certificados.", completado: false },
+        { descripcion: "Establecer VPN cifrada para emisión de certificados", completado: false },
       ],
     },
   ],

@@ -66,6 +66,13 @@ const ECSSceneRenderer: React.FC = () => {
     clearInspect();
   };
 
+  // Dispositivo en zona no interactiva: solo abre el aviso de "no accesible",
+  // sin seleccionarlo ni acercar la cámara (no debe alimentar el panel ni el zoom).
+  const handleBlockedClick = (entidadId: number | null) => {
+    clearInspect();
+    setMenuOpenForEntity(entidadId);
+  };
+
   const handleContextMenu = (
     entity: ECSEntityRef,
     position?: [number, number, number],
@@ -167,6 +174,8 @@ const ECSSceneRenderer: React.FC = () => {
           const isDecorativo =
             (objetoConTipo as { decorativo?: boolean })?.decorativo === true;
           const isInteractive = !isEspacio && !isDecorativo && esInteractiva;
+          // Dispositivo real en una zona no interactiva: clicable solo para avisar.
+          const isBlocked = !isEspacio && !isDecorativo && !esInteractiva;
 
           if (modelPath === "") return null;
           return (
@@ -183,7 +192,9 @@ const ECSSceneRenderer: React.FC = () => {
                         { objetoConTipo, entidadId, entidadCompleta },
                         position,
                       )
-                  : undefined
+                  : isBlocked
+                    ? () => handleBlockedClick(entidadId ?? null)
+                    : undefined
               }
               onHover={
                 isInteractive
@@ -198,8 +209,10 @@ const ECSSceneRenderer: React.FC = () => {
               onHoverEnd={isInteractive ? handleEntityHoverEnd : undefined}
               isSelected={isInteractive && entidadSeleccionadaId === entidadId}
               enableHover={isInteractive && !desktopMode}
+              blocked={isBlocked}
+              blockedMessage="Dispositivo no accesible"
               showMenu={menuOpenForEntity === entidadId}
-              menuOptions={getMenuOptions(rotacionY, position)}
+              menuOptions={isInteractive ? getMenuOptions(rotacionY, position) : []}
               onMenuClose={() => setMenuOpenForEntity(null)}
               onNavigate={(path) => navigate(path)}
             />

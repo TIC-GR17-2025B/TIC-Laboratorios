@@ -10,4 +10,3 @@ export * from './escenarioHackingEtico.js';
 // export * from './escenarioRansomware.js';
 // export * from './escenarioAuditoria.js';
 // export * from './escenarioIoT.js';
-// export * from './escenarioPrueba.js';

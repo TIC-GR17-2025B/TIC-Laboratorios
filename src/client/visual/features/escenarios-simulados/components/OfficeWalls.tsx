@@ -15,6 +15,22 @@ const BASEBOARD_H = 0.1;
 const CORNICE_H = 0.06;
 const FACADE_MULLION_STEP = 1.6;
 
+// Caja de pared reutilizable. Definida a nivel de módulo (no dentro del render de
+// OfficeWalls) para que su identidad de componente sea estable: si se declarara
+// inline, React la trataría como un tipo nuevo en cada render y desmontaría/
+// remontaría todo el subárbol de paredes al cambiar de zona.
+const Box: React.FC<{
+    seg: WallSegment;
+    material: THREE.Material;
+    castShadow?: boolean;
+    receiveShadow?: boolean;
+    renderOrder?: number;
+}> = ({ seg, material, ...rest }) => (
+    <mesh position={seg.position} material={material} {...rest}>
+        <boxGeometry args={seg.size} />
+    </mesh>
+);
+
 /**
  * Edificio unificado de la zona: piso, pasillo, paredes exteriores (incluida una
  * fachada acristalada frontal que cierra la caja), fachada de vidrio del corredor
@@ -69,12 +85,6 @@ const OfficeWalls: React.FC = () => {
     const cx = (bldg.x1 + bldg.x2) / 2;
     const cz = (bldg.z1 + bldg.z2) / 2;
     const hh = WALL_HEIGHT / 2;
-
-    const Box =({ seg, material, ...rest }: { seg: WallSegment; material: THREE.Material; castShadow?: boolean; receiveShadow?: boolean; renderOrder?: number }) => (
-        <mesh position={seg.position} material={material} {...rest}>
-            <boxGeometry args={seg.size} />
-        </mesh>
-    );
 
     return (
         <group name="building">

@@ -27,7 +27,7 @@ export const escenarioRansomware: DefinicionEscenario = {
       tipoEvento: TipoEvento.TRAFICO_RED,
       tiempoNotificacion: 10,
       descripcion:
-        "Se detectó actividad de ransomware en la 'Estación de Enfermería'. Aísla el equipo removiéndolo de la red 'LAN-Clinica' para evitar la propagación. Asigna la 'Estación de Enfermería' únicamente a la red 'Cuarentena'.",
+        "Hay un equipo de la clínica con ransomware activo. Aíslalo de la red antes de que infecte al resto.",
       fase: 1,
       infoAdicional: {
         dispositivoOrigen: "Estación de Enfermería",
@@ -42,7 +42,7 @@ export const escenarioRansomware: DefinicionEscenario = {
       tipoEvento: TipoEvento.TRAFICO_RED,
       tiempoNotificacion: 25,
       descripcion:
-        "Bloquea todo tráfico SSH entrante al servidor de historiales médicos. Configura el firewall del 'Router Hospital' para proteger la red 'LAN-Clinica'.",
+        "El servidor de historiales sigue expuesto. Bloquea el tráfico SSH hacia él desde el firewall.",
       fase: 1,
       infoAdicional: {
         dispositivoOrigen: "Estación de Enfermería",
@@ -57,7 +57,7 @@ export const escenarioRansomware: DefinicionEscenario = {
       tipoEvento: TipoEvento.COMPLETACION_FASE,
       tiempoNotificacion: 40,
       descripcion:
-        "¡Has contenido la amenaza! Ahora establece una conexión segura para que el equipo de respuesta remoto pueda asistir.",
+        "¡Amenaza contenida! Aislar y filtrar tráfico frena la propagación. Ahora habilita el acceso remoto seguro.",
       fase: 1,
     },
     {
@@ -65,7 +65,7 @@ export const escenarioRansomware: DefinicionEscenario = {
       tipoEvento: TipoEvento.CONEXION_VPN,
       tiempoNotificacion: 45,
       descripcion:
-        "El equipo de respuesta a incidentes necesita acceso remoto seguro. Configura el 'VPN Gateway Hospital' y el cliente en 'PC Analista CSIRT' para una conexión Encriptada y Autenticada (EA).",
+        "El CSIRT necesita asistir de forma remota. Conecta el 'VPN Gateway Hospital' y el 'PC Analista CSIRT' en modo Encriptar y Autenticar (EA).",
       fase: 2,
       infoAdicional: {
         gateway: {
@@ -86,7 +86,7 @@ export const escenarioRansomware: DefinicionEscenario = {
       nombreEvento: "Completación Escenario",
       tipoEvento: TipoEvento.COMPLETACION_ESCENARIO,
       tiempoNotificacion: 65,
-      descripcion: "¡Felicidades, has contenido el incidente y asegurado el hospital!",
+      descripcion: "¡Incidente resuelto! Contener, proteger y dar acceso seguro al CSIRT cierra la respuesta.",
       fase: 2,
     },
   ],
@@ -118,7 +118,7 @@ export const escenarioRansomware: DefinicionEscenario = {
       completada: false,
       objetivos: [
         {
-          descripcion: "Establecer VPN de emergencia para el equipo CSIRT.",
+          descripcion: "Establecer VPN de emergencia para el equipo CSIRT",
           completado: false,
         },
       ],

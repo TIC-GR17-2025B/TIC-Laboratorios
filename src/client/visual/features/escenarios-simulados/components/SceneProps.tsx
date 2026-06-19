@@ -3,14 +3,16 @@ import { useBuildingLayout } from '../hooks/useBuildingLayout';
 import Model3D from './Model3D';
 import { PROCEDURAL_PREFIX } from './procedural/proceduralModels';
 import { mulberry32, seedFromId } from '../utils/seededRandom';
-import { ambientProps, type PlacedProp } from '../config/roomProps';
+import { type PlacedProp } from '../config/roomProps';
 import { getPrefab } from '../config/roomPrefabs';
 
 /**
- * Props decorativos: amuebla salas sintéticas según su PREFAB y reparte equipo de
- * red de ambiente en las reales. Render-only, determinista (sembrado por oficina);
- * nunca crea entidades ECS. Cada prop se dibuja con Model3D igual que las entidades
- * reales (misma caché y orientación), pero inerte (sin hover ni click).
+ * Props decorativos: amuebla SOLO las salas sintéticas según su PREFAB. Las salas
+ * reales se dejan a sus dispositivos del ECS para no mezclar equipo decorativo con
+ * los dispositivos interactuables (confunde al usuario). Render-only, determinista
+ * (sembrado por oficina); nunca crea entidades ECS. Cada prop se dibuja con Model3D
+ * igual que las entidades reales (misma caché y orientación), pero inerte (sin hover
+ * ni click).
  */
 
 const PropInstance: React.FC<{ prop: PlacedProp }> = ({ prop }) => (
@@ -29,10 +31,9 @@ const SceneProps: React.FC = () => {
   const items = useMemo(
     () =>
       rooms.flatMap((room) => {
+        if (!room.sintetico || !room.prefabId) return [];
         const rng = mulberry32(seedFromId(room.oficinaId));
-        return room.sintetico && room.prefabId
-          ? getPrefab(room.prefabId).furnish(room, rng)
-          : ambientProps(room, rng);
+        return getPrefab(room.prefabId).furnish(room, rng);
       }),
     [rooms],
   );

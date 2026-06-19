@@ -10,13 +10,16 @@ interface RadialMenuProps {
         to?: string; // Ruta opcional para navegación
     }>;
     onNavigate?: (path: string) => void; // Callback opcional para navegación
+    /** Modo "no accesible": muestra un aviso inerte en vez de las opciones. */
+    blocked?: boolean;
+    blockedMessage?: string;
 }
 
 /**
  * Menú radial vertical estilo Blender
  * Aparece en forma de arco con botones distribuidos radialmente
  */
-const RadialMenu: React.FC<RadialMenuProps> = ({ onClose, options, onNavigate }) => {
+const RadialMenu: React.FC<RadialMenuProps> = ({ onClose, options, onNavigate, blocked = false, blockedMessage }) => {
     const menuRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -68,6 +71,16 @@ const RadialMenu: React.FC<RadialMenuProps> = ({ onClose, options, onNavigate })
                 role="menu"
                 aria-label="Menú de acciones"
             >
+                {blocked ? (
+                    <div className="radial-menu-blocked" role="alert">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                            <circle cx="12" cy="12" r="10" />
+                            <path d="M4.929 4.929 19.07 19.071" />
+                        </svg>
+                        <span>{blockedMessage ?? 'Dispositivo no accesible'}</span>
+                    </div>
+                ) : (
+                <>
                 <div className="radial-menu-center-dot" aria-hidden="true" />
                 {options.map((option, index) => {
                     const angle = arcStart + (angleStep * index);
@@ -114,6 +127,8 @@ const RadialMenu: React.FC<RadialMenuProps> = ({ onClose, options, onNavigate })
                         </div>
                     );
                 })}
+                </>
+                )}
             </div>
         </>
     );

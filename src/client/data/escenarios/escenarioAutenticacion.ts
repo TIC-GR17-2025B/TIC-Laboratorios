@@ -58,9 +58,7 @@ export const escenarioAutenticacion: DefinicionEscenario = {
       tipoAtaque: TipoAtaque.INFECCION_TROYANO,
       dispositivoAAtacar: "PC Recepción",
       descripcion:
-        "¡ALERTA! Se ha detectado un correo con adjunto malicioso dirigido a 'PC Recepción'. " +
-        "Si la configuración 'Cuidado con adjuntos de email' está activada, el ataque será mitigado automáticamente. " +
-        "De lo contrario, el dispositivo será comprometido.",
+        "Llega un correo con un adjunto malicioso al PC de recepción. Si ese equipo está bien protegido, el ataque se frena solo.",
       fase: 2,
       condicionMitigacion: {
         accion: AccionesRealizables.EJECUTAR,
@@ -81,10 +79,7 @@ export const escenarioAutenticacion: DefinicionEscenario = {
       tipoEvento: TipoEvento.TRAFICO_RED,
       tiempoNotificacion: 10,
       descripcion:
-        "Se han detectado intentos de conexión SSH desde Internet hacia la red corporativa. " +
-        "El CONTROL DE ACCESO implica definir quién puede acceder a qué recursos. " +
-        "Configura el firewall del 'Router Principal' para BLOQUEAR todo tráfico SSH entrante a 'LAN-Corp', " +
-        "implementando así una política de acceso restrictiva (deny by default).",
+        "Llegan intentos de conexión SSH desde Internet a la red corporativa. Corta ese acceso no autorizado en el perímetro.",
       fase: 1,
       infoAdicional: {
         dispositivoOrigen: "Servidor Externo",
@@ -99,8 +94,7 @@ export const escenarioAutenticacion: DefinicionEscenario = {
       tipoEvento: TipoEvento.COMPLETACION_FASE,
       tiempoNotificacion: 30,
       descripcion:
-        "¡Bien hecho! Has implementado control de acceso a nivel de red. " +
-        "Ahora fortalece la autenticación a nivel de los dispositivos.",
+        "¡Bien hecho! Aplicaste control de acceso en la red. Ahora fortalece la autenticación en los dispositivos.",
       fase: 1,
     },
     // ── FASE 2: Defensa contra ataque ──
@@ -109,10 +103,7 @@ export const escenarioAutenticacion: DefinicionEscenario = {
       tipoEvento: TipoEvento.VERIFICACION_ACCION_JUGADOR,
       tiempoNotificacion: 35,
       descripcion:
-        "La AUTENTICACIÓN verifica la identidad, pero también debemos proteger contra amenazas internas. " +
-        "Un correo sospechoso podría contener un troyano. Activa la configuración 'Cuidado con adjuntos de email' " +
-        "en el 'PC Recepción' para prevenir la ejecución de archivos maliciosos. " +
-        "Ve a las configuraciones del workstation y activa esta protección antes de que llegue el ataque.",
+        "Un correo sospechoso con adjunto podría infectar el PC de recepción. Protégelo antes de que llegue el ataque.",
       fase: 2,
       infoAdicional: {
         accion: AccionesRealizables.EJECUTAR,
@@ -129,8 +120,7 @@ export const escenarioAutenticacion: DefinicionEscenario = {
       tipoEvento: TipoEvento.COMPLETACION_FASE,
       tiempoNotificacion: 70,
       descripcion:
-        "Has protegido los dispositivos contra el ataque. " +
-        "Ahora establece un canal de acceso remoto seguro y autenticado.",
+        "Protegiste los dispositivos contra el ataque. Ahora establece un canal de acceso remoto seguro y autenticado.",
       fase: 2,
     },
     // ── FASE 3: Acceso remoto autenticado ──
@@ -139,10 +129,7 @@ export const escenarioAutenticacion: DefinicionEscenario = {
       tipoEvento: TipoEvento.CONEXION_VPN,
       tiempoNotificacion: 75,
       descripcion:
-        "Un analista necesita trabajar desde casa. Para garantizar que solo usuarios AUTENTICADOS " +
-        "puedan acceder a la red corporativa, configura una VPN con modo 'Encriptar y Autenticar' (EA). " +
-        "Esto implementa autenticación mutua: tanto el servidor como el cliente verifican su identidad. " +
-        "Configura el 'VPN Gateway' y el 'PC Remoto' con protección EA.",
+        "Un analista trabaja desde casa. Configura una VPN con modo 'Encriptar y Autenticar' (EA) entre el 'VPN Gateway' y el 'PC Remoto'.",
       fase: 3,
       infoAdicional: {
         gateway: {
@@ -164,10 +151,7 @@ export const escenarioAutenticacion: DefinicionEscenario = {
       tipoEvento: TipoEvento.COMPLETACION_ESCENARIO,
       tiempoNotificacion: 95,
       descripcion:
-        "¡Excelente! Has implementado un sistema de seguridad completo: " +
-        "control de acceso con firewall (autorización), hardening de dispositivos (prevención), " +
-        "y acceso remoto con VPN autenticada (autenticación mutua). " +
-        "Estos son los fundamentos de la autenticación y el control de acceso.",
+        "¡Excelente! Combinaste firewall, hardening y VPN autenticada: los fundamentos de la autenticación y el control de acceso.",
       fase: 3,
     },
   ],
@@ -176,7 +160,7 @@ export const escenarioAutenticacion: DefinicionEscenario = {
       id: 1,
       nombre: "Fase 1: Control de acceso con firewall",
       descripcion:
-        "El CONTROL DE ACCESO define quién puede acceder a qué recursos. " +
+        "El control de acceso define quién puede acceder a qué recursos. " +
         "Implementa una política restrictiva bloqueando accesos SSH no autorizados desde Internet.",
       faseActual: true,
       completada: false,
@@ -206,13 +190,13 @@ export const escenarioAutenticacion: DefinicionEscenario = {
       id: 3,
       nombre: "Fase 3: Acceso remoto autenticado (VPN)",
       descripcion:
-        "La AUTENTICACIÓN MUTUA en VPN garantiza que ambas partes (cliente y servidor) " +
+        "La autenticación mutua en VPN garantiza que ambas partes (cliente y servidor) " +
         "verifican su identidad antes de establecer la conexión.",
       faseActual: false,
       completada: false,
       objetivos: [
         {
-          descripcion: "Configurar acceso remoto autenticado.",
+          descripcion: "Configurar acceso remoto autenticado",
           completado: false,
         },
       ],

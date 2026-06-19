@@ -32,21 +32,24 @@ const Sidebar: React.FC = () => {
         const entities = processEntities();
         let target: { position: [number, number, number]; rotationY: number } | null = null;
 
-        // Try selected entity (if it's a workstation)
+        // Try selected entity (if it's a workstation accesible)
         if (entidadSeleccionadaId != null) {
             const selected = entities.find(
                 e => e.entidadId === entidadSeleccionadaId &&
-                    e.objetoConTipo.tipo?.toUpperCase() === 'WORKSTATION'
+                    e.objetoConTipo.tipo?.toUpperCase() === 'WORKSTATION' &&
+                    e.esInteractiva
             );
             if (selected) {
                 target = { position: selected.position, rotationY: selected.rotacionY };
             }
         }
 
-        // Fallback: first workstation in current zone
+        // Fallback: first interactive workstation in current zone. Las zonas no
+        // interactivas no dan acceso a sus dispositivos desde este botón.
         if (!target) {
             const firstWorkstation = entities.find(
-                e => e.objetoConTipo.tipo?.toUpperCase() === 'WORKSTATION'
+                e => e.objetoConTipo.tipo?.toUpperCase() === 'WORKSTATION' &&
+                    e.esInteractiva
             );
             if (firstWorkstation) {
                 target = { position: firstWorkstation.position, rotationY: firstWorkstation.rotacionY };

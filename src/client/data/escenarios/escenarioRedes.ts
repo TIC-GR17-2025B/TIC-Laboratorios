@@ -63,9 +63,7 @@ export const escenarioRedes: DefinicionEscenario = {
       tipoEvento: TipoEvento.TRAFICO_RED,
       tiempoNotificacion: 10,
       descripcion:
-        "La SEGMENTACIÓN DE RED separa sistemas según su función y nivel de sensibilidad. " +
-        "El 'Terminal de Consultas' necesita acceder al 'Servidor de Historiales' en la red 'LAN-Médica'. " +
-        "Asigna el 'Terminal de Consultas' a la red 'LAN-Médica' para permitir el acceso a los historiales.",
+        "El terminal de consultas debe llegar al servidor de historiales. Ponlo en la misma red médica que él.",
       fase: 1,
       infoAdicional: {
         dispositivoOrigen: "Terminal de Consultas",
@@ -80,10 +78,7 @@ export const escenarioRedes: DefinicionEscenario = {
       tipoEvento: TipoEvento.TRAFICO_RED,
       tiempoNotificacion: 25,
       descripcion:
-        "Un FIREWALL es un dispositivo que filtra el tráfico de red según reglas predefinidas. " +
-        "Se detectó un intento de conexión SSH desde el proveedor externo hacia la red médica. " +
-        "Configura el firewall del 'Router Clínica' para BLOQUEAR todo tráfico SSH entrante a 'LAN-Médica'. " +
-        "Esto implementa el principio de DEFENSA EN PROFUNDIDAD: múltiples capas de protección.",
+        "Un proveedor externo intenta entrar por SSH a la red médica. Bloquéalo con el firewall del router.",
       fase: 1,
       infoAdicional: {
         dispositivoOrigen: "Servidor Proveedor",
@@ -98,9 +93,7 @@ export const escenarioRedes: DefinicionEscenario = {
       tipoEvento: TipoEvento.COMPLETACION_FASE,
       tiempoNotificacion: 45,
       descripcion:
-        "¡Perfecto! Has segmentado la red y configurado el firewall. " +
-        "La red médica ahora está aislada del tráfico externo no autorizado. " +
-        "Ahora establece una conexión segura con el laboratorio externo.",
+        "¡Perfecto! La red médica quedó aislada del tráfico externo. Ahora conecta el laboratorio de forma segura.",
       fase: 1,
     },
     // ── FASE 2: Conexión VPN con laboratorio ──
@@ -109,11 +102,7 @@ export const escenarioRedes: DefinicionEscenario = {
       tipoEvento: TipoEvento.CONEXION_VPN,
       tiempoNotificacion: 50,
       descripcion:
-        "El laboratorio externo necesita enviar resultados de forma segura. " +
-        "Una VPN (Virtual Private Network) crea un túnel cifrado sobre Internet, " +
-        "como si ambas sedes estuvieran conectadas por un cable privado. " +
-        "Configura el 'VPN Gateway Clínica' y el 'PC Laboratorio' con protección " +
-        "'Encriptar y Autenticar' (EA) para garantizar confidencialidad e integridad.",
+        "El laboratorio debe enviar resultados de forma segura. Levanta una VPN entre el gateway de la clínica y su PC.",
       fase: 2,
       infoAdicional: {
         gateway: {
@@ -135,11 +124,7 @@ export const escenarioRedes: DefinicionEscenario = {
       tipoEvento: TipoEvento.COMPLETACION_ESCENARIO,
       tiempoNotificacion: 70,
       descripcion:
-        "¡Felicidades! Has implementado las tres soluciones fundamentales de seguridad de redes: " +
-        "1) Segmentación para aislar sistemas sensibles, " +
-        "2) Firewall para controlar el tráfico (IDS/IPS), y " +
-        "3) VPN para comunicación segura entre sedes. " +
-        "Estos son los pilares de la seguridad perimetral de redes.",
+        "¡Felicidades! Aplicaste los tres pilares de la red: segmentación, firewall y VPN. Así se protege el perímetro.",
       fase: 2,
     },
   ],
@@ -148,8 +133,8 @@ export const escenarioRedes: DefinicionEscenario = {
       id: 1,
       nombre: "Fase 1: Segmentación de red y firewall",
       descripcion:
-        "La SEGMENTACIÓN divide la red en zonas con diferentes niveles de confianza. " +
-        "El FIREWALL controla qué tráfico puede pasar entre zonas, actuando como guardia perimetral.",
+        "La segmentación divide la red en zonas con diferentes niveles de confianza. " +
+        "El firewall controla qué tráfico puede pasar entre zonas, actuando como guardia perimetral.",
       faseActual: true,
       completada: false,
       objetivos: [
@@ -173,7 +158,7 @@ export const escenarioRedes: DefinicionEscenario = {
       completada: false,
       objetivos: [
         {
-          descripcion: "Establecer VPN con laboratorio para envío de resultados.",
+          descripcion: "Establecer VPN con laboratorio para envío de resultados",
           completado: false,
         },
       ],

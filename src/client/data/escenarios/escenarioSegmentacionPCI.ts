@@ -38,8 +38,7 @@ export const escenarioSegmentacionPCI: DefinicionEscenario = {
       tipoEvento: TipoEvento.TRAFICO_RED,
       tiempoNotificacion: 10,
       descripcion:
-        "PCI-DSS requiere que los sistemas de pago estén en una red aislada. " +
-        "Asigna el 'Terminal de Pagos' a la red 'PCI-DSS' para cumplir con la normativa.",
+        "PCI-DSS exige aislar los sistemas de pago. Lleva el terminal de pagos a la red de pagos para cumplir la norma.",
       fase: 1,
       infoAdicional: {
         dispositivoOrigen: "Terminal de Pagos",
@@ -54,8 +53,7 @@ export const escenarioSegmentacionPCI: DefinicionEscenario = {
       tipoEvento: TipoEvento.TRAFICO_RED,
       tiempoNotificacion: 25,
       descripcion:
-        "Bloquea todo tráfico SSH entrante desde la red del proveedor hacia 'PCI-DSS'. " +
-        "Configura el firewall del 'Router Tienda'.",
+        "El proveedor intenta entrar por SSH a la red de pagos. Bloquéalo con el firewall del router de la tienda.",
       fase: 1,
       infoAdicional: {
         dispositivoOrigen: "Servidor Proveedor",
@@ -77,8 +75,7 @@ export const escenarioSegmentacionPCI: DefinicionEscenario = {
       tipoEvento: TipoEvento.CONEXION_VPN,
       tiempoNotificacion: 50,
       descripcion:
-        "La bodega necesita consultar inventario de forma segura. " +
-        "Configura VPN con modo EA entre 'VPN Gateway Tienda' y 'PC Bodega'.",
+        "La bodega debe consultar el inventario de forma segura. Levanta una VPN entre el gateway de la tienda y su PC.",
       fase: 2,
       infoAdicional: {
         gateway: {
@@ -118,7 +115,7 @@ export const escenarioSegmentacionPCI: DefinicionEscenario = {
       descripcion: "Establece una conexión VPN cifrada y autenticada con la bodega remota.",
       faseActual: false, completada: false,
       objetivos: [
-        { descripcion: "Establecer VPN con bodega para consulta de inventario.", completado: false },
+        { descripcion: "Establecer VPN con bodega para consulta de inventario", completado: false },
       ],
     },
   ],

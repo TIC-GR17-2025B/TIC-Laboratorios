@@ -43,9 +43,7 @@ export const escenarioAuditoria: DefinicionEscenario = {
       tipoEvento: TipoEvento.VERIFICACION_ACCION_JUGADOR,
       tiempoNotificacion: 5,
       descripcion:
-        "El primer paso de una auditoría es el RECONOCIMIENTO. " +
-        "Escanea los dispositivos del dominio 'LogiCorp' usando Net-Scan Viz " +
-        "para obtener un inventario de la infraestructura.",
+        "Toda auditoría empieza por reconocer el terreno. Escanea la infraestructura de LogiCorp con Net-Scan Viz.",
       fase: 1,
       infoAdicional: {
         accion: AccionesRealizables.EJECUTAR,
@@ -59,8 +57,7 @@ export const escenarioAuditoria: DefinicionEscenario = {
       tipoEvento: TipoEvento.VERIFICACION_ACCION_JUGADOR,
       tiempoNotificacion: 20,
       descripcion:
-        "Identifica a los empleados y su nivel de conciencia de seguridad. " +
-        "Usa Company Social-Searcher para descubrir posibles vectores de ingeniería social.",
+        "Las personas también son un vector de ataque. Perfila a los empleados con Company Social-Searcher.",
       fase: 1,
       infoAdicional: {
         accion: AccionesRealizables.EJECUTAR,
@@ -82,9 +79,7 @@ export const escenarioAuditoria: DefinicionEscenario = {
       tipoEvento: TipoEvento.TRAFICO_RED,
       tiempoNotificacion: 40,
       descripcion:
-        "La auditoría reveló que el servidor de datos es accesible vía SSH desde Internet. " +
-        "Esto es una VULNERABILIDAD CRÍTICA. Configura el firewall del 'Router LogiCorp' " +
-        "para bloquear SSH entrante a 'LAN-Corp'.",
+        "El servidor de datos quedó expuesto por SSH desde Internet: falla crítica. Ciérrale ese acceso en el perímetro.",
       fase: 2,
       infoAdicional: {
         dispositivoOrigen: "PC Auditor",
@@ -99,8 +94,7 @@ export const escenarioAuditoria: DefinicionEscenario = {
       tipoEvento: TipoEvento.CONEXION_VPN,
       tiempoNotificacion: 55,
       descripcion:
-        "Para continuar la auditoría de forma segura, establece una VPN cifrada " +
-        "entre tu equipo y la red corporativa. Configura con modo EA.",
+        "Para seguir auditando sin filtraciones, cifra el canal. Configura una VPN con modo EA hacia la red corporativa.",
       fase: 2,
       infoAdicional: {
         gateway: {
@@ -122,8 +116,7 @@ export const escenarioAuditoria: DefinicionEscenario = {
       tipoEvento: TipoEvento.COMPLETACION_ESCENARIO,
       tiempoNotificacion: 75,
       descripcion:
-        "¡Auditoría completada! Has identificado vulnerabilidades y aplicado controles correctivos. " +
-        "Un SGSI (Sistema de Gestión de Seguridad de la Información) requiere auditorías periódicas.",
+        "¡Auditoría completada! Un SGSI vive de auditorías periódicas que detectan y corrigen riesgos.",
       fase: 2,
     },
   ],
@@ -143,7 +136,7 @@ export const escenarioAuditoria: DefinicionEscenario = {
       faseActual: false, completada: false,
       objetivos: [
         { descripcion: "Bloquear acceso no autorizado al servidor", completado: false },
-        { descripcion: "Establecer canal seguro para auditoría.", completado: false },
+        { descripcion: "Establecer canal seguro para auditoría", completado: false },
       ],
     },
   ],

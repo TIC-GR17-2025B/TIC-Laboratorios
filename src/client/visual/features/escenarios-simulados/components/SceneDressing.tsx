@@ -145,8 +145,8 @@ const SceneDressing: React.FC = () => {
                 intensity={amb.keyIntensity}
                 color={amb.keyColor}
                 castShadow
-                shadow-mapSize-width={2048}
-                shadow-mapSize-height={2048}
+                shadow-mapSize-width={1024}
+                shadow-mapSize-height={1024}
                 shadow-bias={-0.0004}
                 shadow-normalBias={0.025}
                 shadow-camera-near={0.5}

@@ -18,7 +18,7 @@ import { ColoresRed } from "../colores";
  * Objetivo didáctico:
  *   - Comprender firmas digitales y verificación con clave pública (PKI).
  *   - Detectar documentos alterados (integridad comprometida).
- *   - Configurar comunicación cifrada mediante VPN (encriptación simétrica/asimétrica en práctica).
+ *   - Configurar comunicación cifrada mediante VPN (cifrado simétrico/asimétrico en práctica).
  *
  * Dificultad: ★★☆☆☆ (Fácil-Medio)
  *
@@ -50,11 +50,7 @@ export const escenarioCriptografia: DefinicionEscenario = {
       tipoEvento: TipoEvento.VERIFICACION_FIRMA,
       tiempoNotificacion: 5,
       descripcion:
-        "El cliente ha enviado un contrato firmado digitalmente al 'PC Abogado'. " +
-        "Una FIRMA DIGITAL garantiza la INTEGRIDAD del documento (no fue alterado) y la AUTENTICIDAD del remitente. " +
-        "Abre el 'PC Abogado', ve al verificador de firmas y verifica el 'Contrato Comercial' " +
-        "usando la clave pública del cliente. Debes emitir un veredicto sobre la autenticidad del documento " +
-        "según los hashes resultantes.",
+        "El cliente envió el 'Contrato Comercial' al PC Abogado. Abre el verificador de firmas y emite tu veredicto.",
       fase: 1,
       infoAdicional: {
         nombreDocumento: "Contrato Comercial",
@@ -68,9 +64,7 @@ export const escenarioCriptografia: DefinicionEscenario = {
       tipoEvento: TipoEvento.COMPLETACION_FASE,
       tiempoNotificacion: 20,
       descripcion:
-        "¡Correcto! La firma digital es válida: el hash del documento coincide con el hash descifrado de la firma " +
-        "usando la clave pública del cliente. Esto confirma que el documento no fue modificado (Integridad) " +
-        "y que fue firmado por el cliente legítimo (No Repudio).",
+        "¡Correcto! La firma es válida: el documento es íntegro y proviene del cliente legítimo.",
       fase: 1,
     },
     // ── FASE 2: Detectar documento alterado ──
@@ -79,10 +73,7 @@ export const escenarioCriptografia: DefinicionEscenario = {
       tipoEvento: TipoEvento.VERIFICACION_FIRMA,
       tiempoNotificacion: 25,
       descripcion:
-        "Se recibió una factura supuestamente firmada por un proveedor. Sin embargo, hay sospechas de que " +
-        "el documento fue ALTERADO después de ser firmado (ataque a la Integridad). " +
-        "Verifica la 'Factura Proveedor' con la clave pública del proveedor. " +
-        "De igual forma, emite un veredicto según los los hashes resultantes.",
+        "Llegó la 'Factura Proveedor' y se sospecha que fue alterada tras firmarse. Verifícala con la clave del proveedor y emite tu veredicto.",
       fase: 2,
       infoAdicional: {
         nombreDocumento: "Factura Proveedor",
@@ -96,10 +87,7 @@ export const escenarioCriptografia: DefinicionEscenario = {
       tipoEvento: TipoEvento.COMPLETACION_FASE,
       tiempoNotificacion: 40,
       descripcion:
-        "¡Bien detectado! Los hashes no coinciden: el documento fue alterado después de firmarse. " +
-        "Esto demuestra la importancia de las funciones hash criptográficas: cualquier cambio, " +
-        "por mínimo que sea, produce un hash completamente diferente. " +
-        "Ahora establezcamos un canal seguro para futuras comunicaciones.",
+        "¡Bien detectado! Los hashes no coinciden: la factura fue alterada tras firmarse. Ahora protege las comunicaciones futuras.",
       fase: 2,
     },
     // ── FASE 3: VPN cifrada ──
@@ -108,11 +96,7 @@ export const escenarioCriptografia: DefinicionEscenario = {
       tipoEvento: TipoEvento.CONEXION_VPN,
       tiempoNotificacion: 45,
       descripcion:
-        "Para proteger las comunicaciones futuras, configura un túnel VPN cifrado entre el bufete y el cliente. " +
-        "La VPN utiliza criptografía para crear un canal seguro: la opción 'Encriptar y Autenticar' (EA) " +
-        "combina encriptación simétrica (para velocidad) con autenticación asimétrica (para verificar identidad). " +
-        "Configura el 'VPN Gateway Bufete' y el 'PC Cliente' con protección EA para que el cliente pueda establecer "+
-        "una conexión con la computadora del abogado.",
+        "Configura una VPN en modo 'Encriptar y Autenticar' (EA) entre el VPN Gateway Bufete y el PC Cliente.",
       fase: 3,
       infoAdicional: {
         gateway: {
@@ -134,9 +118,7 @@ export const escenarioCriptografia: DefinicionEscenario = {
       tipoEvento: TipoEvento.COMPLETACION_ESCENARIO,
       tiempoNotificacion: 60,
       descripcion:
-        "¡Felicidades! Has aplicado conceptos de criptografía: verificación de firmas digitales, " +
-        "detección de documentos alterados mediante funciones hash, y comunicación cifrada con VPN. " +
-        "Estos son los pilares de la seguridad criptográfica moderna.",
+        "¡Listo! Verificaste firmas, detectaste un documento alterado y cifraste el canal. Eso es criptografía aplicada.",
       fase: 3,
     },
   ],
@@ -207,7 +189,7 @@ export const escenarioCriptografia: DefinicionEscenario = {
       id: 1,
       nombre: "Fase 1: Verificación de firma digital",
       descripcion:
-        "Las FIRMAS DIGITALES usan criptografía asimétrica: el remitente firma con su clave privada " +
+        "Las firmas digitales usan criptografía asimétrica: el remitente firma con su clave privada " +
         "y el receptor verifica con la clave pública. Si los hashes coinciden, el documento es auténtico e íntegro.",
       faseActual: true,
       completada: false,
@@ -222,7 +204,7 @@ export const escenarioCriptografia: DefinicionEscenario = {
       id: 2,
       nombre: "Fase 2: Detección de alteración",
       descripcion:
-        "Las FUNCIONES HASH son el corazón de las firmas digitales. Un cambio mínimo en el documento " +
+        "Las funciones hash son el corazón de las firmas digitales. Un cambio mínimo en el documento " +
         "produce un hash completamente diferente, permitiendo detectar cualquier alteración.",
       faseActual: false,
       completada: false,
@@ -237,7 +219,7 @@ export const escenarioCriptografia: DefinicionEscenario = {
       id: 3,
       nombre: "Fase 3: Comunicación cifrada (VPN)",
       descripcion:
-        "La encriptación protege los datos en tránsito. Una VPN con modo 'Encriptar y Autenticar' " +
+        "El cifrado protege los datos en tránsito. Una VPN con modo 'Encriptar y Autenticar' " +
         "combina cifrado simétrico (AES) para los datos con autenticación asimétrica (RSA/ECDSA) para la identidad.",
       faseActual: false,
       completada: false,

@@ -46,8 +46,7 @@ export const escenarioControlAcceso: DefinicionEscenario = {
       tipoAtaque: TipoAtaque.INFECCION_TROYANO,
       dispositivoAAtacar: "PC Estudiante",
       descripcion:
-        "¡ALERTA! Un estudiante descargó software no autorizado en 'PC Estudiante' que contiene malware. " +
-        "Si el equipo está configurado correctamente, el ataque será bloqueado.",
+        "Un estudiante descargó software no autorizado con malware en el PC del aula. Si está bien protegido, el ataque se frena.",
       fase: 2,
       condicionMitigacion: {
         accion: AccionesRealizables.CLICK,
@@ -69,8 +68,7 @@ export const escenarioControlAcceso: DefinicionEscenario = {
       tiempoNotificacion: 5,
       tiempoEnOcurrir: 10,
       descripcion:
-        "El 'PC Investigador' necesita acceder al 'Servidor de Datos' en la red 'LAN-Lab'. " +
-        "Asigna el 'PC Investigador' a 'LAN-Lab' para permitir la comunicación.",
+        "El 'PC Investigador' necesita comunicarse con el 'Servidor de Datos'. Asígnalo a la red 'LAN-Lab'.",
       fase: 1,
       infoAdicional: {
         dispositivoOrigen: "PC Investigador",
@@ -86,8 +84,7 @@ export const escenarioControlAcceso: DefinicionEscenario = {
       tiempoNotificacion: 15,
       tiempoEnOcurrir: 20,
       descripcion:
-        "Los estudiantes NO deben poder acceder al laboratorio vía SSH. " +
-        "Configura el firewall del 'Router Universidad' para bloquear SSH entrante a 'LAN-Lab'.",
+        "Los estudiantes no deben llegar al laboratorio por SSH. Bloquea ese acceso en el perímetro de la red del laboratorio.",
       fase: 1,
       infoAdicional: {
         dispositivoOrigen: "PC Estudiante",
@@ -111,8 +108,7 @@ export const escenarioControlAcceso: DefinicionEscenario = {
       tiempoNotificacion: 30,
       tiempoEnOcurrir: 35,
       descripcion:
-        "Los equipos del aula son vulnerables a software malicioso descargado por estudiantes. " +
-        "Activa 'Sin software externo' en 'PC Estudiante' para prevenir la instalación de programas no autorizados.",
+        "Un equipo del aula es vulnerable al software que bajan los estudiantes. Endurécelo para impedir instalaciones no autorizadas.",
       fase: 2,
       infoAdicional: {
         accion: AccionesRealizables.CLICK,
@@ -133,13 +129,11 @@ export const escenarioControlAcceso: DefinicionEscenario = {
     },
     // ── FASE 3: VPN autenticada ──
     {
-      nombreEvento: "Configurar VPN para investigador remoto.",
+      nombreEvento: "Configurar VPN para investigador remoto",
       tipoEvento: TipoEvento.CONEXION_VPN,
       tiempoNotificacion: 50,
       descripcion:
-        "Un investigador necesita acceder al servidor del laboratorio desde casa. " +
-        "Configura VPN con modo 'Encriptar y Autenticar' (EA) entre el 'VPN Gateway Universidad' " +
-        "y el 'PC Remoto Investigador'.",
+        "Un investigador accede al laboratorio desde casa. Configura VPN modo 'Encriptar y Autenticar' (EA) entre el gateway y su PC remoto.",
       fase: 3,
       infoAdicional: {
         gateway: {
@@ -251,7 +245,7 @@ export const escenarioControlAcceso: DefinicionEscenario = {
       descripcion: "Configura VPN autenticada para investigadores remotos.",
       faseActual: false, completada: false,
       objetivos: [
-        { descripcion: "Configurar VPN para investigador remoto.", completado: false },
+        { descripcion: "Configurar VPN para investigador remoto", completado: false },
       ],
     },
   ],

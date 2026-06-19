@@ -25,6 +25,9 @@ interface Model3DProps {
     }>;
     onMenuClose?: () => void;
     onNavigate?: (path: string) => void;
+    /** Dispositivo no accesible (zona no interactiva): el menú muestra un aviso inerte. */
+    blocked?: boolean;
+    blockedMessage?: string;
 }
 
 /**
@@ -46,7 +49,9 @@ const Model3DView: React.FC<Model3DProps & { scene: Group }> = React.memo(({
     showMenu = false,
     menuOptions = [],
     onMenuClose,
-    onNavigate
+    onNavigate,
+    blocked = false,
+    blockedMessage
 }) => {
     const groupRef = useRef<Group>(null);
     const [hovered, setHovered] = useState(false);
@@ -154,7 +159,7 @@ const Model3DView: React.FC<Model3DProps & { scene: Group }> = React.memo(({
         >
             <primitive object={clonedScene} />
 
-            {showMenu && menuOptions.length > 0 && (
+            {showMenu && (menuOptions.length > 0 || blocked) && (
                 <Html
                     position={[0, 0, 0]}
                     center
@@ -167,6 +172,8 @@ const Model3DView: React.FC<Model3DProps & { scene: Group }> = React.memo(({
                             onClose={() => onMenuClose?.()}
                             options={menuOptions}
                             onNavigate={onNavigate}
+                            blocked={blocked}
+                            blockedMessage={blockedMessage}
                         />
                     </div>
                 </Html>

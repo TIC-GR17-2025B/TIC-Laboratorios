@@ -48,9 +48,7 @@ export const escenarioAmenazas: DefinicionEscenario = {
       tipoAtaque: TipoAtaque.INFECCION_TROYANO,
       dispositivoAAtacar: "PC Secretaría",
       descripcion:
-        "Los dispositivos USB son un vector de ATAQUE común para introducir malware (troyanos). " +
-        "Un empleado podría conectar una USB infectada sin saberlo. " +
-        "Activa la configuración 'Bloquear medios extraíbles' en el 'PC Secretaría' para reducir este RIESGO.",
+        "Un empleado podría conectar una USB infectada en el PC de secretaría sin saberlo. Endurécelo contra ese vector de ataque.",
       fase: 2,
       condicionMitigacion: {
         accion: AccionesRealizables.CLICK,
@@ -71,9 +69,7 @@ export const escenarioAmenazas: DefinicionEscenario = {
       tipoEvento: TipoEvento.TRAFICO_RED,
       tiempoNotificacion: 5,
       descripcion:
-        "Una AMENAZA es cualquier evento que puede causar daño. Se detectó un intento de conexión SSH " +
-        "desde Internet: esto explota una VULNERABILIDAD (puerto SSH abierto) generando un RIESGO. " +
-        "Configura el firewall del 'Router Oficina' para BLOQUEAR SSH entrante a 'LAN-Oficina'.",
+        "Llega un intento de conexión SSH desde Internet a la red de la oficina. Bloquea ese acceso no autorizado en el perímetro.",
       fase: 1,
       infoAdicional: {
         dispositivoOrigen: "Servidor Externo",
@@ -96,8 +92,7 @@ export const escenarioAmenazas: DefinicionEscenario = {
       tipoEvento: TipoEvento.COMPLETACION_ESCENARIO,
       tiempoNotificacion: 35,
       descripcion:
-        "¡Felicidades! Has protegido la empresa contra amenazas externas (firewall) e internas (hardening). " +
-        "Recuerda: Amenaza + Vulnerabilidad = Riesgo. Tu trabajo es reducir las vulnerabilidades.",
+        "¡Felicidades! Protegiste la empresa contra amenazas externas e internas. Recuerda: amenaza + vulnerabilidad = riesgo.",
       fase: 2,
     },
   ],
@@ -132,7 +127,7 @@ export const escenarioAmenazas: DefinicionEscenario = {
       id: 1,
       nombre: "Fase 1: Bloquear amenaza externa",
       descripcion:
-        "Las AMENAZAS externas buscan explotar VULNERABILIDADES en tu red. " +
+        "Las amenazas externas buscan explotar vulnerabilidades en tu red. " +
         "Usa el firewall para bloquear el acceso no autorizado.",
       faseActual: true,
       completada: false,

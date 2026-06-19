@@ -47,7 +47,7 @@ export const escenarioHackingEtico: DefinicionEscenario = {
       tiempoNotificacion: 5,
       tiempoEnOcurrir: 10,
       descripcion:
-        "Para empezar con la fase de Reconocimiento y Escaneo, escanea los dispositivos disponibles en el dominio 'Corporación' utilizando Net-Scan Viz. Pista: guarda la información resultante del escaneo.",
+        "Inicia el reconocimiento: escanea los dispositivos del dominio con Net-Scan Viz. Pista: guarda lo que encuentres.",
       fase: 1,
       infoAdicional: {
         accion: AccionesRealizables.EJECUTAR,
@@ -63,7 +63,7 @@ export const escenarioHackingEtico: DefinicionEscenario = {
       tiempoNotificacion: 15,
       tiempoEnOcurrir: 20,
       descripcion:
-        "Ahora se necesita obtener información de los empleados de la empresa. Utiliza Company Social-Searcher para lograrlo. Pista: observa quién es más propenso a caer en un ataque de ingeniería social.",
+        "Investiga a los empleados con Company Social-Searcher. Pista: fíjate quién es más propenso a la ingeniería social.",
       fase: 1,
       infoAdicional: {
         accion: AccionesRealizables.EJECUTAR,
@@ -78,7 +78,7 @@ export const escenarioHackingEtico: DefinicionEscenario = {
       tipoEvento: TipoEvento.COMPLETACION_FASE,
       tiempoNotificacion: 25, // Este es un caso especial. Aquí se ejecutará directamente en el tiempo de notificación
       descripcion:
-        "¡Has completado la fase de Reconocimiento y Escaneo! Ahora puedes continuar con la fase de Explotación.",
+        "¡Reconocimiento completo! Con la información reunida ya puedes pasar a la fase de explotación.",
       fase: 1,
     },
     {
@@ -87,7 +87,7 @@ export const escenarioHackingEtico: DefinicionEscenario = {
       tiempoNotificacion: 30,
       tiempoEnOcurrir: 35,
       descripcion:
-        "Una vez identificados los dispositivos y empleados de la empresa, es posible obtener credenciales de acceso mediante ingeniería social. Utiliza Phish-Matic para crear un correo tipo phishing e intentar obtener credenciales a través de él.",
+        "Usa Phish-Matic para crear un correo de phishing y engañar al empleado para que entregue sus credenciales.",
       fase: 2,
       infoAdicional: {
         dispositivoEmisor: "Computadora Lisa",
@@ -101,7 +101,7 @@ export const escenarioHackingEtico: DefinicionEscenario = {
       tiempoNotificacion: 40,
       ejecutarAlInstante: true,
       descripcion:
-        "El engaño con el correo fue exitoso. El empleado acaba de enviar sus credenciales, revisa tu explorador de archivos para encontrarlas.",
+        "¡El engaño funcionó! El empleado envió sus credenciales. Búscalas en tu explorador de archivos.",
       fase: 2,
       infoAdicional: {
         nombreActivo: "credenciales",
@@ -115,7 +115,7 @@ export const escenarioHackingEtico: DefinicionEscenario = {
       tiempoNotificacion: 45,
       tiempoEnOcurrir: 50,
       descripcion:
-        "Ahora, utilizando las credenciales, abre la consola en 'Computadora Lisa' para acceder al dispositivo del empleado mediante SSH. Pista: ejecuta el comando de ayuda 'h' de la consola para guiarte.",
+        "Con las credenciales, abre la consola y accede al equipo del empleado por SSH. Pista: usa el comando de ayuda 'h'.",
       fase: 2,
       infoAdicional: {
         accion: AccionesRealizables.EJECUTAR,
@@ -135,7 +135,7 @@ export const escenarioHackingEtico: DefinicionEscenario = {
       tiempoNotificacion: 55,
       tiempoEnOcurrir: 60,
       descripcion:
-        "Una vez conectado al dispositivo del empleado, obtén información que sea confidencial para la empresa.",
+        "Ya dentro del equipo, busca y extrae algún archivo confidencial de la empresa.",
       fase: 2,
       infoAdicional: {
         accion: AccionesRealizables.EJECUTAR,
@@ -152,8 +152,7 @@ export const escenarioHackingEtico: DefinicionEscenario = {
       tipoEvento: TipoEvento.COMPLETACION_ESCENARIO,
       tiempoNotificacion: 65,
       descripcion:
-        "¡Felicidades, has completado el escenario de este nivel! Ahora ya tienes una mejor idea "+
-        "sobre las fases para realizar un proceso de Hacking Ético.",
+        "¡Escenario completado! Ya conoces las fases de un proceso de hacking ético: reconocer y luego explotar.",
       fase: 2,
     },
   ],

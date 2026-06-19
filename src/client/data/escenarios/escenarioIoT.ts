@@ -66,9 +66,7 @@ export const escenarioIoT: DefinicionEscenario = {
       tipoEvento: TipoEvento.TRAFICO_RED,
       tiempoNotificacion: 10,
       descripcion:
-        "Los dispositivos IoT son el eslabón más débil de la red: firmware desactualizado, " +
-        "contraseñas por defecto, y protocolos inseguros. El 'Controlador IoT' debe comunicarse " +
-        "con el 'Servidor de Producción' en la red 'LAN-IoT'. Asígnalo a esa red.",
+        "Los sensores IoT deben vivir en su propia red, aislados del resto. Ubícalos en la red de planta.",
       fase: 1,
       infoAdicional: {
         dispositivoOrigen: "Controlador IoT",
@@ -83,8 +81,7 @@ export const escenarioIoT: DefinicionEscenario = {
       tipoEvento: TipoEvento.TRAFICO_RED,
       tiempoNotificacion: 25,
       descripcion:
-        "Los dispositivos IoT NO deben ser accesibles desde Internet. " +
-        "Configura el firewall del 'Router Planta' para BLOQUEAR SSH entrante a 'LAN-IoT'.",
+        "Los sensores IoT no deben ser alcanzables desde Internet. Cierra ese acceso en el perímetro de la planta.",
       fase: 1,
       infoAdicional: {
         dispositivoOrigen: "PC Monitoreo Remoto",
@@ -107,9 +104,7 @@ export const escenarioIoT: DefinicionEscenario = {
       tipoEvento: TipoEvento.VERIFICACION_ACCION_JUGADOR,
       tiempoNotificacion: 50,
       descripcion:
-        "Los sistemas SCADA controlan procesos industriales críticos. " +
-        "Activa 'Actualizaciones automáticas de antivirus' en la 'Estación SCADA' " +
-        "para protegerla contra malware dirigido a infraestructura crítica.",
+        "La estación SCADA controla procesos críticos. Protégela contra malware activando sus defensas.",
       fase: 2,
       infoAdicional: {
         accion: AccionesRealizables.EJECUTAR,
@@ -131,9 +126,7 @@ export const escenarioIoT: DefinicionEscenario = {
       tipoEvento: TipoEvento.CONEXION_VPN,
       tiempoNotificacion: 85,
       descripcion:
-        "El equipo de monitoreo necesita supervisar la planta remotamente. " +
-        "En IoT industrial, el acceso remoto debe ser estrictamente controlado. " +
-        "Configura VPN con modo EA entre 'VPN Gateway Planta' y 'PC Monitoreo Remoto'.",
+        "El NOC debe supervisar la planta de forma segura. Configura una VPN con modo EA entre 'VPN Gateway Planta' y 'PC Monitoreo Remoto'.",
       fase: 3,
       infoAdicional: {
         gateway: {
@@ -155,10 +148,7 @@ export const escenarioIoT: DefinicionEscenario = {
       tipoEvento: TipoEvento.COMPLETACION_ESCENARIO,
       tiempoNotificacion: 105,
       descripcion:
-        "¡Felicidades! Has asegurado una infraestructura IoT industrial: " +
-        "segmentación de red IoT, protección SCADA contra malware, " +
-        "y monitoreo remoto seguro vía VPN. Estas son las mejores prácticas " +
-        "de seguridad para tendencias actuales como IoT y Cloud.",
+        "¡Infraestructura IoT asegurada! Segmentar, blindar el SCADA y cifrar el acceso remoto son la base.",
       fase: 3,
     },
   ],
@@ -185,7 +175,7 @@ export const escenarioIoT: DefinicionEscenario = {
       descripcion: "Establece acceso VPN cifrado para supervisión remota de la planta.",
       faseActual: false, completada: false,
       objetivos: [
-        { descripcion: "Establecer VPN para monitoreo remoto.", completado: false },
+        { descripcion: "Establecer VPN para monitoreo remoto", completado: false },
       ],
     },
   ],
