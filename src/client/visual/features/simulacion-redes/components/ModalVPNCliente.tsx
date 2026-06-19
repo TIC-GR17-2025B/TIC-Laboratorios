@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import styles from "../styles/ModalVPN.module.css";
 import { TipoProteccionVPN } from "../../../../shared/types/DeviceEnums";
 import { useECSSceneContext } from "../../escenarios-simulados/context/ECSSceneContext";
@@ -8,62 +8,9 @@ import TrashIcon from "../../../common/icons/TrashIcon";
 import { ZonaComponent } from "../../../../ecs/components/ZonaComponent";
 import { DispositivoComponent } from "../../../../ecs/components";
 import ComputadoraIcon from "../../../common/icons/ComputadoraIcon";
+import ComboBox, { type ComboBoxOption } from "../../hardening-de-dispositivos/components/ComboBox";
 
-type OptionItem = { label: string; value: string };
-
-function ChevronDown() {
-    return (
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-    );
-}
-
-function WinCombo({ items, value, onChange, placeholder = "Seleccionar" }: {
-    items: OptionItem[];
-    value: OptionItem | null;
-    onChange: (item: OptionItem) => void;
-    placeholder?: string;
-}) {
-    const [open, setOpen] = useState(false);
-    const ref = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        const handler = (e: MouseEvent) => {
-            if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-        };
-        document.addEventListener("mousedown", handler);
-        return () => document.removeEventListener("mousedown", handler);
-    }, []);
-
-    return (
-        <div className={styles.comboBox} ref={ref}>
-            <button className={styles.comboTrigger} onClick={() => setOpen(!open)}>
-                <span className={value ? styles.comboValue : styles.comboPlaceholder}>
-                    {value ? value.label : placeholder}
-                </span>
-                <span className={styles.comboChevron}><ChevronDown /></span>
-            </button>
-            {open && (
-                <div className={styles.comboMenu}>
-                    {items.length === 0 ? (
-                        <div className={styles.comboEmpty}>Sin opciones</div>
-                    ) : items.map((item) => (
-                        <button
-                            key={item.value}
-                            className={`${styles.comboOption} ${value?.value === item.value ? styles.comboOptionSelected : ''}`}
-                            onClick={() => { onChange(item); setOpen(false); }}
-                        >
-                            {item.label}
-                        </button>
-                    ))}
-                </div>
-            )}
-        </div>
-    );
-}
-
-const OPCIONES_PROTECCION: OptionItem[] = [
+const OPCIONES_PROTECCION: ComboBoxOption[] = [
     { label: "Encriptar y Autenticar", value: TipoProteccionVPN.EA },
     { label: "Solo Autenticar", value: TipoProteccionVPN.A },
     { label: "Ninguna", value: TipoProteccionVPN.N },
@@ -71,13 +18,13 @@ const OPCIONES_PROTECCION: OptionItem[] = [
 ];
 
 export default function ModalVPNCliente() {
-    const [proteccion, setProteccion] = useState<OptionItem | null>(null);
-    const [dominioRemoto, setDominioRemoto] = useState<OptionItem | null>(null);
-    const [hostRemoto, setHostRemoto] = useState<OptionItem | null>(null);
+    const [proteccion, setProteccion] = useState<ComboBoxOption | null>(null);
+    const [dominioRemoto, setDominioRemoto] = useState<ComboBoxOption | null>(null);
+    const [hostRemoto, setHostRemoto] = useState<ComboBoxOption | null>(null);
 
     const [configuraciones, setConfiguraciones] = useState<Array<PerfilClienteVPN>>([]);
-    const [dominioRemotoOpciones, setDominioRemotoOpciones] = useState<Array<OptionItem>>([]);
-    const [hostRemotoOpciones, setHostRemotoOpciones] = useState<Array<OptionItem>>([]);
+    const [dominioRemotoOpciones, setDominioRemotoOpciones] = useState<Array<ComboBoxOption>>([]);
+    const [hostRemotoOpciones, setHostRemotoOpciones] = useState<Array<ComboBoxOption>>([]);
     const [errorMessage, setErrorMessage] = useState<string>("");
 
     const isFormularioCompleto = proteccion && dominioRemoto && hostRemoto;
@@ -108,7 +55,7 @@ export default function ModalVPNCliente() {
                         ? { label: zonaComponent.dominio, value: entidad.toString() }
                         : null;
                 })
-                .filter((opcion): opcion is OptionItem => opcion !== null);
+                .filter((opcion): opcion is ComboBoxOption => opcion !== null);
             setDominioRemotoOpciones(opciones);
         }
     }, []);
@@ -132,7 +79,7 @@ export default function ModalVPNCliente() {
                         ? { label: dispositivoComponent.nombre, value: entidad.toString() }
                         : null;
                 })
-                .filter((opcion): opcion is OptionItem => opcion !== null);
+                .filter((opcion): opcion is ComboBoxOption => opcion !== null);
             setHostRemotoOpciones(opcionesHosts);
         }
     }, [dominioRemoto, redController]);
@@ -184,8 +131,8 @@ export default function ModalVPNCliente() {
                 <div className={styles.formHorizontal}>
                     <div className={styles.inputGroup}>
                         <label className={styles.label}>Protección</label>
-                        <WinCombo
-                            items={OPCIONES_PROTECCION}
+                        <ComboBox
+                            options={OPCIONES_PROTECCION}
                             placeholder="Seleccionar"
                             value={proteccion}
                             onChange={setProteccion}
@@ -193,8 +140,8 @@ export default function ModalVPNCliente() {
                     </div>
                     <div className={styles.inputGroup}>
                         <label className={styles.label}>Dominio remoto</label>
-                        <WinCombo
-                            items={dominioRemotoOpciones}
+                        <ComboBox
+                            options={dominioRemotoOpciones}
                             placeholder="Seleccionar"
                             value={dominioRemoto}
                             onChange={setDominioRemoto}
@@ -202,8 +149,8 @@ export default function ModalVPNCliente() {
                     </div>
                     <div className={styles.inputGroup}>
                         <label className={styles.label}>Host remoto</label>
-                        <WinCombo
-                            items={hostRemotoOpciones}
+                        <ComboBox
+                            options={hostRemotoOpciones}
                             placeholder="Seleccionar"
                             value={hostRemoto}
                             onChange={setHostRemoto}

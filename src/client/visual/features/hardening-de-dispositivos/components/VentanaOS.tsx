@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import type { ReactNode } from "react";
 import styles from "../styles/VentanaOS.module.css";
+import { useOSTheme } from "../context/OSThemeContext";
 
 export type SnapZone = "left" | "right" | "top" | null;
 
@@ -37,6 +38,7 @@ export default function VentanaOS({
     zIndex = 10,
     hidden = false,
 }: VentanaOSProps) {
+    const os = useOSTheme();
     const [position, setPosition] = useState(initialPosition ?? { x: 80, y: 40 });
     const [size, setSize] = useState(initialSize ?? { width: window.innerWidth * 0.7, height: window.innerHeight * 0.7 });
     const [isMaximized, setIsMaximized] = useState(initialMaximized);
@@ -278,7 +280,7 @@ export default function VentanaOS({
     return (
         <div
             ref={ventanaRef}
-            className={`${styles.ventana} ${isMaximized ? styles.ventanaMaximizada : ""} ${snapState ? styles.ventanaSnapped : ""} ${showSnappingTransition ? styles.ventanaSnapping : ""}`}
+            className={`${styles.ventana} ${os === "linux" ? styles.linux : ""} ${isMaximized ? styles.ventanaMaximizada : ""} ${snapState ? styles.ventanaSnapped : ""} ${showSnappingTransition ? styles.ventanaSnapping : ""}`}
             style={isMaximized ? { zIndex, display: hidden ? "none" : undefined } : {
                 left: position.x,
                 top: position.y,

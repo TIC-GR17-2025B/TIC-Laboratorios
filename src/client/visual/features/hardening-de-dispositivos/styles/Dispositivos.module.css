@@ -102,53 +102,97 @@
 }
 
 .barraTareasLinux {
-  background: rgba(50, 10, 40, 0.75);
+  background: rgba(34, 34, 34, 0.92);
+  backdrop-filter: blur(16px) saturate(120%);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
   order: -1;
   flex-direction: column;
-  width: 52px;
+  align-items: center;
+  width: 62px;
   height: auto;
-  padding: 8px 0;
-  gap: 4px;
+  padding: 6px 0;
+  gap: 6px;
   border-top: none;
-  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  border-right: 1px solid rgba(0, 0, 0, 0.45);
 }
 
 .barraTareasLinux .appsTareas {
+  flex: 1 1 auto;
   flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 2px 0;
   overflow-x: visible;
   overflow-y: auto;
 }
 
+.barraTareasLinux .appsTareas::-webkit-scrollbar {
+  width: 0;
+}
+
 .barraTareasLinux .appTarea {
   justify-content: center !important;
-  padding: 6px !important;
-  height: auto !important;
-  width: 40px;
+  width: 48px !important;
+  height: 48px !important;
+  padding: 0 !important;
   margin: 0 auto;
+  border-radius: 14px !important;
+}
+
+.barraTareasLinux .appTarea svg {
+  width: 26px !important;
+  height: 26px !important;
+}
+
+.barraTareasLinux .appTarea:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
 }
 
 .barraTareasLinux .appTareaNombre {
   display: none;
 }
 
+.barraTareasLinux .appTareaActiva {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
 .barraTareasLinux .appTareaActiva::after {
   bottom: auto;
   top: 50%;
-  left: 0;
+  left: -7px;
   right: auto;
   transform: translateY(-50%);
-  width: 2px;
-  height: 16px;
+  width: 4px;
+  height: 22px;
+  background: #e95420;
+  border-radius: 0 3px 3px 0;
 }
 
 .barraTareasLinux .bandejaSistema {
-  flex-direction: column;
-  padding: 4px 0;
+  display: none;
 }
 
-.barraTareasLinux .reloj {
-  font-size: 10px;
-  writing-mode: horizontal-tb;
+.botonAppsLinux {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 48px !important;
+  height: 48px !important;
+  margin: 0 auto 2px !important;
+  padding: 0 !important;
+  flex-shrink: 0;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 14px !important;
+  color: rgba(255, 255, 255, 0.86) !important;
+  cursor: pointer !important;
+  transition: background 0.08s ease !important;
+}
+
+.botonAppsLinux:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
 }
 
 .appsTareas {

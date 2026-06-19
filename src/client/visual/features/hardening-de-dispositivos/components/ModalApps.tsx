@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback, type ReactNode } from "react";
 import styles from "../styles/ModalApps.module.css";
-import { useEscenario } from "../../../common/contexts";
-import { useAppsDispositivo } from "../hooks";
+import { useOSTheme } from "../context/OSThemeContext";
+import { useDispositivoApps } from "../context/DispositivoAppsContext";
 import NetScanVizIcon from "../../../common/icons/NetScanVizIcon";
 import ConexionIcon from "../../../common/icons/ConexionIcon";
 import RedesIcon from "../../../common/icons/RedesIcon";
@@ -17,7 +17,7 @@ const APP_ICONS: Record<string, ReactNode> = {
 };
 
 export default function ModalApps() {
-    const { dispositivoSeleccionado } = useEscenario();
+    const isLinux = useOSTheme() === "linux";
     const [activeTab, setActiveTab] = useState<Tab>('repositorio');
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -26,7 +26,7 @@ export default function ModalApps() {
         appsDisponibles,
         comprarApp,
         desinstalarApp,
-    } = useAppsDispositivo(dispositivoSeleccionado?.entidadId);
+    } = useDispositivoApps();
 
     const [loadingApp, setLoadingApp] = useState<string | null>(null);
 
@@ -62,7 +62,7 @@ export default function ModalApps() {
     };
 
     return (
-        <div className={styles.container}>
+        <div className={`${styles.container} ${isLinux ? styles.linux : ""}`}>
             <div className={styles.searchBar}>
                 <span className={styles.searchIcon}>
                     <svg width="14" height="14" viewBox="0 0 16 16" fill="none">

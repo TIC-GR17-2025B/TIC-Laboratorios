@@ -30,16 +30,8 @@ import ModalPhishMatic from "../components/ModalPhishMatic";
 import ModalConsola from "../components/ModalConsola";
 import VentanaOS from "../components/VentanaOS";
 import type { SnapZone } from "../components/VentanaOS";
-
-type OSCategory = "windows" | "linux" | "other";
-
-function getOSCategory(so?: string): OSCategory {
-    if (!so) return "other";
-    const lower = so.toLowerCase();
-    if (lower.includes("windows")) return "windows";
-    if (lower.includes("ubuntu") || lower.includes("linux") || lower.includes("debian") || lower.includes("fedora") || lower.includes("centos")) return "linux";
-    return "other";
-}
+import { OSThemeProvider, getOSCategory, type OSCategory } from "../context/OSThemeContext";
+import { DispositivoAppsProvider } from "../context/DispositivoAppsContext";
 
 function getDesktopThemeClass(osCategory: OSCategory, tipo?: TipoDispositivo): string {
     const isServer = tipo === TipoDispositivo.SERVER;
@@ -71,8 +63,8 @@ interface VentanaConfig {
 function Dispositivos({ embedded = false }: { embedded?: boolean }) {
     const { setDispositivoSeleccionado, dispositivoSeleccionado, entidadSeleccionadaId } = useEscenario();
     const { dispositivos } = useDispositivos();
-    const { appsInstaladas } = useAppsDispositivo(entidadSeleccionadaId ?? undefined);
-    const appInstalada = (nombre: string) => appsInstaladas.some(a => a.nombre === nombre);
+    const appsDispositivo = useAppsDispositivo(entidadSeleccionadaId ?? undefined);
+    const appInstalada = (nombre: string) => appsDispositivo.appsInstaladas.some(a => a.nombre === nombre);
     const [ventanasAbiertas, setVentanasAbiertas] = useState<VentanaId[]>([]);
     const [ventanasMinimizadas, setVentanasMinimizadas] = useState<VentanaId[]>([]);
     const [iconoSeleccionado, setIconoSeleccionado] = useState<VentanaId | null>(null);
@@ -80,6 +72,8 @@ function Dispositivos({ embedded = false }: { embedded?: boolean }) {
     const [snapPreviewZone, setSnapPreviewZone] = useState<SnapZone>(null);
     const ultimoClick = useRef<{ id: VentanaId; time: number } | null>(null);
     const estadosPorDispositivo = useRef<Map<string, { ventanasAbiertas: VentanaId[]; ventanasMinimizadas: VentanaId[]; ordenZ: VentanaId[]; iconoSeleccionado: VentanaId | null }>>(new Map());
+
+    const osCategory = getOSCategory(dispositivoSeleccionado?.sistemaOperativo);
 
     const ventanasConfig: VentanaConfig[] = [
         { id: "estePC", titulo: "Este PC", icono: <EstePCIcon size={14} />, contenido: <ModalEstePC />, posicionInicial: { x: 50, y: 30 } },
@@ -91,7 +85,7 @@ function Dispositivos({ embedded = false }: { embedded?: boolean }) {
         { id: "netScanViz", titulo: "Net-Scan Viz", icono: <NetScanVizIcon size={14} />, contenido: <ModalNetScanViz />, posicionInicial: { x: 60, y: 60 } },
         { id: "socialSearcher", titulo: "Social-Searcher", icono: <ConexionIcon size={14} />, contenido: <ModalSocialSearcher />, posicionInicial: { x: 90, y: 40 } },
         { id: "phishMatic", titulo: "Phish-Matic", icono: <RedesIcon size={14} />, contenido: <ModalPhishMatic />, posicionInicial: { x: 120, y: 55 } },
-        { id: "consola", titulo: "Consola", icono: <ConsolaIcon size={14} />, contenido: <ModalConsola os={getOSCategory(dispositivoSeleccionado?.sistemaOperativo)} />, posicionInicial: { x: 150, y: 35 } },
+        { id: "consola", titulo: "Consola", icono: <ConsolaIcon size={14} />, contenido: <ModalConsola os={osCategory} />, posicionInicial: { x: 150, y: 35 } },
     ];
 
     const enfocarVentana = (id: VentanaId) => {
@@ -197,6 +191,8 @@ function Dispositivos({ embedded = false }: { embedded?: boolean }) {
     };
 
     const desktopContent = (
+        <OSThemeProvider os={osCategory}>
+        <DispositivoAppsProvider value={appsDispositivo}>
         <div className={styles.contenedor}>
             {!embedded && (
                 <div className={styles.tabsDispositivos}>
@@ -212,9 +208,9 @@ function Dispositivos({ embedded = false }: { embedded?: boolean }) {
                 </div>
             )}
 
-            <div className={`${styles.escritorio} ${getDesktopThemeClass(getOSCategory(dispositivoSeleccionado?.sistemaOperativo), dispositivoSeleccionado?.tipo)}`}>
+            <div className={`${styles.escritorio} ${getDesktopThemeClass(osCategory, dispositivoSeleccionado?.tipo)}`}>
                 <div className={styles.areaEscritorio} onClick={() => setIconoSeleccionado(null)}>
-                    <div className={`${styles.iconosEscritorio} ${getOSCategory(dispositivoSeleccionado?.sistemaOperativo) === "linux" ? styles.iconosEscritorioLinux : ""}`}>
+                    <div className={`${styles.iconosEscritorio} ${osCategory === "linux" ? styles.iconosEscritorioLinux : ""}`}>
                         <button className={`${styles.iconoApp} ${iconoSeleccionado === "estePC" ? styles.iconoAppSeleccionado : ""}`} onClick={(e) => handleClickIcono(e, "estePC")}>
                             <div className={styles.iconoAppImagen}>
                                 <EstePCIcon size={48} />
@@ -316,8 +312,8 @@ function Dispositivos({ embedded = false }: { embedded?: boolean }) {
                         }`} />
                     )}
                 </div>
-                <div className={`${styles.barraTareas} ${getTaskbarThemeClass(getOSCategory(dispositivoSeleccionado?.sistemaOperativo))}`}>
-                    {getOSCategory(dispositivoSeleccionado?.sistemaOperativo) === "windows" && (
+                <div className={`${styles.barraTareas} ${getTaskbarThemeClass(osCategory)}`}>
+                    {osCategory === "windows" && (
                         <button className={styles.botonInicio} title="Inicio">
                             <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor">
                                 <rect x="1" y="1" width="7.5" height="7.5" rx="1" />
@@ -349,9 +345,26 @@ function Dispositivos({ embedded = false }: { embedded?: boolean }) {
                             <span>{new Date().toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
                         </div>
                     </div>
+                    {osCategory === "linux" && (
+                        <button className={styles.botonAppsLinux} title="Mostrar aplicaciones">
+                            <svg width="20" height="20" viewBox="0 0 22 22" fill="currentColor">
+                                <circle cx="4" cy="4" r="1.8" />
+                                <circle cx="11" cy="4" r="1.8" />
+                                <circle cx="18" cy="4" r="1.8" />
+                                <circle cx="4" cy="11" r="1.8" />
+                                <circle cx="11" cy="11" r="1.8" />
+                                <circle cx="18" cy="11" r="1.8" />
+                                <circle cx="4" cy="18" r="1.8" />
+                                <circle cx="11" cy="18" r="1.8" />
+                                <circle cx="18" cy="18" r="1.8" />
+                            </svg>
+                        </button>
+                    )}
                 </div>
             </div>
         </div>
+        </DispositivoAppsProvider>
+        </OSThemeProvider>
     );
 
     if (embedded) return desktopContent;

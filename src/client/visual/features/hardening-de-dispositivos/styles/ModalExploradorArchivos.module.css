@@ -349,3 +349,59 @@
   height: 12px;
   background: rgba(255, 255, 255, 0.1);
 }
+
+/* ═══════════════════════════════════════════════════════════
+   Ubuntu (Yaru) Dark — Archivos (Nautilus)
+   ═══════════════════════════════════════════════════════════ */
+.linux {
+  background: #1e1e1e;
+}
+
+.linux .addressBar {
+  background: #303030;
+  border-bottom-color: rgba(0, 0, 0, 0.35);
+}
+
+.linux .addressPath {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
+  border-radius: 7px;
+}
+
+.linux .navBtn:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.linux .sidebar {
+  background: #262626;
+  border-right-color: rgba(0, 0, 0, 0.3);
+}
+
+.linux .sidebarItemActive,
+.linux .sidebarItemActive:hover {
+  background: rgba(233, 84, 32, 0.22);
+  color: #ffffff;
+}
+
+.linux .filePanel,
+.linux .columnHeaders {
+  background: #1e1e1e;
+}
+
+.linux .filePanel {
+  border-right-color: rgba(255, 255, 255, 0.06);
+}
+
+.linux .itemArchivo.seleccionado,
+.linux .itemArchivo.seleccionado:hover {
+  background: rgba(233, 84, 32, 0.22);
+}
+
+.linux .previewPanel,
+.linux .statusBar {
+  background: #262626;
+}
+
+.linux .documento {
+  background: #2a2a2a;
+}

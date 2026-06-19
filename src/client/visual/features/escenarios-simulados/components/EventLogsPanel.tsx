@@ -63,6 +63,7 @@ const EventLogsPanel: React.FC = () => {
                     onClick={handleToggle}
                     aria-label="Abrir panel de registros"
                     type="button"
+                    data-tour="logs-open"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M8 9h8m-8 4h6m1 5h-2l-5 3v-3H6a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3v5.5M19 16v3m0 3v.01" /></svg>
                     {hasNewLog && <span className={styles.newLogIndicator} />}

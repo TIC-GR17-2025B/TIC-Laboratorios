@@ -1,5 +1,6 @@
 import { useEscenario } from "../../../common/contexts";
 import styles from "../styles/ModalEstePC.module.css";
+import { useOSTheme } from "../context/OSThemeContext";
 
 function DeviceIcon() {
     return (
@@ -14,10 +15,12 @@ function DeviceIcon() {
 
 export default function ModalEstePC() {
     const { dispositivoSeleccionado } = useEscenario();
+    const isLinux = useOSTheme() === "linux";
+    const rootClass = `${styles.container} ${isLinux ? styles.linux : ""}`;
 
     if (!dispositivoSeleccionado) {
         return (
-            <div className={styles.container}>
+            <div className={rootClass}>
                 <div className={styles.emptyState}>No hay dispositivo seleccionado</div>
             </div>
         );
@@ -28,7 +31,7 @@ export default function ModalEstePC() {
     const nombreEquipo = (dispositivoSeleccionado.nombre || "pc").replace(/\s+/g, "-");
 
     return (
-        <div className={styles.container}>
+        <div className={rootClass}>
             <div className={styles.headerCard}>
                 <div className={styles.headerIcon}>
                     <DeviceIcon />

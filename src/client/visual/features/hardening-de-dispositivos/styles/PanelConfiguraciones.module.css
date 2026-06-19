@@ -58,6 +58,7 @@
   align-items: center;
   gap: 6px;
   padding: 0 0 16px;
+  user-select: none;
 }
 
 .breadcrumbLink {
@@ -280,4 +281,57 @@
   padding: 32px 16px;
   color: #9e9e9e;
   font-size: 14px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Ubuntu (Yaru) Dark — Configuración
+   ═══════════════════════════════════════════════════════════ */
+.linux {
+  background: #1e1e1e;
+}
+
+.linux .searchInput {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 7px;
+}
+
+.linux .searchInput:focus {
+  background: rgba(0, 0, 0, 0.25);
+  border-color: #e95420;
+  border-bottom-color: #e95420;
+}
+
+.linux .catCard {
+  background: #2a2a2a !important;
+}
+
+.linux .catCard:hover {
+  background: #333333 !important;
+}
+
+.linux .catCard:active {
+  background: #2e2e2e !important;
+}
+
+.linux .detalleCard {
+  background: #2a2a2a;
+}
+
+.linux .configRow + .configRow {
+  border-top-color: rgba(255, 255, 255, 0.06);
+}
+
+/* ─── GNOME switch (orange) ─── */
+.linux .toggleInput:checked + .toggleTrack {
+  background: #e95420;
+  border-color: #e95420;
+}
+
+.linux .toggleInput:checked + .toggleTrack::after {
+  background: #ffffff;
+}
+
+.linux .toggleInput:focus-visible + .toggleTrack {
+  outline-color: #e95420;
 }

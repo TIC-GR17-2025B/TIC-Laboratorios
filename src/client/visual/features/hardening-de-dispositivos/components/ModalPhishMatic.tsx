@@ -1,16 +1,9 @@
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useMemo } from "react";
 import styles from "../styles/ModalPhishMatic.module.css";
 import { useEscenario } from "../../../common/contexts";
 import { useECSSceneContext } from "../../escenarios-simulados/context/ECSSceneContext";
 import type { PlantillaCorreoPhishing } from "../../../../shared/types/EscenarioTypes";
-
-function ChevronDown() {
-    return (
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-    );
-}
+import ComboBox, { type ComboBoxOption } from "./ComboBox";
 
 export default function ModalPhishMatic() {
     const { dispositivoSeleccionado } = useEscenario();
@@ -23,27 +16,15 @@ export default function ModalPhishMatic() {
     const [plantillaIdx, setPlantillaIdx] = useState<number | "">("");
     const [correoDestinatario, setCorreoDestinatario] = useState("");
     const [enviado, setEnviado] = useState(false);
-    const [dropdownOpen, setDropdownOpen] = useState(false);
-    const dropdownRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        const handleClick = (e: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-                setDropdownOpen(false);
-            }
-        };
-        document.addEventListener("mousedown", handleClick);
-        return () => document.removeEventListener("mousedown", handleClick);
-    }, []);
+    const opcionesPlantilla: ComboBoxOption[] = plantillas.map((p, i) => ({
+        label: p.asunto,
+        value: String(i),
+    }));
+    const plantillaOption = opcionesPlantilla.find((o) => o.value === String(plantillaIdx)) ?? null;
 
     const plantillaSeleccionada: PlantillaCorreoPhishing | null =
         plantillaIdx !== "" ? plantillas[plantillaIdx] ?? null : null;
-
-    const handleSelectPlantilla = (idx: number) => {
-        setPlantillaIdx(idx);
-        setEnviado(false);
-        setDropdownOpen(false);
-    };
 
     const handleEnviar = () => {
         if (!plantillaSeleccionada || !correoDestinatario.trim() || !dispositivoSeleccionado?.nombre) return;
@@ -60,38 +41,19 @@ export default function ModalPhishMatic() {
 
     const puedeEnviar = plantillaSeleccionada !== null && correoDestinatario.trim().length > 0;
 
-    const selectedLabel = plantillaSeleccionada
-        ? plantillaSeleccionada.asunto
-        : "Seleccionar plantilla";
-
     return (
         <div className={styles.container}>
             <div className={styles.field}>
                 <span className={styles.label}>Plantilla de correo</span>
-                <div className={styles.comboBox} ref={dropdownRef}>
-                    <button
-                        className={styles.comboTrigger}
-                        onClick={() => setDropdownOpen(!dropdownOpen)}
-                    >
-                        <span className={plantillaIdx === "" ? styles.comboPlaceholder : styles.comboValue}>
-                            {selectedLabel}
-                        </span>
-                        <span className={styles.comboChevron}><ChevronDown /></span>
-                    </button>
-                    {dropdownOpen && (
-                        <div className={styles.comboMenu}>
-                            {plantillas.map((p, i) => (
-                                <button
-                                    key={i}
-                                    className={`${styles.comboOption} ${plantillaIdx === i ? styles.comboOptionSelected : ''}`}
-                                    onClick={() => handleSelectPlantilla(i)}
-                                >
-                                    {p.asunto}
-                                </button>
-                            ))}
-                        </div>
-                    )}
-                </div>
+                <ComboBox
+                    placeholder="Seleccionar plantilla"
+                    options={opcionesPlantilla}
+                    value={plantillaOption}
+                    onChange={(opt) => {
+                        setPlantillaIdx(Number(opt.value));
+                        setEnviado(false);
+                    }}
+                />
             </div>
 
             <div className={styles.field}>

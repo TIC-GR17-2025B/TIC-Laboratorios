@@ -2,12 +2,19 @@ import { useState } from "react";
 import styles from "../styles/ModalNetScanViz.module.css";
 import { useECSSceneContext } from "../../escenarios-simulados/context/ECSSceneContext";
 import type { InfoDispositivoEscaneado } from "../../../../shared/types/EscenarioTypes";
+import ComboBox, { type ComboBoxOption } from "./ComboBox";
 
 export default function ModalNetScanViz() {
     const { escenarioController, redController, zonasDisponibles } = useECSSceneContext();
     const [zonaSeleccionada, setZonaSeleccionada] = useState<number | "">("");
     const [resultados, setResultados] = useState<InfoDispositivoEscaneado[]>([]);
     const [escaneado, setEscaneado] = useState(false);
+
+    const opcionesZona: ComboBoxOption[] = zonasDisponibles.map((zona) => ({
+        label: zona.dominio,
+        value: String(zona.id),
+    }));
+    const zonaOption = opcionesZona.find((o) => o.value === String(zonaSeleccionada)) ?? null;
 
     const handleEscanear = () => {
         if (zonaSeleccionada === "") return;
@@ -25,21 +32,16 @@ export default function ModalNetScanViz() {
     return (
         <div className={styles.container}>
             <div className={styles.toolbar}>
-                <select
+                <ComboBox
                     className={styles.select}
-                    value={zonaSeleccionada}
-                    onChange={(e) => {
-                        setZonaSeleccionada(e.target.value ? Number(e.target.value) : "");
+                    placeholder="Seleccionar dominio..."
+                    options={opcionesZona}
+                    value={zonaOption}
+                    onChange={(opt) => {
+                        setZonaSeleccionada(Number(opt.value));
                         setEscaneado(false);
                     }}
-                >
-                    <option value="">Seleccionar dominio...</option>
-                    {zonasDisponibles.map((zona) => (
-                        <option key={zona.id} value={zona.id}>
-                            {zona.dominio}
-                        </option>
-                    ))}
-                </select>
+                />
                 <button
                     className={styles.btnScan}
                     onClick={handleEscanear}

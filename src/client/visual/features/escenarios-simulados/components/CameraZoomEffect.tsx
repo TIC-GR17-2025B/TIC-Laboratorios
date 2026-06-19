@@ -116,10 +116,12 @@ const CameraZoomEffect: React.FC = () => {
         const saved = savedCameraState.current;
         if (!saved) return;
 
-        // Calculate the screen center in world space (accounting for model rotation)
-        // El modelo procedural se renderiza con rotacionY + offset (+90°, ver
-        // OFFSET_FRENTE_Y.workstation), así que sumamos 90° para alinear con la cara.
-        const adjustedRotation = targetRotationY + Math.PI / 2;
+        // Calculate the screen center in world space (accounting for model rotation).
+        // La workstation se construye con la pantalla mirando a +Z local y NO tiene
+        // entrada en OFFSET_FRENTE_Y (offset = 0), así que se renderiza tal cual con
+        // rotation.y = rotacionY. Por tanto la normal de la pantalla en mundo es
+        // exactamente targetRotationY: (sin, 0, cos). Sin offset extra.
+        const adjustedRotation = targetRotationY;
         const cosR = Math.cos(adjustedRotation);
         const sinR = Math.sin(adjustedRotation);
         // Apply Y-axis rotation matrix: X' = x*cos + z*sin, Z' = -x*sin + z*cos
@@ -205,9 +207,10 @@ function projectMonitorToScreen(
     screenCenter: Vector3,
     rotationY: number,
 ) {
-    // +90° para alinearse con el cálculo del zoom de cámara (el modelo procedural
-    // tiene su eje frontal rotado por OFFSET_FRENTE_Y.workstation).
-    const adjusted = rotationY + Math.PI / 2;
+    // Mismo criterio que el cálculo del zoom: la pantalla de la workstation mira a
+    // +Z local y el modelo no tiene offset en OFFSET_FRENTE_Y, así que la rotación
+    // efectiva de la cara es exactamente rotationY (sin sumar nada).
+    const adjusted = rotationY;
     const cosR = Math.cos(adjusted);
     const sinR = Math.sin(adjusted);
 

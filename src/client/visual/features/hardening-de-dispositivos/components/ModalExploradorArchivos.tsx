@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import styles from "../styles/ModalExploradorArchivos.module.css";
 import { useEscenario } from "../../../common/contexts";
 import { useECSSceneContext } from "../../escenarios-simulados/context/ECSSceneContext";
+import { useOSTheme } from "../context/OSThemeContext";
 import type { Activo } from "../../../../shared/types/EscenarioTypes";
 import { TipoActivo } from "../../../../shared/types/DeviceEnums";
 import { ArrowLeft, ArrowUp, ArrowRight, RotateCw, ChevronRight } from "lucide-react";
@@ -117,6 +118,7 @@ export default function ModalExploradorArchivos() {
     const [activoSeleccionado, setActivoSeleccionado] = useState<Activo | null>(null);
     const { entidadSeleccionadaId } = useEscenario();
     const { escenarioController } = useECSSceneContext();
+    const isLinux = useOSTheme() === "linux";
 
     useEffect(() => {
         if (entidadSeleccionadaId !== null) {
@@ -131,7 +133,7 @@ export default function ModalExploradorArchivos() {
     }, [entidadSeleccionadaId, escenarioController]);
 
     return (
-        <div className={styles.contenedor}>
+        <div className={`${styles.contenedor} ${isLinux ? styles.linux : ""}`}>
             {/* Address bar */}
             <div className={styles.addressBar}>
                 <div className={styles.navButtons}>

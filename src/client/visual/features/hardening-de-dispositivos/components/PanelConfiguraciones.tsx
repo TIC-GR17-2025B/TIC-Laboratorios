@@ -3,6 +3,7 @@ import styles from '../styles/PanelConfiguraciones.module.css';
 import obtenerConfiguraciones from '../utils/obtenerConfiguraciones';
 import { useEscenario } from '../../../common/contexts';
 import { useECSSceneContext } from '../../escenarios-simulados/context/ECSSceneContext';
+import { useOSTheme } from '../context/OSThemeContext';
 import ShieldCheckIcon from '../../../common/icons/ShieldCheckIcon';
 import SistemaOpIcon from '../../../common/icons/SistemaOpIcon';
 import KeyIcon from '../../../common/icons/KeyIcon';
@@ -124,6 +125,8 @@ export default function PanelConfiguraciones() {
 
     const { toggleConfigWorkstation } = useECSSceneContext();
     const { dispositivoSeleccionado } = useEscenario();
+    const isLinux = useOSTheme() === "linux";
+    const rootClass = `${styles.contenedor} ${isLinux ? styles.linux : ""}`;
 
     useEffect(() => {
         if (!dispositivoSeleccionado || !dispositivoSeleccionado.configuraciones) {
@@ -170,7 +173,7 @@ export default function PanelConfiguraciones() {
             .filter((item): item is NonNullable<typeof item> => item !== null);
 
         return (
-            <div className={styles.contenedor}>
+            <div className={rootClass}>
                 <div className={styles.breadcrumb}>
                     <button className={styles.breadcrumbLink} onClick={() => setCategoriaActiva(null)}>
                         Configuración
@@ -220,7 +223,7 @@ export default function PanelConfiguraciones() {
     );
 
     return (
-        <div className={styles.contenedor}>
+        <div className={rootClass}>
             <div className={styles.searchBar}>
                 <span className={styles.searchIcon}>
                     <SearchIcon size={14} />

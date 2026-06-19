@@ -1,33 +1,22 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import styles from "../styles/ModalSocialSearcher.module.css";
 import { useECSSceneContext } from "../../escenarios-simulados/context/ECSSceneContext";
+import { useOSTheme } from "../context/OSThemeContext";
 import type { InfoPersonaEncontrada } from "../../../../shared/types/EscenarioTypes";
-
-function ChevronDown() {
-    return (
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-    );
-}
+import ComboBox, { type ComboBoxOption } from "./ComboBox";
 
 export default function ModalSocialSearcher() {
     const { escenarioController, zonasDisponibles } = useECSSceneContext();
+    const isLinux = useOSTheme() === "linux";
     const [zonaSeleccionada, setZonaSeleccionada] = useState<number | "">("");
     const [resultados, setResultados] = useState<InfoPersonaEncontrada[]>([]);
     const [buscado, setBuscado] = useState(false);
-    const [dropdownOpen, setDropdownOpen] = useState(false);
-    const dropdownRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        const handleClick = (e: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-                setDropdownOpen(false);
-            }
-        };
-        document.addEventListener("mousedown", handleClick);
-        return () => document.removeEventListener("mousedown", handleClick);
-    }, []);
+    const opcionesZona: ComboBoxOption[] = zonasDisponibles.map((zona) => ({
+        label: zona.nombre,
+        value: String(zona.id),
+    }));
+    const zonaOption = opcionesZona.find((o) => o.value === String(zonaSeleccionada)) ?? null;
 
     const handleBuscar = () => {
         if (zonaSeleccionada === "") return;
@@ -41,16 +30,6 @@ export default function ModalSocialSearcher() {
 
         escenarioController.registrarEjecucionAplicacion("Company Social-Searcher");
     };
-
-    const handleSelectZona = (id: number) => {
-        setZonaSeleccionada(id);
-        setBuscado(false);
-        setDropdownOpen(false);
-    };
-
-    const selectedLabel = zonaSeleccionada === ""
-        ? "Seleccionar zona"
-        : zonasDisponibles.find(z => z.id === zonaSeleccionada)?.nombre ?? "Seleccionar zona";
 
     const getInitials = (nombre: string) => {
         const parts = nombre.split(" ");
@@ -69,32 +48,18 @@ export default function ModalSocialSearcher() {
     };
 
     return (
-        <div className={styles.container}>
+        <div className={`${styles.container} ${isLinux ? styles.linux : ""}`}>
             <div className={styles.toolbar}>
-                <div className={styles.comboBox} ref={dropdownRef}>
-                    <button
-                        className={styles.comboTrigger}
-                        onClick={() => setDropdownOpen(!dropdownOpen)}
-                    >
-                        <span className={zonaSeleccionada === "" ? styles.comboPlaceholder : styles.comboValue}>
-                            {selectedLabel}
-                        </span>
-                        <span className={styles.comboChevron}><ChevronDown /></span>
-                    </button>
-                    {dropdownOpen && (
-                        <div className={styles.comboMenu}>
-                            {zonasDisponibles.map((zona) => (
-                                <button
-                                    key={zona.id}
-                                    className={`${styles.comboOption} ${zonaSeleccionada === zona.id ? styles.comboOptionSelected : ''}`}
-                                    onClick={() => handleSelectZona(zona.id)}
-                                >
-                                    {zona.nombre}
-                                </button>
-                            ))}
-                        </div>
-                    )}
-                </div>
+                <ComboBox
+                    className={styles.comboField}
+                    placeholder="Seleccionar zona"
+                    options={opcionesZona}
+                    value={zonaOption}
+                    onChange={(opt) => {
+                        setZonaSeleccionada(Number(opt.value));
+                        setBuscado(false);
+                    }}
+                />
                 <button
                     className={styles.btnSearch}
                     onClick={handleBuscar}

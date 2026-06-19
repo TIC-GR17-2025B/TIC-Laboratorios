@@ -1,7 +1,15 @@
-import { useState, useEffect, useLayoutEffect, useCallback, useRef, type CSSProperties } from "react";
+import {
+  useState,
+  useEffect,
+  useLayoutEffect,
+  useCallback,
+  useRef,
+  type CSSProperties,
+} from "react";
 import { useNavigate, useLocation } from "react-router";
 import { useECSSceneContext } from "../context/ECSSceneContext";
 import { useChatContext } from "../../chat/context/ChatContext";
+import Button from "../../../common/components/Button";
 import s from "../styles/TutorialTour.module.css";
 
 interface TourStep {
@@ -24,7 +32,7 @@ const clamp = (value: number, min: number, max: number) =>
 function getTooltipPosition(
   rect: DOMRect | null,
   placement: TourStep["placement"],
-  size: { width: number; height: number }
+  size: { width: number; height: number },
 ): CSSProperties {
   if (!rect || placement === "center") return {};
 
@@ -67,90 +75,85 @@ export default function TutorialTour() {
   const [active, setActive] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
+  // El target de un paso anclado no se pudo localizar (no montó o desapareció,
+  // p. ej. el usuario abrió el panel y el botón se desmontó): mostrar centrado.
+  const [targetMissing, setTargetMissing] = useState(false);
   const [tooltipSize, setTooltipSize] = useState({ width: 0, height: 0 });
   const tooltipRef = useRef<HTMLDivElement>(null);
   const wasPausedBeforeTour = useRef(false);
   const prevStepRef = useRef(-1);
 
   const steps: TourStep[] = [
-    // — Bienvenida (centered, en oficina)
     {
       target: "body",
       placement: "center",
       route: "/",
-      title: "Bienvenido a TechStart",
+      title: "Bienvenido al simulador",
       content:
-        "Es tu primer día como administrador de seguridad informática. " +
-        "Te daremos un recorrido rápido por las herramientas que tienes disponibles.",
+        "Este es un simulador para aprender seguridad informática practicando. " +
+        "Cada escenario te pone en una situación distinta: a veces proteges los sistemas " +
+        "de una empresa, a veces eres tú quien ataca. Te mostramos rápido las herramientas que tienes.",
     },
-    // — Escena 3D
     {
       target: '[data-tour="escena-3d"]',
       placement: "center",
       route: "/",
       title: "Tu oficina",
       content:
-        "Esta es la oficina de TechStart en 3D. Puedes hacer clic en los dispositivos " +
-        "para ver su información, o clic derecho para configurarlos.",
+        "Cada escenario ocurre en una oficina 3D. No todos los dispositivos se pueden usar: " +
+        "los que sí están en los cuartos con la puerta abierta. Haz clic en ellos para ver sus " +
+        "opciones. Cada tipo de dispositivo sirve para algo distinto.",
     },
-    // — Dock general
     {
       target: '[data-tour="dock"]',
       placement: "top",
       route: "/",
       title: "Barra de navegación",
       content:
-        "Desde aquí accedes a todo: la oficina, los dispositivos, la red y los objetivos de la partida.",
+        "Desde aquí llegas a todo: la oficina, los dispositivos, la red y los objetivos.",
     },
-    // — Vista de Redes
     {
       target: "body",
       placement: "center",
       route: "/redes",
       title: "Vista de Redes",
       content:
-        "Aquí ves cómo están conectados los dispositivos. Puedes asignar equipos a redes " +
-        "y ver la topología completa. Tu primer objetivo va a ser exactamente esto.",
+        "Aquí ves cómo se conectan los dispositivos. Puedes asignar equipos a redes tras seleccionarlos.",
     },
-    // — Vista de Fases/Partida
     {
       target: "body",
       placement: "center",
       route: "/fases-partida",
       title: "Objetivos de la partida",
       content:
-        "Aquí puedes ver las fases del escenario y qué debes lograr en cada una. " +
-        "Cuando no sepas qué hacer, revisa esta sección.",
+        "Aquí están las fases del escenario y lo que debes lograr en cada una. " +
+        "Si no sabes qué hacer, revísalo. No puedes completar una fase sin antes haber completado sus objetivos.",
     },
-    // — Logs panel (volver a oficina)
     {
-      target: '[data-tour="logs-panel"]',
+      target: '[data-tour="logs-open"]',
       placement: "left",
       route: "/",
       title: "Panel de eventos",
       content:
-        "Los eventos del escenario aparecen aquí. Cada uno te dará instrucciones " +
-        "sobre qué está pasando y qué debes hacer. Léelos con atención.",
+        "Los eventos del escenario se registran en este panel. Te ayudarán indicándote en qué enfocarte.",
     },
-    // — Tiempo y pausa
     {
       target: '[data-tour="dock-tiempo"]',
       placement: "top",
       route: "/",
       title: "El tiempo corre",
       content:
-        "La simulación avanza en tiempo real. Los retos aparecen en momentos específicos. " +
-        "Si necesitas pensar, puedes pausar con el botón de al lado.",
+        "La simulación avanza en tiempo real y los retos aparecen en momentos concretos. " +
+        "Si necesitas pensar, pausa con el botón de al lado.",
     },
-    // — Chat
     {
       target: '[data-chat-toggle="true"]',
       placement: "top",
       route: "/",
       title: "Tu asistente IA",
       content:
-        "Si te pierdes o no entiendes algo, puedes preguntarle al chatbot. " +
-        "Está ahí para ayudarte durante todo el escenario.",
+        "Si te pierdes o algo no queda claro, pregúntale al chatbot. " +
+        "Está para ayudarte durante todo el escenario.",
       onEnter: () => openChat(),
       onLeave: () => closeChat(),
     },
@@ -160,17 +163,17 @@ export default function TutorialTour() {
       placement: "center",
       route: "/",
       title: "¡Listo!",
-      content:
-        "Recuerda los tres pilares de la seguridad:\n" +
-        "• Confidencialidad — Solo los autorizados acceden\n" +
-        "• Integridad — La información no se altera\n" +
-        "• Disponibilidad — Los sistemas están accesibles\n\n" +
-        "Tu primer reto aparecerá en unos segundos. ¡Buena suerte!",
+      content: "Tu primer reto aparecerá en unos segundos. ¡Buena suerte!",
     },
   ];
 
   const step = steps[stepIndex];
-  const isCentered = step.target === "body" || !targetRect;
+  const isBodyStep = step.target === "body";
+  // Centrado para pasos "body" y como fallback si el target no se localiza.
+  const isCentered = isBodyStep || targetMissing;
+  // Un paso anclado solo se muestra cuando ya tiene su posición medida (o cuando
+  // cae al fallback centrado); así evitamos el flash en la posición anterior.
+  const showTooltip = isBodyStep || targetRect !== null || targetMissing;
   const isLast = stepIndex === steps.length - 1;
 
   const close = useCallback(() => {
@@ -186,13 +189,12 @@ export default function TutorialTour() {
     const slug = localStorage.getItem("slug_escenario_actual");
     if (slug !== "tutorial") return;
 
-    const timer = setTimeout(() => {
-      wasPausedBeforeTour.current = isPaused;
-      if (!isPaused) pause();
-      setActive(true);
-    }, 1500);
+    wasPausedBeforeTour.current = isPaused;
+    setActive(true);
 
-    return () => clearTimeout(timer);
+    // Diferir la pausa: el timer se crea/inicia en el efecto de useECSScene,
+    // que corre después de este. El microtask se ejecuta tras ese flush.
+    if (!isPaused) queueMicrotask(pause);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Navigate & run side effects when step changes
@@ -208,37 +210,68 @@ export default function TutorialTour() {
       navigate(step.route);
     }
 
+    // Actualizar siempre, también cuando hay onEnter, para que el onLeave del
+    // paso actual se dispare al salir (p. ej. cerrar el panel de eventos).
+    prevStepRef.current = stepIndex;
+
     if (step.onEnter) {
       const t = setTimeout(step.onEnter, 100);
       return () => clearTimeout(t);
     }
-
-    prevStepRef.current = stepIndex;
   }, [stepIndex, active]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Update target rect
-  useEffect(() => {
+  // Medir el target del paso actual antes del paint (sin salto). Si el elemento
+  // aún no existe (p. ej. la ruta acaba de cambiar) se reintenta en cada frame
+  // hasta encontrarlo, en vez de usar un delay fijo.
+  useLayoutEffect(() => {
     if (!active) return;
 
-    const updateRect = () => {
-      if (step.target === "body") {
-        setTargetRect(null);
+    if (isBodyStep) {
+      setTargetRect(null);
+      setTargetMissing(false);
+      return;
+    }
+
+    setTargetMissing(false);
+    // Si ya estamos en la ruta del paso, el target debería existir enseguida; si
+    // no aparece en pocos frames es que no está (p. ej. el panel se abrió y el
+    // botón se desmontó) y caemos a centrado. Si hay que navegar, damos margen
+    // para que la nueva ruta monte.
+    const needsNav = !!step.route && step.route !== location.pathname;
+    const maxAttempts = needsNav ? 120 : 8;
+
+    let raf = 0;
+    let attempts = 0;
+    const measure = () => {
+      const el = document.querySelector(step.target);
+      if (el) {
+        setTargetRect(el.getBoundingClientRect());
+        setTargetMissing(false);
         return;
       }
+      // Limpiar el rect previo para que el tooltip no quede en la posición
+      // anterior mientras se busca el target.
+      setTargetRect(null);
+      if (attempts++ < maxAttempts) {
+        raf = requestAnimationFrame(measure);
+      } else {
+        setTargetMissing(true);
+      }
+    };
+    measure();
+
+    const onReflow = () => {
       const el = document.querySelector(step.target);
       setTargetRect(el ? el.getBoundingClientRect() : null);
     };
-
-    // Small delay so route transitions can render
-    const timer = setTimeout(updateRect, 50);
-    window.addEventListener("resize", updateRect);
-    window.addEventListener("scroll", updateRect, true);
+    window.addEventListener("resize", onReflow);
+    window.addEventListener("scroll", onReflow, true);
     return () => {
-      clearTimeout(timer);
-      window.removeEventListener("resize", updateRect);
-      window.removeEventListener("scroll", updateRect, true);
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", onReflow);
+      window.removeEventListener("scroll", onReflow, true);
     };
-  }, [active, step.target, location.pathname]);
+  }, [active, isBodyStep, step.target, stepIndex, location.pathname]);
 
   // Medir el tooltip para poder acotarlo al viewport (antes del paint, sin parpadeo)
   useLayoutEffect(() => {
@@ -249,7 +282,7 @@ export default function TutorialTour() {
     setTooltipSize((prev) =>
       prev.width === offsetWidth && prev.height === offsetHeight
         ? prev
-        : { width: offsetWidth, height: offsetHeight }
+        : { width: offsetWidth, height: offsetHeight },
     );
   }, [active, isCentered, stepIndex, targetRect]);
 
@@ -261,61 +294,73 @@ export default function TutorialTour() {
 
   return (
     <div className={s.overlay}>
-      {isCentered ? (
-        <div className={s.overlayBackground} />
-      ) : (
+      {targetRect && !isCentered ? (
         <div
           className={s.spotlight}
           style={{
-            top: targetRect!.top - 4,
-            left: targetRect!.left - 4,
-            width: targetRect!.width + 8,
-            height: targetRect!.height + 8,
+            top: targetRect.top - 4,
+            left: targetRect.left - 4,
+            width: targetRect.width + 8,
+            height: targetRect.height + 8,
           }}
         />
+      ) : (
+        <div className={s.overlayBackground} />
       )}
 
-      <div
-        ref={tooltipRef}
-        className={tooltipClass}
-        style={isCentered ? {} : getTooltipPosition(targetRect, step.placement, tooltipSize)}
-      >
-        <div className={s.header}>
-          <h3 className={s.title}>{step.title}</h3>
-          <button className={s.closeButton} onClick={close} aria-label="Cerrar tour">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-          </button>
-        </div>
+      {showTooltip && (
+        <div
+          ref={tooltipRef}
+          className={tooltipClass}
+          style={
+            isCentered
+              ? {}
+              : getTooltipPosition(targetRect, step.placement, tooltipSize)
+          }
+        >
+          <div className={s.header}>
+            <h3 className={s.title}>{step.title}</h3>
+            <button
+              className={s.closeButton}
+              onClick={close}
+              aria-label="Cerrar tour"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M18 6L6 18M6 6l12 12"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </button>
+          </div>
 
-        <div className={s.body}>{step.content}</div>
+          <div className={s.body}>{step.content}</div>
 
-        <div className={s.footer}>
-          <button className={s.skipButton} onClick={close}>
-            Saltar tour
-          </button>
           <div className={s.footerRight}>
             <span className={s.progress}>
               {stepIndex + 1} / {steps.length}
             </span>
-            {stepIndex > 0 && (
-              <button
-                className={s.backButton}
-                onClick={() => setStepIndex((i) => i - 1)}
+            <div className={s.footerActions}>
+              {stepIndex > 0 && (
+                <Button
+                  variant="primary"
+                  onClick={() => setStepIndex((i) => i - 1)}
+                >
+                  Anterior
+                </Button>
+              )}
+              <Button
+                variant="accent"
+                onClick={() => (isLast ? close() : setStepIndex((i) => i + 1))}
               >
-                Anterior
-              </button>
-            )}
-            <button
-              className={s.nextButton}
-              onClick={() => (isLast ? close() : setStepIndex((i) => i + 1))}
-            >
-              {isLast ? "¡Empezar!" : "Siguiente"}
-            </button>
+                {isLast ? "¡Empezar!" : "Siguiente"}
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
