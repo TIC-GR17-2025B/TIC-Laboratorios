@@ -1,4 +1,5 @@
 import {
+  Box3,
   BoxGeometry,
   CylinderGeometry,
   Group,
@@ -317,6 +318,16 @@ export const buildWorkstationModel = (): Group => {
   const raton = buildRaton();
   raton.position.set(0.27, 0, 0.13);
   ws.add(raton);
+
+  // Centra la huella XZ en el origen (torre y teclado están descentrados), para
+  // que el conjunto quede balanceado sobre el tablero.
+  const box = new Box3().setFromObject(ws);
+  const offsetX = (box.min.x + box.max.x) / 2;
+  const offsetZ = (box.min.z + box.max.z) / 2;
+  for (const child of ws.children) {
+    child.position.x -= offsetX;
+    child.position.z -= offsetZ;
+  }
 
   return ws;
 };

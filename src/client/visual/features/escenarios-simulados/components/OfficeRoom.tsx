@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
 import * as THREE from 'three';
-import { Text } from '@react-three/drei';
 import type { RoomInfo } from '../hooks/useBuildingLayout';
 import { getRoomPalette } from '../config/roomThemes';
 
@@ -16,9 +15,8 @@ interface OfficeRoomProps {
  * sale de la paleta del tema inferido para la sala.
  */
 const OfficeRoom: React.FC<OfficeRoomProps> = React.memo(({ room }) => {
-    const { padded, centerX, centerZ, width, depth, nombre, tipo } = room;
+    const { centerX, centerZ, width, depth, tipo } = room;
     const palette = getRoomPalette(tipo);
-    const facesNorth = room.corridorSide === 'north';
 
     const floorMaterial = useMemo(() => new THREE.MeshStandardMaterial({
         color: palette.floor,
@@ -32,8 +30,6 @@ const OfficeRoom: React.FC<OfficeRoomProps> = React.memo(({ room }) => {
 
     useEffect(() => () => floorMaterial.dispose(), [floorMaterial]);
 
-    const labelColor = tipo === 'hacker' || tipo === 'datacenter' ? '#aebfd6' : '#5a4e42';
-
     return (
         <group name={`office-floor-${room.oficinaId}`}>
             <mesh
@@ -44,21 +40,6 @@ const OfficeRoom: React.FC<OfficeRoomProps> = React.memo(({ room }) => {
             >
                 <planeGeometry args={[width - 0.06, depth - 0.06]} />
             </mesh>
-
-            {/* Etiqueta en la pared trasera, mirando hacia el interior */}
-            <Text
-                position={[centerX, 2.1, facesNorth ? padded.z1 + 0.1 : padded.z2 - 0.1]}
-                rotation={[0, facesNorth ? 0 : Math.PI, 0]}
-                fontSize={0.22}
-                color={labelColor}
-                anchorX="center"
-                anchorY="middle"
-                maxWidth={width - 0.5}
-                outlineWidth={0.004}
-                outlineColor={tipo === 'hacker' || tipo === 'datacenter' ? '#05070b' : '#ffffff'}
-            >
-                {nombre}
-            </Text>
         </group>
     );
 });

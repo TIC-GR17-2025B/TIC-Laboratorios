@@ -52,7 +52,9 @@ const CATEGORY_ORDER = [
 export default function LevelSelectionMenuList() {
     const [escenarios, setEscenarios] = useState<EscenarioPreview[]>([]);
     const [progresos, setProgresos] = useState<Progreso[]>([]);
+    const [progresosListos, setProgresosListos] = useState(false);
     const [openTooltip, setOpenTooltip] = useState<number | null>(null);
+    const [tooltipPlacement, setTooltipPlacement] = useState<'top' | 'bottom'>('bottom');
     const containerRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
     const { setSelectedEscenario } = useSelectedLevel();
@@ -63,19 +65,41 @@ export default function LevelSelectionMenuList() {
         if (escenariosData) setEscenarios(escenariosData);
 
         const userStr = localStorage.getItem('user');
-        if (userStr) {
-            const user = JSON.parse(userStr);
-            const idEstudiante = user.id_estudiante;
-            if (idEstudiante) {
-                fetch(`${API_BASE_URL}/progreso/estudiante/${idEstudiante}`)
-                    .then(res => res.json())
-                    .then(result => {
-                        if (result.success && result.data) setProgresos(result.data);
-                    })
-                    .catch(err => console.error('Error al obtener progresos:', err));
-            }
+        const user = userStr ? JSON.parse(userStr) : null;
+        const idEstudiante = user?.id_estudiante;
+
+        // Sin estudiante no hay progresos que esperar: no dejamos el skeleton colgado.
+        if (!idEstudiante) {
+            setProgresosListos(true);
+            return;
         }
+
+        fetch(`${API_BASE_URL}/progreso/estudiante/${idEstudiante}`)
+            .then(res => res.json())
+            .then(result => {
+                if (result.success && result.data) setProgresos(result.data);
+            })
+            .catch(err => console.error('Error al obtener progresos:', err))
+            .finally(() => setProgresosListos(true));
     }, []);
+
+    // Altura estimada del tooltip (título + descripción + botón + padding). Sirve para
+    // decidir si cabe abajo del nodo o conviene abrirlo hacia arriba.
+    const TOOLTIP_EST_HEIGHT = 260;
+
+    const toggleTooltip = (id: number, nodeEl: HTMLElement) => {
+        if (openTooltip === id) {
+            setOpenTooltip(null);
+            return;
+        }
+        const rect = nodeEl.getBoundingClientRect();
+        const spaceBelow = window.innerHeight - rect.bottom;
+        const spaceAbove = rect.top;
+        // Abrir arriba solo si abajo no cabe y arriba hay más espacio.
+        const placeTop = spaceBelow < TOOLTIP_EST_HEIGHT + 12 && spaceAbove > spaceBelow;
+        setTooltipPlacement(placeTop ? 'top' : 'bottom');
+        setOpenTooltip(id);
+    };
 
     const handleSelectLevel = (escenario: EscenarioPreview) => {
         const escenarioCompleto = nivelController.cargarEscenario(escenario.id) as Escenario;
@@ -134,6 +158,38 @@ export default function LevelSelectionMenuList() {
     );
 
     let globalIndex = 0;
+
+    // Mientras llegan los progresos pintamos un skeleton en las posiciones exactas
+    // de los nodos (zigzag), para que la transición al estado real no "salte".
+    if (!progresosListos) {
+        return (
+            <div className={styles.path} ref={containerRef} aria-busy="true">
+                {groups.map((group) => (
+                    <div key={group.categoria} className={styles.section}>
+                        <div className={styles.banner}>
+                            <span className={styles.bannerTitle}>{group.categoria}</span>
+                        </div>
+                        <div className={styles.nodes}>
+                            {group.escenarios.map(() => {
+                                const offset = zigzagOffset(globalIndex);
+                                const mt = nodeMarginTop(globalIndex);
+                                globalIndex++;
+                                return (
+                                    <div
+                                        key={globalIndex}
+                                        className={styles.nodeRow}
+                                        style={{ marginTop: mt, transform: `translateX(${offset}px)` }}
+                                    >
+                                        <div className={`${styles.node} ${styles.nodeSkeleton}`} />
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                ))}
+            </div>
+        );
+    }
 
     return (
         <div className={styles.path} ref={containerRef}>
@@ -199,9 +255,9 @@ export default function LevelSelectionMenuList() {
                                         aria-expanded={isOpen}
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            setOpenTooltip(isOpen ? null : esc.id);
+                                            toggleTooltip(esc.id, e.currentTarget);
                                         }}
-                                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpenTooltip(isOpen ? null : esc.id); } }}
+                                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleTooltip(esc.id, e.currentTarget); } }}
                                     >
                                         {completado ? (
                                             <Check size={24} strokeWidth={3} />
@@ -213,14 +269,14 @@ export default function LevelSelectionMenuList() {
                                     <AnimatePresence>
                                         {isOpen && (
                                             <motion.div
-                                                className={styles.tooltip}
+                                                className={`${styles.tooltip} ${tooltipPlacement === 'top' ? styles.tooltipTop : ''}`}
                                                 style={{ transform: `translateX(calc(-50% - ${offset}px))` }}
                                                 initial={{ opacity: 0, scale: 0.9 }}
                                                 animate={{ opacity: 1, scale: 1 }}
                                                 exit={{ opacity: 0, scale: 0.9 }}
                                                 transition={{ duration: 0.15 }}
                                             >
-                                                <div className={styles.tooltipArrow} />
+                                                <div className={`${styles.tooltipArrow} ${tooltipPlacement === 'top' ? styles.tooltipArrowTop : ''}`} />
                                                 <span className={styles.tooltipTitle}>{esc.titulo}</span>
                                                 <p className={styles.tooltipDesc}>{esc.descripcion}</p>
                                                 <button

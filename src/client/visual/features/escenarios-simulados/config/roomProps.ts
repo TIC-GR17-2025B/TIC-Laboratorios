@@ -18,7 +18,7 @@ import { rngInt, rngRange } from '../utils/seededRandom';
 
 export type PropModel =
   | 'rack' | 'serverrack' | 'switch' | 'router' | 'mesa' | 'workstation'
-  | 'meetingtable' | 'sofa' | 'whiteboard';
+  | 'meetingtable' | 'sofa' | 'tv' | 'whiteboard';
 
 /** Una instancia de prop ya posicionada en coordenadas de mundo. */
 export interface PlacedProp {
@@ -75,13 +75,10 @@ export function placeBackRow(room: RoomInfo, rng: () => number, spec: RowSpec): 
 
   const surfaceY = spec.base === 'mesa' ? MESA_SURFACE_Y : RACK_TOPE_Y;
   const facesNorth = room.corridorSide === 'north';
-  // Rack/serverrack tienen el frente hacia +Z, y la mesa la silla hacia -Z.
-  const baseYaw = facesNorth
-    ? (spec.base === 'mesa' ? Math.PI : 0)
-    : (spec.base === 'mesa' ? 0 : Math.PI);
+  // Frente hacia el interior; lo comparten mesa, equipo y el workstation de encima.
+  const baseYaw = facesNorth ? 0 : Math.PI;
   const backZ = facesNorth ? room.padded.z1 + WALL_CLEARANCE : room.padded.z2 - WALL_CLEARANCE;
   const rowStep = facesNorth ? AISLE : -AISLE;
-  const topperBackOffset = facesNorth ? -0.16 : 0.16;
   const totalW = spec.pitch * (perRow - 1);
   const x0 = room.centerX - totalW / 2;
   const rowCount = spec.rows ?? 1;
@@ -107,7 +104,7 @@ export function placeBackRow(room: RoomInfo, rng: () => number, spec: RowSpec): 
         props.push({
           id: `ws-${room.oficinaId}-${idx}`,
           kind: 'workstation',
-          position: [x, surfaceY, z + topperBackOffset], // sobre el tablero, hacia el fondo
+          position: [x, surfaceY, z],
           rotationY: yaw,
           scale: 1,
         });

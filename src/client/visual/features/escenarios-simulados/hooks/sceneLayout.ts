@@ -1,8 +1,6 @@
 import type { Entidad } from '../../../../ecs/core/Componente';
 import { OficinaComponent } from '../../../../ecs/components/OficinaComponent';
 import { DispositivoComponent } from '../../../../ecs/components/DispositivoComponent';
-import { EspacioComponent } from '../../../../ecs/components/EspacioComponent';
-import { Mueble } from '../../../../shared/types/DeviceEnums';
 import { mulberry32, pick, rngInt, seedFromId } from '../utils/seededRandom';
 import { chooseArchetype } from '../config/buildingArchetypes';
 import { CELL_DEPTH, CELL_WIDTH, getPrefab } from '../config/roomPrefabs';
@@ -40,16 +38,10 @@ const SLOT_W = 2.1;         // separación entre escritorios en la fila (X)
 const FURN_MARGIN = 1.0;    // margen a las paredes
 const BACK_CLEARANCE = 0.85; // distancia del mobiliario a la pared trasera
 
-// Rotación (grados) que hace que el frente del modelo mire al interior (-Z) cuando
-// está contra la pared trasera. Compensa el offset baked de los modelos para
-// calcar la orientación de las salas decorativas (que ya luce bien): la mesa deja
-// la silla hacia la sala; los equipos (rack/router/switch) quedan de frente.
-const ROT_MESA = -90;
-const ROT_EQUIPO = 90;
-const rotMueble = (mueble: unknown): number =>
-    mueble === Mueble.RACK ? ROT_EQUIPO : mueble === Mueble.MESA ? ROT_MESA : 0;
-const rotDispositivo = (tipo: string): number =>
-    tipo.toLowerCase() === 'workstation' ? 0 : ROT_EQUIPO;
+// Orientación (grados): el frente del mobiliario mira al interior de la sala. Lo
+// comparten mesa, equipo y workstation, así el monitor queda de frente a la silla.
+const facingDeg = (corridorSide: CorridorSide): number =>
+    corridorSide === 'north' ? 0 : 180;
 
 export type RoomTheme = 'office' | 'datacenter' | 'classroom' | 'home' | 'hacker' | 'legal';
 
@@ -167,10 +159,10 @@ const SYNTH_NOMBRES: Record<RoomTheme, string[]> = {
 // ═══════════════════════════════════════════════════════════
 
 type CorridorSide = RoomInfo['corridorSide'];
-type FloorPlanVariant = 'double-loaded' | 'grid-wings' | 'l-u-shape';
+type FloorPlanVariant = 'double-loaded' | 'grid-wings';
 interface CorridorLine { x1: number; x2: number; z: number; side: CorridorSide; }
 
-const FLOOR_PLAN_VARIANTS: FloorPlanVariant[] = ['double-loaded', 'grid-wings', 'l-u-shape'];
+const FLOOR_PLAN_VARIANTS: FloorPlanVariant[] = ['double-loaded', 'grid-wings'];
 
 function mergeCorridorWalls(results: CorridorWallResult[]): CorridorWallResult {
     return {
@@ -183,7 +175,7 @@ function mergeCorridorWalls(results: CorridorWallResult[]): CorridorWallResult {
 }
 
 function generateCorridorWall(
-    paddedOffices: PaddedBounds[],
+    paddedOffices: (PaddedBounds & { sintetico?: boolean })[],
     bldgX1: number,
     bldgX2: number,
     officeFrontZ: number,
@@ -236,11 +228,15 @@ function generateCorridorWall(
             { position: [doorR, DOOR_HEIGHT / 2, officeFrontZ], size: [fW, DOOR_HEIGHT, fD] },
             { position: [officeCenterX, DOOR_HEIGHT, officeFrontZ], size: [DOOR_WIDTH + fW * 2, fW, fD] },
         );
+        // La hoja se extiende en +X desde la bisagra. Cerrada (decorativa) debe
+        // llenar el vano, así que su bisagra va siempre en el jamba izquierdo; las
+        // abiertas (reales) conservan la bisagra según el lado del corredor.
+        const hingeX = office.sintetico || side === 'south' ? doorL + fW / 2 : doorR - fW / 2;
         doorLeaves.push({
-            hinge: [side === 'south' ? doorL + fW / 2 : doorR - fW / 2, 0, officeFrontZ],
+            hinge: [hingeX, 0, officeFrontZ],
             width: DOOR_WIDTH,
             height: DOOR_HEIGHT - 0.04,
-            openRad: side === 'south' ? 0.62 : -0.62,
+            openRad: office.sintetico ? 0 : (side === 'south' ? 0.62 : -0.62),
         });
         currentX = office.x2;
     }
@@ -280,10 +276,10 @@ function computeInternalWalls(offices: PaddedBounds[], bldg: BuildingBounds, gla
 // ═══ ENSAMBLADO ═══
 // ═══════════════════════════════════════════════════════════
 
-interface EspacioReal { espacioId: Entidad; mueble: unknown; dispositivos: { id: Entidad; tipo: string }[]; }
+interface EspacioReal { espacioId: Entidad; dispositivos: { id: Entidad; tipo: string }[]; }
 interface RealSpec {
     oficinaId: number; nombre: string; tipo: RoomTheme; deviceTypes: string[];
-    espacios: EspacioReal[]; wCells: number;
+    espacios: EspacioReal[]; width: number;
 }
 interface DecoSpec { oficinaId: number; nombre: string; tipo: RoomTheme; prefabId: string; wCells: number; }
 type RoomSpec = (RealSpec & { real: true }) | (DecoSpec & { real: false });
@@ -304,12 +300,12 @@ function layoutRealOffice(spec: RealSpec, padded: PaddedBounds, corridorSide: Co
     const cx = (padded.x1 + padded.x2) / 2;
     const cz = (padded.z1 + padded.z2) / 2;
     const x0 = cx - (SLOT_W * (n - 1)) / 2;
-    const rotOffset = corridorSide === 'north' ? 180 : 0;
+    const rotDeg = facingDeg(corridorSide);
 
     spec.espacios.forEach((esp, i) => {
         const x = x0 + i * SLOT_W;
-        placements.set(esp.espacioId, { x, z: cz, rotDeg: rotMueble(esp.mueble) + rotOffset });
-        for (const disp of esp.dispositivos) placements.set(disp.id, { x, z: cz, rotDeg: rotDispositivo(disp.tipo) + rotOffset });
+        placements.set(esp.espacioId, { x, z: cz, rotDeg });
+        for (const disp of esp.dispositivos) placements.set(disp.id, { x, z: cz, rotDeg });
     });
 }
 
@@ -331,8 +327,11 @@ function buildRoom(spec: RoomSpec, padded: PaddedBounds, corridorSide: CorridorS
     };
 }
 
+const roomWidth = (spec: RoomSpec): number =>
+    spec.real ? spec.width : spec.wCells * CELL_WIDTH;
+
 const widthOf = (specs: RoomSpec[]): number =>
-    specs.reduce((sum, s) => sum + s.wCells * CELL_WIDTH, 0);
+    specs.reduce((sum, s) => sum + roomWidth(s), 0);
 
 function splitBalanced(specs: RoomSpec[], rowCount: number): RoomSpec[][] {
     const rows = Array.from({ length: rowCount }, () => [] as RoomSpec[]);
@@ -340,20 +339,52 @@ function splitBalanced(specs: RoomSpec[], rowCount: number): RoomSpec[][] {
     specs.forEach((spec) => {
         const rowIndex = widths.indexOf(Math.min(...widths));
         rows[rowIndex].push(spec);
-        widths[rowIndex] += spec.wCells * CELL_WIDTH;
+        widths[rowIndex] += roomWidth(spec);
     });
     return rows.filter(row => row.length > 0);
 }
 
-function layoutRow(specs: RoomSpec[], z1: number, z2: number, corridorSide: CorridorSide, xOffset = 0): PlacedRoomSpec[] {
+function layoutRow(specs: RoomSpec[], z1: number, z2: number, corridorSide: CorridorSide): PlacedRoomSpec[] {
     const totalWidth = widthOf(specs);
-    let cursorX = xOffset - totalWidth / 2;
+    let cursorX = -totalWidth / 2;
     return specs.map((spec) => {
-        const w = spec.wCells * CELL_WIDTH;
+        const w = roomWidth(spec);
         const placed: PlacedRoomSpec = { spec, padded: { x1: cursorX, x2: cursorX + w, z1, z2 }, corridorSide };
         cursorX += w;
         return placed;
     });
+}
+
+/**
+ * Estira las salas de cada fila para que abarquen TODO el ancho del edificio
+ * (`[x1, x2]`). El cascarón es un rectángulo al ancho de la fila más ancha, así
+ * que las filas angostas dejaban "bolsillos" de piso vacío en los costados. El
+ * sobrante de cada fila se reparte proporcional al ancho de cada sala (las salas
+ * grandes absorben más; los prefabs pequeños se inflan poco) y las salas vuelven
+ * a embaldosarse contiguas desde `x1`. Muta `padded` in-place (antes de construir
+ * RoomInfo/placements, para que el mobiliario se recentre en la sala ya ensanchada).
+ */
+function justifyRowsToWidth(placed: PlacedRoomSpec[], x1: number, x2: number): void {
+    const target = x2 - x1;
+    const byRow = new Map<string, PlacedRoomSpec[]>();
+    for (const p of placed) {
+        const key = `${p.padded.z1.toFixed(2)}|${p.padded.z2.toFixed(2)}`;
+        const row = byRow.get(key);
+        if (row) row.push(p); else byRow.set(key, [p]);
+    }
+    for (const row of byRow.values()) {
+        row.sort((a, b) => a.padded.x1 - b.padded.x1);
+        const totalW = row.reduce((sum, p) => sum + (p.padded.x2 - p.padded.x1), 0);
+        const slack = target - totalW;
+        if (slack < 0.02) continue;
+        let cursorX = x1;
+        for (const p of row) {
+            const newW = (p.padded.x2 - p.padded.x1) + slack * ((p.padded.x2 - p.padded.x1) / totalW);
+            p.padded.x1 = cursorX;
+            p.padded.x2 = cursorX + newW;
+            cursorX += newW;
+        }
+    }
 }
 
 function buildDoubleLoadedLayout(ordered: RoomSpec[]): { placed: PlacedRoomSpec[]; corridorLines: CorridorLine[]; hallways: BuildingLayout['hallways'] } {
@@ -379,50 +410,39 @@ function buildGridLayout(ordered: RoomSpec[]): { placed: PlacedRoomSpec[]; corri
     const placed: PlacedRoomSpec[] = [];
     const corridorLines: CorridorLine[] = [];
     const hallways: BuildingLayout['hallways'] = [];
-    const stride = CELL_DEPTH + HALLWAY_DEPTH;
-    const totalDepth = rows.length * stride;
-    let rowBaseZ = -totalDepth / 2 + HALLWAY_DEPTH;
+    const pairs = Math.floor(rows.length / 2);
+    const hasSingle = rows.length % 2 === 1;
+    const totalDepth = pairs * (CELL_DEPTH * 2 + HALLWAY_DEPTH) + (hasSingle ? CELL_DEPTH + HALLWAY_DEPTH : 0);
+    let cursorZ = -totalDepth / 2;
 
-    rows.forEach((row) => {
-        const rowPlaced = layoutRow(row, rowBaseZ, rowBaseZ + CELL_DEPTH, 'south');
-        placed.push(...rowPlaced);
-        const x1 = Math.min(...rowPlaced.map(p => p.padded.x1));
-        const x2 = Math.max(...rowPlaced.map(p => p.padded.x2));
-        corridorLines.push({ x1, x2, z: rowBaseZ, side: 'south' });
-        hallways.push({ x1, x2, z1: rowBaseZ - HALLWAY_DEPTH, z2: rowBaseZ });
-        rowBaseZ += stride;
-    });
+    for (let i = 0; i < rows.length; i += 2) {
+        const lowerRow = rows[i];
+        const upperRow = rows[i + 1];
 
-    return { placed, corridorLines, hallways };
-}
+        if (!upperRow) {
+            const rowPlaced = layoutRow(lowerRow, cursorZ + HALLWAY_DEPTH, cursorZ + HALLWAY_DEPTH + CELL_DEPTH, 'south');
+            placed.push(...rowPlaced);
+            const x1 = Math.min(...rowPlaced.map(p => p.padded.x1));
+            const x2 = Math.max(...rowPlaced.map(p => p.padded.x2));
+            corridorLines.push({ x1, x2, z: cursorZ + HALLWAY_DEPTH, side: 'south' });
+            hallways.push({ x1, x2, z1: cursorZ, z2: cursorZ + HALLWAY_DEPTH });
+            cursorZ += CELL_DEPTH + HALLWAY_DEPTH;
+            continue;
+        }
 
-function buildLUShapeLayout(ordered: RoomSpec[], rng: () => number): { placed: PlacedRoomSpec[]; corridorLines: CorridorLine[]; hallways: BuildingLayout['hallways'] } {
-    const rowCount = Math.min(3, Math.max(2, Math.ceil(ordered.length / 3)));
-    const chunkSize = Math.ceil(ordered.length / rowCount);
-    const rows: RoomSpec[][] = [];
-    for (let i = 0; i < ordered.length; i += chunkSize) rows.push(ordered.slice(i, i + chunkSize));
-
-    const maxWidth = Math.max(...rows.map(widthOf));
-    const makeU = rows.length >= 3 && rng() > 0.45;
-    const stride = CELL_DEPTH + HALLWAY_DEPTH;
-    const totalDepth = rows.length * stride;
-    let rowBaseZ = -totalDepth / 2 + HALLWAY_DEPTH;
-    const placed: PlacedRoomSpec[] = [];
-    const corridorLines: CorridorLine[] = [];
-    const hallways: BuildingLayout['hallways'] = [];
-
-    rows.forEach((row, i) => {
-        const rowWidth = widthOf(row);
-        const alignedWing = i > 0 && (!makeU || i < rows.length - 1);
-        const xOffset = alignedWing ? (maxWidth - rowWidth) / 2 : 0;
-        const rowPlaced = layoutRow(row, rowBaseZ, rowBaseZ + CELL_DEPTH, 'south', xOffset);
-        placed.push(...rowPlaced);
-        const x1 = Math.min(...rowPlaced.map(p => p.padded.x1));
-        const x2 = Math.max(...rowPlaced.map(p => p.padded.x2));
-        corridorLines.push({ x1, x2, z: rowBaseZ, side: 'south' });
-        hallways.push({ x1, x2, z1: rowBaseZ - HALLWAY_DEPTH, z2: rowBaseZ });
-        rowBaseZ += stride;
-    });
+        const lowerPlaced = layoutRow(lowerRow, cursorZ, cursorZ + CELL_DEPTH, 'north');
+        const upperPlaced = layoutRow(upperRow, cursorZ + CELL_DEPTH + HALLWAY_DEPTH, cursorZ + CELL_DEPTH + HALLWAY_DEPTH + CELL_DEPTH, 'south');
+        placed.push(...lowerPlaced, ...upperPlaced);
+        const pairPlaced = [...lowerPlaced, ...upperPlaced];
+        const x1 = Math.min(...pairPlaced.map(p => p.padded.x1));
+        const x2 = Math.max(...pairPlaced.map(p => p.padded.x2));
+        corridorLines.push(
+            { x1, x2, z: cursorZ + CELL_DEPTH, side: 'north' },
+            { x1, x2, z: cursorZ + CELL_DEPTH + HALLWAY_DEPTH, side: 'south' },
+        );
+        hallways.push({ x1, x2, z1: cursorZ + CELL_DEPTH, z2: cursorZ + CELL_DEPTH + HALLWAY_DEPTH });
+        cursorZ += CELL_DEPTH * 2 + HALLWAY_DEPTH;
+    }
 
     return { placed, corridorLines, hallways };
 }
@@ -449,20 +469,20 @@ function computeSceneLayout(builder: BuilderLike, ecs: EcsLike, zonaActual: numb
                 const tipo = ecs.getComponentes(dispId)?.get(DispositivoComponent)?.tipo;
                 if (tipo) deviceTypes.push(String(tipo));
             }
-            const mueble = ecs.getComponentes(espacioId)?.get(EspacioComponent)?.mueble;
             const dispositivos = dispositivoIds.map(id => ({
                 id,
                 tipo: String(ecs.getComponentes(id)?.get(DispositivoComponent)?.tipo ?? ''),
             }));
-            espacios.push({ espacioId, mueble, dispositivos });
+            espacios.push({ espacioId, dispositivos });
         }
 
         const nombre = ecs.getComponentes(oficinaId)?.get(OficinaComponent)?.nombre ?? `Oficina ${oficinaId}`;
         realSpecs.push({
             oficinaId, nombre, deviceTypes, espacios,
             tipo: inferRoomTheme(nombre, zonaNombre, deviceTypes),
-            // Ancho suficiente para una fila de N escritorios (+ margen a paredes).
-            wCells: Math.max(1, Math.ceil((espacios.length * SLOT_W + 2 * FURN_MARGIN) / CELL_WIDTH)),
+            // Ancho exacto para una fila de N escritorios (+ margen a paredes),
+            // sin inflar la sala a celdas completas como los prefabs decorativos.
+            width: Math.max(CELL_WIDTH, espacios.length * SLOT_W + 2 * FURN_MARGIN),
         });
     }
     if (realSpecs.length === 0) return EMPTY;
@@ -487,12 +507,19 @@ function computeSceneLayout(builder: BuilderLike, ecs: EcsLike, zonaActual: numb
 
     // 4. Asigna X (fila centrada en el origen) y banda Z común (edificio centrado).
     const variant = pick(rng, FLOOR_PLAN_VARIANTS);
-    const planned =
-        variant === 'double-loaded'
-            ? buildDoubleLoadedLayout(ordered)
-            : variant === 'grid-wings'
-                ? buildGridLayout(ordered)
-                : buildLUShapeLayout(ordered, rng);
+    const planned = variant === 'double-loaded'
+        ? buildDoubleLoadedLayout(ordered)
+        : buildGridLayout(ordered);
+
+    // Justifica cada fila al ancho del edificio para eliminar los bolsillos de
+    // piso vacío que dejaban las filas más angostas dentro del rectángulo exterior.
+    const bx1 = Math.min(...planned.placed.map(p => p.padded.x1));
+    const bx2 = Math.max(...planned.placed.map(p => p.padded.x2));
+    justifyRowsToWidth(planned.placed, bx1, bx2);
+    // Tras justificar, toda fila abarca [bx1, bx2]: pasillos y corredor también.
+    for (const line of planned.corridorLines) { line.x1 = bx1; line.x2 = bx2; }
+    for (const h of planned.hallways) { h.x1 = bx1; h.x2 = bx2; }
+
     const rooms: RoomInfo[] = [];
     const placements = new Map<Entidad, EntityPlacement>();
     for (const { spec, padded, corridorSide } of planned.placed) {
@@ -501,7 +528,7 @@ function computeSceneLayout(builder: BuilderLike, ecs: EcsLike, zonaActual: numb
     }
 
     // 5. Envolvente, corredor, particiones, pasillos.
-    const padded = rooms.map(r => r.padded);
+    const padded = rooms.map(r => ({ ...r.padded, sintetico: !!r.sintetico }));
     const x1 = Math.min(...padded.map(o => o.x1));
     const x2 = Math.max(...padded.map(o => o.x2));
     const z1 = Math.min(...padded.map(o => o.z1), ...planned.hallways.map(h => h.z1));

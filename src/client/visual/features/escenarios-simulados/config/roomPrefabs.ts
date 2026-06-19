@@ -95,17 +95,36 @@ function classroom(room: RoomInfo, rng: () => number): PlacedProp[] {
     const z = zRear + (r * (zBoard - zRear)) / (rows - 1);
     colXs.forEach((cx, c) => {
       const x = cx + rngRange(rng, -0.05, 0.05);
-      // yaw 0 → la silla queda hacia -Z y el alumno mira hacia +Z (la pizarra).
-      props.push({ id: `pup-${room.oficinaId}-${r}-${c}`, kind: 'mesa', position: [x, 0, z], rotationY: facesNorth ? Math.PI : 0, scale: PUPITRE_SCALE });
+      props.push({ id: `pup-${room.oficinaId}-${r}-${c}`, kind: 'mesa', position: [x, 0, z], rotationY: facesNorth ? 0 : Math.PI, scale: PUPITRE_SCALE });
     });
   }
   return props;
 }
 
-/** Sala de estar: sofá contra la pared trasera mirando al interior. (Las plantas las pone RoomDecor.) */
+/**
+ * Sala de estar: sofá contra la pared lateral izquierda mirando a la pared
+ * opuesta, con un televisor (apagado) montado en esa pared derecha, frente al
+ * sofá. El frente del sofá (+Z) y de la TV (+Z) se orientan con yaw.
+ */
 function lounge(room: RoomInfo, rng: () => number): PlacedProp[] {
-  const facesNorth = room.corridorSide === 'north';
-  return [placeOne(room, 'sofa', facesNorth ? room.padded.z1 + 0.75 : room.padded.z2 - 0.75, (facesNorth ? 0 : Math.PI) + rngRange(rng, -0.03, 0.03))];
+  const TV_MOUNT_Y = 1.45; // altura del centro de la TV en la pared
+  const sofa: PlacedProp = {
+    id: `sofa-${room.oficinaId}`,
+    kind: 'sofa',
+    // Contra la pared izquierda, mirando hacia +X (la pared derecha).
+    position: [room.padded.x1 + 0.62, 0, room.centerZ + rngRange(rng, -0.15, 0.15)],
+    rotationY: Math.PI / 2 + rngRange(rng, -0.03, 0.03),
+    scale: 1,
+  };
+  const tv: PlacedProp = {
+    id: `tv-${room.oficinaId}`,
+    kind: 'tv',
+    // En la pared derecha, mirando hacia -X (hacia el sofá).
+    position: [room.padded.x2 - 0.05, TV_MOUNT_Y, room.centerZ],
+    rotationY: -Math.PI / 2,
+    scale: 1,
+  };
+  return [sofa, tv];
 }
 
 // ─── Catálogo de prefabs ───

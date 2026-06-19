@@ -261,18 +261,13 @@ export function useECSScene() {
         );
 
         const offsetY = calcularOffsetY(entidadId, objetoConTipo);
-        // Posición derivada por el motor; la Y la da el mueble. La rotación se
-        // conserva del dato (su orientación ya estaba calibrada para los modelos).
+        // Posición y orientación las deriva el motor de layout (la Y la da el mueble).
         const placement = placements.get(entidadId);
         const baseX = placement ? placement.x : transform?.x ?? 0;
         const baseZ = placement ? placement.z : transform?.z ?? 0;
         const position: [number, number, number] = [baseX, offsetY, baseZ];
 
-        const rotacionY = placement
-          ? (placement.rotDeg * Math.PI) / 180
-          : transform
-            ? (transform.rotacionY * Math.PI) / 180
-            : 0;
+        const rotacionY = placement ? (placement.rotDeg * Math.PI) / 180 : 0;
 
         return {
           entidadId,

@@ -7,6 +7,7 @@ import {
     type BuildingBounds,
 } from '../hooks/useBuildingLayout';
 import { getRoomPalette, getZoneAmbience } from '../config/roomThemes';
+import { mulberry32, seedFromId } from '../utils/seededRandom';
 
 // ═══════════════════════════════════════════════════════════
 // ═══ DECORADO POR SALA ═══
@@ -16,35 +17,26 @@ const conPlantas = (tipo: RoomInfo['tipo']) =>
     tipo === 'office' || tipo === 'legal' || tipo === 'home' || tipo === 'classroom';
 const conAlfombra = (tipo: RoomInfo['tipo']) =>
     tipo === 'office' || tipo === 'legal' || tipo === 'home';
+// Solo una fracción de las salas elegibles lleva plantas (determinista por sala).
+const conPlantasEnSala = (room: RoomInfo) =>
+    conPlantas(room.tipo) && mulberry32(seedFromId(room.oficinaId) ^ 0x9e3779b9)() < 0.4;
 
 /**
- * Viste una oficina con luz interior, luminaria de techo, alfombra, plantas y un
- * acento de pared, todo según el tema inferido. Es puramente decorativo y vive
- * en el render: nunca toca el ECS ni la vista de topología.
+ * Viste una oficina con luz interior, luminaria de techo, alfombra y plantas según
+ * el tema inferido. Render-only: nunca toca el ECS ni la vista de topología.
  */
 const RoomDecor: React.FC<{ room: RoomInfo }> = React.memo(({ room }) => {
     const { padded, centerX, centerZ, width, depth, tipo } = room;
     const palette = getRoomPalette(tipo);
-    const facesNorth = room.corridorSide === 'north';
 
     const mats = useMemo(() => ({
-        fixture: new THREE.MeshStandardMaterial({
-            color: '#f3f4f6', emissive: palette.light, emissiveIntensity: 1.1, roughness: 0.4,
-        }),
         rug: new THREE.MeshStandardMaterial({
             color: palette.rug, roughness: 0.95, metalness: 0,
             polygonOffset: true, polygonOffsetFactor: -6, polygonOffsetUnits: -6,
         }),
         pot: new THREE.MeshStandardMaterial({ color: '#8a6a4a', roughness: 0.8 }),
         foliage: new THREE.MeshStandardMaterial({ color: palette.plantFoliage, roughness: 0.85 }),
-        accent: new THREE.MeshStandardMaterial({
-            color: tipo === 'datacenter' || tipo === 'hacker' ? '#0c1a26' : '#f2efe9',
-            emissive: tipo === 'datacenter' || tipo === 'hacker' ? '#1d3a52' : '#000000',
-            emissiveIntensity: tipo === 'datacenter' || tipo === 'hacker' ? 0.6 : 0,
-            roughness: 0.6,
-        }),
-        accentFrame: new THREE.MeshStandardMaterial({ color: palette.accent, roughness: 0.5, metalness: 0.3 }),
-    }), [palette.light, palette.rug, palette.plantFoliage, palette.accent, tipo]);
+    }), [palette.rug, palette.plantFoliage]);
 
     useEffect(() => () => { Object.values(mats).forEach(m => m.dispose()); }, [mats]);
 
@@ -70,11 +62,6 @@ const RoomDecor: React.FC<{ room: RoomInfo }> = React.memo(({ room }) => {
                 />
             )}
 
-            {/* Luminaria de techo (panel emisivo) */}
-            <mesh position={[centerX, CEILING_Y - 0.06, centerZ]} material={mats.fixture}>
-                <boxGeometry args={[Math.min(width * 0.5, 1.4), 0.06, Math.min(depth * 0.18, 0.4)]} />
-            </mesh>
-
             {/* Alfombra bajo el área de escritorios */}
             {conAlfombra(tipo) && (
                 <mesh position={[centerX, 0.025, centerZ]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow material={mats.rug}>
@@ -82,8 +69,8 @@ const RoomDecor: React.FC<{ room: RoomInfo }> = React.memo(({ room }) => {
                 </mesh>
             )}
 
-            {/* Plantas en esquinas */}
-            {conPlantas(tipo) && corners.map(([x, z], i) => (
+            {/* Plantas en esquinas (solo en algunas salas) */}
+            {conPlantasEnSala(room) && corners.map(([x, z], i) => (
                 <group key={`plant-${i}`} position={[x, 0, z]}>
                     <mesh position={[0, 0.18, 0]} material={mats.pot} castShadow>
                         <cylinderGeometry args={[0.16, 0.12, 0.36, 10]} />
@@ -93,19 +80,6 @@ const RoomDecor: React.FC<{ room: RoomInfo }> = React.memo(({ room }) => {
                     </mesh>
                 </group>
             ))}
-
-            {/* Acento de pared trasera (cuadro / pantalla de estado) */}
-            <group
-                position={[centerX - width * 0.28, 1.7, facesNorth ? padded.z1 + 0.12 : padded.z2 - 0.12]}
-                rotation={[0, facesNorth ? 0 : Math.PI, 0]}
-            >
-                <mesh material={mats.accentFrame}>
-                    <boxGeometry args={[0.92, 0.62, 0.04]} />
-                </mesh>
-                <mesh position={[0, 0, -0.025]} material={mats.accent}>
-                    <boxGeometry args={[0.82, 0.52, 0.02]} />
-                </mesh>
-            </group>
         </group>
     );
 });

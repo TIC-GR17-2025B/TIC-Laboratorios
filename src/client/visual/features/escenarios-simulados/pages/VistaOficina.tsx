@@ -5,13 +5,17 @@ import { useEscenario } from "../../../common/contexts";
 import { useScreenTransition } from "../../../common/contexts/ScreenTransitionContext";
 import MonitorDesktopOverlay from "../../../common/components/MonitorDesktopOverlay";
 import { useECSSceneContext } from "../context/ECSSceneContext";
+import { useZonaKeyboardNav } from "../hooks/useZonaKeyboardNav";
 
 import { useEffect, useRef } from "react";
 function VistaOficina() {
   const { dispositivoSeleccionado, setDispositivoSeleccionado } = useEscenario();
   const { desktopMode, pendingZoom, consumePendingZoom, startZoom, exitDesktopMode } = useScreenTransition();
-  const { zonaActual } = useECSSceneContext();
+  const { zonaActual, siguienteZona, anteriorZona } = useECSSceneContext();
   const zonaAnteriorRef = useRef(zonaActual);
+
+  // ArrowLeft / ArrowRight navegan entre zonas; deshabilitado dentro del overlay de monitor.
+  useZonaKeyboardNav({ onPrev: anteriorZona, onNext: siguienteZona, enabled: !desktopMode });
 
   useEffect(() => {
     setDispositivoSeleccionado(null);

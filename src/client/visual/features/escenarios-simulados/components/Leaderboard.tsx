@@ -83,7 +83,7 @@ export default function Leaderboard({
                                     <Identicon seed={entry.correo} />
                                 </div>
                                 <span className={styles.name}>{entry.nombre}</span>
-                                <span className={styles.score}>
+                                <span className={`${styles.score} ${isCurrent ? styles.scoreCurrent : ""}`}>
                                     {entry.puntaje.toLocaleString()} pts
                                 </span>
                             </div>

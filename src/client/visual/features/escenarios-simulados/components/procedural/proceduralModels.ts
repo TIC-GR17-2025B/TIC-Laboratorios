@@ -2,7 +2,12 @@ import { Group } from "three";
 import { buildRouterModel } from "./routerModel";
 import { buildSwitchModel } from "./switchModel";
 import { buildRackModel } from "./rackModel";
+import { buildServerRackModel } from "./serverRackModel";
 import { buildMesaModel } from "./mesaModel";
+import { buildMeetingTableModel } from "./meetingTableModel";
+import { buildSofaModel } from "./sofaModel";
+import { buildTvModel } from "./tvModel";
+import { buildWhiteboardModel } from "./whiteboardModel";
 import { buildWorkstationModel } from "./workstationModel";
 
 /**
@@ -16,21 +21,10 @@ import { buildWorkstationModel } from "./workstationModel";
 
 export const PROCEDURAL_PREFIX = "procedural:";
 
-/**
- * Offset de orientación (eje Y) por modelo. Los modelos se construyen con el
- * frente hacia +Z, pero el `rotacionY` de los escenarios se calibró para la
- * convención de los modelos antiguos; este offset alinea ambos. Si algún modelo
- * queda mirando al lado equivocado, ajusta su valor (Math.PI / 2, -Math.PI / 2,
- * Math.PI o 0).
- */
+// Normaliza el frente de cada modelo a +Z (convención común). Todos se construyen
+// ya con el frente a +Z salvo la mesa, cuyo frente (la silla) mira a -Z.
 const OFFSET_FRENTE_Y: Record<string, number> = {
-  router: Math.PI / 2,
-  switch: Math.PI / 2,
-  rack: Math.PI / 2,
-  mesa: Math.PI / 2,
-  // Construida con el frente (pantalla/teclado) hacia +Z; alinear con la mesa
-  // para que la pantalla mire hacia la silla.
-  workstation: Math.PI / 2,
+  mesa: Math.PI,
 };
 
 type ConstructorModelo = () => Group;
@@ -39,7 +33,12 @@ const builders: Record<string, ConstructorModelo> = {
   router: buildRouterModel,
   switch: buildSwitchModel,
   rack: buildRackModel,
+  serverrack: buildServerRackModel,
   mesa: buildMesaModel,
+  meetingtable: buildMeetingTableModel,
+  sofa: buildSofaModel,
+  tv: buildTvModel,
+  whiteboard: buildWhiteboardModel,
   workstation: buildWorkstationModel,
 };
 
@@ -64,6 +63,7 @@ export const getProceduralScene = (path: string): Group => {
     }
     scene = build();
     scene.rotation.y = OFFSET_FRENTE_Y[key] ?? 0;
+    scene.traverse((o) => { o.castShadow = true; o.receiveShadow = true; });
     cache.set(key, scene);
   }
   return scene;
