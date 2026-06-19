@@ -20,7 +20,7 @@ export const MUEBLE_MODELS: Record<string, string> = {
  * Mapea tipos de dispositivos a rutas de modelos 3D
  */
 export const DISPOSITIVO_MODELS: Record<string, string> = {
-  [TipoDispositivo.WORKSTATION]: "/assets/models/computadora.gltf",
+  [TipoDispositivo.WORKSTATION]: "procedural:workstation",
   [TipoDispositivo.ROUTER]: "procedural:router",
   [TipoDispositivo.SWITCH]: "procedural:switch",
   [TipoDispositivo.VPN]: "procedural:switch",

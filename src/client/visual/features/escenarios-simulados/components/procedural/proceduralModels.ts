@@ -3,6 +3,7 @@ import { buildRouterModel } from "./routerModel";
 import { buildSwitchModel } from "./switchModel";
 import { buildRackModel } from "./rackModel";
 import { buildMesaModel } from "./mesaModel";
+import { buildWorkstationModel } from "./workstationModel";
 
 /**
  * Registro de modelos 3D procedurales (construidos por código en lugar de
@@ -27,6 +28,9 @@ const OFFSET_FRENTE_Y: Record<string, number> = {
   switch: Math.PI / 2,
   rack: Math.PI / 2,
   mesa: Math.PI / 2,
+  // Construida con el frente (pantalla/teclado) hacia +Z; alinear con la mesa
+  // para que la pantalla mire hacia la silla.
+  workstation: Math.PI / 2,
 };
 
 type ConstructorModelo = () => Group;
@@ -36,6 +40,7 @@ const builders: Record<string, ConstructorModelo> = {
   switch: buildSwitchModel,
   rack: buildRackModel,
   mesa: buildMesaModel,
+  workstation: buildWorkstationModel,
 };
 
 // Caché del prototipo: cada modelo se construye una sola vez y luego Model3D

@@ -24,7 +24,7 @@ const FACADE_MULLION_STEP = 1.6;
  * como un edificio cerrado y coherente.
  */
 const OfficeWalls: React.FC = () => {
-    const { rooms, bldg, officeFrontZ, corridorWall, internalWalls, theme } = useBuildingLayout();
+    const { rooms, bldg, corridorWall, internalWalls, hallways, theme } = useBuildingLayout();
     const palette = getRoomPalette(theme);
 
     // ═══ MATERIALES (tematizados + con disposal) ═══
@@ -70,10 +70,7 @@ const OfficeWalls: React.FC = () => {
     const cz = (bldg.z1 + bldg.z2) / 2;
     const hh = WALL_HEIGHT / 2;
 
-    const hallwayCZ = (bldg.z1 + officeFrontZ) / 2;
-    const hallwayD = officeFrontZ - bldg.z1;
-
-    const Box = ({ seg, material, ...rest }: { seg: WallSegment; material: THREE.Material; castShadow?: boolean; receiveShadow?: boolean; renderOrder?: number }) => (
+    const Box =({ seg, material, ...rest }: { seg: WallSegment; material: THREE.Material; castShadow?: boolean; receiveShadow?: boolean; renderOrder?: number }) => (
         <mesh position={seg.position} material={material} {...rest}>
             <boxGeometry args={seg.size} />
         </mesh>
@@ -86,10 +83,18 @@ const OfficeWalls: React.FC = () => {
                 <planeGeometry args={[w, d]} />
             </mesh>
 
-            {/* ═══ PISO DEL PASILLO ═══ */}
-            <mesh position={[cx, HALLWAY_FLOOR_Y, hallwayCZ]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow material={mats.corridorFloor}>
-                <planeGeometry args={[w - 0.02, hallwayD - 0.02]} />
-            </mesh>
+            {/* ═══ PISOS DE PASILLO (uno por fila de salas) ═══ */}
+            {hallways.map((h, i) => (
+                <mesh
+                    key={`hall-${i}`}
+                    position={[(h.x1 + h.x2) / 2, HALLWAY_FLOOR_Y, (h.z1 + h.z2) / 2]}
+                    rotation={[-Math.PI / 2, 0, 0]}
+                    receiveShadow
+                    material={mats.corridorFloor}
+                >
+                    <planeGeometry args={[h.x2 - h.x1 - 0.02, h.z2 - h.z1 - 0.02]} />
+                </mesh>
+            ))}
 
             {/* ═══ PAREDES EXTERIORES ═══ */}
             {/* Trasera */}

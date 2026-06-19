@@ -1,4 +1,4 @@
-import type { RoomTheme } from '../hooks/useBuildingLayout';
+import type { RoomTheme } from '../hooks/sceneLayout';
 
 /**
  * Paleta y parámetros de ambiente por tipo de sala. El tema se infiere en

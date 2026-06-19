@@ -17,6 +17,7 @@ import { useECSLogs } from "./useECSLogs";
 import { useECSTime } from "./useECSTime";
 import { useECSZones } from "./useECSZones";
 import { useECSNavigation } from "./useECSNavigation";
+import { getSceneLayout } from "./sceneLayout";
 
 export interface ECSSceneEntity {
   entidadId: Entidad;
@@ -200,6 +201,14 @@ export function useECSScene() {
 
     const sistemaJerarquia = escenarioController.builder.getSistemaJerarquia();
 
+    // Posiciones derivadas por el motor de layout (ignora las `posicion` del dato;
+    // ver sceneLayout). Memoizado por (builder, zona), así que es barato por frame.
+    const placements = getSceneLayout(
+      escenarioController.builder,
+      escenarioController.ecsManager,
+      zoneState.zonaActual,
+    ).placements;
+
     // Altura a la que se apoya un dispositivo: la superficie del mueble de su
     // espacio (mesa/rack/piso) + un ajuste fino opcional por tipo. Así la altura
     // depende del mueble y no del tipo de dispositivo.
@@ -252,11 +261,18 @@ export function useECSScene() {
         );
 
         const offsetY = calcularOffsetY(entidadId, objetoConTipo);
-        const position: [number, number, number] = transform
-          ? [transform.x, transform.y + offsetY, transform.z]
-          : [0, offsetY, 0];
+        // Posición derivada por el motor; la Y la da el mueble. La rotación se
+        // conserva del dato (su orientación ya estaba calibrada para los modelos).
+        const placement = placements.get(entidadId);
+        const baseX = placement ? placement.x : transform?.x ?? 0;
+        const baseZ = placement ? placement.z : transform?.z ?? 0;
+        const position: [number, number, number] = [baseX, offsetY, baseZ];
 
-        const rotacionY = transform ? (transform.rotacionY * Math.PI) / 180 : 0;
+        const rotacionY = placement
+          ? (placement.rotDeg * Math.PI) / 180
+          : transform
+            ? (transform.rotacionY * Math.PI) / 180
+            : 0;
 
         return {
           entidadId,

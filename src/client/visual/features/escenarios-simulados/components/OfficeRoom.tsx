@@ -18,6 +18,7 @@ interface OfficeRoomProps {
 const OfficeRoom: React.FC<OfficeRoomProps> = React.memo(({ room }) => {
     const { padded, centerX, centerZ, width, depth, nombre, tipo } = room;
     const palette = getRoomPalette(tipo);
+    const facesNorth = room.corridorSide === 'north';
 
     const floorMaterial = useMemo(() => new THREE.MeshStandardMaterial({
         color: palette.floor,
@@ -46,8 +47,8 @@ const OfficeRoom: React.FC<OfficeRoomProps> = React.memo(({ room }) => {
 
             {/* Etiqueta en la pared trasera, mirando hacia el interior */}
             <Text
-                position={[centerX, 2.1, padded.z2 - 0.1]}
-                rotation={[0, Math.PI, 0]}
+                position={[centerX, 2.1, facesNorth ? padded.z1 + 0.1 : padded.z2 - 0.1]}
+                rotation={[0, facesNorth ? 0 : Math.PI, 0]}
                 fontSize={0.22}
                 color={labelColor}
                 anchorX="center"

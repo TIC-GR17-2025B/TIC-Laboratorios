@@ -15,6 +15,7 @@ import ECSSceneRenderer from './ECSSceneRenderer';
 import CameraZoomEffect from './CameraZoomEffect';
 import OfficeWalls from './OfficeWalls';
 import SceneDressing from './SceneDressing';
+import SceneProps from './SceneProps';
 import ZoneToast from './ZoneToast';
 import Controles3D from './Controles3D';
 import { useECSSceneContext } from '../context/ECSSceneContext';
@@ -77,6 +78,7 @@ const Escena3D: React.FC = () => {
                 <CameraZoomEffect />
                 <OfficeWalls />
                 <SceneDressing />
+                <SceneProps />
                 <CameraControls
                     enabled={!isZooming && !desktopMode}
                     enableZoom={DEFAULT_CONTROLS_CONFIG.enableZoom}

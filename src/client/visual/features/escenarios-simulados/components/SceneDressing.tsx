@@ -25,6 +25,7 @@ const conAlfombra = (tipo: RoomInfo['tipo']) =>
 const RoomDecor: React.FC<{ room: RoomInfo }> = React.memo(({ room }) => {
     const { padded, centerX, centerZ, width, depth, tipo } = room;
     const palette = getRoomPalette(tipo);
+    const facesNorth = room.corridorSide === 'north';
 
     const mats = useMemo(() => ({
         fixture: new THREE.MeshStandardMaterial({
@@ -56,14 +57,18 @@ const RoomDecor: React.FC<{ room: RoomInfo }> = React.memo(({ room }) => {
 
     return (
         <group name={`decor-${room.oficinaId}`}>
-            {/* Luz interior cálida/fría según tema (sin sombras, barata) */}
-            <pointLight
-                position={[centerX, CEILING_Y - 0.35, centerZ]}
-                color={palette.light}
-                intensity={palette.lightIntensity}
-                distance={Math.max(width, depth) * 1.8}
-                decay={2}
-            />
+            {/* Luz interior cálida/fría según tema (sin sombras, barata). Las salas
+                sintéticas la omiten para acotar el número de luces: se apoyan en la
+                luz ambiente/direccional global. */}
+            {!room.sintetico && (
+                <pointLight
+                    position={[centerX, CEILING_Y - 0.35, centerZ]}
+                    color={palette.light}
+                    intensity={palette.lightIntensity}
+                    distance={Math.max(width, depth) * 1.8}
+                    decay={2}
+                />
+            )}
 
             {/* Luminaria de techo (panel emisivo) */}
             <mesh position={[centerX, CEILING_Y - 0.06, centerZ]} material={mats.fixture}>
@@ -90,7 +95,10 @@ const RoomDecor: React.FC<{ room: RoomInfo }> = React.memo(({ room }) => {
             ))}
 
             {/* Acento de pared trasera (cuadro / pantalla de estado) */}
-            <group position={[centerX - width * 0.28, 1.7, padded.z2 - 0.12]} rotation={[0, Math.PI, 0]}>
+            <group
+                position={[centerX - width * 0.28, 1.7, facesNorth ? padded.z1 + 0.12 : padded.z2 - 0.12]}
+                rotation={[0, facesNorth ? 0 : Math.PI, 0]}
+            >
                 <mesh material={mats.accentFrame}>
                     <boxGeometry args={[0.92, 0.62, 0.04]} />
                 </mesh>

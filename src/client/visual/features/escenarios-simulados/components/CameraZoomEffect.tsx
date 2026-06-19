@@ -3,19 +3,21 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { Vector3, Quaternion, PerspectiveCamera } from 'three';
 import { useScreenTransition } from '../../../common/contexts/ScreenTransitionContext';
 
-// Monitor screen center in model's LOCAL space (before rotation)
-// From GLTF: monitor front face is at Z≈0.25, centered at X≈0.125, mid-height Y≈0.25
-// The screen faces +Z in the model's local space
-const SCREEN_OFFSET = { x: 0.125, y: 0.25, z: 0.25 };
-// Screen half-dimensions in 3D units (monitor is ~0.5 wide, ~0.5 tall)
-const SCREEN_HALF_W = 0.22;
-const SCREEN_HALF_H = 0.20;
-// How far in front of the screen the camera should end up
-const CAMERA_DISTANCE = 0.16;
-// Lateral offset: negative = camera shifts left, positive = right
-const CAMERA_LATERAL_OFFSET = -0.313;
-// Vertical offset: negative = camera shifts down, positive = up
-const CAMERA_VERTICAL_OFFSET = -0.035;
+// Centro de la pantalla del monitor en el espacio LOCAL del modelo (antes de
+// rotar). Modelo procedural workstationModel: el panel está centrado en X=0, con
+// el centro de la pantalla a Y≈0.371 sobre la base y Z≈-0.129 (la cara emisiva
+// mira hacia +Z local). La base del modelo apoya en la superficie de la mesa.
+const SCREEN_OFFSET = { x: 0, y: 0.371, z: -0.129 };
+// Semidimensiones de la pantalla en unidades 3D (cara visible 0.52 × 0.30).
+const SCREEN_HALF_W = 0.26;
+const SCREEN_HALF_H = 0.15;
+// Distancia a la que la cámara queda delante de la pantalla.
+const CAMERA_DISTANCE = 0.19;
+// Offset lateral: negativo = cámara a la izquierda, positivo = derecha.
+// El monitor está centrado en X, así que la vista va recta (0).
+const CAMERA_LATERAL_OFFSET = 0;
+// Offset vertical: negativo = abajo, positivo = arriba.
+const CAMERA_VERTICAL_OFFSET = 0;
 
 function easeInOutCubic(t: number): number {
     return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
@@ -115,8 +117,9 @@ const CameraZoomEffect: React.FC = () => {
         if (!saved) return;
 
         // Calculate the screen center in world space (accounting for model rotation)
-        // Subtract 90° offset to align camera with the actual screen face
-        const adjustedRotation = targetRotationY - Math.PI / 2;
+        // El modelo procedural se renderiza con rotacionY + offset (+90°, ver
+        // OFFSET_FRENTE_Y.workstation), así que sumamos 90° para alinear con la cara.
+        const adjustedRotation = targetRotationY + Math.PI / 2;
         const cosR = Math.cos(adjustedRotation);
         const sinR = Math.sin(adjustedRotation);
         // Apply Y-axis rotation matrix: X' = x*cos + z*sin, Z' = -x*sin + z*cos
@@ -202,8 +205,9 @@ function projectMonitorToScreen(
     screenCenter: Vector3,
     rotationY: number,
 ) {
-    // -90° para alinearse con el cálculo del zoom de cámara (el modelo GLTF tiene su eje frontal rotado).
-    const adjusted = rotationY - Math.PI / 2;
+    // +90° para alinearse con el cálculo del zoom de cámara (el modelo procedural
+    // tiene su eje frontal rotado por OFFSET_FRENTE_Y.workstation).
+    const adjusted = rotationY + Math.PI / 2;
     const cosR = Math.cos(adjusted);
     const sinR = Math.sin(adjusted);
 
