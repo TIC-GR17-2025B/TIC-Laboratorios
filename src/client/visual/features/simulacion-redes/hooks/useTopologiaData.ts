@@ -13,7 +13,7 @@ import type {
 import { EscenarioController } from "../../../../ecs/controllers/EscenarioController";
 import { EventosPublicos } from "../../../../shared/types/EventosEnums";
 import type { ECSManager } from "../../../../ecs/core/ECSManager";
-import type { ScenarioBuilder } from "../../../../ecs/utils/ScenarioBuilder";
+import type { EscenarioBuilder } from "../../../../ecs/utils/EscenarioBuilder";
 
 /**
  * Crea un mapa de todas las redes disponibles en el ECS
@@ -62,7 +62,7 @@ function crearNodoDispositivo(
  */
 function obtenerNodosDeZona(
   zonaId: number,
-  builder: ScenarioBuilder,
+  builder: EscenarioBuilder,
   redesMap: Map<Entidad, { nombre: string; color: string }>
 ): NodoTopologia[] {
   const nodos: NodoTopologia[] = [];
@@ -90,7 +90,7 @@ function obtenerNodosDeZona(
  */
 function construirTopologia(
   ecsManager: ECSManager,
-  builder: ScenarioBuilder
+  builder: EscenarioBuilder
 ): Topologia {
   const zonas: ZonaTopologia[] = [];
   const redesMap = crearMapaRedes(ecsManager);

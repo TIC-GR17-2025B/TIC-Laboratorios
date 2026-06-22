@@ -41,7 +41,7 @@ export default defineConfig(({ mode }) => {
           '**/EscenarioController.ts',
           '**/ProgresoController.ts',
           '**/RedController.ts',
-          '**/ScenarioBuilder.ts',
+          '**/EscenarioBuilder.ts',
           '**/FirewallBuilder.ts',
           '**/apiConfig.ts',
         ],

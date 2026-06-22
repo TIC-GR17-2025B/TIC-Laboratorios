@@ -20,7 +20,7 @@ import {
   SistemaPresupuesto,
   SistemaTiempo,
 } from "../systems";
-import { ScenarioBuilder } from "../utils/ScenarioBuilder";
+import { EscenarioBuilder } from "../utils/EscenarioBuilder";
 import type { Activo, Escenario, LogGeneral, SoftwareApp, RegistroVeredictoFirma, InfoPersonaEncontrada, PlantillaCorreoPhishing, RespuestaComando } from "../../shared/types/EscenarioTypes";
 import {
   EventosInternos,
@@ -35,7 +35,7 @@ import { PlantillasCorreoPhishing } from "../../data/plantillas/Plantillas";
 export class EscenarioController {
   public escenario: Escenario;
   public ecsManager: ECSManager;
-  public builder!: ScenarioBuilder;
+  public builder!: EscenarioBuilder;
 
   private entidadTiempo?: Entidad;
   private entidadTiempoTotal?: Entidad;
@@ -88,7 +88,7 @@ export class EscenarioController {
       return;
     }
 
-    this.builder = new ScenarioBuilder(this.ecsManager);
+    this.builder = new EscenarioBuilder(this.ecsManager);
     this.builder.construirDesdeArchivo(this.escenario);
 
     if (!this.sistemaEvento) {

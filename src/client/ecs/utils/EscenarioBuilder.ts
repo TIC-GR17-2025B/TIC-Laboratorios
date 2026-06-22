@@ -42,7 +42,7 @@ import { FirewallConfigService } from "../systems/red";
  * Usa el SistemaJerarquiaEscenario centralizado del ECSManager para
  * mantener las relaciones jerárquicas de forma consistente.
  */
-export class ScenarioBuilder {
+export class EscenarioBuilder {
   private ecsManager: ECSManager;
   private sistemaJerarquia: SistemaJerarquiaEscenario;
   private entidadRedInternet: Entidad = -1;
@@ -160,7 +160,7 @@ export class ScenarioBuilder {
     return this;
   }
 
-  crearEscenario(escenario: Escenario): Entidad {
+  private crearEscenario(escenario: Escenario): Entidad {
     const entidadEscenario = this.ecsManager.agregarEntidad();
     this.ecsManager.agregarComponente(
       entidadEscenario,
@@ -176,7 +176,7 @@ export class ScenarioBuilder {
     return entidadEscenario;
   }
 
-  crearAtaque(ataque: unknown) {
+  private crearAtaque(ataque: unknown) {
     const a = ataque as {
       nombreAtaque: string;
       tiempoNotificacion: number;
@@ -208,7 +208,7 @@ export class ScenarioBuilder {
     );
   }
 
-  crearEvento(evento: unknown) {
+  private crearEvento(evento: unknown) {
     const a = evento as {
       nombreEvento: string;
       tipoEvento: TipoEvento;
@@ -235,7 +235,7 @@ export class ScenarioBuilder {
     );
   }
 
-  crearFase(entidadEscenario: Entidad, fase: unknown) {
+  private crearFase(entidadEscenario: Entidad, fase: unknown) {
     const f = fase as {
       id: number;
       nombre: string;
@@ -256,13 +256,13 @@ export class ScenarioBuilder {
     escenarioContainer?.get(EscenarioComponent)?.fases.push(faseAAgregar);
   }
 
-  crearApp(entidadEscenario: Entidad, app: SoftwareApp) {
+  private crearApp(entidadEscenario: Entidad, app: SoftwareApp) {
     const escenarioContainer = this.ecsManager.getEntidades().get(entidadEscenario);
 
     escenarioContainer?.get(EscenarioComponent)?.apps.push(app);
   }
 
-  crearZona(zona: unknown, escenarioEntidad?: Entidad): Entidad {
+  private crearZona(zona: unknown, escenarioEntidad?: Entidad): Entidad {
     const entidadZona = this.ecsManager.agregarEntidad();
     const z = zona as { id: number; nombre: string; dominio: string; esInteractiva: boolean; };
     this.ecsManager.agregarComponente(
@@ -276,7 +276,7 @@ export class ScenarioBuilder {
     return entidadZona;
   }
 
-  crearRed(
+  private crearRed(
     entidadZona: Entidad,
     entidadRed: Entidad,
     red: unknown,
@@ -294,7 +294,7 @@ export class ScenarioBuilder {
     relacionZonaRed.agregar(entidadZona, entidadRed);
   }
 
-  crearPersona(
+  private crearPersona(
     entidadZona: Entidad,
     entidadPersona: Entidad,
     persona: unknown,
@@ -314,7 +314,7 @@ export class ScenarioBuilder {
     this.sistemaJerarquia.agregarPersonaAZona(entidadZona, entidadPersona);
   }
 
-  crearOficina(oficina: unknown, zonaId: number): Entidad {
+  private crearOficina(oficina: unknown, zonaId: number): Entidad {
     const entidadOficina = this.ecsManager.agregarEntidad();
     const ofi = oficina as { id: number; nombre?: string };
     this.ecsManager.agregarComponente(
@@ -329,7 +329,7 @@ export class ScenarioBuilder {
     return entidadOficina;
   }
 
-  crearEspacio(espacio: unknown, oficinaId: number): Entidad {
+  private crearEspacio(espacio: unknown, oficinaId: number): Entidad {
     const entidadEspacio = this.ecsManager.agregarEntidad();
     const esp = espacio as {
       id: number;
@@ -356,7 +356,7 @@ export class ScenarioBuilder {
     return entidadEspacio;
   }
 
-  crearDispositivo(
+  private crearDispositivo(
     dispositivo: unknown,
     espacioId: number,
     reds: Map<Entidad, { nombre: string; color: string }>
@@ -481,7 +481,7 @@ export class ScenarioBuilder {
     return entidadDispositivo;
   }
 
-  crearActivos(entidadDispositivo: number, activos: Activo[]) {
+  private crearActivos(entidadDispositivo: number, activos: Activo[]) {
     const tipoDispositivo = this.ecsManager
                             .getComponentes(entidadDispositivo)
                             ?.get(DispositivoComponent)?.tipo; 

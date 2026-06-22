@@ -20,7 +20,7 @@ import {
  *
  * Arquitectura:
  * - Se registra una única vez en el ECSManager
- * - ScenarioBuilder y Controllers lo usan sin crear nuevas instancias
+ * - EscenarioBuilder y Controllers lo usan sin crear nuevas instancias
  * - Garantiza consistencia de datos entre diferentes partes de la aplicación
  */
 export class SistemaJerarquiaEscenario extends Sistema {
