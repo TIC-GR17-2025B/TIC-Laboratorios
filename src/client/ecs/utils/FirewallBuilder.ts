@@ -54,15 +54,15 @@ export class FirewallBuilder {
     return this.bloquearProtocolos(entidadRed, protocolos, DireccionTrafico.AMBAS);
   }
  
-  limpiarRed(entidadRed: Entidad): this {
+  /*limpiarRed(entidadRed: Entidad): this {
     this.bloqueosFirewall.delete(entidadRed);
     return this;
-  }
+  }*/
  
-  limpiarTodo(): this {
+  /*limpiarTodo(): this {
     this.bloqueosFirewall.clear();
     return this;
-  }
+  }*/
  
   build(): Map<Entidad, Reglas[]> {
     return this.bloqueosFirewall;
