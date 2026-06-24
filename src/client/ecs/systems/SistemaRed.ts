@@ -77,8 +77,7 @@ export class SistemaRed extends Sistema {
   private getTransferenciaService(): TransferenciaService {
     if (!this.transferenciaService) {
       this.transferenciaService = new TransferenciaService(
-        this.ecsManager,
-        this.getEventoService()
+        this.ecsManager
       );
     }
     return this.transferenciaService;

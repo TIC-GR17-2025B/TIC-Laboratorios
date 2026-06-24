@@ -82,16 +82,4 @@ export class EventoRedService {
   //
   //   this.ecsManager.emit(EventosRed.TRAFICO_ENVIADO, registro);
   // }
-
-  emitirActivoEnviado(
-    nombreActivo: string,
-    origen: string,
-    destino: string
-  ): void {
-    this.ecsManager.emit(EventosPublicos.RED_ACTIVO_ENVIADO, {
-      nombreActivo,
-      d1: origen,
-      d2: destino,
-    });
-  }
 }

@@ -1,14 +1,12 @@
 import type { ECSManager } from "../../core/ECSManager";
 import type { Entidad } from "../../core";
 import { ActivoComponent, DispositivoComponent } from "../../components";
-import type { EventoRedService } from "./EventoRedService";
 import { EventosPublicos } from "../../../shared/types/EventosEnums";
 
 // Servicio responsable de transferir activos entre dispositivos
 export class TransferenciaService {
   constructor(
     private ecsManager: ECSManager,
-    private eventoService?: EventoRedService
   ) {}
 
   // Transfiere un activo de un dispositivo a otro (protocolo FTP)
@@ -66,6 +64,10 @@ export class TransferenciaService {
         // Transferir activo
         activosReceptor.activos.push(activoAenviar);
 
-        this.eventoService?.emitirActivoEnviado(activo, dispEmisor.nombre, dispReceptor.nombre);
+        this.ecsManager.emit(EventosPublicos.RED_ACTIVO_ENVIADO, {
+            nombreActivo: activo,
+            d1: dispEmisor.nombre,
+            d2: dispReceptor.nombre,
+        });
     }
 }
