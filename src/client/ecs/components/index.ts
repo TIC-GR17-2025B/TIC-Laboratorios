@@ -1,5 +1,5 @@
 // Export de components
-export * from "./Transform";
+export * from "./TransformComponent";
 export * from "./Velocidad";
 export * from "./DispositivoComponent";
 export * from "./EspacioComponent";

@@ -3,7 +3,7 @@ import { EscenarioController } from "../../../../ecs/controllers/EscenarioContro
 import {
   DispositivoComponent,
   WorkstationComponent,
-  Transform,
+  TransformComponent,
   RedComponent,
   ZonaComponent,
 } from "../../../../ecs/components";
@@ -73,7 +73,7 @@ export function useDispositivos() {
 
       const dispComp = container.get(DispositivoComponent);
       const wsComp = container.get(WorkstationComponent);
-      const transform = container.get(Transform);
+      const transform = container.get(TransformComponent);
 
       const posicion = transform
         ? {

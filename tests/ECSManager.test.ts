@@ -1,6 +1,6 @@
 import { describe, it, beforeEach, expect } from "vitest";
 import { ECSManager } from "../src/client/ecs/core";
-import { Transform, Velocidad } from "../src/client/ecs/components";
+import { TransformComponent, Velocidad } from "../src/client/ecs/components";
 import { SistemaTiempo } from "../src/client/ecs/systems";
 
 describe("ECSManager", () => {
@@ -31,22 +31,22 @@ describe("ECSManager", () => {
   describe("agregarComponente", () => {
     it("debe agregar un componente a una entidad", () => {
       const entidad = em.agregarEntidad();
-      const pos = new Transform(10, 20, 10, 0);
+      const pos = new TransformComponent(10, 20, 10, 0);
 
       em.agregarComponente(entidad, pos);
 
       const componentes = em.getComponentes(entidad);
-      expect(componentes?.get(Transform)).toBe(pos);
+      expect(componentes?.get(TransformComponent)).toBe(pos);
     });
 
     it("debe permitir agregar múltiples componentes", () => {
       const entidad = em.agregarEntidad();
 
-      em.agregarComponente(entidad, new Transform(10, 20, 10, 0));
+      em.agregarComponente(entidad, new TransformComponent(10, 20, 10, 0));
       em.agregarComponente(entidad, new Velocidad(1, 2));
 
       const componentes = em.getComponentes(entidad);
-      expect(componentes?.tiene(Transform)).toBe(true);
+      expect(componentes?.tiene(TransformComponent)).toBe(true);
       expect(componentes?.tiene(Velocidad)).toBe(true);
     });
 
@@ -55,7 +55,7 @@ describe("ECSManager", () => {
             em.agregarSistema(sistema);
           
             const entidad = em.agregarEntidad();
-            em.agregarComponente(entidad, new Transform(0, 0, 0, 0));
+            em.agregarComponente(entidad, new TransformComponent(0, 0, 0, 0));
           
             // Sistema aún no debe incluir la entidad (falta Velocidad)
             em.actualizar();
@@ -66,7 +66,7 @@ describe("ECSManager", () => {
             em.actualizar();
           
             const componentes = em.getComponentes(entidad);
-            const pos = componentes?.get(Transform);
+            const pos = componentes?.get(TransformComponent);
             expect(pos?.x).toBe(1); // Se movió
         });*/
   });
@@ -74,10 +74,10 @@ describe("ECSManager", () => {
   describe("getComponentes", () => {
     it("debe retornar los componentes de una entidad", () => {
       const entidad = em.agregarEntidad();
-      em.agregarComponente(entidad, new Transform(5, 10, 15, 0));
+      em.agregarComponente(entidad, new TransformComponent(5, 10, 15, 0));
 
       const componentes = em.getComponentes(entidad);
-      const pos = componentes?.get(Transform);
+      const pos = componentes?.get(TransformComponent);
 
       expect(pos?.x).toBe(5);
       expect(pos?.y).toBe(10);
@@ -94,12 +94,12 @@ describe("ECSManager", () => {
   describe("removerComponente", () => {
     it("debe remover un componente de una entidad", () => {
       const entidad = em.agregarEntidad();
-      em.agregarComponente(entidad, new Transform(0, 0, 0, 0));
+      em.agregarComponente(entidad, new TransformComponent(0, 0, 0, 0));
 
-      em.removerComponente(entidad, Transform);
+      em.removerComponente(entidad, TransformComponent);
 
       const componentes = em.getComponentes(entidad);
-      expect(componentes?.tiene(Transform)).toBe(false);
+      expect(componentes?.tiene(TransformComponent)).toBe(false);
     });
 
     /*it('debe actualizar sistemas al remover componente', () => {
@@ -107,25 +107,25 @@ describe("ECSManager", () => {
             em.agregarSistema(sistema);
           
             const entidad = em.agregarEntidad();
-            em.agregarComponente(entidad, new Transform(0, 0, 0, 0));
+            em.agregarComponente(entidad, new TransformComponent(0, 0, 0, 0));
             em.agregarComponente(entidad, new Velocidad(1, 1));
           
             // La entidad debe estar en el sistema
             em.actualizar();
-            const pos1 = em.getComponentes(entidad)?.get(Transform);
+            const pos1 = em.getComponentes(entidad)?.get(TransformComponent);
             expect(pos1?.x).toBe(1);
           
             // Al remover componente, ya no debe procesarse
             em.removerComponente(entidad, Velocidad);
             em.actualizar();
           
-            const pos2 = em.getComponentes(entidad)?.get(Transform);
+            const pos2 = em.getComponentes(entidad)?.get(TransformComponent);
             expect(pos2?.x).toBe(1); // No cambió porque ya no cumple requisitos
         });*/
 
     it("no debe causar error al remover componente de entidad inexistente", () => {
       expect(() => {
-        em.removerComponente(999, Transform);
+        em.removerComponente(999, TransformComponent);
       }).not.toThrow();
     });
   });
@@ -140,7 +140,7 @@ describe("ECSManager", () => {
 
     /*it('debe procesar entidades existentes al agregar sistema', () => {
             const entidad = em.agregarEntidad();
-            em.agregarComponente(entidad, new Transform(0, 0, 0, 0));
+            em.agregarComponente(entidad, new TransformComponent(0, 0, 0, 0));
             em.agregarComponente(entidad, new Velocidad(1, 1));
           
             const sistema = new SistemaMovimiento();
@@ -148,7 +148,7 @@ describe("ECSManager", () => {
           
             em.actualizar();
           
-            const pos = em.getComponentes(entidad)?.get(Transform);
+            const pos = em.getComponentes(entidad)?.get(TransformComponent);
             expect(pos?.x).toBe(1);
         });*/
 
@@ -160,7 +160,7 @@ describe("ECSManager", () => {
             em.agregarSistema(sistema2);
           
             const entidad = em.agregarEntidad();
-            em.agregarComponente(entidad, new Transform(0, 0, 0, 0));
+            em.agregarComponente(entidad, new TransformComponent(0, 0, 0, 0));
             em.agregarComponente(entidad, new Velocidad(1, 1));
             em.agregarComponente(entidad, new TiempoComponent(0, false));
           
@@ -177,7 +177,7 @@ describe("ECSManager", () => {
             em.removerSistema(sistema);
 
             const entidad = em.agregarEntidad();
-            em.agregarComponente(entidad, new Transform(0, 0, 0, 0));
+            em.agregarComponente(entidad, new TransformComponent(0, 0, 0, 0));
             em.agregarComponente(entidad, new Velocidad(1, 1));
 
             em.actualizar();
@@ -208,7 +208,7 @@ describe("ECSManager", () => {
             em.agregarSistema(sistema2);
 
             const entidad1 = em.agregarEntidad();
-            em.agregarComponente(entidad1, new Transform(0, 0, 0, 0));
+            em.agregarComponente(entidad1, new TransformComponent(0, 0, 0, 0));
             em.agregarComponente(entidad1, new Velocidad(1, 1));
 
             const entidad2 = em.agregarEntidad();
@@ -217,7 +217,7 @@ describe("ECSManager", () => {
             em.actualizar();
 
             // sistema1 solo debe procesar entidad1
-            const pos = em.getComponentes(entidad1)?.get(Transform);
+            const pos = em.getComponentes(entidad1)?.get(TransformComponent);
             expect(pos?.x).toBe(1);
         });*/
 
@@ -226,14 +226,14 @@ describe("ECSManager", () => {
             em.agregarSistema(sistema);
 
             const entidad = em.agregarEntidad();
-            em.agregarComponente(entidad, new Transform(0, 0, 0, 0));
+            em.agregarComponente(entidad, new TransformComponent(0, 0, 0, 0));
             em.agregarComponente(entidad, new Velocidad(2, 3));
 
             em.actualizar();
             em.actualizar();
             em.actualizar();
 
-            const pos = em.getComponentes(entidad)?.get(Transform);
+            const pos = em.getComponentes(entidad)?.get(TransformComponent);
             expect(pos?.x).toBe(6); // 2 * 3
             expect(pos?.z).toBe(9); // 3 * 3
             expect(sistema.actualizacionesRealizadas).toBe(3);
@@ -243,7 +243,7 @@ describe("ECSManager", () => {
   /*describe('removerEntidad', () => {
         /*it('debe marcar entidad para destrucción', () => {
             const entidad = em.agregarEntidad();
-            em.agregarComponente(entidad, new Transform(0, 0, 0, 0));
+            em.agregarComponente(entidad, new TransformComponent(0, 0, 0, 0));
 
             em.removerEntidad(entidad);
             em.actualizar(); // Las entidades se destruyen en actualizar()
@@ -257,7 +257,7 @@ describe("ECSManager", () => {
             em.agregarSistema(sistema);
 
             const entidad = em.agregarEntidad();
-            em.agregarComponente(entidad, new Transform(0, 0, 0, 0));
+            em.agregarComponente(entidad, new TransformComponent(0, 0, 0, 0));
             em.agregarComponente(entidad, new Velocidad(1, 1));
 
             em.actualizar();

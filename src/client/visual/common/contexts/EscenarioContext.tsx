@@ -7,7 +7,7 @@ import { EscenarioController } from '../../../ecs/controllers/EscenarioControlle
 import {
     DispositivoComponent,
     WorkstationComponent,
-    Transform,
+    TransformComponent,
 } from '../../../ecs/components';
 import { ComponenteContainer } from '../../../ecs/core/Componente';
 import { useSelectedLevel } from './SelectedLevelContext';
@@ -87,7 +87,7 @@ function mapEntityToDispositivo(input: Dispositivo | ECSEntityRef | null): Dispo
     if (raw.entidadCompleta instanceof ComponenteContainer) {
         const container = raw.entidadCompleta;
         const dispComp = container.get(DispositivoComponent);
-        const transform = container.get(Transform);
+        const transform = container.get(TransformComponent);
 
         if (!dispComp) {
             if (raw.objetoConTipo) {

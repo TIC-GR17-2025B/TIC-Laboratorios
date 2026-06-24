@@ -2,7 +2,7 @@ import { ECSManager } from "../core/ECSManager";
 import { ColoresRed } from "../../data/colores";
 import { APPS } from "../../data/apps";
 import {
-  Transform,
+  TransformComponent,
   DispositivoComponent,
   EspacioComponent,
   OficinaComponent,
@@ -342,7 +342,7 @@ export class EscenarioBuilder {
     );
     this.ecsManager.agregarComponente(
       entidadEspacio,
-      new Transform(
+      new TransformComponent(
         esp.posicion?.x ?? 0,
         esp.posicion?.y ?? 0,
         esp.posicion?.z ?? 0,
@@ -408,7 +408,7 @@ export class EscenarioBuilder {
     // Agregar Transform (posición 3D)
     this.ecsManager.agregarComponente(
       entidadDispositivo,
-      new Transform(
+      new TransformComponent(
         d.posicion?.x ?? 0,
         d.posicion?.y ?? 0,
         d.posicion?.z ?? 0,
