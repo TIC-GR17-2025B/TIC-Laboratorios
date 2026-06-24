@@ -34,9 +34,9 @@ describe(/*'PresupuestoComponent y */'SistemaPresupuesto', () => {
 
         expect(estadoActualConfiguracion).not.toBe(estadoOriginalConfiguracion);
 
-        console.log("Se activó la configuración:", configuracion);
-        console.log("Estado original configuracion:", estadoOriginalConfiguracion);
-        console.log("Estado actual configuración:", estadoActualConfiguracion);
+        //console.log("Se activó la configuración:", configuracion);
+        //console.log("Estado original configuracion:", estadoOriginalConfiguracion);
+        //console.log("Estado actual configuración:", estadoActualConfiguracion);
         // console.log("Presupuesto actual:", presupuesto.monto)
 
         // const montoDespuesDeActivacion = presupuesto.monto
@@ -44,7 +44,7 @@ describe(/*'PresupuestoComponent y */'SistemaPresupuesto', () => {
         // Simular desactivación de una configuración
         sistema.toggleConfiguracionWorkstation(/*entidadPresupuesto, */entidadWorkstation, configuracion)
         // expect(presupuesto.monto).toBeLessThan(montoDespuesDeActivacion);
-        console.log("Se desactivó la configuración:", configuracion)
+        //console.log("Se desactivó la configuración:", configuracion)
         // console.log("Presupuesto actual:", presupuesto.monto)
     });
 
