@@ -38,11 +38,11 @@ const ECSSceneRenderer: React.FC = () => {
     setDispositivoSeleccionado(null);
   }, []);
 
-  const handleEntityClick = (entity: ECSEntityRef) => {
+  /*const handleEntityClick = (entity: ECSEntityRef) => {
     if (entity.objetoConTipo?.tipo === "espacio") return;
     setClickedEntityId(entity.entidadId ?? null);
     setDispositivoSeleccionado(entity);
-  };
+  };*/
 
   const handleEntityHover = (entity: ECSEntityRef) => {
     if (entity.objetoConTipo?.tipo === "espacio") return;

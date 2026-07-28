@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import SistemaOpIcon from "../../../common/icons/SistemaOpIcon";
+//import SistemaOpIcon from "../../../common/icons/SistemaOpIcon";
 import styles from "../styles/Dispositivos.module.css"
 
 import PanelConfiguraciones from "../components/PanelConfiguraciones";
@@ -17,7 +17,7 @@ import FileExplorerIcon from "../../../common/icons/FileExplorerIcon";
 import ModalExploradorArchivos from "../components/ModalExploradorArchivos";
 import AppStoreIcon from "../../../common/icons/AppStoreIcon";
 import ModalApps from "../components/ModalApps";
-import ComputadoraIcon from "../../../common/icons/ComputadoraIcon";
+//import ComputadoraIcon from "../../../common/icons/ComputadoraIcon";
 import EstePCIcon from "../../../common/icons/EstePCIcon";
 import ConfiguracionIcon from "../../../common/icons/ConfiguracionIcon";
 import NetScanVizIcon from "../../../common/icons/NetScanVizIcon";
@@ -181,14 +181,14 @@ function Dispositivos({ embedded = false }: { embedded?: boolean }) {
         ultimoClick.current = null;
     };
 
-    const getIconoDispositivo = (tipo: string) => {
+    /*const getIconoDispositivo = (tipo: string) => {
         switch (tipo?.toLowerCase()) {
             case "servidor":
                 return <SistemaOpIcon size={16} />;
             default:
                 return <ComputadoraIcon size={16} />;
         }
-    };
+    };*/
 
     const desktopContent = (
         <OSThemeProvider os={osCategory}>

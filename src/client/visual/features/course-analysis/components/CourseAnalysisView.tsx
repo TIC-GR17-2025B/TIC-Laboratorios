@@ -20,10 +20,10 @@ function formatText(text: string) {
 
 export function CourseAnalysisView({
   analysis,
-  cursoNombre,
+  /*cursoNombre,
   onAnalysisGenerated,
   idCurso,
-  idProfesor
+  idProfesor*/
 }: CourseAnalysisViewProps) {
   if (!analysis) return null;
 

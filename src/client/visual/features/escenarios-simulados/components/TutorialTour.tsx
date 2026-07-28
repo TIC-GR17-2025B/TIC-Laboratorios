@@ -182,7 +182,7 @@ export default function TutorialTour() {
     setActive(false);
     if (location.pathname !== "/") navigate("/");
     if (!wasPausedBeforeTour.current) resume();
-  }, [resume, navigate, location.pathname]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [resume, navigate, location.pathname]);  
 
   // Init
   useEffect(() => {
@@ -195,7 +195,7 @@ export default function TutorialTour() {
     // Diferir la pausa: el timer se crea/inicia en el efecto de useECSScene,
     // que corre después de este. El microtask se ejecuta tras ese flush.
     if (!isPaused) queueMicrotask(pause);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);  
 
   // Navigate & run side effects when step changes
   useEffect(() => {
@@ -218,7 +218,7 @@ export default function TutorialTour() {
       const t = setTimeout(step.onEnter, 100);
       return () => clearTimeout(t);
     }
-  }, [stepIndex, active]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [stepIndex, active]);  
 
   // Medir el target del paso actual antes del paint (sin salto). Si el elemento
   // aún no existe (p. ej. la ruta acaba de cambiar) se reintenta en cada frame

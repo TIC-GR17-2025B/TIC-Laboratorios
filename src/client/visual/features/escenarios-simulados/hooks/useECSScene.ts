@@ -322,7 +322,7 @@ export function useECSScene() {
     cambiarZona(zoneState.zonasDisponibles[prevIndex].id);
   }, [zoneState.zonasDisponibles, zoneState.zonaActual, cambiarZona]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   const getWorkstations = useCallback((): ECSSceneEntity[] => {
     return processEntities().filter((e) => e.objetoConTipo.tipo === "workstation");
   }, [entities, zoneState.zonaActual]);

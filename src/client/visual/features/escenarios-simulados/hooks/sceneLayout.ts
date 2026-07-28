@@ -36,7 +36,7 @@ const TOLERANCE = 0.35;
 // Acomodo del mobiliario real dentro de una sala.
 const SLOT_W = 2.1;         // separación entre escritorios en la fila (X)
 const FURN_MARGIN = 1.0;    // margen a las paredes
-const BACK_CLEARANCE = 0.85; // distancia del mobiliario a la pared trasera
+//const BACK_CLEARANCE = 0.85; // distancia del mobiliario a la pared trasera
 
 // Orientación (grados): el frente del mobiliario mira al interior de la sala. Lo
 // comparten mesa, equipo y workstation, así el monitor queda de frente a la silla.

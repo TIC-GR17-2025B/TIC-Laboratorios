@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import FormModal from '../../../common/components/FormModal';
 import InvitationCode from '../../../common/components/InvitationCode';
-import styles from '../styles/ModalUnirseGrupo.module.css';
+//import styles from '../styles/ModalUnirseGrupo.module.css';
 
 interface ModalUnirseGrupoProps {
   isOpen: boolean;

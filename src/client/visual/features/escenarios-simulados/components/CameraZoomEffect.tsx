@@ -60,7 +60,7 @@ const CameraZoomEffect: React.FC = () => {
             completeExit();
         };
     // stable refs: camera, gl, savedCameraState, completeExit
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
     }, []);
 
     useFrame((_, rawDelta) => {

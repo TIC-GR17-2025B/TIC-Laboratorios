@@ -116,7 +116,7 @@ export default function DetalleGrupo() {
     setConfirmDeleteGrupo(false);
   };
 
-  const handleExportCSV = () => {
+  /*const handleExportCSV = () => {
     if (estudiantes.length === 0) return;
     const headers = ['Nombre', 'Código', 'Correo'];
     const rows = estudiantes.map((e) => [
@@ -143,7 +143,7 @@ export default function DetalleGrupo() {
         </button>
       </div>
     );
-  }
+  }*/
 
   const filteredStudents = estudiantes.filter((est) => {
     if (!searchQuery.trim()) return true;

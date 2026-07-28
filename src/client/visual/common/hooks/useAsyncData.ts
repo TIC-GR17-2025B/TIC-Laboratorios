@@ -22,7 +22,7 @@ export function useAsyncData<T>(
   const { loading, error, runAsync } = useAsyncState();
   const [data, setData] = useState<T | null>(null);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   const refetch = useCallback(async () => {
     const result = await runAsync(fetcher);
     if (result !== null) setData(result);
