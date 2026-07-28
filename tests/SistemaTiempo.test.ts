@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest'
-import { ECSManager } from '../src/ecs/core'
-import { TiempoComponent } from '../src/ecs/components'
-import { SistemaTiempo } from '../src/ecs/systems'
+import { ECSManager } from '../src/client/ecs/core'
+import { TiempoComponent } from '../src/client/ecs/components'
+import { SistemaTiempo } from '../src/client/ecs/systems'
 
 describe('SistemaTiempo y TimeComponent', () => {
     test('el valor de transcurrido se incrementa cuando no está pausado', () => {

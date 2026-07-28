@@ -45,3 +45,43 @@ jobs:
 
       - name: Ejecutar Build
         run: npm run build
+
+  e2e:
+    name: Pruebas E2E (Playwright)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout de la rama del PR
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Instalar navegador de Playwright
+        run: npx playwright install --with-deps chromium
+
+      # Tests DOM (auth + rutas): deterministas, bloquean el PR si fallan.
+      - name: Ejecutar E2E (auth y rutas)
+        run: npm run test:e2e -- --grep-invert @slow
+
+      # Smoke de la escena 3D: usa WebGL por software, no bloquea el pipeline.
+      - name: Ejecutar E2E (escena 3D)
+        run: npm run test:e2e -- --grep @slow
+        continue-on-error: true
+
+      - name: Subir reporte de Playwright
+        uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
