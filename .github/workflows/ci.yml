@@ -50,6 +50,9 @@ jobs:
     name: Pruebas E2E (Playwright)
     runs-on: ubuntu-latest
 
+    env:
+      DIRECT_URL: ${{ secrets.DIRECT_URL }}
+
     steps:
       - name: Checkout de la rama del PR
         uses: actions/checkout@v4
