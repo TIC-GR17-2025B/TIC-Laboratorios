@@ -23,6 +23,22 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-*.env
+# Variables de entorno (contienen secretos)
+.env
+.env.development
+.env.production
+.env.local
+.env.*.local
+
+# Mantener plantillas como referencia
+!.env.example
+!.env.docker
 
 /src/generated/prisma
+.env.docker
+
+# Playwright (E2E)
+/test-results
+/playwright-report
+/blob-report
+/.playwright/.cache
