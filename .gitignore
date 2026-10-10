@@ -35,3 +35,10 @@ dist-ssr
 !.env.docker
 
 /src/generated/prisma
+.env.docker
+
+# Playwright (E2E)
+/test-results
+/playwright-report
+/blob-report
+/.playwright/.cache

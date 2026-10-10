@@ -1,8 +1,8 @@
 import { describe, expect, test } from "vitest";
-import { ECSManager } from "../src/ecs/core";
-import { SistemaActivo } from "../src/ecs/systems";
-import { TipoActivo } from "../src/types/DeviceEnums";
-import { Activo } from "../src/types/EscenarioTypes";
+import { ECSManager } from "../src/client/ecs/core";
+import { SistemaActivo } from "../src/client/ecs/systems";
+import { TipoActivo } from "../src/client/shared/types/DeviceEnums";
+import { Activo } from "../src/client/shared/types/EscenarioTypes";
 
 describe("SistemaActivo", () => {
     test("verifica la firma de un documento junto con la clave pública", async () => {
